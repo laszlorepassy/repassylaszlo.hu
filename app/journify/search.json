@@ -1,0 +1,254 @@
+[
+  {
+    "objectID": "support.html",
+    "href": "support.html",
+    "title": "Journify App",
+    "section": "",
+    "text": "Kezdőlap\n    Rólam\n    \n    Támogatás\n  \n  \n    EN"
+  },
+  {
+    "objectID": "support.html#támogasd-a-fejlesztést",
+    "href": "support.html#támogasd-a-fejlesztést",
+    "title": "Journify App",
+    "section": "Támogasd a fejlesztést",
+    "text": "Támogasd a fejlesztést\nHa szívesen használod a Journify-t, és szeretnéd támogatni a fejlesztését, hívj meg egy sütire! Minden hozzájárulás segít abban, hogy tovább fejlesszem az alkalmazást, és új funkciókat adjak hozzá.\n\n Hívj meg egy sütire"
+  },
+  {
+    "objectID": "en/support.html",
+    "href": "en/support.html",
+    "title": "Journify App",
+    "section": "",
+    "text": "Home\n    About\n    \n    Support\n  \n  \n    HU"
+  },
+  {
+    "objectID": "en/support.html#support-the-development",
+    "href": "en/support.html#support-the-development",
+    "title": "Journify App",
+    "section": "Support the development",
+    "text": "Support the development\nIf you enjoy using Journify and would like to support its development, buy me a coffee! Every contribution helps me keep improving the app and adding new features.\n\n Buy me a coffee"
+  },
+  {
+    "objectID": "en/changelog.html",
+    "href": "en/changelog.html",
+    "title": "Journify App",
+    "section": "",
+    "text": "Home\n    About\n    \n    Support\n  \n  \n    HU"
+  },
+  {
+    "objectID": "en/changelog.html#changelog",
+    "href": "en/changelog.html#changelog",
+    "title": "Journify App",
+    "section": "Changelog",
+    "text": "Changelog"
+  },
+  {
+    "objectID": "en/changelog.html#section",
+    "href": "en/changelog.html#section",
+    "title": "Journify App",
+    "section": "2.0.2",
+    "text": "2.0.2\n\nGoogle Drive sync: Android now has its own OAuth client, so sign-in no longer runs into Google’s policy restrictions.\nAndroid: a long press on the app icon opens shortcuts (Dictate, New entry, Timeline), and the icon now lands on the home screen after install.\nAndroid: dictation records a voice note, and you can share text, an image, or a file from other apps directly into an entry.\nAndroid: swiping to close the side menus and switching between panes is more reliable.\nAn entry’s location can now be added or changed with a button.\nTimeline: jumping to a date keeps the month and scrolls to the chosen day; the scroll position is remembered until you page or jump again.\nEvery open entry now shows a back arrow that returns you to wherever you opened it from.\nNew Entry menu: “Add or edit templates” is always available.\nVarious interface fixes on Windows and Android: image viewer layering, status indicator color, error message display."
+  },
+  {
+    "objectID": "en/changelog.html#section-1",
+    "href": "en/changelog.html#section-1",
+    "title": "Journify App",
+    "section": "2.0.1",
+    "text": "2.0.1\n\nMore consistent, more visible status reporting for long-running operations (sync, export, import)."
+  },
+  {
+    "objectID": "en/changelog.html#android",
+    "href": "en/changelog.html#android",
+    "title": "Journify App",
+    "section": "2.0.0 — Android",
+    "text": "2.0.0 — Android\n\nThe app’s first Android release, with the same features as Windows.\nA custom title bar on Windows, so the system’s own title bar no longer gets in the way.\nMap view: entries appear on a world map grouped by where they were written."
+  },
+  {
+    "objectID": "en/changelog.html#locations",
+    "href": "en/changelog.html#locations",
+    "title": "Journify App",
+    "section": "1.2.0 — Locations",
+    "text": "1.2.0 — Locations\n\nNew entries — with permission — record where they were written.\nDiarium and Day One import/export now preserve location data.\nThe whole test runner rewritten on a TypeScript/Rust foundation."
+  },
+  {
+    "objectID": "en/changelog.html#section-2",
+    "href": "en/changelog.html#section-2",
+    "title": "Journify App",
+    "section": "1.1.0",
+    "text": "1.1.0\n\nEarlier versions of an entry can be saved locally and restored.\nThe TypeScript code gained real types.\nA startup animation while the interface loads."
+  },
+  {
+    "objectID": "en/changelog.html#section-3",
+    "href": "en/changelog.html#section-3",
+    "title": "Journify App",
+    "section": "1.0.3",
+    "text": "1.0.3\n\nDictation now uses Windows’ own built-in dictation instead of the earlier AI-based approach.\nGoogle Drive sync configuration is now global instead of per-diary.\nThe JavaScript codebase converted to TypeScript.\nSeveral fixes: delete confirmations, missing translations, a Diarium import time-zone bug."
+  },
+  {
+    "objectID": "en/changelog.html#multiple-diaries",
+    "href": "en/changelog.html#multiple-diaries",
+    "title": "Journify App",
+    "section": "1.0.2 — Multiple diaries",
+    "text": "1.0.2 — Multiple diaries\n\nManage several independent diaries in one app, each with its own color and name.\nBack up, restore, and delete diaries individually.\nA cleaner, more consistent interface."
+  },
+  {
+    "objectID": "changelog.html",
+    "href": "changelog.html",
+    "title": "Journify App",
+    "section": "",
+    "text": "Kezdőlap\n    Rólam\n    \n    Támogatás\n  \n  \n    EN"
+  },
+  {
+    "objectID": "changelog.html#változásnapló",
+    "href": "changelog.html#változásnapló",
+    "title": "Journify App",
+    "section": "Változásnapló",
+    "text": "Változásnapló"
+  },
+  {
+    "objectID": "changelog.html#section",
+    "href": "changelog.html#section",
+    "title": "Journify App",
+    "section": "2.0.2",
+    "text": "2.0.2\n\nGoogle Drive szinkron: Androidnak külön OAuth kliense van, hogy a bejelentkezés ne ütközzön Google szabályaival.\nAndroid: hosszan nyomott alkalmazásikon gyorsparancsokat ad (Diktálok, Új bejegyzés, Idővonal), és a kezdőképernyőre is felkerül az ikon telepítés után.\nAndroid: diktálás hangfelvételként, és megosztás más alkalmazásokból közvetlenül egy bejegyzésbe.\nAndroid: az oldalmenük söprős bezárása és a menük közti lapozás megbízhatóbb.\nBejegyzés helyszíne mostantól hozzáadható vagy módosítható egy gombbal.\nIdővonal: dátumra ugráskor a hónap megmarad, csak a kiválasztott naphoz görget; a görgetési pozíció megmarad lapozásig.\nMinden megnyitott bejegyzésnél megjelenik egy vissza nyíl, ami oda visz, ahonnan a bejegyzést megnyitottad.\nÚj bejegyzés menü: mindig elérhető a “Sablonok hozzáadása vagy szerkesztése” pont.\nTöbb felületi javítás Windowson és Androidon: képnézegető réteg sorrendje, állapotjelző színe, hibaüzenetek megjelenése."
+  },
+  {
+    "objectID": "changelog.html#section-1",
+    "href": "changelog.html#section-1",
+    "title": "Journify App",
+    "section": "2.0.1",
+    "text": "2.0.1\n\nA hosszú folyamatok (szinkron, exportálás, importálás) állapotjelzése egységesebb és jobban látható."
+  },
+  {
+    "objectID": "changelog.html#android",
+    "href": "changelog.html#android",
+    "title": "Journify App",
+    "section": "2.0.0 — Android",
+    "text": "2.0.0 — Android\n\nAz alkalmazás első Android kiadása, ugyanazokkal a funkciókkal, mint Windowson.\nWindowson egyéni ablak felső sáv, a rendszer sávja nem zavarja a felületet.\nTérkép nézet: a bejegyzések a helyszínük szerint jelennek meg egy világtérképen."
+  },
+  {
+    "objectID": "changelog.html#helyszínek",
+    "href": "changelog.html#helyszínek",
+    "title": "Journify App",
+    "section": "1.2.0 — Helyszínek",
+    "text": "1.2.0 — Helyszínek\n\nÚj bejegyzés létrehozásakor az alkalmazás — engedéllyel — elmenti, hol keletkezett.\nDiarium és Day One import/export megőrzi a helyrajzi adatokat.\nTeljes tesztfuttató átírva TypeScript/Rust alapra."
+  },
+  {
+    "objectID": "changelog.html#section-2",
+    "href": "changelog.html#section-2",
+    "title": "Journify App",
+    "section": "1.1.0",
+    "text": "1.1.0\n\nBejegyzések korábbi verziói helyileg menthetők és visszaállíthatók.\nA TypeScript kód valódi típusokat kapott.\nIndítási animáció, amíg a felület betöltődik."
+  },
+  {
+    "objectID": "changelog.html#section-3",
+    "href": "changelog.html#section-3",
+    "title": "Journify App",
+    "section": "1.0.3",
+    "text": "1.0.3\n\nA diktálás Windows saját beépített diktálására épül, a korábbi AI-alapú megoldás helyett.\nA Google Drive szinkron beállítása globális, nem naplónkénti.\nA JavaScript kód átalakítva TypeScript-re.\nTöbb hibajavítás: törlés-megerősítés, fordítási hiányosságok, Diarium import időzóna-hiba."
+  },
+  {
+    "objectID": "changelog.html#több-napló",
+    "href": "changelog.html#több-napló",
+    "title": "Journify App",
+    "section": "1.0.2 — Több napló",
+    "text": "1.0.2 — Több napló\n\nTöbb, egymástól független napló kezelése egy alkalmazáson belül, saját színnel és névvel.\nNaplók mentése, visszaállítása és törlése egyenként.\nEgységesített, letisztult felület."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Journify App",
+    "section": "",
+    "text": "Kezdőlap\n    Rólam\n    \n    Támogatás\n  \n  \n    EN"
+  },
+  {
+    "objectID": "about.html#rólam",
+    "href": "about.html#rólam",
+    "title": "Journify App",
+    "section": "Rólam",
+    "text": "Rólam\nSzia, Répássy László vagyok. Informatikát (digitális kultúrát) és matematikát tanítok gimnáziumban. Azért készítettem a Journify-t, mert szeretek naplót vezetni, és remélem, neked is örömödre szolgál majd a használata.\nA Journify-val pontosan úgy rögzítheted a gondolataidat, mint egy hagyományos papíralapú naplóban, csak egy modern, digitális alkalmazás kényelmével és teljes körű adatvédelemmel.\nAz alkalmazás középpontjában az adataid védelme áll: alapértelmezés szerint az adataid kizárólag a saját eszközödön tárolódnak, és opcionálisan szinkronizálhatod a saját felhő tárhely fiókoddal — végpontok közötti titkosítással, egy olyan jelmondattal, amit csak te ismersz, így még a szolgáltató sem tudja elolvasni a bejegyzéseidet.\nItt találod a személyes weboldalamat: https://repassylaszlo.hu."
+  },
+  {
+    "objectID": "en/about.html",
+    "href": "en/about.html",
+    "title": "Journify App",
+    "section": "",
+    "text": "Home\n    About\n    \n    Support\n  \n  \n    HU"
+  },
+  {
+    "objectID": "en/about.html#about",
+    "href": "en/about.html#about",
+    "title": "Journify App",
+    "section": "About",
+    "text": "About\nHi, I’m László Répássy. I teach IT (digital culture) and mathematics at a secondary school. I built Journify because I like keeping a diary myself, and I hope you’ll enjoy using it too.\nWith Journify you can capture your thoughts exactly like you would in a traditional paper diary, just with the convenience of a modern, digital app and complete privacy.\nProtecting your data is at the center of the app: by default your data lives only on your own device, and you can optionally sync it with your own cloud storage account — end-to-end encrypted with a passphrase only you know, so not even the provider can read your entries.\nHere is my personal website: https://repassylaszlo.hu."
+  },
+  {
+    "objectID": "en/index.html",
+    "href": "en/index.html",
+    "title": "Journify App",
+    "section": "",
+    "text": "Home\n    About\n    \n    Support\n  \n  \n    HU\nReleased as a beta on the Microsoft Store — coming soon to Google Play and Linux too."
+  },
+  {
+    "objectID": "en/index.html#what-can-journify-do",
+    "href": "en/index.html#what-can-journify-do",
+    "title": "Journify App",
+    "section": "What can Journify do?",
+    "text": "What can Journify do?\n\n\nA real writing experience. Bold, italic, underlined text, highlight colors, checklists, and embedded photos — write the way a modern app should let you, not in a plain text box.\n\n\nBrowse your diary your own way. A large monthly calendar with a photo preview for every day, a scrollable timeline of everything you’ve ever written, a photo gallery grouped by month, or search across every date, title, and word.\n\n\nTags and counters. Tag entries however you like, and track numbers over time — weight, mood, step count, anything you can express as a number — with a line chart showing the trend.\n\n\nOn This Day. See what you wrote on today’s date in earlier years.\n\n\nTemplates. Save the starting point of an entry you write often — a daily check-in, a weekly summary — and fill it in with one click.\n\n\nAttachments. Attach photos and files to any entry; images show up both in the entry and in the monthly gallery.\n\n\nLocation. Add or change an entry’s location, and browse your diary on a map, grouped by place.\n\n\nExport to Word. Turn any date range of your diary into a nicely formatted DOCX document, complete with a table of contents and your photos.\n\n\nBack up, and switch from another app. Save your whole diary — entries and attachments — into a single file you control. Coming from Diarium or Day One, Journify can import your existing diary directly, and export back into both formats too.\n\n\nCloud storage sync, end-to-end encrypted. Keep your diary in sync across your devices using your own cloud storage account; everything is encrypted with a passphrase only you know before it ever leaves your device.\n\n\nShare into Journify. On Android, share text, an image, or a file from any app straight into a diary entry.\n\n\nHungarian and English. The interface follows your system language automatically, or you can override it in Settings.\n\n\nWindows and Android. Available as a native desktop app for Windows, and as an Android app."
+  },
+  {
+    "objectID": "en/index.html#privacy-policy",
+    "href": "en/index.html#privacy-policy",
+    "title": "Journify App",
+    "section": "Privacy policy",
+    "text": "Privacy policy\nProtecting your data is Journify’s developer’s top priority. This policy explains how your data is handled.\n\n1. What data do we collect?\nNone. Journify (and its developer) does not collect, store, or transmit any personal data, diary entries, images, or files to external servers. Everything you create in the app stays exclusively on your own local device.\n\n\n2. Cloud storage sync and permissions\nThe app includes an optional sync feature to keep your data safe and reachable from more than one device, using a cloud storage account you connect yourself. To use it, the app requests only the minimum permission needed to create and access its own dedicated sync folder in that account.\nHow are these permissions used?\nThe app creates a dedicated folder in your own cloud storage account. It only ever accesses the sync files it created itself. Journify does not see, read, or modify your existing personal files, photos, or documents in that account. Access is strictly limited to syncing diary entries.\nEnd-to-end encryption\nBefore a diary entry leaves your device, Journify encrypts it with a passphrase you set yourself and that only you know. That passphrase is never sent to your cloud storage provider, to the developer, or to any other server. As a result, the diary_sync.json file stored in your cloud storage account is encrypted: neither your cloud storage provider nor Journify’s developer can read its contents.\nImportant: since your passphrase is the only way to decrypt your synced data, losing it means your synced diary entries can no longer be recovered — not even by the developer. Keep your passphrase somewhere safe, and consider making local backups too (see Terms of use below).\n\n\n3. Sharing data with third parties\nSince the app’s developer has no access to your data, it can never be sold, transferred, or shared with any third party. Your data travels only between your device and your own cloud storage account, over that provider’s own encrypted channels.\n\n\n4. Deleting your data\nTo delete your data from your cloud storage account: choose “Disconnect” next to the connected provider in the app’s settings, then delete the journify folder in that account."
+  },
+  {
+    "objectID": "en/index.html#terms-of-use",
+    "href": "en/index.html#terms-of-use",
+    "title": "Journify App",
+    "section": "Terms of use",
+    "text": "Terms of use\nJournify is provided “as is.” While every effort is made to keep the app reliable, the developer is not responsible for any data loss or damage caused by a software or hardware failure, or by an outage of a third-party service (e.g. your cloud storage provider).\nI recommend making regular local backups of your important entries using the export feature in the app’s settings window.\nIf you use cloud storage sync, keep your encryption passphrase somewhere safe: since your entries are end-to-end encrypted, losing the passphrase means permanently losing access to your synced data — neither your cloud storage provider nor the developer can recover or reset it."
+  },
+  {
+    "objectID": "en/index.html#license",
+    "href": "en/index.html#license",
+    "title": "Journify App",
+    "section": "License",
+    "text": "License\nJournify is closed-source software. All rights reserved © Répássy László. The app is not open source: it may not be copied, modified, reverse-engineered, redistributed, or used to create derivative works without the developer’s prior written permission. You’re free to use the app under the terms of its official store distribution."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Journify App",
+    "section": "",
+    "text": "Kezdőlap\n    Rólam\n    \n    Támogatás\n  \n  \n    EN\nBétaként elérhető a Microsoft Store-ban — hamarosan jön a Google Play-re és Linuxra is."
+  },
+  {
+    "objectID": "index.html#mit-tud-a-journify",
+    "href": "index.html#mit-tud-a-journify",
+    "title": "Journify App",
+    "section": "Mit tud a Journify?",
+    "text": "Mit tud a Journify?\n\n\nValódi írás élmény. Félkövér, dőlt, aláhúzott szöveg, kiemelő színek, feladatlisták és beágyazott fotók — úgy írhatsz, ahogy egy modern alkalmazástól elvárható, nem csak egy sima szövegdobozban.\n\n\nBöngéssz a naplódban a saját stílusodban. Egy nagy havi naptár minden naphoz fotóelőnézettel, egy görgethető idővonal mindenről, amit valaha írtál, egy hónapok szerint csoportosított fotógaléria, vagy keress bármelyik dátumban, címben és szóban.\n\n\nCímkék és számlálók. Címkézd a bejegyzéseket kedved szerint, és kövesd nyomon a számokat az idő múlásával — testsúly, hangulat, lépésszám, bármi, amit számmal ki tudsz fejezni — egy vonaldiagrammal, ami megmutatja a trendet.\n\n\nEzen a napon. Nézd meg, mit írtál a mai dátumon korábbi években.\n\n\nSablonok. Mentsd el egy gyakran írt bejegyzéstípus kiindulópontját — egy napi bejelentkezőt, egy heti összegzést — és töltsd ki egyetlen kattintással.\n\n\nCsatolmányok. Csatolj fotókat és fájlokat bármelyik bejegyzéshez; a képek megjelennek a bejegyzésben és a havi galériában is.\n\n\nHelyszín. Add meg vagy módosítsd egy bejegyzés helyszínét, és nézd meg a naplód térképen, hely szerint csoportosítva.\n\n\nExportálás Wordbe. Alakítsd a naplód egy adott időszakát szépen formázott DOCX dokumentummá, tartalomjegyzékkel és a fotóiddal együtt.\n\n\nMentés, és váltás másik alkalmazásból. Mentsd el a teljes naplódat — bejegyzéseket és csatolmányokat — egyetlen, általad kezelt fájlba. Ha Diariumból vagy Day One-ból jössz, a Journify közvetlenül tudja importálni a meglévő naplódat, és vissza is tud exportálni mindkét formátumba.\n\n\nFelhő tárhely szinkron, végpontok közötti titkosítással. Tartsd szinkronban a naplódat az eszközeid között a saját felhő tárhely fiókod használatával; minden titkosítva van egy olyan jelmondattal, amit csak te ismersz, mielőtt bármi elhagyná az eszközödet.\n\n\nMegosztás a Journify-vel. Androidon oszthatsz meg szöveget, képet vagy fájlt bármely alkalmazásból közvetlenül egy naplóbejegyzésbe.\n\n\nMagyar és angol. A felület automatikusan igazodik a rendszered nyelvéhez, de a beállításokban felülbírálhatod.\n\n\nWindows és Android. Elérhető natív asztali alkalmazásként Windowsra, és Android alkalmazásként is."
+  },
+  {
+    "objectID": "index.html#adatvédelmi-irányelvek",
+    "href": "index.html#adatvédelmi-irányelvek",
+    "title": "Journify App",
+    "section": "Adatvédelmi irányelvek",
+    "text": "Adatvédelmi irányelvek\nA Journify fejlesztőjének legfontosabb prioritása az adataid védelme. Ez az irányelv elmagyarázza, hogyan kezeljük az adataidat.\n\n1. Milyen adatokat gyűjtünk?\nSemmilyet. A Journify (és a fejlesztője) nem gyűjt, nem tárol és nem továbbít semmilyen személyes adatot, naplóbejegyzést, képet vagy fájlt külső szerverekre. Minden, amit az alkalmazásban létrehozol, kizárólag a saját, helyi eszközödön tárolódik.\n\n\n2. Felhő tárhely szinkron és engedélyek\nAz alkalmazás tartalmaz egy opcionális szinkronizációs funkciót, hogy biztonságban tudhasd az adataidat, és több eszközről is elérhesd őket, a saját, általad összekapcsolt felhő tárhely fiókodat felhasználva. A funkció használatához az alkalmazás csak a saját szinkron mappájának létrehozásához és eléréséhez szükséges minimális engedélyt kéri.\nHogyan használjuk ezeket az engedélyeket?\nAz alkalmazás létrehoz egy külön mappát a saját felhő tárhely fiókodban. Az alkalmazás kizárólag az általa létrehozott szinkronizációs fájlokhoz fér hozzá. A Journify nem látja, nem olvassa és nem módosítja a meglévő személyes fájljaidat, fotóidat vagy dokumentumaidat abban a fiókban. A hozzáférés szigorúan a naplóbejegyzések szinkronizálására korlátozódik.\nVégpontok közötti titkosítás\nMielőtt egy naplóbejegyzés elhagyná az eszközödet, a Journify titkosítja egy olyan jelmondattal, amit te állítasz be, és csak te ismersz. Ez a jelmondat sosem kerül elküldésre a felhő tárhely szolgáltatónak, a fejlesztőnek vagy bármely más szervernek. Ennek eredményeként a felhő tárhely fiókodban tárolt diary_sync.json fájl titkosított: sem a szolgáltató, sem a Journify fejlesztője nem tudja elolvasni a tartalmát.\nFontos: mivel a jelmondatod az egyetlen módja a szinkronizált adataid visszafejtésének, ha elfelejted, a szinkronizált naplóbejegyzéseid többé nem állíthatók helyre — még a fejlesztő által sem. Tárold a jelmondatodat biztonságos helyen, és érdemes helyi mentéseket is készítened (lásd a Felhasználási feltételeket lentebb).\n\n\n3. Adatmegosztás harmadik felekkel\nMivel az alkalmazás fejlesztője nem fér hozzá az adataidhoz, azok soha nem adhatók el, nem továbbíthatók és nem oszthatók meg semmilyen harmadik féllel. Az adataid kizárólag az eszközöd és a saját felhő tárhely fiókod között utaznak, az adott szolgáltató titkosított csatornáin keresztül.\n\n\n4. Az adataid törlése\nHa törölni szeretnéd az adataidat a felhő tárhely fiókodból: válaszd a „Leválasztás” lehetőséget az összekapcsolt szolgáltató mellett az alkalmazás beállításaiban, majd töröld a journify mappát abban a fiókban."
+  },
+  {
+    "objectID": "index.html#felhasználási-feltételek",
+    "href": "index.html#felhasználási-feltételek",
+    "title": "Journify App",
+    "section": "Felhasználási feltételek",
+    "text": "Felhasználási feltételek\nA Journify „ahogy van” áll rendelkezésre. Bár mindent megteszek annak érdekében, hogy az alkalmazás megbízhatóan működjön, a fejlesztő nem vállal felelősséget semmilyen adatvesztésért vagy kárért, amely a szoftver vagy hardverhiba vagy egy harmadik fél szolgáltatásának (pl. a felhő tárhely szolgáltatódnak) a kiesése miatt következik be.\nJavaslom, hogy rendszeresen készíts helyi mentést a fontos bejegyzéseidről az alkalmazás beállítások ablakában található exportálási funkcióval.\nHa használod a felhő tárhely szinkronizációt, gondosan jegyezd meg a titkosítási jelmondatodat: mivel a bejegyzéseid végpontok között titkosítottak, a jelmondat elvesztése a szinkronizált adataidhoz való hozzáférés végleges elvesztését jelenti — sem a szolgáltató, sem a fejlesztő nem tudja helyreállítani vagy visszaállítani azt."
+  },
+  {
+    "objectID": "index.html#licenc",
+    "href": "index.html#licenc",
+    "title": "Journify App",
+    "section": "Licenc",
+    "text": "Licenc\nA Journify zárt forráskódú szoftver. Minden jog fenntartva © Répássy László. Az alkalmazás nem nyílt forráskódú: a fejlesztő előzetes írásbeli engedélye nélkül nem másolható, nem módosítható, nem fejthető vissza, nem terjeszthető tovább, és nem készíthető belőle származékos mű. Az alkalmazást a hivatalos áruházi terjesztés szerint szabadon használhatod."
+  }
+]
