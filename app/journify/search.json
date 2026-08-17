@@ -165,7 +165,7 @@
     "href": "about.html#rólam",
     "title": "Journify App",
     "section": "Rólam",
-    "text": "Rólam\nSzia, Répássy László vagyok. Informatikát (digitális kultúrát) és matematikát tanítok gimnáziumban. Azért készítettem a Journify-t, mert szeretek naplót vezetni, és remélem, neked is örömödre szolgál majd a használata.\nA Journify-val pontosan úgy rögzítheted a gondolataidat, mint egy hagyományos papíralapú naplóban, csak egy modern, digitális alkalmazás kényelmével és teljes körű adatvédelemmel.\nAz alkalmazás középpontjában az adataid védelme áll: alapértelmezés szerint az adataid kizárólag a saját eszközödön tárolódnak, és opcionálisan szinkronizálhatod a saját felhő tárhely fiókoddal — végpontok közötti titkosítással, egy olyan jelmondattal, amit csak te ismersz, így még a szolgáltató sem tudja elolvasni a bejegyzéseidet.\nItt találod a személyes weboldalamat: https://repassylaszlo.hu."
+    "text": "Rólam\nSzia, Répássy László vagyok. Informatikát (digitális kultúrát) és matematikát tanítok gimnáziumban. Azért készítettem a Journify-t, mert szeretek naplót vezetni, és remélem, neked is örömödre szolgál majd a használata.\nA Journify-val pontosan úgy rögzítheted a gondolataidat, mint egy hagyományos papíralapú naplóban, csak egy modern, digitális alkalmazás kényelmével. Alapértelmezés szerint az adataid kizárólag a saját eszközödön tárolódnak, és opcionálisan szinkronizálhatod a saját felhő tárhely fiókoddal — végpontok közötti titkosítással, egy olyan jelmondattal, amit csak te ismersz, így még a szolgáltató sem tudja elolvasni a bejegyzéseidet.\nItt találod a személyes weboldalamat: https://repassylaszlo.hu."
   },
   {
     "objectID": "en/about.html",
@@ -179,14 +179,14 @@
     "href": "en/about.html#about",
     "title": "Journify App",
     "section": "About",
-    "text": "About\nHi, I’m László Répássy. I teach IT (digital culture) and mathematics at a secondary school. I built Journify because I like keeping a diary myself, and I hope you’ll enjoy using it too.\nWith Journify you can capture your thoughts exactly like you would in a traditional paper diary, just with the convenience of a modern, digital app and complete privacy.\nProtecting your data is at the center of the app: by default your data lives only on your own device, and you can optionally sync it with your own cloud storage account — end-to-end encrypted with a passphrase only you know, so not even the provider can read your entries.\nHere is my personal website: https://repassylaszlo.hu."
+    "text": "About\nHi, I’m László Répássy. I teach IT (digital culture) and mathematics at a secondary school. I built Journify because I like keeping a diary myself, and I hope you’ll enjoy using it too.\nWith Journify you can capture your thoughts exactly like you would in a traditional paper diary, just with the convenience of a modern, digital app. By default your data lives only on your own device, and you can optionally sync it with your own cloud storage account — end-to-end encrypted with a passphrase only you know, so not even the provider can read your entries.\nHere is my personal website: https://repassylaszlo.hu."
   },
   {
     "objectID": "en/index.html",
     "href": "en/index.html",
     "title": "Journify App",
     "section": "",
-    "text": "Home\n    About\n    \n    Support\n  \n  \n    HU\nReleased on the Microsoft Store — coming soon to Google Play and Linux too."
+    "text": "Home\n    About\n    \n    Support\n  \n  \n    HU\nAvailable on the Microsoft Store and for Linux as an AppImage — coming soon to Google Play too."
   },
   {
     "objectID": "en/index.html#what-can-journify-do",
@@ -221,7 +221,7 @@
     "href": "index.html",
     "title": "Journify App",
     "section": "",
-    "text": "Kezdőlap\n    Rólam\n    \n    Támogatás\n  \n  \n    EN\nElérhető a Microsoft Store-ban — hamarosan jön a Google Play-re és Linuxra is."
+    "text": "Kezdőlap\n    Rólam\n    \n    Támogatás\n  \n  \n    EN\nElérhető a Microsoft Store-ban és Linuxra AppImage formájában — hamarosan jön a Google Play-re is."
   },
   {
     "objectID": "index.html#mit-tud-a-journify",
