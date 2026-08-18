@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="hu" xml:lang="hu"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -38,10 +41,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-d3ff6920955c64ea83193d87d91c8e03.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5b0d986ae0ee1868b2ea91687cce331f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -119,11 +122,11 @@ ul.task-list li input[type="checkbox"] {
 <section id="journify" class="level1 hero">
 <h1>Journify</h1>
 <p class="tagline">
-Egy modern, privát napló alkalmazás.
+Egy modern, privát napló Windowsra és Androidra.
 </p>
 </section>
 <div class="download-buttons">
-<p><a href="ms-windows-store://pdp/?productid=9NFDLCTDMJQJ" class="btn btn-primary"><i class="bi bi-windows"></i> Microsoft Store</a> <a href="#" class="btn btn-outline-secondary" aria-disabled="true"><i class="bi bi-android2"></i> Google Play</a> <a href="https://filedn.eu/lLSQLhcJykVBlVwRSNFrmXy/Journify/linux/Journify-4.0.1.AppImage" class="btn btn-primary"><i class="bi bi-ubuntu"></i> Linux</a></p>
+<p><a href="ms-windows-store://pdp/?productid=9NFDLCTDMJQJ" class="btn btn-primary"><i class="bi bi-windows"></i> Microsoft Store</a> <a href="#" class="btn btn-outline-secondary" aria-disabled="true"><i class="bi bi-android2"></i> Google Play</a> <a href="https://github.com/laszlorepassy/repassylaszlo.hu/releases/latest/download/Journify.AppImage" class="btn btn-primary"><i class="bi bi-ubuntu"></i> Linux</a></p>
 </div>
 <p class="download-note">
 Elérhető a Microsoft Store-ban és Linuxra AppImage formájában — hamarosan jön a Google Play-re is.
