@@ -186,7 +186,7 @@
     "href": "en/index.html",
     "title": "Journify App",
     "section": "",
-    "text": "Home\n    About\n    Bugs & Ideas\n    \n    Support\n  \n  \n    HU\nAvailable on the Microsoft Store and for Linux as an AppImage — before it can launch on Google Play, it needs to go through a testing period. If you’d like to help test it for a couple of weeks, enter your Gmail address in the first field of the Bugs & Ideas form. This isn’t an instant invite — I’ll send the link once the Android app’s test build is ready."
+    "text": "Home\n    About\n    Bugs & Ideas\n    \n    Support\n  \n  \n    HU\nAvailable on the Microsoft Store and for Linux as an AppImage. Before it can launch on Android in the Google Play Store, it needs to go through a testing period: a few testers need to install it for a couple of weeks. If you’d like to try it on Android, enter your Gmail address in the first field of the Bugs & Ideas form, and I’ll send the link as soon as the test build is ready."
   },
   {
     "objectID": "en/index.html#what-can-journify-do",
@@ -221,7 +221,7 @@
     "href": "index.html",
     "title": "Journify App",
     "section": "",
-    "text": "Kezdőlap\n    Rólam\n    Hibák és ötletek\n    \n    Támogatás\n  \n  \n    EN\nElérhető a Microsoft Store-ban és Linuxra AppImage formájában — mielőtt megjelenhetne a Google Play-en, egy próbaidőszakon kell átesnie. Ha szívesen tesztelnéd néhány hétig, írd be a Gmail-címedet a Hibák és ötletek űrlap első mezőjébe. Ez nem egy azonnali meghívó: amint elkészül az Android alkalmazás tesztváltozata, elküldöm a linket."
+    "text": "Kezdőlap\n    Rólam\n    Hibák és ötletek\n    \n    Támogatás\n  \n  \n    EN\nElérhető a Microsoft Store-ban és Linuxra AppImage formájában. Mielőtt megjelenhetne Androidra a Google Play áruházban, egy próbaidőszakon kell átmennie: néhány tesztelőnek fel kell telepítenie pár hétre. Ha szívesen kipróbálnád Androidon, írd be a Gmail-címedet a Hibák és ötletek űrlap első mezőjébe, és küldök linket, amint elkészül a teszt verzió."
   },
   {
     "objectID": "index.html#mit-tud-a-journify",
