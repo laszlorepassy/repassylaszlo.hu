@@ -68,11 +68,15 @@
 }
 
 .download-buttons {
+  margin-bottom: 12px;
+}
+
+.download-buttons p {
   display: flex;
   justify-content: center;
   gap: 14px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  margin: 0;
 }
 
 .download-buttons .btn {
@@ -97,6 +101,21 @@
   color: #8a8f83;
   font-size: 0.85rem;
   margin-bottom: 48px;
+}
+
+@media (max-width: 480px) {
+  .download-buttons p {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .download-buttons .btn {
+    min-width: 0;
+  }
+
+  .download-note {
+    font-size: 1rem;
+  }
 }
 
 .screenshot-row {
