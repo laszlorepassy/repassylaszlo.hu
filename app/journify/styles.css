@@ -3,6 +3,13 @@
    Bootstrap Icons (already bundled with Quarto's HTML output) stand in
    for anything that would otherwise be an emoji glyph. */
 
+/* The page's own title comes from .site-nav .brand now, so the
+   Quarto-generated title block (same "Journify App" text, rendered as a
+   separate block above .site-nav) would just duplicate it. */
+#title-block-header {
+  display: none;
+}
+
 .site-nav {
   display: flex;
   align-items: center;
@@ -84,10 +91,13 @@
 }
 
 @media (max-width: 640px) {
+  .site-nav {
+    justify-content: flex-start;
+  }
+
   .nav-toggle {
     display: flex;
     order: -1;
-    margin-left: auto;
   }
 
   .site-nav .links,
