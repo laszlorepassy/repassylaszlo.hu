@@ -52,6 +52,61 @@
   color: #234d3b;
 }
 
+.nav-toggle-checkbox {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 30px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.nav-toggle span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #26312c;
+  border-radius: 2px;
+}
+
+.nav-toggle-checkbox:focus-visible + .nav-toggle {
+  outline: 2px solid #234d3b;
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .nav-toggle {
+    display: flex;
+    order: -1;
+    margin-left: auto;
+  }
+
+  .site-nav .links,
+  .site-nav .lang-switch {
+    display: none;
+    width: 100%;
+  }
+
+  .site-nav .links {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .nav-toggle-checkbox:checked ~ .links,
+  .nav-toggle-checkbox:checked ~ .lang-switch {
+    display: flex;
+  }
+}
+
 .hero {
   text-align: center;
   padding: 12px 0 8px;
