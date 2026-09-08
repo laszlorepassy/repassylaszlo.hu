@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="hu" xml:lang="hu"><head>
-<meta name="robots" content="noindex, nofollow">
 
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.10.18">
@@ -74,6 +73,7 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<meta name="robots" content="noindex, nofollow">
 
 
 <meta property="og:title" content="Répássy László digitális kultúra és matematika szakos tanár">
@@ -149,168 +149,67 @@ ul.task-list li input[type="checkbox"] {
 
 
 </header>
-<div id="secret-gate" data-secret-page-locked>
-  <style>
-    #secret-gate .secret-form {
-      max-width: 26rem;
-      margin: 2.5rem auto;
-      padding: 1.75rem;
-      background: rgba(255, 255, 255, 0.85);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 0.75rem;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-      text-align: center;
-    }
-    #secret-gate .secret-form p { text-shadow: none; }
-    /* A beviteli mező és a gomb külön sorban, teljes szélességben: egymás
-       mellett a keskeny telefonképernyőn annyira összenyomódott a mező, hogy
-       nem is látszott beviteli mezőnek. */
-    #secret-gate .secret-row { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
-    #secret-gate input {
-      width: 100%;
-      padding: 0.6rem 0.75rem;
-      /* 16 pixelnél kisebb betű esetén a mobil böngészők ráközelítenek a
-         mezőre, amint belekattint valaki — 1rem pont ekkora. */
-      font-size: 1rem;
-      border: 1px solid #cbd5e1;
-      border-radius: 0.375rem;
-    }
-    #secret-gate input:focus { outline: 2px solid #15803d; outline-offset: 1px; }
-    #secret-gate button {
-      width: 100%;
-      padding: 0.6rem 1.25rem;
-      font-size: 1rem;
-      font-weight: 500;
-      color: #fff;
-      background: #15803d;
-      border: none;
-      border-radius: 0.375rem;
-      cursor: pointer;
-    }
-    #secret-gate button:hover { background: #166534; }
-    #secret-gate button[disabled] { opacity: 0.6; cursor: progress; }
-    #secret-gate .secret-message { min-height: 1.5rem; margin: 0.75rem 0 0; font-size: 0.95rem; }
-  </style>
-  <div class="secret-form">
-    <p><i class="bi bi-lock-fill"></i> Ez az oldal jelszóval védett.</p>
-    <div class="secret-row">
-      <input id="secret-password" type="password" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Jelszó" aria-label="Jelszó">
-      <button id="secret-submit" type="button">Belépés</button>
-    </div>
-    <p class="secret-message" id="secret-message" role="status" aria-live="polite"></p>
-  </div>
-</div>
-<div id="secret-content" hidden></div>
-<script type="application/json" id="secret-payload">{"salt":"/OI6ix+Op9klM8WpVJlPvw==","iv":"vtShj1zjneZhhTS/","ciphertext":"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","iterations":250000}</script>
-<script>
-(function () {
-  var gate = document.getElementById('secret-gate');
-  var content = document.getElementById('secret-content');
-  var input = document.getElementById('secret-password');
-  var button = document.getElementById('secret-submit');
-  var message = document.getElementById('secret-message');
-  var embeddedPayload = JSON.parse(document.getElementById('secret-payload').textContent);
-  var storageKey = 'secret-page:' + location.pathname;
 
-  function bytes(base64) {
-    return Uint8Array.from(atob(base64), function (c) { return c.charCodeAt(0); });
-  }
 
-  // Ugyanaz a "megbocsátó" alak, mint titkosításkor: ékezet, kis/nagybetű,
-  // szóköz és írásjel nem számít.
-  function canonicalize(password) {
-    return password.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
-  }
+<section id="matematika-9.-osztály" class="level1">
+<h1>Matematika 9. osztály</h1>
+<p>Hetente egyszer találkozunk, egymás után három matematikaórán. Ez azonban kevés: a matematikát legalább még egyszer minden héten elő kell venni egyénileg is. Fogunk olvasni a <em>Dialógusok a matematikáról</em> című műből, és beszélgetünk a matematika hasznáról és filozófiai hátteréről is, de az elsődleges cél a sikeres érettségi vizsga, amit idén megalapozunk.</p>
+<section id="felszerelés" class="level2">
+<h2 data-anchor-id="felszerelés">Felszerelés</h2>
+<ul>
+<li>Nyomtatott tankönyv nem kötelező, de jó ötlet használni.</li>
+<li>Egy A4-es matematika füzet kötelező. Ebbe kerülnek kézírással, tollal az órán írt jegyzetek és a házi feladatok, semmi más.</li>
+<li>Számológépre idén nem lesz szükség.</li>
+</ul>
+</section>
+<section id="a-tanév-témái" class="level2">
+<h2 data-anchor-id="a-tanév-témái">A tanév témái</h2>
+<section id="kombinatorika-és-halmazok" class="level3">
+<h3 data-anchor-id="kombinatorika-és-halmazok">2. Kombinatorika és halmazok</h3>
+<p><strong>szeptember 7.</strong> A <a href="https://www.tankonyvkatalogus.hu/tankonyv/OH-MAT09TA_I">Matematika 9. tankönyv I. kötet</a> 6-8. oldala a tanulnivaló, a házi feladat a 8. oldalon az 5. és a 6. feladat. Ezen kívül gondoljuk át újra a jegyzetünk alapján, hogy miért tanulunk matematikát.</p>
+</section>
+<section id="a-számok-világa" class="level3">
+<h3 data-anchor-id="a-számok-világa">3. A számok világa</h3>
+</section>
+<section id="egyenletek-és-azonosságok" class="level3">
+<h3 data-anchor-id="egyenletek-és-azonosságok">4. Egyenletek és azonosságok</h3>
+</section>
+<section id="bevezetés-a-geometriába" class="level3">
+<h3 data-anchor-id="bevezetés-a-geometriába">5. Bevezetés a geometriába</h3>
+</section>
+<section id="függvények" class="level3">
+<h3 data-anchor-id="függvények">6. Függvények</h3>
+</section>
+<section id="egybevágóság-négyszögek" class="level3">
+<h3 data-anchor-id="egybevágóság-négyszögek">7. Egybevágóság, négyszögek</h3>
+</section>
+</section>
+<section id="követelmények" class="level2">
+<h2 data-anchor-id="követelmények">Követelmények</h2>
+<ul>
+<li>Heti házi feladat: kézírással, a füzetbe megoldva, kötelező. Mivel hetente csak egyszer találkozunk, így kerül elő biztosan kétszer a matematika egy héten.</li>
+<li>Dolgozatok: legalább negyedévente dolgozatot írunk.</li>
+<li>A tárgy teljesítésének feltétele: aki az órán figyel, vezeti a füzetet, megírja a házi feladatokat, és az egyszerűbb típusfeladatokat önállóan meg tudja oldani, annak biztosan sikerülni fog.</li>
+</ul>
+</section>
+<section id="ajánlott-irodalom" class="level2">
+<h2 data-anchor-id="ajánlott-irodalom">Ajánlott irodalom</h2>
+<ul>
+<li><a href="https://www.tankonyvkatalogus.hu/tankonyv/OH-MAT09TA_I">Matematika 9. tankönyv I. kötet</a> — <a href="https://www.nkp.hu/tankonyv/matematika_9_i_nat2020/">online változat</a></li>
+<li><a href="https://www.tankonyvkatalogus.hu/tankonyv/OH-MAT09TA_II">Matematika 9. tankönyv II. kötet</a> — <a href="https://www.nkp.hu/tankonyv/matematika_9_ii_nat2020/">online változat</a></li>
+<li><a href="https://www.tankonyvkatalogus.hu/tankonyv/OH-MAT912GY">Matematika feladatgyűjtemény a középszintű érettségihez</a></li>
+<li><a href="https://www.tankonyvkatalogus.hu/tankonyv/OH-FGV912GY">Függvénytáblázatok – Matematikai, fizikai, kémiai, biológiai összefüggések</a></li>
+<li>Rényi Alfréd: <a href="https://mek.oszk.hu/00800/00856/">Dialógusok a matematikáról</a></li>
+</ul>
+</section>
+<section id="e-mail" class="level2">
+<h2 data-anchor-id="e-mail">E-mail</h2>
+<p>Ha nincs felírva a kérdésére a válasz és az osztálytársak sem tudják, itt lehet kérdezni: laszlo.repassy+estimatek@gmail.com</p>
 
-  // Ez a lap statikus GitHub Pages-en él, ahol nincs mód szerveroldali
-  // cache-tiltó fejlécre (.htaccess ott nem fut le). Ezért a titkosított
-  // tartalmat a szkript MINDEN belépésnél frissen, a böngésző gyorsítótárát
-  // megkerülve (cache: 'no-store') tölti le újra a saját URL-jéről — így a
-  // szerkesztő által frissen publikált tartalom mindig megjelenik, sosem egy
-  // korábban elmentett másolat. A jelszó megjegyzése (localStorage) ettől
-  // független, azt nem érinti.
-  var freshPayload = fetch(location.href, { cache: 'no-store' })
-    .then(function (res) { return res.text(); })
-    .then(function (html) {
-      var match = html.match(/<script type="application\/json" id="secret-payload">([\s\S]*?)<\/script>/);
-      if (!match) throw new Error('nincs-payload-a-friss-valaszban');
-      return JSON.parse(match[1]);
-    })
-    .catch(function () {
-      // Nincs hálózat (pl. repülő üzemmód) — inkább a lapba sütött, esetleg
-      // elavult tartalommal próbálkozunk, mint hogy semmit ne lásson a diák.
-      return embeddedPayload;
-    });
 
-  function decrypt(password) {
-    var subtle = window.crypto && window.crypto.subtle;
-    if (!subtle) {
-      return Promise.reject(new Error('nincs-webcrypto'));
-    }
-    return freshPayload.then(function (payload) {
-      return subtle.importKey('raw', new TextEncoder().encode(canonicalize(password)), 'PBKDF2', false, ['deriveKey'])
-        .then(function (baseKey) {
-          return subtle.deriveKey(
-            { name: 'PBKDF2', salt: bytes(payload.salt), iterations: payload.iterations, hash: 'SHA-256' },
-            baseKey,
-            { name: 'AES-GCM', length: 256 },
-            false,
-            ['decrypt']
-          );
-        })
-        .then(function (key) {
-          return subtle.decrypt({ name: 'AES-GCM', iv: bytes(payload.iv) }, key, bytes(payload.ciphertext));
-        });
-    })
-    .then(function (plain) {
-      return new TextDecoder().decode(plain);
-    });
-  }
+</section>
+</section>
 
-  function reveal(html) {
-    content.innerHTML = html;
-    content.hidden = false;
-    gate.remove();
-    // A képletek a betöltés után érkeztek, ezért újra kell szedetni őket.
-    if (window.MathJax && window.MathJax.typesetPromise) {
-      window.MathJax.typesetPromise([content]);
-    }
-  }
-
-  function attempt(password, fromStorage) {
-    button.disabled = true;
-    message.style.color = '#4b5563';
-    message.textContent = fromStorage ? '' : 'Egy pillanat…';
-    return decrypt(password).then(function (html) {
-      try { localStorage.setItem(storageKey, password); } catch (e) { /* privát böngészés */ }
-      reveal(html);
-    }).catch(function (error) {
-      button.disabled = false;
-      message.style.color = '#b91c1c';
-      if (error && error.message === 'nincs-webcrypto') {
-        message.textContent = 'A böngésző nem engedi a visszafejtést. Nyisd meg az oldalt https címen.';
-      } else if (fromStorage) {
-        message.textContent = '';
-      } else {
-        message.textContent = 'Hibás jelszó.';
-      }
-      try { localStorage.removeItem(storageKey); } catch (e) { /* nem baj */ }
-    });
-  }
-
-  button.addEventListener('click', function () {
-    if (input.value) { attempt(input.value, false); }
-  });
-  input.addEventListener('keydown', function (event) {
-    if (event.key === 'Enter' && input.value) { attempt(input.value, false); }
-  });
-
-  // Aki már beírta a jelszót ezen a gépen, annak ne kelljen újra.
-  var remembered = null;
-  try { remembered = localStorage.getItem(storageKey); } catch (e) { /* nem baj */ }
-  if (remembered) { attempt(remembered, true); } else { input.focus(); }
-})();
-</script>
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
