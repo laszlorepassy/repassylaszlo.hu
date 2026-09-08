@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <title>Órarend időzítő</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Répássy László - órarend időzítő alkalmazás." />
+
+  <link rel="icon" type="image/png" href="./table-icon-6369326-512.png">
+  <link rel="stylesheet" href="style.css">
+  <!-- LZ-String a hash-alapú mentéshez (opcionális, de hasznos) -->
+  <script src="./lz-string.min.js"></script>
+</head>
+<body>
+  <!-- Felső státusz kijelző (nagy betűvel) -->
+  <div id="statusTop" aria-live="polite">Betöltés...</div>
+  <div id="errorMessage"></div>
+
+  <header>
+    <h1>Órarend időzítő</h1>
+    <button id="newTabBtn">Új órarend</button>
+  </header>
+
+  <!-- Órarend neve -->
+  <div class="bar">
+    <label for="timetableName"></label>
+    <input type="text" id="timetableName" value="Új órarend" />
+  </div>
+
+  <!-- Órák időpontjai (csak kezdés és befejezés, minden napra közös) -->
+  <section class="times">
+    <h2></h2>
+    <div id="timesList"></div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>

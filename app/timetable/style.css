@@ -1,0 +1,135 @@
+/* Egyszerű órarend – stílusok */
+
+:root {
+  --veres-red: #b5121b;
+  --veres-red-dark: #8c0e15;
+  --ink: #111;
+  --bg: #ffffff;
+  --panel: #f7f7f7;
+  --border: #e5e7eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  margin: 12px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+
+h1 {
+  color: var(--veres-red);
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+#statusTop {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+}
+
+@media(max-width:600px) {
+  #statusTop {
+    font-size: 1.5rem;
+  }
+}
+
+#errorMessage {
+  text-align: center;
+  font-weight: 700;
+  color: #b5121b;
+  margin: 10px 0;
+  display: none;
+}
+
+#newTabBtn {
+  cursor: pointer;
+  border: none;
+  background: var(--veres-red);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+#newTabBtn:hover {
+  background: var(--veres-red-dark);
+}
+
+.bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.bar input {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.times {
+  margin: 18px 0;
+  padding: 12px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+}
+
+.times h2 {
+  margin: 0 0 10px;
+  color: var(--veres-red);
+  font-size: 1.1rem;
+}
+
+/* Idősorok: max 400px, középre igazítva */
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px auto;
+  max-width: 400px;
+}
+
+.time-row label {
+  flex: 0 0 70px;
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.time-row input[type="time"] {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* Hangsúly nélküli óraszám (visszafogott) */
+.small-note {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
