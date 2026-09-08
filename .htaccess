@@ -26,3 +26,14 @@ ErrorDocument 404 /404.html
   ExpiresByType font/woff "access plus 1 year"
   ExpiresByType font/woff2 "access plus 1 year"
 </IfModule>
+
+# 3. NEVER CACHE THE PASSWORD-PROTECTED "ESTI MATEK" PAGE
+# Ez az oldal gyakran frissül, ezért mindig a friss tartalmat kell kapnia a
+# böngészőnek, sosem a korábban elmentett (cache-elt) változatot.
+<IfModule mod_headers.c>
+  <FilesMatch "^estimatek-2026\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>
