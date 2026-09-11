@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="hu" xml:lang="hu"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Applications and Obsidian plugins I have written.">
 
-<title>Légzőgyakorlatok (nem csak) érettségizőknek – Répássy László digitális kultúra és matematika szakos tanár</title>
+<title>My programs – László Répássy – teacher of digital culture and mathematics</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -29,23 +30,23 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./img/favicon.png" rel="icon" type="image/png">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-02194ca6b699299b277130d9d6045845.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../img/favicon.png" rel="icon" type="image/png">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-02194ca6b699299b277130d9d6045845.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -60,24 +61,85 @@ ul.task-list li input[type="checkbox"] {
   ],
   "show-item-context": false,
   "language": {
-    "search-no-results-text": "Nincs találat",
-    "search-matching-documents-text": "találat",
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matches",
     "search-copy-link-title": "Copy link to search",
-    "search-hide-matches-text": "Találatok elrejtése",
-    "search-more-match-text": "további találat",
-    "search-more-matches-text": "további találat",
-    "search-clear-button-title": "Törlés",
+    "search-hide-matches-text": "Hide matches",
+    "search-more-match-text": "more match",
+    "search-more-matches-text": "more matches",
+    "search-clear-button-title": "Clear",
     "search-text-placeholder": "",
-    "search-detached-cancel-button-title": "Mégse",
-    "search-submit-button-title": "Keresés",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Search",
     "search-label": "Search"
   }
 }</script>
+<!--
+  Angol menüsor.
+
+  A Quarto menüsora projektszintű: egyetlen helyen, a _quarto.yml-ben van
+  definiálva, és nincs rá mód, hogy egy mappa (itt: en/) saját menüt kapjon.
+  Ezért az angol oldalakon ez a néhány sor írja át a kész menüt angolra —
+  a feliratokat és a hivatkozásokat is, hogy az angol oldalról angol oldalra
+  lehessen lépni.
+
+  Ha új menüpont kerül a _quarto.yml-be, ide is fel kell venni az angol párját.
+-->
+<style>
+  /* Amíg a szkript le nem cseréli, ne villanjon fel a magyar menü. A logó és a
+     kereső látható marad, így a fejléc nem ugrik meg. */
+  html[lang="en"] #navbarCollapse { visibility: hidden; }
+</style>
+<noscript>
+  <!-- JavaScript nélkül maradjon inkább magyar felirattal, mint sehogy. -->
+  <style>html[lang="en"] #navbarCollapse { visibility: visible; }</style>
+</noscript>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var items = [
+      { text: "Home", href: "index.html" },
+      { text: "Breathing exercises", href: "breathing-exercises.html" },
+      { text: "Evening maths", href: "evening-maths-2026.html" },
+      { text: "My programs", href: "my-programs.html" },
+      { text: "Magyar", href: "../index.html" },
+    ];
+
+    // A jelenlegi oldal fájlneve; a kezdőlap "/en/" alakban is érkezhet.
+    var current = window.location.pathname.split("/").pop() || "index.html";
+
+    var menu = document.querySelector("#navbarCollapse .navbar-nav");
+    if (menu) {
+      menu.innerHTML = items
+        .map(function (item) {
+          var active = item.href === current;
+          return (
+            '<li class="nav-item">' +
+            '<a class="nav-link' + (active ? " active" : "") + '" href="' + item.href + '"' +
+            (active ? ' aria-current="page"' : "") + ">" +
+            '<span class="menu-text">' + item.text + "</span></a>" +
+            "</li>"
+          );
+        })
+        .join("");
+    }
+
+    // A logó a magyar kezdőlapra mutatna; angol oldalon az angol kezdőlap jár.
+    var brand = document.querySelector(".navbar-brand");
+    if (brand) {
+      brand.setAttribute("href", "index.html");
+    }
+
+    var collapse = document.getElementById("navbarCollapse");
+    if (collapse) {
+      collapse.style.visibility = "visible";
+    }
+  });
+</script>
 
 
 <meta property="og:title" content="Répássy László digitális kultúra és matematika szakos tanár">
-<meta property="og:description" content="Digitális kultúra és matematika szakos tanár a Békásmegyeri Veres Péter Gimnáziumban.">
-<meta property="og:image" content="https://repassylaszlo.hu/img/portrait.jpg">
+<meta property="og:description" content="Applications and Obsidian plugins I have written.">
+<meta property="og:image" content="https://repassylaszlo.hu/en/img/portrait.jpg">
 <meta property="og:site_name" content="Répássy László digitális kultúra és matematika szakos tanár">
 <meta property="og:locale" content="hu_HU">
 </head>
@@ -89,9 +151,9 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./img/favicon.png" alt="" class="navbar-logo light-content">
-    <img src="./img/favicon.png" alt="" class="navbar-logo dark-content">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../img/favicon.png" alt="" class="navbar-logo light-content">
+    <img src="../img/favicon.png" alt="" class="navbar-logo dark-content">
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -101,23 +163,23 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
+    <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Kezdőlap</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./legzogyakorlatok.html" aria-current="page"> 
+    <a class="nav-link" href="../legzogyakorlatok.html"> 
 <span class="menu-text">Légzőgyakorlatok</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./estimatek-2026.html"> 
+    <a class="nav-link" href="../estimatek-2026.html"> 
 <span class="menu-text">Esti matek</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./alkalmazasaim.html"> 
+    <a class="nav-link" href="../alkalmazasaim.html"> 
 <span class="menu-text">Programjaim</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./en/index.html"> 
+    <a class="nav-link" href="../en/index.html"> 
 <span class="menu-text">English</span></a>
   </li>  
 </ul>
@@ -137,9 +199,14 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Légzőgyakorlatok (nem csak) érettségizőknek</h1>
+<h1 class="title">My programs</h1>
 </div>
 
+<div>
+  <div class="description">
+    Applications and Obsidian plugins I have written.
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -154,62 +221,16 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>A dolgozatok vagy az érettségi okozta feszültség természetes jelenség. A légzésünk tudatos irányításával hatékonyan befolyásolhatjuk idegrendszerünk állapotát. Az alábbi gyakorlatok segítenek a fókusz visszanyerésében és a stressz csökkentésében.</p>
-<section id="négyzet-légzés" class="level1">
-<h1>Négyzet légzés</h1>
-<p>Ezt a légzőgyakorlatot bármikor alkalmazhatod, ha izgulsz vagy jobban szeretnél figyelni valamire. Képzeld el, hogy a légzésed ritmusával egy négyzetet rajzolsz. Ugyanannyi ideig fog tartani a belégzés, benntartás, kilégzés, és a kilégzés utáni idő. Ülj, állj vagy sétálj kényelmesen, egyenes háttal miközben gyakorlod.</p>
-<section id="gyakorlat" class="level3">
-<h3 data-anchor-id="gyakorlat">Gyakorlat</h3>
 <ul>
-<li>Vegyél 4 ütemen át levegőt, 1, 2, 3, 4.</li>
-<li>Tartsd bent, 1, 2, 3, 4.</li>
-<li>Fújd ki, 1, 2, 3, 4.</li>
-<li>Pihenj, 1, 2, 3, 4.</li>
+<li><strong><a href="https://repassylaszlo.hu/app/journify/en/">Journify</a></strong>: A modern, private diary app for Windows, Linux and — soon — Android, with end-to-end encrypted cloud sync.</li>
+<li><strong><a href="https://community.obsidian.md/plugins/pcloud-vault-clone">pCloud Sync (Obsidian plugin)</a></strong>: An Obsidian community plugin that mirrors your vault into a pCloud folder as plain, unencrypted files, so you can reach it from the pCloud app or a browser on any of your devices; conflicting edits are merged.</li>
+<li><strong><a href="https://community.obsidian.md/plugins/simple-backup">Simple Backup (Obsidian plugin)</a></strong>: An Obsidian community plugin that saves your vault into a folder of your choice, versioned by date and time stamp, in a low-priority background process.</li>
+<li><strong><a href="https://github.com/laszlorepassy/obsidian-hyper-sync">Hyper Sync (Obsidian plugin)</a></strong>: An Obsidian plugin that syncs your vault directly between your own devices, peer to peer, using Hypercore/Hyperswarm — no cloud and no server.</li>
+<li><strong><a href="https://repassylaszlo.hu/app/timetable/">Timetable timer</a></strong>: An online application for putting together a school bell schedule and timing it.</li>
+<li><strong>Markdown Folder</strong> <em>(coming soon)</em>: A standalone, folder- and file-based visual Markdown editor that lets you open any folder on any of your machines for note taking, without an Obsidian-style vault.</li>
 </ul>
-<p>Ez volt az első négyzet. Most jöjjön a második négyzet.</p>
-<ul>
-<li>Ismét vegyél levegőt.</li>
-<li>Ugyanannyi ideig tartsd bent.</li>
-<li>Ugyanannyi ideig fújd ki.</li>
-<li>Ugyanannyi ideig tartsd kinn.</li>
-</ul>
-<p>Lélegezz így tovább, összesen 8-10-szer. Ha közben elkalandoznak a gondolataid, térj vissza a figyelmeddel a légzésedhez.</p>
-</section>
-<section id="befejezés" class="level3">
-<h3 data-anchor-id="befejezés">Befejezés</h3>
-<p>Amikor abbahagyod a gyakorlatot, engedd, hogy a légzésed visszatérjen a természetes ritmusába. Figyeld meg, hogy érzed magad.</p>
-</section>
-<section id="források" class="level3">
-<h3 data-anchor-id="források">Források</h3>
-<ol type="1">
-<li><a href="https://www.youtube.com/watch?v=tEmt1Znux58">Box breathing relaxation technique: how to calm feelings of stress or anxiety (video)</a></li>
-<li><a href="https://www.calm.com/blog/box-breathing">Box breathing: how to do it and why it matters — Calm Blog</a></li>
-<li><a href="https://www.psypost.org/breathing-exercises-reduce-test-anxiety-in-middle-school-students/">Breathing exercises reduce test anxiety in middle school students</a></li>
-<li><a href="https://www.health.harvard.edu/mind-and-mood/try-this-take-a-tactical-breather">Try this: Take a tactical breather - Harvard Health</a></li>
-<li><a href="https://time.com/4316151/breathing-technique-navy-seal-calm-focused/">Breathing Technique for Calm: Tips from a Navy Seal | TIME</a></li>
-<li><a href="https://www.med.navy.mil/Portals/62/Documents/NMFA/NMCPHC/root/Documents/health-promotion-wellness/psychological-emotional-wellbeing/Combat-Tactical-Breathing.pdf">Combat Tactical Breathing</a></li>
-</ol>
-<hr>
-</section>
-</section>
-<section id="légzésfigyelés" class="level1">
-<h1>Légzésfigyelés</h1>
-<p>Egy könnyű, pihentető légzőgyakorlat, amit bármikor tudsz alkalmazni. Ülj, állj vagy sétálj közben kényelmesen.</p>
-<p>Kezdj el figyelni a légzésedre. Hol érzed leginkább? Az orrodban? A mellkasodban? A hasadban? Figyeld meg, milyen érzés, ahogy a levegő beáramlik… és kiáramlik. Nem kell megváltoztatnod, nem kell erőltetned. Csak figyeld a légzésedet úgy, ahogy van.</p>
-<p>Ha a gondolataid elkalandoznak, az is rendben van. Amikor észreveszed, egyszerűen hozd vissza a figyelmedet a következő belégzésre… majd a kilégzésre.</p>
-<p>Még néhány légzésig figyeld: Belégzés… és kilégzés. Figyelj az egyre nyugodtabb és lassabb áramlásra.</p>
-<p>Bármikor megfigyelheted a légzésed, ha szeretnél megnyugodni vagy szeretnéd jobban érezni magad.</p>
-<section id="források-1" class="level3">
-<h3 data-anchor-id="források-1">Források</h3>
-<ol type="1">
-<li><a href="https://www.bbcchildreninneed.co.uk/wp-content/uploads/2021/10/Mindfulness-Investigating-the-Breath-Guided-Meditation.pdf">Mindfulness | Guided Meditation | Investigating the Breath | bbcchildreninneed.co.uk</a></li>
-<li><a href="https://moly.hu/konyvek/szondy-mate-megelni-a-pillanatot">Megélni a pillanatot · Szondy Máté · Könyv · Moly</a></li>
-<li><a href="https://www.filosz.hu/konyvek/Eletorom">Életöröm - | FILOSZ KÖNYV</a></li>
-</ol>
 
 
-</section>
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
