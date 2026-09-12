@@ -45,7 +45,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="/site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="/site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="/site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="/site_libs/bootstrap/bootstrap-02194ca6b699299b277130d9d6045845.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="/site_libs/bootstrap/bootstrap-01dc7a72f658c14e5d76b35e82c554ff.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -88,12 +88,6 @@ ul.task-list li input[type="checkbox"] {
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="/index.html" class="navbar-brand navbar-brand-logo">
-    <img src="/img/favicon.png" alt="" class="navbar-logo light-content">
-    <img src="/img/favicon.png" alt="" class="navbar-logo dark-content">
-    </a>
-  </div>
             <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
@@ -116,10 +110,25 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="/alkalmazasaim.html"> 
 <span class="menu-text">Programjaim</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="/en/index.html"> 
-<span class="menu-text">English</span></a>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-magyar" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-globe2" role="img">
+</i> 
+ <span class="menu-text">Magyar</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-magyar">    
+        <li>
+    <a class="dropdown-item" href="/index.html">
+ <span class="dropdown-text">Magyar</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="/en/index.html">
+ <span class="dropdown-text">English</span></a>
+  </li>  
+    </ul>
+  </li>
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -164,6 +173,82 @@ ul.task-list li input[type="checkbox"] {
 
 
 </main> <!-- /main -->
+<!--
+  Nyelvválasztó a menüsor jobb oldalán (a _quarto.yml "right:" menüje).
+
+  A Quarto menüje minden oldalon ugyanaz, ezért magától csak a két kezdőlapra
+  tud mutatni. Ez a szkript az aktuális oldal másik nyelvű párjára állítja a
+  hivatkozásokat (pl. Légzőgyakorlatok <-> Breathing exercises), a menü
+  feliratát az aktuális nyelvre írja, és pipával jelöli a kiválasztottat.
+  Aminek nincs párja (pl. Esti matek), annál a másik nyelv kezdőlapjára visz.
+
+  Ha új, kétnyelvű oldal készül, a párját ide is fel kell venni.
+-->
+<script>
+  (function () {
+    // [magyar oldal, angol oldal az en/ mappán belül]
+    var pairs = [
+      ["index.html", "index.html"],
+      ["legzogyakorlatok.html", "breathing-exercises.html"],
+      ["projekthet.html", "project-week.html"],
+      ["alkalmazasaim.html", "my-apps.html"],
+    ];
+
+    // A Quarto nem veszi át a menü saját id-jét, ezért a helyéről ismerjük fel:
+    // ez az egyetlen lenyíló menü a menüsor jobb oldalán.
+    var toggle = document.querySelector("#navbarCollapse .navbar-nav.ms-auto .dropdown-toggle");
+    if (!toggle) {
+      return;
+    }
+    toggle.id = "language-chooser";
+    toggle.parentElement.querySelector(".dropdown-menu").setAttribute("aria-labelledby", toggle.id);
+    var menu = toggle.parentElement.querySelector(".dropdown-menu");
+    var links = menu ? menu.querySelectorAll("a.dropdown-item") : [];
+    if (links.length !== 2) {
+      return;
+    }
+
+    var english = document.documentElement.lang === "en";
+    // A kezdőlap "/en/" vagy "/" alakban is érkezhet.
+    var current = window.location.pathname.split("/").pop() || "index.html";
+    var match = null;
+    pairs.forEach(function (pair) {
+      if (pair[english ? 1 : 0] === current) {
+        match = pair;
+      }
+    });
+
+    // Az oldal helye a webhely gyökeréhez képest ("./", "../", a 404-en "/").
+    var offset = document.querySelector('meta[name="quarto:offset"]');
+    var root = offset ? offset.getAttribute("content") : "./";
+
+    // Pár nélküli oldalon a kiválasztott nyelv maradjon ezen az oldalon, a másik
+    // nyelv pedig a saját kezdőlapjára vigyen.
+    var here = window.location.pathname + window.location.search;
+    var huHref = match ? root + match[0] : english ? root + "index.html" : here;
+    var enHref = match ? root + "en/" + match[1] : english ? here : root + "en/index.html";
+
+    var languages = [
+      { link: links[0], code: "hu", href: huHref, selected: !english },
+      { link: links[1], code: "en", href: enHref, selected: english },
+    ];
+
+    languages.forEach(function (language) {
+      var link = language.link;
+      link.setAttribute("href", language.href);
+      link.setAttribute("hreflang", language.code);
+      link.setAttribute("lang", language.code);
+      link.classList.toggle("active", language.selected);
+      if (language.selected) {
+        link.setAttribute("aria-current", "true");
+        toggle.querySelector(".menu-text").textContent = link.textContent.trim();
+      }
+    });
+
+    toggle.setAttribute("aria-label", english ? "Language: English" : "Nyelv: magyar");
+    toggle.setAttribute("title", english ? "Language" : "Nyelv");
+  })();
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
