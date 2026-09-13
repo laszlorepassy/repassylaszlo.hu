@@ -294,3 +294,38 @@
   color: #8a8f83;
   font-size: 0.85rem;
 }
+
+.beta-box {
+  max-width: 720px;
+  margin: 0 auto 48px;
+  padding: 20px 24px;
+  border: 1px solid #d8dcd2;
+  border-radius: 10px;
+  background: #fbfcf9;
+}
+
+.beta-box h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.beta-box p,
+.beta-box li {
+  color: #57604f;
+  font-size: 0.95rem;
+}
+
+.beta-box ol {
+  margin-bottom: 12px;
+  padding-left: 20px;
+}
+
+.beta-box li {
+  margin-bottom: 6px;
+}
+
+.beta-box > *:last-child {
+  margin-bottom: 0;
+}
