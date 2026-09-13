@@ -329,3 +329,13 @@
 .beta-box > *:last-child {
   margin-bottom: 0;
 }
+
+.demo-video {
+  display: block;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto 40px;
+  border: 1px solid #d8dcd2;
+  border-radius: 10px;
+  background: #fbfaf7;
+}
