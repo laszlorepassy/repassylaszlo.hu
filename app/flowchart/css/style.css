@@ -42,12 +42,10 @@ header#appHeader {
   align-items: center;
   gap: 16px;
 }
-.brand { font-weight: 700; font-size: 18px; color: var(--accent-dark); white-space: nowrap; }
-
 .menu { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
 .spacer { flex: 1; }
 .program-name-input {
-  width: 130px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px;
+  flex: 1; min-width: 120px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px;
   font-size: 13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 .clipboard-status {
@@ -70,15 +68,15 @@ header#appHeader {
 .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent-dark); }
 .btn-primary:hover { background: var(--accent-dark); }
 .btn-small { padding: 3px 8px; font-size: 12px; }
-/* Extra-wide and solid green so it's the first thing anyone (especially a
-   kid following along) notices as "the button that starts the program". */
+/* Solid green and a bit wider so it's the first thing anyone (especially a
+   kid following along) notices as "the button that starts the program" —
+   same height as its neighbors, just standing out by color and width. */
 .btn-run {
   background: #16a34a;
   color: #fff;
   border-color: #15803d;
   font-weight: 700;
-  font-size: 18px;
-  min-width: 84px;
+  min-width: 60px;
 }
 .btn-run:hover { background: #15803d; }
 
@@ -129,6 +127,7 @@ select#langSelect {
 
 main { flex: 1; display: flex; min-height: 0; }
 
+.canvas-outer { position: relative; flex: 1; min-width: 0; display: flex; }
 .canvas-wrap {
   flex: 1;
   overflow: auto;
@@ -138,6 +137,25 @@ main { flex: 1; display: flex; min-height: 0; }
     var(--bg);
   padding: 10px;
 }
+svg#flowSvg.pannable { cursor: grab; }
+svg#flowSvg.panning { cursor: grabbing; }
+
+/* Positioned relative to .canvas-outer (which doesn't scroll), not
+   .canvas-wrap, so it stays pinned to the canvas's bottom-right corner
+   regardless of how far the diagram is scrolled or panned. */
+.zoom-controls {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.zoom-controls .btn { min-width: 30px; padding: 4px 8px; font-size: 15px; line-height: 1; }
 
 .side-panel {
   width: 380px;

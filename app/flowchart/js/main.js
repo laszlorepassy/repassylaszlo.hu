@@ -4,6 +4,7 @@ import { renderRoutine, highlightBlock } from './render.js';
 import { openInsertMenu, openBlockEditor, openRoutineEditor, showConfirm, showAlert } from './blockEditor.js';
 import { runProgram, formatValue } from './interpreter.js';
 import { generatePython } from './codegen.js';
+import { generateCpp } from './codegenCpp.js';
 import { programToFprg, fprgToProgram, downloadFile, pickFprgFile } from './fileio.js';
 
 initLang();
@@ -19,6 +20,35 @@ const el = (id) => document.getElementById(id);
 const svgRoot = el('flowSvg');
 
 function currentRoutine() { return program.routines[currentRoutineIndex]; }
+
+// ---------- browser-local autosave ----------
+// Mirrors the last edited program (and the chosen code-export language) to
+// localStorage only, so a page reload doesn't lose in-progress work — no
+// network call is involved, same as the language-preference mechanism in
+// i18n.js. Wrapped in try/catch since localStorage can throw in private
+// browsing or when its quota is exceeded.
+const STORAGE_KEY_PROGRAM = 'flowchart_last_program';
+const STORAGE_KEY_CODELANG = 'flowchart_code_lang';
+
+function saveProgramToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY_PROGRAM, JSON.stringify({
+      name: el('programName').value,
+      fprg: programToFprg(program),
+    }));
+  } catch { /* localStorage unavailable — autosave is a convenience, not a guarantee */ }
+}
+
+function loadProgramFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_PROGRAM);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    program = fprgToProgram(data.fprg);
+    if (data.name) el('programName').value = data.name;
+    return true;
+  } catch { return false; }
+}
 
 // ---------- rendering ----------
 // Declare's "Variable Names" field can produce sibling blocks beyond the
@@ -82,7 +112,63 @@ function rerenderDiagram() {
   };
   const res = renderRoutine(svgRoot, currentRoutine(), cbs);
   hitMap = res.hitMap;
+  saveProgramToStorage();
 }
+
+// ---------- zoom & pan ----------
+// A CSS transform on the SVG itself (not a viewBox change) so it survives
+// renderRoutine()'s innerHTML rebuilds untouched — only the element's own
+// inline style is set here, which innerHTML clears never touch.
+const ZOOM_MIN = 0.15;
+const ZOOM_MAX = 3;
+let zoomLevel = 1;
+const canvasWrap = el('canvasWrap');
+
+function applyZoom() {
+  svgRoot.style.transform = `scale(${zoomLevel})`;
+  svgRoot.style.transformOrigin = '0 0';
+}
+
+function zoomBy(factor) {
+  zoomLevel = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoomLevel * factor));
+  applyZoom();
+}
+
+function zoomToFit() {
+  const svgW = Number(svgRoot.getAttribute('width')) || 1;
+  const svgH = Number(svgRoot.getAttribute('height')) || 1;
+  const availW = canvasWrap.clientWidth - 20;
+  const availH = canvasWrap.clientHeight - 20;
+  zoomLevel = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, availW / svgW, availH / svgH));
+  applyZoom();
+  canvasWrap.scrollLeft = 0;
+  canvasWrap.scrollTop = 0;
+}
+
+el('btnZoomIn').addEventListener('click', () => zoomBy(1.25));
+el('btnZoomOut').addEventListener('click', () => zoomBy(1 / 1.25));
+el('btnZoomFit').addEventListener('click', zoomToFit);
+
+// Click-and-drag panning: only starts when the mousedown lands directly on
+// the SVG background (not a shape/connector, which have their own click
+// handlers), so it never steals clicks meant for editing the diagram.
+svgRoot.classList.add('pannable');
+let panState = null;
+svgRoot.addEventListener('mousedown', (ev) => {
+  if (ev.target !== svgRoot || ev.button !== 0) return;
+  panState = { startX: ev.clientX, startY: ev.clientY, scrollLeft: canvasWrap.scrollLeft, scrollTop: canvasWrap.scrollTop };
+  svgRoot.classList.add('panning');
+});
+window.addEventListener('mousemove', (ev) => {
+  if (!panState) return;
+  canvasWrap.scrollLeft = panState.scrollLeft - (ev.clientX - panState.startX);
+  canvasWrap.scrollTop = panState.scrollTop - (ev.clientY - panState.startY);
+});
+window.addEventListener('mouseup', () => {
+  if (!panState) return;
+  panState = null;
+  svgRoot.classList.remove('panning');
+});
 
 function renderRoutineTabs() {
   const wrap = el('routineTabs');
@@ -217,7 +303,7 @@ function requestInputFromUser(ev) {
 
 // ---------- run driver ----------
 function delay(ms) { return new Promise((r) => setTimeout(r, ms)); }
-function currentDelayMs() { return Math.round((100 - Number(el('speedRange').value)) * 6); }
+function currentDelayMs() { return Number(el('speedSelect').value); }
 
 function switchToRoutineTab(routine) {
   if (!routine) return;
@@ -300,6 +386,9 @@ async function onStepClick() {
 }
 
 async function onRunClick() {
+  // Clicking Run again after the program finished restarts it from
+  // scratch instead of doing nothing — no need to press Reset first.
+  if (runState.done) onResetClick();
   ensureGenStarted();
   if (runState.done) return;
   runState.running = true;
@@ -347,7 +436,9 @@ function setRunButtonsState() {
 
 // ---------- code export ----------
 function refreshCode() {
-  el('codeOutput').textContent = generatePython(program);
+  const lang = el('codeLangSelect').value;
+  el('codeOutput').textContent = lang === 'cpp' ? generateCpp(program) : generatePython(program);
+  el('btnDownloadCode').textContent = `${t('downloadCode')} ${lang === 'cpp' ? '.cpp' : '.py'}`;
 }
 
 // ---------- image export ----------
@@ -428,6 +519,8 @@ function programName() {
   return raw.replace(/[\\/:*?"<>|]/g, '_');
 }
 
+el('programName').addEventListener('input', saveProgramToStorage);
+
 el('clipboardStatus').addEventListener('click', () => {
   clipboard = null;
   updateClipboardStatus();
@@ -449,6 +542,7 @@ el('btnOpen').addEventListener('click', async () => {
     program = fprgToProgram(file.text);
     clipboard = null;
     updateClipboardStatus();
+    el('programName').value = file.name.replace(/\.fprg$/i, '') || 'program';
     resetAllAndRerender();
   } catch (err) {
     await showAlert(t('fileLoadError'));
@@ -460,6 +554,10 @@ el('btnSave').addEventListener('click', () => {
 });
 
 el('btnGenerateCode').addEventListener('click', refreshCode);
+el('codeLangSelect').addEventListener('change', () => {
+  try { localStorage.setItem(STORAGE_KEY_CODELANG, el('codeLangSelect').value); } catch { /* ignore */ }
+  refreshCode();
+});
 
 el('btnExportImage').addEventListener('click', () => { exportDiagramAsImage(programName()); });
 
@@ -467,7 +565,8 @@ el('btnCopyCode').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(el('codeOutput').textContent); } catch { /* clipboard may be unavailable */ }
 });
 el('btnDownloadCode').addEventListener('click', () => {
-  downloadFile(`${programName()}.py`, el('codeOutput').textContent, 'text/x-python');
+  const isCpp = el('codeLangSelect').value === 'cpp';
+  downloadFile(`${programName()}${isCpp ? '.cpp' : '.py'}`, el('codeOutput').textContent, isCpp ? 'text/x-c++src' : 'text/x-python');
 });
 
 el('btnRun').addEventListener('click', onRunClick);
@@ -477,7 +576,6 @@ el('btnReset').addEventListener('click', onResetClick);
 
 // ---------- i18n wiring ----------
 function applyStaticStrings() {
-  el('brandTitle').textContent = t('appTitle');
   document.title = t('appTitle');
   el('btnNew').textContent = t('menuNew');
   el('btnOpen').textContent = t('menuOpen');
@@ -486,6 +584,11 @@ function applyStaticStrings() {
   el('btnExportImage').textContent = t('menuExportImage');
   el('programName').placeholder = t('programNamePlaceholder');
   el('speedLabel').textContent = t('speed');
+  el('speedOptSlowest').textContent = t('speedSlowest');
+  el('speedOptSlow').textContent = t('speedSlow');
+  el('speedOptNormal').textContent = t('speedNormal');
+  el('speedOptFast').textContent = t('speedFast');
+  el('speedOptFastest').textContent = t('speedFastest');
   el('btnRun').title = t('run');
   el('btnStep').title = t('step');
   el('btnPause').title = t('pause');
@@ -498,7 +601,7 @@ function applyStaticStrings() {
   el('thValue').textContent = t('varValue');
   el('inputSubmit').textContent = t('submit');
   el('btnCopyCode').textContent = t('copyCode');
-  el('btnDownloadCode').textContent = t('downloadCode');
+  refreshCode();
   document.documentElement.lang = getLang();
 }
 
@@ -508,11 +611,15 @@ el('langSelect').addEventListener('change', (ev) => {
   applyStaticStrings();
   renderRoutineTabs();
   rerenderDiagram();
-  refreshCode();
   updateClipboardStatus();
 });
 
 // ---------- boot ----------
+loadProgramFromStorage();
+try {
+  const savedLang = localStorage.getItem(STORAGE_KEY_CODELANG);
+  if (savedLang === 'python' || savedLang === 'cpp') el('codeLangSelect').value = savedLang;
+} catch { /* ignore */ }
 applyStaticStrings();
 renderRoutineTabs();
 rerenderDiagram();

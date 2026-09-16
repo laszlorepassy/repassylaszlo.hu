@@ -280,10 +280,12 @@ function drawBlock(group, block, x, y, colW, cbs, hitMap, list, idx) {
       // Loop-back: shape's left vertex -> dedicated lane -> body's top
       // (kept — genuine arrowhead re-entering the body).
       drawPath(group, `M ${shapeLeftX} ${shapeMidY} L ${laneX} ${shapeMidY} L ${laneX} ${bodyY - CONNECT_GAP} L ${res.centerX} ${bodyY - CONNECT_GAP} L ${res.centerX} ${bodyY}`);
-      // Exit: straight down from the shape's own middle (hidden under it,
-      // so no gap) to the return point. No arrowhead — see drawPath's note.
-      const exitBottom = diaY + DIAMOND_H + EXIT_PAD;
-      drawPath(group, `M ${cx} ${shapeMidY} L ${cx} ${exitBottom}`, false);
+      // Exit: straight down from the shape's own bottom edge (not its
+      // middle — that would visually drill through the hexagon) to the
+      // return point. No arrowhead — see drawPath's note.
+      const shapeBottomY = diaY + DIAMOND_H;
+      const exitBottom = shapeBottomY + EXIT_PAD;
+      drawPath(group, `M ${cx} ${shapeBottomY} L ${cx} ${exitBottom}`, false);
       return exitBottom;
     }
     default: {

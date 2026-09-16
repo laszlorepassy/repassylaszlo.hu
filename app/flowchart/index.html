@@ -10,7 +10,6 @@
 <body>
 <div id="app">
   <header id="appHeader">
-    <div class="brand" id="brandTitle">Flowchart</div>
     <nav class="menu">
       <button id="btnNew" class="btn"></button>
       <button id="btnOpen" class="btn"></button>
@@ -25,7 +24,13 @@
         <button id="btnPause" class="btn" title="Pause">⏸</button>
         <button id="btnReset" class="btn" title="Reset">⟲</button>
         <label class="speed-label"><span id="speedLabel">Speed</span>
-          <input type="range" id="speedRange" min="0" max="100" value="70">
+          <select id="speedSelect">
+            <option id="speedOptSlowest" value="800">Slowest</option>
+            <option id="speedOptSlow" value="400">Slow</option>
+            <option id="speedOptNormal" value="150" selected>Normal</option>
+            <option id="speedOptFast" value="50">Fast</option>
+            <option id="speedOptFastest" value="0">Fastest</option>
+          </select>
         </label>
       </div>
       <select id="langSelect">
@@ -38,8 +43,15 @@
   <div class="routine-tabs" id="routineTabs"></div>
 
   <main>
-    <div class="canvas-wrap" id="canvasWrap">
-      <svg id="flowSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="canvas-outer">
+      <div class="canvas-wrap" id="canvasWrap">
+        <svg id="flowSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="zoom-controls">
+        <button id="btnZoomIn" class="btn btn-small" title="Zoom in">+</button>
+        <button id="btnZoomOut" class="btn btn-small" title="Zoom out">−</button>
+        <button id="btnZoomFit" class="btn btn-small" title="Fit to view">⛶</button>
+      </div>
     </div>
     <aside class="side-panel">
       <div class="side-tabs" id="sideTabs">
@@ -70,6 +82,10 @@
       <div class="tab-content" id="tabCode">
         <div class="code-actions">
           <button id="btnGenerateCode" class="btn btn-primary"></button>
+          <select id="codeLangSelect" class="btn btn-small">
+            <option value="python">Python</option>
+            <option value="cpp">C++</option>
+          </select>
           <button id="btnCopyCode" class="btn btn-small"></button>
           <button id="btnDownloadCode" class="btn btn-small"></button>
         </div>
