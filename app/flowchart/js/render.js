@@ -88,8 +88,14 @@ function drawArrow(parent, x1, y1, x2, y2, list, index, cbs) {
     svg('title', {}, hit).textContent = t('insertBlock');
   }
 }
-function drawPath(parent, d) {
-  svg('path', { d, class: 'flow-line', fill: 'none', 'marker-end': 'url(#arrowhead)' }, parent);
+// `marker`=false is for a path that immediately merges back onto the main
+// trunk, which the caller (drawList) always draws its own fresh arrow out
+// of right after — an arrowhead here too would be a second, redundant one
+// sitting in the middle of what should read as one continuous line.
+function drawPath(parent, d, marker = true) {
+  const attrs = { d, class: 'flow-line', fill: 'none' };
+  if (marker) attrs['marker-end'] = 'url(#arrowhead)';
+  svg('path', attrs, parent);
 }
 
 function shapeLabel(type) {
@@ -211,8 +217,8 @@ function drawBlock(group, block, x, y, colW, cbs, hitMap, list, idx) {
       const branchY = y + DIAMOND_H + CONNECT_GAP;
       const tipX = cx;
       const tipY = y + DIAMOND_H;
-      drawArrow(group, tipX, tipY, lx + tM.w / 2, branchY - 2);
-      drawArrow(group, tipX, tipY, lx + tM.w + BRANCH_GAP + fM.w / 2, branchY - 2);
+      drawArrow(group, tipX, tipY, lx + tM.w / 2, branchY);
+      drawArrow(group, tipX, tipY, lx + tM.w + BRANCH_GAP + fM.w / 2, branchY);
       text(group, tipX - 26, tipY + 13, t('branchTrue'), 'branch-label');
       text(group, tipX + 26, tipY + 13, t('branchFalse'), 'branch-label');
       const tRes = drawList(group, block.trueBody, lx, branchY, tM.w, cbs, hitMap);
@@ -221,42 +227,64 @@ function drawBlock(group, block, x, y, colW, cbs, hitMap, list, idx) {
       drawArrow(group, tRes.centerX, tRes.bottomY, tRes.centerX, mergeY);
       drawArrow(group, fRes.centerX, fRes.bottomY, fRes.centerX, mergeY);
       svg('line', { x1: tRes.centerX, y1: mergeY, x2: fRes.centerX, y2: mergeY, class: 'flow-line' }, group);
-      drawArrow(group, cx, mergeY, cx, mergeY + MERGE_H);
+      // No arrowhead: drawList's own leading connector for whatever comes
+      // after this If starts at exactly (cx, mergeY) and supplies the one
+      // arrowhead that should be seen here, so the two read as one line.
+      drawPath(group, `M ${cx} ${mergeY} L ${cx} ${mergeY + MERGE_H}`, false);
       return mergeY + MERGE_H;
     }
     case 'while':
     case 'for': {
       const bM = measureList(block.body);
-      const totalW = bM.w + LOOP_INDENT + EXIT_LANE;
+      const shapeW = Math.min(BOX_W, bM.w);
       const cx = x + colW / 2;
-      const lx = cx - totalW / 2;
+      const bodyLeft = cx - bM.w / 2;
+      const laneX = bodyLeft - LOOP_INDENT / 2;
+      const exitLaneX = bodyLeft + bM.w + EXIT_LANE / 2;
+      const shapeLeftX = cx - shapeW / 2;
+      const shapeRightX = cx + shapeW / 2;
+      const shapeMidY = y + DIAMOND_H / 2;
       const label = block.type === 'for'
         ? `${t('blockFor')} ${block.varName} = ${block.start}..${block.end} (${block.step})`
         : `${t('blockWhile')}: ${block.cond}`;
-      hexagonShape(group, cx, y, Math.min(BOX_W, bM.w), DIAMOND_H, label, block, cbs, hitMap, list, idx);
+      hexagonShape(group, cx, y, shapeW, DIAMOND_H, label, block, cbs, hitMap, list, idx);
       const bodyY = y + DIAMOND_H + CONNECT_GAP;
-      drawArrow(group, cx, y + DIAMOND_H / 2 + 6, cx, bodyY);
-      const res = drawList(group, block.body, lx + LOOP_INDENT, bodyY, bM.w, cbs, hitMap);
-      const loopBackX = lx + LOOP_INDENT / 2;
-      drawPath(group, `M ${res.centerX} ${res.bottomY} L ${res.centerX} ${res.bottomY + 10} L ${loopBackX} ${res.bottomY + 10} L ${loopBackX} ${y + DIAMOND_H / 2} L ${lx} ${y + DIAMOND_H / 2}`);
-      const exitX = lx + LOOP_INDENT + bM.w + EXIT_LANE / 2;
+      // Starts from the shape's own vertical middle (hidden under the
+      // shape itself down to its bottom edge) so there's no gap regardless
+      // of the shape's exact height/edge math.
+      drawArrow(group, cx, shapeMidY, cx, bodyY);
+      const res = drawList(group, block.body, bodyLeft, bodyY, bM.w, cbs, hitMap);
+      // Loop-back: body bottom -> dedicated lane -> the shape's own left
+      // vertex (kept — a genuine, non-redundant arrowhead: nothing else
+      // points into the shape from that side).
+      drawPath(group, `M ${res.centerX} ${res.bottomY} L ${res.centerX} ${res.bottomY + 10} L ${laneX} ${res.bottomY + 10} L ${laneX} ${shapeMidY} L ${shapeLeftX} ${shapeMidY}`);
+      // Exit: shape's right vertex -> dedicated lane -> back onto the
+      // trunk. No arrowhead (see drawPath's comment above).
       const exitBottom = res.bottomY + EXIT_PAD;
-      drawPath(group, `M ${lx + LOOP_INDENT + bM.w + DIAMOND_H / 6} ${y + DIAMOND_H / 2} L ${exitX} ${y + DIAMOND_H / 2} L ${exitX} ${exitBottom} L ${cx} ${exitBottom}`);
+      drawPath(group, `M ${shapeRightX} ${shapeMidY} L ${exitLaneX} ${shapeMidY} L ${exitLaneX} ${exitBottom} L ${cx} ${exitBottom}`, false);
       return exitBottom;
     }
     case 'dowhile': {
       const bM = measureList(block.body);
-      const totalW = bM.w + LOOP_INDENT;
+      const shapeW = Math.min(BOX_W, bM.w);
       const cx = x + colW / 2;
-      const lx = cx - totalW / 2;
+      const bodyLeft = cx - bM.w / 2;
+      const laneX = bodyLeft - LOOP_INDENT / 2;
       const bodyY = y;
-      const res = drawList(group, block.body, lx + LOOP_INDENT, bodyY, bM.w, cbs, hitMap);
+      const res = drawList(group, block.body, bodyLeft, bodyY, bM.w, cbs, hitMap);
       const diaY = res.bottomY + CONNECT_GAP;
-      hexagonShape(group, cx, diaY, Math.min(BOX_W, bM.w), DIAMOND_H, `${t('blockDowhile')}: ${block.cond}`, block, cbs, hitMap, list, idx);
+      const shapeMidY = diaY + DIAMOND_H / 2;
+      const shapeLeftX = cx - shapeW / 2;
+      hexagonShape(group, cx, diaY, shapeW, DIAMOND_H, `${t('blockDowhile')}: ${block.cond}`, block, cbs, hitMap, list, idx);
       drawArrow(group, cx, res.bottomY, cx, diaY);
-      const loopBackX = lx + LOOP_INDENT / 2;
-      drawPath(group, `M ${lx} ${diaY + DIAMOND_H / 2} L ${loopBackX} ${diaY + DIAMOND_H / 2} L ${loopBackX} ${bodyY - CONNECT_GAP} L ${res.centerX} ${bodyY - CONNECT_GAP} L ${res.centerX} ${bodyY}`);
-      return diaY + DIAMOND_H + EXIT_PAD;
+      // Loop-back: shape's left vertex -> dedicated lane -> body's top
+      // (kept — genuine arrowhead re-entering the body).
+      drawPath(group, `M ${shapeLeftX} ${shapeMidY} L ${laneX} ${shapeMidY} L ${laneX} ${bodyY - CONNECT_GAP} L ${res.centerX} ${bodyY - CONNECT_GAP} L ${res.centerX} ${bodyY}`);
+      // Exit: straight down from the shape's own middle (hidden under it,
+      // so no gap) to the return point. No arrowhead — see drawPath's note.
+      const exitBottom = diaY + DIAMOND_H + EXIT_PAD;
+      drawPath(group, `M ${cx} ${shapeMidY} L ${cx} ${exitBottom}`, false);
+      return exitBottom;
     }
     default: {
       const cx = x + colW / 2;

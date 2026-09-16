@@ -354,6 +354,9 @@ function refreshCode() {
 // The diagram's colors come from css/style.css classes, which a standalone
 // exported file has no access to — so the export gets its own small,
 // self-contained copy of just the rules it needs.
+// Kept in sync with css/style.css's shape colors by hand (a standalone
+// exported file has no access to that stylesheet, so it needs its own
+// self-contained copy of just the rules it uses).
 const EXPORT_SVG_STYLE = `
   .flow-text { font: 12px sans-serif; fill: #1f2937; }
   .branch-label { font: 600 11px sans-serif; fill: #6b7280; }
@@ -361,12 +364,14 @@ const EXPORT_SVG_STYLE = `
   .arrow-fill { fill: #64748b; }
   .shape { stroke-width: 1.6; }
   .shape-terminal { fill: #ecfdf5; stroke: #047857; }
-  .shape-declare, .shape-assign { fill: #eef2ff; stroke: #4338ca; }
-  .shape-input, .shape-output { fill: #eff6ff; stroke: #1d4ed8; }
-  .shape-decision { fill: #fff7ed; stroke: #c2410c; }
-  .shape-call { fill: #f5f3ff; stroke: #6d28d9; }
+  .shape-declare, .shape-assign { fill: #fef9c3; stroke: #ca8a04; }
+  .shape-input { fill: #dbeafe; stroke: #2563eb; }
+  .shape-output { fill: #dcfce7; stroke: #16a34a; }
+  .shape-decision { fill: #fee2e2; stroke: #dc2626; }
+  .shape-loop { fill: #ffedd5; stroke: #ea580c; }
+  .shape-call { fill: #fae8ff; stroke: #a21caf; }
   .shape-comment { fill: #fffbeb; stroke: #b45309; stroke-dasharray: 3 2; }
-  .shape-innerline { stroke: #6d28d9; stroke-width: 1.2; }
+  .shape-innerline { stroke: #a21caf; stroke-width: 1.2; }
 `;
 
 function buildExportSvgString() {

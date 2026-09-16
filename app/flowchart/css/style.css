@@ -65,10 +65,22 @@ header#appHeader {
   font-size: 13px;
 }
 .btn:hover { background: #f1f5f9; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn:disabled:hover { background: #fff; }
 .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent-dark); }
 .btn-primary:hover { background: var(--accent-dark); }
 .btn-small { padding: 3px 8px; font-size: 12px; }
-.btn-run { color: #047857; font-weight: 700; }
+/* Extra-wide and solid green so it's the first thing anyone (especially a
+   kid following along) notices as "the button that starts the program". */
+.btn-run {
+  background: #16a34a;
+  color: #fff;
+  border-color: #15803d;
+  font-weight: 700;
+  font-size: 18px;
+  min-width: 84px;
+}
+.btn-run:hover { background: #15803d; }
 
 .run-controls { display: flex; align-items: center; gap: 6px; }
 .speed-label { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); }
