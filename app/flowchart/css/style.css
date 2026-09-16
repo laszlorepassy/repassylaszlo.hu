@@ -7,16 +7,22 @@
   --accent: #2563eb;
   --accent-dark: #1d4ed8;
   --danger: #dc2626;
-  --shape-fill: #eef2ff;
-  --shape-stroke: #4338ca;
-  --decision-fill: #fff7ed;
-  --decision-stroke: #c2410c;
+  /* Shape colors follow Flowgorithm's own palette: yellow declare/assign,
+     blue input, green output, red decision, orange loops, magenta call. */
+  --shape-fill: #fef9c3;
+  --shape-stroke: #ca8a04;
+  --decision-fill: #fee2e2;
+  --decision-stroke: #dc2626;
   --terminal-fill: #ecfdf5;
   --terminal-stroke: #047857;
-  --io-fill: #eff6ff;
-  --io-stroke: #1d4ed8;
-  --call-fill: #f5f3ff;
-  --call-stroke: #6d28d9;
+  --input-fill: #dbeafe;
+  --input-stroke: #2563eb;
+  --output-fill: #dcfce7;
+  --output-stroke: #16a34a;
+  --loop-fill: #ffedd5;
+  --loop-stroke: #ea580c;
+  --call-fill: #fae8ff;
+  --call-stroke: #a21caf;
   --comment-fill: #fffbeb;
   --comment-stroke: #b45309;
   font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -192,8 +198,10 @@ svg#flowSvg { display: block; background: transparent; }
 .shape-terminal { fill: var(--terminal-fill); stroke: var(--terminal-stroke); }
 .shape-declare { fill: var(--shape-fill); stroke: var(--shape-stroke); }
 .shape-assign { fill: var(--shape-fill); stroke: var(--shape-stroke); }
-.shape-input, .shape-output { fill: var(--io-fill); stroke: var(--io-stroke); }
+.shape-input { fill: var(--input-fill); stroke: var(--input-stroke); }
+.shape-output { fill: var(--output-fill); stroke: var(--output-stroke); }
 .shape-decision { fill: var(--decision-fill); stroke: var(--decision-stroke); }
+.shape-loop { fill: var(--loop-fill); stroke: var(--loop-stroke); }
 .shape-call { fill: var(--call-fill); stroke: var(--call-stroke); }
 .shape-comment { fill: var(--comment-fill); stroke: var(--comment-stroke); stroke-dasharray: 3 2; }
 

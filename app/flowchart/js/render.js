@@ -10,13 +10,17 @@ const BOX_H = 46;
 const TERM_H = 40;
 const DIAMOND_H = 62;
 const GAP = 34; // vertical space reserved for the insert (+) control
-const BRANCH_GAP = 36;
-const MERGE_PAD = 18;
+const BRANCH_GAP = 48;
+const MERGE_PAD = 22;
 const MERGE_H = 16;
-const LOOP_INDENT = 34;
-const EXIT_LANE = 44;
-const EXIT_PAD = 18;
-const CONNECT_GAP = 10;
+// Generous on purpose: nested loops/branches route their loop-back and
+// exit lines through lanes this wide on each side of their body, so a loop
+// inside a branch inside another loop still gets a lane of its own instead
+// of its lines crossing a sibling construct's lines.
+const LOOP_INDENT = 46;
+const EXIT_LANE = 46;
+const EXIT_PAD = 22;
+const CONNECT_GAP = 14;
 
 function svg(tag, attrs = {}, parent = null) {
   const el = document.createElementNS(NS, tag);
@@ -133,23 +137,11 @@ function simpleShape(group, block, cx, y, w, h, cbs, hitMap, list, idx) {
   }
   const label = text(group, cx, y + h / 2 + 4, truncate(blockText(block)));
   svg('title', {}, el).textContent = `${shapeLabel(block.type)}: ${blockText(block)}`;
-  el.dataset.blockId = block.id;
-  const onClick = (ev) => { ev.stopPropagation(); cbs.onEdit(block, list, idx); };
-  const onCtx = (ev) => { ev.preventDefault(); ev.stopPropagation(); cbs.onCut(block, list, idx); };
-  el.addEventListener('click', onClick);
-  label.addEventListener('click', onClick);
-  el.addEventListener('contextmenu', onCtx);
-  label.addEventListener('contextmenu', onCtx);
-  el.style.cursor = 'pointer';
-  hitMap.set(block.id, el);
+  wireShapeEvents(el, label, block, cbs, hitMap, list, idx);
   return el;
 }
 
-function diamondShape(group, cx, y, w, h, condText, block, cbs, hitMap, list, idx) {
-  const pts = `${cx},${y} ${cx + w / 2},${y + h / 2} ${cx},${y + h} ${cx - w / 2},${y + h / 2}`;
-  const el = svg('polygon', { points: pts, class: `shape shape-decision` }, group);
-  const label = text(group, cx, y + h / 2 + 4, truncate(condText, 22));
-  svg('title', {}, el).textContent = condText;
+function wireShapeEvents(el, label, block, cbs, hitMap, list, idx) {
   el.dataset.blockId = block.id;
   const onClick = (ev) => { ev.stopPropagation(); cbs.onEdit(block, list, idx); };
   const onCtx = (ev) => { ev.preventDefault(); ev.stopPropagation(); cbs.onCut(block, list, idx); };
@@ -159,6 +151,28 @@ function diamondShape(group, cx, y, w, h, condText, block, cbs, hitMap, list, id
   label.addEventListener('contextmenu', onCtx);
   el.style.cursor = 'pointer';
   hitMap.set(block.id, el);
+}
+
+// If's decision diamond, matching Flowgorithm's own shape for it.
+function diamondShape(group, cx, y, w, h, condText, block, cbs, hitMap, list, idx) {
+  const pts = `${cx},${y} ${cx + w / 2},${y + h / 2} ${cx},${y + h} ${cx - w / 2},${y + h / 2}`;
+  const el = svg('polygon', { points: pts, class: 'shape shape-decision' }, group);
+  const label = text(group, cx, y + h / 2 + 4, truncate(condText, 22));
+  svg('title', {}, el).textContent = condText;
+  wireShapeEvents(el, label, block, cbs, hitMap, list, idx);
+  return el;
+}
+
+// While/For/Do-While's loop header, matching Flowgorithm's own shape for
+// loops — a flattened hexagon, visually distinct from If's diamond.
+function hexagonShape(group, cx, y, w, h, labelText, block, cbs, hitMap, list, idx) {
+  const notch = Math.min(w * 0.22, 26);
+  const pts = `${cx - w / 2},${y + h / 2} ${cx - w / 2 + notch},${y} ${cx + w / 2 - notch},${y} `
+    + `${cx + w / 2},${y + h / 2} ${cx + w / 2 - notch},${y + h} ${cx - w / 2 + notch},${y + h}`;
+  const el = svg('polygon', { points: pts, class: 'shape shape-loop' }, group);
+  const label = text(group, cx, y + h / 2 + 4, truncate(labelText, 24));
+  svg('title', {}, el).textContent = labelText;
+  wireShapeEvents(el, label, block, cbs, hitMap, list, idx);
   return el;
 }
 
@@ -219,7 +233,7 @@ function drawBlock(group, block, x, y, colW, cbs, hitMap, list, idx) {
       const label = block.type === 'for'
         ? `${t('blockFor')} ${block.varName} = ${block.start}..${block.end} (${block.step})`
         : `${t('blockWhile')}: ${block.cond}`;
-      diamondShape(group, cx, y, Math.min(BOX_W, bM.w), DIAMOND_H, label, block, cbs, hitMap, list, idx);
+      hexagonShape(group, cx, y, Math.min(BOX_W, bM.w), DIAMOND_H, label, block, cbs, hitMap, list, idx);
       const bodyY = y + DIAMOND_H + CONNECT_GAP;
       drawArrow(group, cx, y + DIAMOND_H / 2 + 6, cx, bodyY);
       const res = drawList(group, block.body, lx + LOOP_INDENT, bodyY, bM.w, cbs, hitMap);
@@ -238,7 +252,7 @@ function drawBlock(group, block, x, y, colW, cbs, hitMap, list, idx) {
       const bodyY = y;
       const res = drawList(group, block.body, lx + LOOP_INDENT, bodyY, bM.w, cbs, hitMap);
       const diaY = res.bottomY + CONNECT_GAP;
-      diamondShape(group, cx, diaY, Math.min(BOX_W, bM.w), DIAMOND_H, `${t('blockDowhile')}: ${block.cond}`, block, cbs, hitMap, list, idx);
+      hexagonShape(group, cx, diaY, Math.min(BOX_W, bM.w), DIAMOND_H, `${t('blockDowhile')}: ${block.cond}`, block, cbs, hitMap, list, idx);
       drawArrow(group, cx, res.bottomY, cx, diaY);
       const loopBackX = lx + LOOP_INDENT / 2;
       drawPath(group, `M ${lx} ${diaY + DIAMOND_H / 2} L ${loopBackX} ${diaY + DIAMOND_H / 2} L ${loopBackX} ${bodyY - CONNECT_GAP} L ${res.centerX} ${bodyY - CONNECT_GAP} L ${res.centerX} ${bodyY}`);

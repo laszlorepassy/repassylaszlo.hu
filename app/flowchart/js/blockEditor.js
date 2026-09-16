@@ -124,10 +124,11 @@ function typeIconMarkup(type) {
       return `<svg viewBox="0 0 48 32" class="type-icon"><polygon points="${3 + skew},3 45,3 ${45 - skew},29 3,29" class="shape shape-${type}"/></svg>`;
     }
     case 'if':
+      return '<svg viewBox="0 0 48 32" class="type-icon"><polygon points="24,2 46,16 24,30 2,16" class="shape shape-decision"/></svg>';
     case 'while':
     case 'dowhile':
     case 'for':
-      return '<svg viewBox="0 0 48 32" class="type-icon"><polygon points="24,2 46,16 24,30 2,16" class="shape shape-decision"/></svg>';
+      return '<svg viewBox="0 0 48 32" class="type-icon"><polygon points="2,16 12,2 36,2 46,16 36,30 12,30" class="shape shape-loop"/></svg>';
     case 'call':
       return '<svg viewBox="0 0 48 32" class="type-icon"><rect x="3" y="3" width="42" height="26" class="shape shape-call"/>'
         + '<line x1="11" y1="3" x2="11" y2="29" class="shape-innerline"/><line x1="37" y1="3" x2="37" y2="29" class="shape-innerline"/></svg>';
