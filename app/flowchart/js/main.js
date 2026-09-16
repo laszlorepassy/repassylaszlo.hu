@@ -1,7 +1,7 @@
 import { t, setLang, getLang, initLang } from './i18n.js';
-import { newProgram, newRoutine, removeBlockById } from './model.js';
+import { newProgram, newRoutine, removeBlockById, cloneBlock } from './model.js';
 import { renderRoutine, highlightBlock } from './render.js';
-import { openInsertMenu, openBlockEditor, openRoutineEditor } from './blockEditor.js';
+import { openInsertMenu, openBlockEditor, openRoutineEditor, showConfirm, showAlert } from './blockEditor.js';
 import { runProgram, formatValue } from './interpreter.js';
 import { generatePython } from './codegen.js';
 import { programToFprg, fprgToProgram, downloadFile, pickFprgFile } from './fileio.js';
@@ -11,6 +11,7 @@ initLang();
 let program = newProgram();
 let currentRoutineIndex = 0;
 let hitMap = new Map();
+let clipboard = null; // a cut block, ready to be pasted at a connector
 
 const runState = { gen: null, running: false, done: false };
 
@@ -20,20 +21,64 @@ const svgRoot = el('flowSvg');
 function currentRoutine() { return program.routines[currentRoutineIndex]; }
 
 // ---------- rendering ----------
+// Declare's "Variable Names" field can produce sibling blocks beyond the
+// one being edited/inserted (comma-separated names, Flowgorithm-style);
+// splice those in right after it, then redraw.
+function handleBlockSaved(list, block, extraBlocks) {
+  if (extraBlocks && extraBlocks.length) {
+    const idx = list.indexOf(block);
+    if (idx >= 0) list.splice(idx + 1, 0, ...extraBlocks);
+  }
+  rerenderDiagram();
+}
+
+function updateClipboardStatus() {
+  const badge = el('clipboardStatus');
+  if (!clipboard) { badge.textContent = ''; badge.hidden = true; return; }
+  badge.hidden = false;
+  badge.textContent = `✂ ${t(`block${clipboard.type[0].toUpperCase()}${clipboard.type.slice(1)}`)} — ${t('clipboardHint')}`;
+}
+
+function doInsert(list, index) {
+  openInsertMenu(list, index, program, (block) => {
+    rerenderDiagram();
+    // Matches Flowgorithm: picking a symbol immediately opens it for editing.
+    openBlockEditor(block, program, (saved, extra) => handleBlockSaved(list, saved, extra), (b) => {
+      removeBlockById(currentRoutine(), b.id);
+      rerenderDiagram();
+    });
+  });
+}
+
 function rerenderDiagram() {
+  const deleteBlock = (block) => {
+    removeBlockById(currentRoutine(), block.id);
+    rerenderDiagram();
+  };
   const cbs = {
-    onInsert: (list, index) => {
-      openInsertMenu(list, index, program, () => rerenderDiagram());
+    onInsert: doInsert,
+    onEdit: (block, list) => {
+      openBlockEditor(block, program, (saved, extra) => handleBlockSaved(list || currentRoutine().body, saved, extra), deleteBlock);
     },
-    onEdit: (block) => {
-      openBlockEditor(block, program, () => rerenderDiagram());
+    // Right-click a symbol to cut it (removes it and holds it); right-click
+    // a connector to paste whatever was last cut there.
+    onCut: (block, list) => {
+      const target = list || currentRoutine().body;
+      const idx = target.indexOf(block);
+      if (idx < 0) return;
+      target.splice(idx, 1);
+      clipboard = cloneBlock(block);
+      updateClipboardStatus();
+      rerenderDiagram();
     },
-    onDelete: (block) => {
-      if (confirm(t('confirmDeleteBlock'))) {
-        removeBlockById(currentRoutine(), block.id);
-        rerenderDiagram();
-      }
+    onPaste: (list, index) => {
+      if (!clipboard) { doInsert(list, index); return; }
+      list.splice(index, 0, clipboard);
+      clipboard = null;
+      updateClipboardStatus();
+      rerenderDiagram();
     },
+    onDelete: deleteBlock,
   };
   const res = renderRoutine(svgRoot, currentRoutine(), cbs);
   hitMap = res.hitMap;
@@ -278,6 +323,66 @@ function refreshCode() {
   el('codeOutput').textContent = generatePython(program);
 }
 
+// ---------- image export ----------
+// The diagram's colors come from css/style.css classes, which a standalone
+// exported file has no access to — so the export gets its own small,
+// self-contained copy of just the rules it needs.
+const EXPORT_SVG_STYLE = `
+  .flow-text { font: 12px sans-serif; fill: #1f2937; }
+  .branch-label { font: 600 11px sans-serif; fill: #6b7280; }
+  .flow-line { stroke: #64748b; stroke-width: 1.6; fill: none; }
+  .arrow-fill { fill: #64748b; }
+  .shape { stroke-width: 1.6; }
+  .shape-terminal { fill: #ecfdf5; stroke: #047857; }
+  .shape-declare, .shape-assign { fill: #eef2ff; stroke: #4338ca; }
+  .shape-input, .shape-output { fill: #eff6ff; stroke: #1d4ed8; }
+  .shape-decision { fill: #fff7ed; stroke: #c2410c; }
+  .shape-call { fill: #f5f3ff; stroke: #6d28d9; }
+  .shape-comment { fill: #fffbeb; stroke: #b45309; stroke-dasharray: 3 2; }
+  .shape-innerline { stroke: #6d28d9; stroke-width: 1.2; }
+`;
+
+function buildExportSvgString() {
+  const src = svgRoot;
+  const clone = src.cloneNode(true);
+  const styleEl = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+  styleEl.textContent = EXPORT_SVG_STYLE;
+  clone.insertBefore(styleEl, clone.firstChild);
+  clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  return new XMLSerializer().serializeToString(clone);
+}
+
+function exportDiagramAsImage(name) {
+  const width = Number(svgRoot.getAttribute('width')) || 800;
+  const height = Number(svgRoot.getAttribute('height')) || 600;
+  const scale = 2;
+  const svgBlob = new Blob([buildExportSvgString()], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+    canvas.toBlob((blob) => {
+      const a = document.createElement('a');
+      const dlUrl = URL.createObjectURL(blob);
+      a.href = dlUrl;
+      a.download = `${name}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(dlUrl), 1000);
+    }, 'image/png');
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); showAlert(t('errGeneric')); };
+  img.src = url;
+}
+
 // ---------- file menu ----------
 function resetAllAndRerender() {
   onResetClick();
@@ -286,9 +391,21 @@ function resetAllAndRerender() {
   rerenderDiagram();
 }
 
-el('btnNew').addEventListener('click', () => {
-  if (confirm(t('confirmNewProgram'))) {
+function programName() {
+  const raw = (el('programName').value || 'program').trim() || 'program';
+  return raw.replace(/[\\/:*?"<>|]/g, '_');
+}
+
+el('clipboardStatus').addEventListener('click', () => {
+  clipboard = null;
+  updateClipboardStatus();
+});
+
+el('btnNew').addEventListener('click', async () => {
+  if (await showConfirm(t('confirmNewProgram'))) {
     program = newProgram();
+    clipboard = null;
+    updateClipboardStatus();
     resetAllAndRerender();
   }
 });
@@ -298,14 +415,16 @@ el('btnOpen').addEventListener('click', async () => {
   if (!file) return;
   try {
     program = fprgToProgram(file.text);
+    clipboard = null;
+    updateClipboardStatus();
     resetAllAndRerender();
   } catch (err) {
-    alert(t('fileLoadError'));
+    await showAlert(t('fileLoadError'));
   }
 });
 
 el('btnSave').addEventListener('click', () => {
-  downloadFile('program.fprg', programToFprg(program));
+  downloadFile(`${programName()}.fprg`, programToFprg(program));
 });
 
 el('btnExportCode').addEventListener('click', () => {
@@ -313,11 +432,13 @@ el('btnExportCode').addEventListener('click', () => {
   switchSideTab('code');
 });
 
+el('btnExportImage').addEventListener('click', () => { exportDiagramAsImage(programName()); });
+
 el('btnCopyCode').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(el('codeOutput').textContent); } catch { /* clipboard may be unavailable */ }
 });
 el('btnDownloadCode').addEventListener('click', () => {
-  downloadFile('program.py', el('codeOutput').textContent, 'text/x-python');
+  downloadFile(`${programName()}.py`, el('codeOutput').textContent, 'text/x-python');
 });
 
 el('btnRun').addEventListener('click', onRunClick);
@@ -333,6 +454,8 @@ function applyStaticStrings() {
   el('btnOpen').textContent = t('menuOpen');
   el('btnSave').textContent = t('menuSave');
   el('btnExportCode').textContent = t('menuExportCode');
+  el('btnExportImage').textContent = t('menuExportImage');
+  el('programName').placeholder = t('programNamePlaceholder');
   el('speedLabel').textContent = t('speed');
   el('btnRun').title = t('run');
   el('btnStep').title = t('step');
@@ -357,6 +480,7 @@ el('langSelect').addEventListener('change', (ev) => {
   renderRoutineTabs();
   rerenderDiagram();
   refreshCode();
+  updateClipboardStatus();
 });
 
 // ---------- boot ----------

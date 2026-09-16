@@ -40,6 +40,14 @@ header#appHeader {
 
 .menu { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
 .spacer { flex: 1; }
+.program-name-input {
+  width: 130px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px;
+  font-size: 13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.clipboard-status {
+  font-size: 12px; color: var(--accent-dark); background: #eef2ff; border: 1px solid #c7d2fe;
+  border-radius: 999px; padding: 4px 10px; cursor: pointer; white-space: nowrap;
+}
 
 .btn {
   background: #fff;
@@ -191,10 +199,11 @@ svg#flowSvg { display: block; background: transparent; }
 
 .shape.active-block { filter: drop-shadow(0 0 0 3px rgba(37,99,235,0.4)); stroke: var(--accent); stroke-width: 3; }
 
-.insert-point { cursor: pointer; opacity: 0.35; transition: opacity .12s; }
-.insert-point:hover { opacity: 1; }
-.insert-circle { fill: #fff; stroke: var(--accent); stroke-width: 1.4; }
-.insert-plus { stroke: var(--accent); stroke-width: 1.6; }
+/* Invisible, wide overlay on a plain connector so clicking anywhere along
+   the arrow opens the insert picker (or, on right-click, pastes a cut
+   block) — like clicking a connector in Flowgorithm itself. */
+.flow-line-hit { stroke: transparent; stroke-width: 14px; cursor: pointer; }
+.flow-line-hit:hover { stroke: rgba(37,99,235,0.12); }
 
 /* --- modal --- */
 .modal-overlay {
@@ -211,18 +220,41 @@ svg#flowSvg { display: block; background: transparent; }
 .field input[type=text], .field select, .field textarea {
   font-size: 14px; color: var(--text); padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit;
 }
+/* Expressions, conditions, variable/routine names and arguments are code,
+   not prose — a fixed-width font makes them easier to read and edit. */
+.field input[type=text], .field textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
 .field input[type=checkbox] { width: 18px; height: 18px; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 .form-error { color: var(--danger); font-size: 12px; min-height: 16px; }
 
 .type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .type-btn {
-  padding: 12px 8px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; cursor: pointer; font-size: 13px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 10px 8px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; cursor: pointer; font-size: 13px;
 }
 .type-btn:hover { border-color: var(--accent); background: #eef2ff; }
+.type-icon { width: 48px; height: 32px; }
+.type-btn-label { line-height: 1.2; }
 
 .args-wrap { display: flex; flex-direction: column; gap: 8px; border-top: 1px dashed var(--border); padding-top: 8px; }
 .hint { color: var(--muted); font-size: 12px; }
+
+/* --- temporary testing password gate --- */
+.gate-overlay {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; align-items: center; justify-content: center; z-index: 1000;
+}
+.gate-form {
+  background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 28px 26px;
+  width: 280px; max-width: 90vw; box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.gate-title { font-weight: 700; font-size: 20px; color: var(--accent-dark); text-align: center; }
+.gate-field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+.gate-field input { font-size: 14px; padding: 7px 9px; border: 1px solid var(--border); border-radius: 6px; }
+.gate-error { color: var(--danger); font-size: 12px; min-height: 14px; text-align: center; }
 
 .params-header { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 12px; color: var(--muted); }
 .params-list { display: flex; flex-direction: column; gap: 6px; }

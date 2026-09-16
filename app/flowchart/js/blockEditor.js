@@ -7,6 +7,36 @@ const NAME_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
 function modalRoot() { return document.getElementById('modalRoot'); }
 
+// In-app replacements for window.confirm()/alert(): a browser's native
+// dialogs show the page's origin in their title bar (e.g. "repassylaszlo.hu
+// says"), which looks wrong for an app; these look like the rest of the UI.
+export function showConfirm(message) {
+  return new Promise((resolve) => {
+    openModal((dialog, close) => {
+      const p = document.createElement('p');
+      p.textContent = message;
+      p.style.margin = '0 0 4px';
+      dialog.appendChild(p);
+      buttonRow(dialog, [
+        { label: t('cancel'), onClick: () => { close(); resolve(false); } },
+        { label: t('ok'), primary: true, onClick: () => { close(); resolve(true); } },
+      ]);
+    });
+  });
+}
+
+export function showAlert(message) {
+  return new Promise((resolve) => {
+    openModal((dialog, close) => {
+      const p = document.createElement('p');
+      p.textContent = message;
+      p.style.margin = '0 0 4px';
+      dialog.appendChild(p);
+      buttonRow(dialog, [{ label: t('ok'), primary: true, onClick: () => { close(); resolve(); } }]);
+    });
+  });
+}
+
 function openModal(buildFn) {
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
@@ -64,9 +94,49 @@ function buttonRow(parent, buttons) {
     row.appendChild(btn);
   }
   parent.appendChild(row);
+  return row;
+}
+
+// Pressing Enter in a single-line text field submits the dialog, same as
+// clicking its primary button (Comment's textarea is excluded, since Enter
+// there means "new line").
+function enterSubmits(dialog, primaryBtn) {
+  dialog.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter' && ev.target.tagName === 'INPUT') {
+      ev.preventDefault();
+      primaryBtn.click();
+    }
+  });
 }
 
 const BLOCK_TYPE_ORDER = ['declare', 'assign', 'input', 'output', 'if', 'while', 'dowhile', 'for', 'call', 'comment'];
+
+// Small flowchart-shape icons for the insert picker, reusing the exact CSS
+// classes (and thus colors) the real diagram draws each block type with.
+function typeIconMarkup(type) {
+  switch (type) {
+    case 'declare':
+    case 'assign':
+      return '<svg viewBox="0 0 48 32" class="type-icon"><rect x="3" y="3" width="42" height="26" rx="2" class="shape shape-' + type + '"/></svg>';
+    case 'input':
+    case 'output': {
+      const skew = 9;
+      return `<svg viewBox="0 0 48 32" class="type-icon"><polygon points="${3 + skew},3 45,3 ${45 - skew},29 3,29" class="shape shape-${type}"/></svg>`;
+    }
+    case 'if':
+    case 'while':
+    case 'dowhile':
+    case 'for':
+      return '<svg viewBox="0 0 48 32" class="type-icon"><polygon points="24,2 46,16 24,30 2,16" class="shape shape-decision"/></svg>';
+    case 'call':
+      return '<svg viewBox="0 0 48 32" class="type-icon"><rect x="3" y="3" width="42" height="26" class="shape shape-call"/>'
+        + '<line x1="11" y1="3" x2="11" y2="29" class="shape-innerline"/><line x1="37" y1="3" x2="37" y2="29" class="shape-innerline"/></svg>';
+    case 'comment':
+      return '<svg viewBox="0 0 48 32" class="type-icon"><rect x="3" y="3" width="42" height="26" rx="3" class="shape shape-comment"/></svg>';
+    default:
+      return '';
+  }
+}
 
 export function openInsertMenu(list, index, program, onInsert) {
   openModal((dialog, close) => {
@@ -78,7 +148,7 @@ export function openInsertMenu(list, index, program, onInsert) {
     for (const type of BLOCK_TYPE_ORDER) {
       const btn = document.createElement('button');
       btn.className = `type-btn type-btn-${type}`;
-      btn.textContent = t(`block${type[0].toUpperCase()}${type.slice(1)}`);
+      btn.innerHTML = `${typeIconMarkup(type)}<span class="type-btn-label">${t(`block${type[0].toUpperCase()}${type.slice(1)}`)}</span>`;
       btn.addEventListener('click', () => {
         const block = newBlock(type);
         list.splice(index, 0, block);
@@ -92,7 +162,11 @@ export function openInsertMenu(list, index, program, onInsert) {
   });
 }
 
-export function openBlockEditor(block, program, onSave) {
+// onSave(block, extraBlocks): extraBlocks is a (usually empty) array of
+// sibling blocks to splice in right after `block` — currently only used by
+// Declare's comma-separated "Variable Names" field, matching Flowgorithm's
+// own Declare dialog, which can create several variables at once.
+export function openBlockEditor(block, program, onSave, onDelete) {
   openModal((dialog, close) => {
     const h = document.createElement('h3');
     h.textContent = `${t('editBlock')} — ${t(`block${block.type[0].toUpperCase()}${block.type.slice(1)}`)}`;
@@ -102,25 +176,33 @@ export function openBlockEditor(block, program, onSave) {
     dialog.appendChild(form);
 
     const getters = [];
-    buildFieldsForBlock(block, form, program, getters);
+    const extraBlocks = [];
+    buildFieldsForBlock(block, form, program, getters, extraBlocks);
 
-    buttonRow(dialog, [
-      { label: t('cancel'), onClick: close },
-      {
-        label: t('save'), primary: true, onClick: () => {
-          for (const apply of getters) apply();
-          close();
-          onSave(block);
+    const buttons = [{ label: t('cancel'), onClick: close }];
+    if (onDelete) {
+      buttons.push({
+        label: t('delete'), onClick: async () => {
+          if (await showConfirm(t('confirmDeleteBlock'))) { close(); onDelete(block); }
         },
+      });
+    }
+    buttons.push({
+      label: t('save'), primary: true, onClick: () => {
+        for (const apply of getters) apply();
+        close();
+        onSave(block, extraBlocks);
       },
-    ]);
+    });
+    const row = buttonRow(dialog, buttons);
+    enterSubmits(dialog, row.querySelector('.btn-primary'));
   });
 }
 
-function buildFieldsForBlock(block, form, program, getters) {
+function buildFieldsForBlock(block, form, program, getters, extraBlocks) {
   switch (block.type) {
     case 'declare': {
-      const name = field(form, t('varName'), textInput(block.varName));
+      const name = field(form, t('labelVariableNames'), textInput(block.varName));
       const type = field(form, t('varType'), selectInput(VAR_TYPES, block.varType));
       const arrChk = document.createElement('input');
       arrChk.type = 'checkbox';
@@ -134,21 +216,31 @@ function buildFieldsForBlock(block, form, program, getters) {
       arrChk.addEventListener('change', syncSize);
       syncSize();
       getters.push(() => {
-        block.varName = name.value.trim() || block.varName;
+        // Flowgorithm's own Declare dialog accepts several comma-separated
+        // names at once; the first becomes this block, the rest become new
+        // sibling Declare blocks (see openBlockEditor's `extraBlocks`).
+        const names = name.value.split(',').map((s) => s.trim()).filter(Boolean);
+        const finalNames = names.length ? names : [block.varName];
+        block.varName = finalNames[0];
         block.varType = type.value;
         block.isArray = arrChk.checked;
         block.arraySize = sizeInput.value;
+        for (let i = 1; i < finalNames.length; i++) {
+          extraBlocks.push(newBlock('declare', {
+            varName: finalNames[i], varType: type.value, isArray: arrChk.checked, arraySize: sizeInput.value,
+          }));
+        }
       });
       break;
     }
     case 'assign': {
-      const name = field(form, t('varName'), textInput(block.varName));
+      const name = field(form, t('labelVariable'), textInput(block.varName));
       const expr = field(form, t('labelExpression'), textInput(block.expr));
       getters.push(() => { block.varName = name.value.trim() || block.varName; block.expr = expr.value; });
       break;
     }
     case 'input': {
-      const name = field(form, t('varName'), textInput(block.varName));
+      const name = field(form, t('labelVariable'), textInput(block.varName));
       const prompt = field(form, t('labelPrompt'), textInput(block.prompt));
       getters.push(() => { block.varName = name.value.trim() || block.varName; block.prompt = prompt.value; });
       break;
@@ -170,7 +262,7 @@ function buildFieldsForBlock(block, form, program, getters) {
       break;
     }
     case 'for': {
-      const name = field(form, t('varName'), textInput(block.varName));
+      const name = field(form, t('labelVariable'), textInput(block.varName));
       const start = field(form, t('labelStart'), textInput(block.start));
       const end = field(form, t('labelEnd'), textInput(block.end));
       const step = field(form, t('labelStepBy'), textInput(block.step));
@@ -301,8 +393,8 @@ export function openRoutineEditor(routine, program, { onSave, onDelete }) {
     const buttons = [{ label: t('cancel'), onClick: close }];
     if (!isNew && onDelete) {
       buttons.push({
-        label: t('delete'), onClick: () => {
-          if (confirm(t('confirmDeleteRoutine'))) { close(); onDelete(routine); }
+        label: t('delete'), onClick: async () => {
+          if (await showConfirm(t('confirmDeleteRoutine'))) { close(); onDelete(routine); }
         },
       });
     }
@@ -320,6 +412,7 @@ export function openRoutineEditor(routine, program, { onSave, onDelete }) {
         }, routine);
       },
     });
-    buttonRow(dialog, buttons);
+    const row = buttonRow(dialog, buttons);
+    enterSubmits(dialog, row.querySelector('.btn-primary'));
   });
 }

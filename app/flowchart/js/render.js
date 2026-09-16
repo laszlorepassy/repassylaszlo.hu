@@ -70,8 +70,19 @@ function measureBlock(b) {
 }
 
 // ---------- shape drawing helpers ----------
-function drawArrow(parent, x1, y1, x2, y2) {
+// A plain top-to-bottom connector between siblings in a list is itself
+// clickable — click opens the insert picker, right-click pastes whatever
+// was last cut (Flowgorithm-style: no separate + marker needed). Structural
+// connectors used elsewhere (branch/loop wiring) call this without
+// list/index/cbs and stay purely decorative.
+function drawArrow(parent, x1, y1, x2, y2, list, index, cbs) {
   svg('line', { x1, y1, x2, y2, class: 'flow-line', 'marker-end': 'url(#arrowhead)' }, parent);
+  if (list && cbs) {
+    const hit = svg('line', { x1, y1, x2, y2, class: 'flow-line-hit' }, parent);
+    hit.addEventListener('click', (ev) => { ev.stopPropagation(); cbs.onInsert(list, index); });
+    hit.addEventListener('contextmenu', (ev) => { ev.preventDefault(); ev.stopPropagation(); cbs.onPaste(list, index); });
+    svg('title', {}, hit).textContent = t('insertBlock');
+  }
 }
 function drawPath(parent, d) {
   svg('path', { d, class: 'flow-line', fill: 'none', 'marker-end': 'url(#arrowhead)' }, parent);
@@ -96,17 +107,7 @@ function blockText(b) {
   }
 }
 
-// Registers click handlers for an insert-point marker on the connector line.
-function insertPoint(group, cx, y, list, index, cbs) {
-  const g = svg('g', { class: 'insert-point', transform: `translate(${cx},${y})` }, group);
-  svg('circle', { r: 8, class: 'insert-circle' }, g);
-  svg('line', { x1: -4, y1: 0, x2: 4, y2: 0, class: 'insert-plus' }, g);
-  svg('line', { x1: 0, y1: -4, x2: 0, y2: 4, class: 'insert-plus' }, g);
-  g.addEventListener('click', (ev) => { ev.stopPropagation(); cbs.onInsert(list, index); });
-  svg('title', {}, g).textContent = t('insertBlock');
-}
-
-function simpleShape(group, block, cx, y, w, h, cbs, hitMap) {
+function simpleShape(group, block, cx, y, w, h, cbs, hitMap, list, idx) {
   let el;
   const cls = `shape shape-${block.type}`;
   switch (block.type) {
@@ -133,8 +134,8 @@ function simpleShape(group, block, cx, y, w, h, cbs, hitMap) {
   const label = text(group, cx, y + h / 2 + 4, truncate(blockText(block)));
   svg('title', {}, el).textContent = `${shapeLabel(block.type)}: ${blockText(block)}`;
   el.dataset.blockId = block.id;
-  const onClick = (ev) => { ev.stopPropagation(); cbs.onEdit(block); };
-  const onCtx = (ev) => { ev.preventDefault(); ev.stopPropagation(); cbs.onDelete(block); };
+  const onClick = (ev) => { ev.stopPropagation(); cbs.onEdit(block, list, idx); };
+  const onCtx = (ev) => { ev.preventDefault(); ev.stopPropagation(); cbs.onCut(block, list, idx); };
   el.addEventListener('click', onClick);
   label.addEventListener('click', onClick);
   el.addEventListener('contextmenu', onCtx);
@@ -144,14 +145,14 @@ function simpleShape(group, block, cx, y, w, h, cbs, hitMap) {
   return el;
 }
 
-function diamondShape(group, cx, y, w, h, condText, block, cbs, hitMap) {
+function diamondShape(group, cx, y, w, h, condText, block, cbs, hitMap, list, idx) {
   const pts = `${cx},${y} ${cx + w / 2},${y + h / 2} ${cx},${y + h} ${cx - w / 2},${y + h / 2}`;
   const el = svg('polygon', { points: pts, class: `shape shape-decision` }, group);
   const label = text(group, cx, y + h / 2 + 4, truncate(condText, 22));
   svg('title', {}, el).textContent = condText;
   el.dataset.blockId = block.id;
-  const onClick = (ev) => { ev.stopPropagation(); cbs.onEdit(block); };
-  const onCtx = (ev) => { ev.preventDefault(); ev.stopPropagation(); cbs.onDelete(block); };
+  const onClick = (ev) => { ev.stopPropagation(); cbs.onEdit(block, list, idx); };
+  const onCtx = (ev) => { ev.preventDefault(); ev.stopPropagation(); cbs.onCut(block, list, idx); };
   el.addEventListener('click', onClick);
   label.addEventListener('click', onClick);
   el.addEventListener('contextmenu', onCtx);
@@ -167,37 +168,41 @@ function diamondShape(group, cx, y, w, h, condText, block, cbs, hitMap) {
 function drawList(group, list, x, yTop, colW, cbs, hitMap) {
   let y = yTop;
   const cx = x + colW / 2;
-  insertPoint(group, cx, y + GAP / 2, list, 0, cbs);
-  drawArrow(group, cx, y, cx, y + GAP);
+  drawArrow(group, cx, y, cx, y + GAP, list, 0, cbs);
   y += GAP;
   list.forEach((block, idx) => {
     const m = measureBlock(block);
-    const bottom = drawBlock(group, block, x, y, colW, cbs, hitMap);
+    const bottom = drawBlock(group, block, x, y, colW, cbs, hitMap, list, idx);
     y = bottom;
-    insertPoint(group, cx, y + GAP / 2, list, idx + 1, cbs);
-    drawArrow(group, cx, y, cx, y + GAP);
+    drawArrow(group, cx, y, cx, y + GAP, list, idx + 1, cbs);
     y += GAP;
   });
   return { bottomY: y, centerX: cx };
 }
 
-function drawBlock(group, block, x, y, colW, cbs, hitMap) {
+function drawBlock(group, block, x, y, colW, cbs, hitMap, list, idx) {
   switch (block.type) {
     case 'if': {
       const tM = measureList(block.trueBody);
       const fM = measureList(block.falseBody);
       const totalW = tM.w + fM.w + BRANCH_GAP;
-      const cx = x + totalW / 2;
-      diamondShape(group, cx, y, Math.min(BOX_W, totalW), DIAMOND_H, `${t('blockIf')}: ${block.cond}`, block, cbs, hitMap);
+      // Center this block's own content on the trunk line the parent
+      // column already draws its connectors through (x + colW/2), instead
+      // of on its own local width — otherwise, whenever a sibling is wider
+      // than this If/While/For/DoWhile, the shape drifts off the line the
+      // incoming/outgoing arrows actually use, and the diagram looks broken.
+      const cx = x + colW / 2;
+      const lx = cx - totalW / 2;
+      diamondShape(group, cx, y, Math.min(BOX_W, totalW), DIAMOND_H, `${t('blockIf')}: ${block.cond}`, block, cbs, hitMap, list, idx);
       const branchY = y + DIAMOND_H + CONNECT_GAP;
       const tipX = cx;
       const tipY = y + DIAMOND_H;
-      drawArrow(group, tipX, tipY, x + tM.w / 2, branchY - 2);
-      drawArrow(group, tipX, tipY, x + tM.w + BRANCH_GAP + fM.w / 2, branchY - 2);
+      drawArrow(group, tipX, tipY, lx + tM.w / 2, branchY - 2);
+      drawArrow(group, tipX, tipY, lx + tM.w + BRANCH_GAP + fM.w / 2, branchY - 2);
       text(group, tipX - 26, tipY + 13, t('branchTrue'), 'branch-label');
       text(group, tipX + 26, tipY + 13, t('branchFalse'), 'branch-label');
-      const tRes = drawList(group, block.trueBody, x, branchY, tM.w, cbs, hitMap);
-      const fRes = drawList(group, block.falseBody, x + tM.w + BRANCH_GAP, branchY, fM.w, cbs, hitMap);
+      const tRes = drawList(group, block.trueBody, lx, branchY, tM.w, cbs, hitMap);
+      const fRes = drawList(group, block.falseBody, lx + tM.w + BRANCH_GAP, branchY, fM.w, cbs, hitMap);
       const mergeY = Math.max(tRes.bottomY, fRes.bottomY) + MERGE_PAD;
       drawArrow(group, tRes.centerX, tRes.bottomY, tRes.centerX, mergeY);
       drawArrow(group, fRes.centerX, fRes.bottomY, fRes.centerX, mergeY);
@@ -209,36 +214,39 @@ function drawBlock(group, block, x, y, colW, cbs, hitMap) {
     case 'for': {
       const bM = measureList(block.body);
       const totalW = bM.w + LOOP_INDENT + EXIT_LANE;
-      const cx = x + LOOP_INDENT + bM.w / 2;
+      const cx = x + colW / 2;
+      const lx = cx - totalW / 2;
       const label = block.type === 'for'
         ? `${t('blockFor')} ${block.varName} = ${block.start}..${block.end} (${block.step})`
         : `${t('blockWhile')}: ${block.cond}`;
-      diamondShape(group, cx, y, Math.min(BOX_W, bM.w), DIAMOND_H, label, block, cbs, hitMap);
+      diamondShape(group, cx, y, Math.min(BOX_W, bM.w), DIAMOND_H, label, block, cbs, hitMap, list, idx);
       const bodyY = y + DIAMOND_H + CONNECT_GAP;
       drawArrow(group, cx, y + DIAMOND_H / 2 + 6, cx, bodyY);
-      const res = drawList(group, block.body, x + LOOP_INDENT, bodyY, bM.w, cbs, hitMap);
-      const loopBackX = x + LOOP_INDENT / 2;
-      drawPath(group, `M ${res.centerX} ${res.bottomY} L ${res.centerX} ${res.bottomY + 10} L ${loopBackX} ${res.bottomY + 10} L ${loopBackX} ${y + DIAMOND_H / 2} L ${x} ${y + DIAMOND_H / 2}`);
-      const exitX = x + LOOP_INDENT + bM.w + EXIT_LANE / 2;
+      const res = drawList(group, block.body, lx + LOOP_INDENT, bodyY, bM.w, cbs, hitMap);
+      const loopBackX = lx + LOOP_INDENT / 2;
+      drawPath(group, `M ${res.centerX} ${res.bottomY} L ${res.centerX} ${res.bottomY + 10} L ${loopBackX} ${res.bottomY + 10} L ${loopBackX} ${y + DIAMOND_H / 2} L ${lx} ${y + DIAMOND_H / 2}`);
+      const exitX = lx + LOOP_INDENT + bM.w + EXIT_LANE / 2;
       const exitBottom = res.bottomY + EXIT_PAD;
-      drawPath(group, `M ${x + LOOP_INDENT + bM.w + DIAMOND_H / 6} ${y + DIAMOND_H / 2} L ${exitX} ${y + DIAMOND_H / 2} L ${exitX} ${exitBottom} L ${cx} ${exitBottom}`);
+      drawPath(group, `M ${lx + LOOP_INDENT + bM.w + DIAMOND_H / 6} ${y + DIAMOND_H / 2} L ${exitX} ${y + DIAMOND_H / 2} L ${exitX} ${exitBottom} L ${cx} ${exitBottom}`);
       return exitBottom;
     }
     case 'dowhile': {
       const bM = measureList(block.body);
-      const cx = x + LOOP_INDENT + bM.w / 2;
+      const totalW = bM.w + LOOP_INDENT;
+      const cx = x + colW / 2;
+      const lx = cx - totalW / 2;
       const bodyY = y;
-      const res = drawList(group, block.body, x + LOOP_INDENT, bodyY, bM.w, cbs, hitMap);
+      const res = drawList(group, block.body, lx + LOOP_INDENT, bodyY, bM.w, cbs, hitMap);
       const diaY = res.bottomY + CONNECT_GAP;
-      diamondShape(group, cx, diaY, Math.min(BOX_W, bM.w), DIAMOND_H, `${t('blockDowhile')}: ${block.cond}`, block, cbs, hitMap);
+      diamondShape(group, cx, diaY, Math.min(BOX_W, bM.w), DIAMOND_H, `${t('blockDowhile')}: ${block.cond}`, block, cbs, hitMap, list, idx);
       drawArrow(group, cx, res.bottomY, cx, diaY);
-      const loopBackX = x + LOOP_INDENT / 2;
-      drawPath(group, `M ${x} ${diaY + DIAMOND_H / 2} L ${loopBackX} ${diaY + DIAMOND_H / 2} L ${loopBackX} ${bodyY - CONNECT_GAP} L ${res.centerX} ${bodyY - CONNECT_GAP} L ${res.centerX} ${bodyY}`);
+      const loopBackX = lx + LOOP_INDENT / 2;
+      drawPath(group, `M ${lx} ${diaY + DIAMOND_H / 2} L ${loopBackX} ${diaY + DIAMOND_H / 2} L ${loopBackX} ${bodyY - CONNECT_GAP} L ${res.centerX} ${bodyY - CONNECT_GAP} L ${res.centerX} ${bodyY}`);
       return diaY + DIAMOND_H + EXIT_PAD;
     }
     default: {
       const cx = x + colW / 2;
-      simpleShape(group, block, cx, y, BOX_W, BOX_H, cbs, hitMap);
+      simpleShape(group, block, cx, y, BOX_W, BOX_H, cbs, hitMap, list, idx);
       return y + BOX_H;
     }
   }
