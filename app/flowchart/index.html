@@ -8,51 +8,7 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div id="gateOverlay" class="gate-overlay">
-  <form id="gateForm" class="gate-form">
-    <div class="gate-title">Flowchart</div>
-    <label class="gate-field">
-      <span id="gateLabel">Password</span>
-      <input type="password" id="gatePassword" autocomplete="current-password">
-    </label>
-    <button type="submit" class="btn btn-primary" id="gateSubmit">OK</button>
-    <div id="gateError" class="gate-error"></div>
-  </form>
-</div>
-<script>
-// Temporary client-side gate while this app is being tested — purely a
-// casual-visitor deterrent (there is no backend, so this cannot be real
-// security; anyone can read the password in this file's source).
-(function () {
-  var KEY = 'flowchart_gate_ok';
-  var PASSWORD = 'flowgorithm';
-  var isHu = (navigator.language || '').toLowerCase().indexOf('hu') === 0;
-  document.getElementById('gateLabel').textContent = isHu ? 'Jelszó' : 'Password';
-  document.getElementById('gateSubmit').textContent = isHu ? 'Belépés' : 'Enter';
-  var overlay = document.getElementById('gateOverlay');
-  // #app is declared later in the document, so it must be looked up lazily
-  // (not at script-parse time, when it wouldn't exist in the DOM yet).
-  function unlock() { overlay.style.display = 'none'; document.getElementById('app').style.display = ''; }
-  var already = false;
-  try { already = sessionStorage.getItem(KEY) === '1'; } catch (e) { /* ignore */ }
-  if (already) { unlock(); } else {
-    var input = document.getElementById('gatePassword');
-    setTimeout(function () { input.focus(); }, 0);
-    document.getElementById('gateForm').addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      if (input.value === PASSWORD) {
-        try { sessionStorage.setItem(KEY, '1'); } catch (e) { /* ignore */ }
-        unlock();
-      } else {
-        document.getElementById('gateError').textContent = isHu ? 'Hibás jelszó.' : 'Wrong password.';
-        input.value = '';
-        input.focus();
-      }
-    });
-  }
-})();
-</script>
-<div id="app" style="display:none">
+<div id="app">
   <header id="appHeader">
     <div class="brand" id="brandTitle">Flowchart</div>
     <nav class="menu">
