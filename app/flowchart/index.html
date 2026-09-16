@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowchart</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <header id="appHeader">
+    <div class="brand" id="brandTitle">Flowchart</div>
+    <nav class="menu">
+      <button id="btnNew" class="btn"></button>
+      <button id="btnOpen" class="btn"></button>
+      <button id="btnSave" class="btn"></button>
+      <button id="btnExportCode" class="btn"></button>
+      <span class="spacer"></span>
+      <div class="run-controls">
+        <button id="btnRun" class="btn btn-run" title="Run">▶</button>
+        <button id="btnStep" class="btn" title="Step">⏭</button>
+        <button id="btnPause" class="btn" title="Pause">⏸</button>
+        <button id="btnReset" class="btn" title="Reset">⟲</button>
+        <label class="speed-label"><span id="speedLabel">Speed</span>
+          <input type="range" id="speedRange" min="0" max="100" value="70">
+        </label>
+      </div>
+      <select id="langSelect">
+        <option value="en">EN</option>
+        <option value="hu">HU</option>
+      </select>
+    </nav>
+  </header>
+
+  <div class="routine-tabs" id="routineTabs"></div>
+
+  <main>
+    <div class="canvas-wrap" id="canvasWrap">
+      <svg id="flowSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <aside class="side-panel">
+      <div class="side-tabs" id="sideTabs">
+        <button class="side-tab active" data-tab="vars" id="tabBtnVars"></button>
+        <button class="side-tab" data-tab="console" id="tabBtnConsole"></button>
+        <button class="side-tab" data-tab="code" id="tabBtnCode"></button>
+      </div>
+
+      <div class="tab-content active" id="tabVars">
+        <table class="vars-table">
+          <thead><tr><th id="thName"></th><th id="thType"></th><th id="thValue"></th></tr></thead>
+          <tbody id="varsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="tab-content" id="tabConsole">
+        <div id="consoleOutput" class="console-output"></div>
+        <div id="inputRow" class="input-row" hidden>
+          <label id="inputLabel" for="inputField"></label>
+          <div class="input-row-controls">
+            <input type="text" id="inputField">
+            <button id="inputSubmit" class="btn btn-primary"></button>
+          </div>
+        </div>
+        <div id="runStatus" class="run-status"></div>
+      </div>
+
+      <div class="tab-content" id="tabCode">
+        <div class="code-actions">
+          <button id="btnCopyCode" class="btn btn-small"></button>
+          <button id="btnDownloadCode" class="btn btn-small"></button>
+        </div>
+        <pre id="codeOutput" class="code-output"></pre>
+      </div>
+    </aside>
+  </main>
+
+  <div id="modalRoot"></div>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
