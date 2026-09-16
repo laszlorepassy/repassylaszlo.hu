@@ -6,7 +6,7 @@ const DICTS = {
   en: {
     appTitle: 'Flowchart',
     menuNew: 'New', menuOpen: 'Open…', menuSave: 'Save', menuSaveAs: 'Save As…',
-    menuExportCode: 'Export Source Code', menuExportImage: 'Export Image',
+    menuExportImage: 'Export Image', generateCode: 'Generate Source Code',
     programNamePlaceholder: 'Program name',
     clipboardHint: 'right-click a connector to paste, or click here to cancel',
     run: 'Run', step: 'Step', pause: 'Pause', reset: 'Reset', speed: 'Speed',
@@ -63,7 +63,7 @@ const DICTS = {
   hu: {
     appTitle: 'Folyamatábra',
     menuNew: 'Új', menuOpen: 'Megnyitás…', menuSave: 'Mentés', menuSaveAs: 'Mentés másként…',
-    menuExportCode: 'Forráskód exportálása', menuExportImage: 'Kép exportálása',
+    menuExportImage: 'Kép exportálása', generateCode: 'Forráskód generálása',
     programNamePlaceholder: 'Program neve',
     clipboardHint: 'jobb kattintás egy nyílra a beillesztéshez, vagy kattints ide a törléshez',
     run: 'Futtatás', step: 'Lépés', pause: 'Szünet', reset: 'Visszaállítás', speed: 'Sebesség',

@@ -454,10 +454,7 @@ el('btnSave').addEventListener('click', () => {
   downloadFile(`${programName()}.fprg`, programToFprg(program));
 });
 
-el('btnExportCode').addEventListener('click', () => {
-  refreshCode();
-  switchSideTab('code');
-});
+el('btnGenerateCode').addEventListener('click', refreshCode);
 
 el('btnExportImage').addEventListener('click', () => { exportDiagramAsImage(programName()); });
 
@@ -480,7 +477,7 @@ function applyStaticStrings() {
   el('btnNew').textContent = t('menuNew');
   el('btnOpen').textContent = t('menuOpen');
   el('btnSave').textContent = t('menuSave');
-  el('btnExportCode').textContent = t('menuExportCode');
+  el('btnGenerateCode').textContent = t('generateCode');
   el('btnExportImage').textContent = t('menuExportImage');
   el('programName').placeholder = t('programNamePlaceholder');
   el('speedLabel').textContent = t('speed');
