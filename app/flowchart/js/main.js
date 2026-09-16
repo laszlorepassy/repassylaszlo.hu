@@ -204,6 +204,9 @@ function requestInputFromUser(ev) {
       row.hidden = true;
       submit.removeEventListener('click', done);
       field.removeEventListener('keydown', onKey);
+      // Echo what was typed into the console log, like a real console would,
+      // so the run's log shows both what the program asked for and what it got.
+      appendConsole(`${ev.varName} = ${field.value}`, true);
       resolve(field.value);
     }
     function onKey(e) { if (e.key === 'Enter') done(); }
