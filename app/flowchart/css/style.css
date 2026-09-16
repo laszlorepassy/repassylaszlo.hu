@@ -237,7 +237,12 @@ svg#flowSvg { display: block; background: transparent; }
 .shape-call { fill: var(--call-fill); stroke: var(--call-stroke); }
 .shape-comment { fill: var(--comment-fill); stroke: var(--comment-stroke); stroke-dasharray: 3 2; }
 
-.shape.active-block { filter: drop-shadow(0 0 0 3px rgba(37,99,235,0.4)); stroke: var(--accent); stroke-width: 3; }
+/* drop-shadow() only takes offset-x/offset-y/blur-radius, not a 4th
+   "spread" value like box-shadow — a spread value here made the whole
+   filter invalid (and silently ignored), leaving only a thin 3px stroke
+   as the sole visible cue, easy to miss on a loop body's blocks flashing
+   past quickly during a run. */
+.shape.active-block { filter: drop-shadow(0 0 5px rgba(37,99,235,0.9)); stroke: var(--accent); stroke-width: 3; }
 
 /* Invisible, wide overlay on a plain connector so clicking anywhere along
    the arrow opens the insert picker (or, on right-click, pastes a cut
