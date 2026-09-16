@@ -295,7 +295,11 @@ export function renderRoutine(svgRoot, routine, cbs) {
   svg('rect', { x: bodyRes.centerX - BOX_W / 2, y: bodyRes.bottomY, width: BOX_W, height: TERM_H, rx: TERM_H / 2, class: 'shape shape-terminal' }, group);
   text(group, bodyRes.centerX, bodyRes.bottomY + TERM_H / 2 + 4, endLabel);
 
-  const totalH = bodyRes.bottomY + TERM_H + 20;
+  // +20 mirrors the group's own translate(30,20) offset (so the End shape
+  // gets the same margin below it that the Start shape gets above it);
+  // the group's translate is *inside* this height, so leaving it out here
+  // left zero room for the End shape's stroke and clipped its bottom edge.
+  const totalH = bodyRes.bottomY + TERM_H + 20 + 20;
   svgRoot.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
   svgRoot.setAttribute('width', totalW);
   svgRoot.setAttribute('height', totalH);
