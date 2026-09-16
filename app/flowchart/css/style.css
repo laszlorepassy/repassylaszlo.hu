@@ -166,6 +166,8 @@ main { flex: 1; display: flex; min-height: 0; }
   overflow: auto;
   min-height: 120px;
 }
+.console-error-line { color: #f87171; font-weight: 600; }
+.console-success-line { color: #4ade80; font-weight: 600; }
 .input-row { margin-top: 8px; }
 .input-row label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
 .input-row-controls { display: flex; gap: 6px; }

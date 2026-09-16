@@ -44,16 +44,9 @@
     </div>
     <aside class="side-panel">
       <div class="side-tabs" id="sideTabs">
-        <button class="side-tab" data-tab="vars" id="tabBtnVars"></button>
         <button class="side-tab active" data-tab="console" id="tabBtnConsole"></button>
+        <button class="side-tab" data-tab="vars" id="tabBtnVars"></button>
         <button class="side-tab" data-tab="code" id="tabBtnCode"></button>
-      </div>
-
-      <div class="tab-content" id="tabVars">
-        <table class="vars-table">
-          <thead><tr><th id="thName"></th><th id="thType"></th><th id="thValue"></th></tr></thead>
-          <tbody id="varsBody"></tbody>
-        </table>
       </div>
 
       <div class="tab-content active" id="tabConsole">
@@ -66,6 +59,13 @@
           </div>
         </div>
         <div id="runStatus" class="run-status"></div>
+      </div>
+
+      <div class="tab-content" id="tabVars">
+        <table class="vars-table">
+          <thead><tr><th id="thName"></th><th id="thType"></th><th id="thValue"></th></tr></thead>
+          <tbody id="varsBody"></tbody>
+        </table>
       </div>
 
       <div class="tab-content" id="tabCode">

@@ -164,9 +164,25 @@ function updateVarsPanel(scope) {
 function clearVarsPanel() { el('varsBody').innerHTML = ''; }
 
 // ---------- console ----------
+// Appends as DOM nodes (not `textContent +=`), so an earlier system-message
+// span keeps its color instead of being flattened back to plain text by a
+// later plain-text append.
 function appendConsole(str, newline) {
   const out = el('consoleOutput');
-  out.textContent += str + (newline ? '\n' : '');
+  out.appendChild(document.createTextNode(str + (newline ? '\n' : '')));
+  out.scrollTop = out.scrollHeight;
+}
+// A run-lifecycle notice (started/finished/stopped/error), shown inline in
+// the console so the whole run reads as one log: errors red, other system
+// notices green, the program's own Output text plain white — all on the
+// same black background.
+function logSystemMessage(str, kind) {
+  const out = el('consoleOutput');
+  const span = document.createElement('span');
+  span.className = kind === 'error' ? 'console-error-line' : 'console-success-line';
+  span.textContent = str;
+  out.appendChild(span);
+  out.appendChild(document.createTextNode('\n'));
   out.scrollTop = out.scrollHeight;
 }
 function clearConsole() { el('consoleOutput').textContent = ''; }
@@ -240,7 +256,9 @@ function errorText(err) {
 }
 
 function handleRuntimeError(err) {
-  setStatus(errorText(err));
+  const msg = errorText(err);
+  setStatus(msg);
+  logSystemMessage(msg, 'error');
   if (err && err.blockId) highlightBlock(hitMap, err.blockId);
   switchSideTab('console');
 }
@@ -262,6 +280,7 @@ function finishRun(errored) {
   setRunButtonsState();
   if (!errored) {
     setStatus(t('programFinished'));
+    logSystemMessage(t('programFinished'), 'success');
     highlightBlock(hitMap, null);
   }
 }
@@ -298,7 +317,12 @@ async function onRunClick() {
   setRunButtonsState();
 }
 
-function onPauseClick() { runState.running = false; setRunButtonsState(); }
+function onPauseClick() {
+  runState.running = false;
+  setRunButtonsState();
+  setStatus(t('programStopped'));
+  logSystemMessage(t('programStopped'), 'success');
+}
 
 function onResetClick() {
   runState.gen = null;
