@@ -45,9 +45,9 @@ header#appHeader {
   gap: 16px;
 }
 .menu { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
-.spacer { flex: 1; }
 .program-name-input {
-  flex: 1; min-width: 120px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px;
+  /* Takes all the free room up to the run controls. */
+  flex: 1 1 auto; min-width: 120px; margin-right: 8px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px;
   font-size: 13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 .clipboard-status {
@@ -252,6 +252,7 @@ svg#flowSvg { display: block; background: transparent; }
 .shape-loop { fill: var(--loop-fill); stroke: var(--loop-stroke); }
 .shape-call { fill: var(--call-fill); stroke: var(--call-stroke); }
 .shape-file { fill: var(--file-fill); stroke: var(--file-stroke); }
+.shape-breakpoint { fill: #fee2e2; stroke: var(--danger); stroke-width: 2; }
 .shape-comment { fill: var(--comment-fill); stroke: var(--comment-stroke); stroke-dasharray: 3 2; }
 
 /* drop-shadow() only takes offset-x/offset-y/blur-radius, not a 4th
