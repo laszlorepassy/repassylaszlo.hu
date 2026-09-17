@@ -3,7 +3,7 @@
    - Értesítésre kattintva az app ablakát hozza előre
 */
 
-const CACHE = 'timetable-0e3b32b';
+const CACHE = 'timetable-dd1170b';
 const ASSETS = [
   './', 'index.html', 'script.js', 'logic.js', 'style.css', 'lz-string.min.js',
   'manifest.webmanifest', 'icon-192.png', 'table-icon-6369326-512.png',
