@@ -8,23 +8,71 @@
 <meta name="copyright" content="© 2026 Répássy László. Minden jog fenntartva. All rights reserved.">
 <title>Flowchart</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="stylesheet" href="css/style.css?v=896480f4ad">
+<link rel="stylesheet" href="css/style.css?v=09c058f015">
 </head>
 <body>
 <div id="app">
   <header id="appHeader">
     <nav class="menu">
-      <button id="btnNew" class="btn"></button>
-      <button id="btnOpen" class="btn btn-icon btn-icon-open" title="">📂</button>
-      <button id="btnSave" class="btn btn-icon btn-icon-save" title="">💾</button>
-      <button id="btnExportImage" class="btn btn-icon btn-icon-image" title="">🖼️</button>
+      <!-- Icon-only command buttons (Fluent 2 "subtle" icon button: a 32x32
+           square, 20px glyph, no border, name in the tooltip). The glyphs are
+           inline SVG in Fluent's own 24px geometry, colored with currentColor. -->
+      <div class="toolbar-group">
+        <button id="btnNew" class="icon-btn icon-new" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M13.3 3.6H7.8A1.5 1.5 0 0 0 6.3 5.1v13.8a1.5 1.5 0 0 0 1.5 1.5h8.4a1.5 1.5 0 0 0 1.5-1.5V7.9z"/>
+            <path d="M13.3 3.6v2.8a1.5 1.5 0 0 0 1.5 1.5h2.9"/>
+            <path d="M12 11.1v5.2M9.4 13.7h5.2"/>
+          </svg>
+        </button>
+        <button id="btnOpen" class="icon-btn icon-open" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M19.4 10.4V8.2a1.7 1.7 0 0 0-1.7-1.7h-5.2l-1.6-1.7a1.7 1.7 0 0 0-1.2-.5H5.8A1.7 1.7 0 0 0 4.1 6v11.6"/>
+            <path d="M4.1 17.6l2.3-6.1a1.7 1.7 0 0 1 1.6-1.1h11.9a1.2 1.2 0 0 1 1.13 1.6l-1.9 5.3a1.7 1.7 0 0 1-1.6 1.1H5.8a1.7 1.7 0 0 1-1.7-1.7z"/>
+          </svg>
+        </button>
+        <button id="btnSave" class="icon-btn icon-save" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6.5 4.5h8.1a2 2 0 0 1 1.42.59l2.4 2.4A2 2 0 0 1 19 8.9v8.6a2 2 0 0 1-2 2H6.5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2z"/>
+            <path d="M8.6 4.6v3.5h5.3V4.6"/>
+            <path d="M7.6 19.4v-4.6h8.4v4.6"/>
+          </svg>
+        </button>
+        <button id="btnExportImage" class="icon-btn icon-image" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4.6 6.7a2.1 2.1 0 0 1 2.1-2.1h10.6a2.1 2.1 0 0 1 2.1 2.1v10.6a2.1 2.1 0 0 1-2.1 2.1H6.7a2.1 2.1 0 0 1-2.1-2.1z"/>
+            <circle cx="9.4" cy="9.6" r="1.4"/>
+            <path d="M4.8 17.1l3.9-3.7a1.7 1.7 0 0 1 2.3 0l3.1 2.9 1.2-1.1a1.7 1.7 0 0 1 2.3 0l1.7 1.6"/>
+          </svg>
+        </button>
+      </div>
+      <span class="toolbar-divider" aria-hidden="true"></span>
       <input type="text" id="programName" class="program-name-input" value="program">
       <span id="clipboardStatus" class="clipboard-status" hidden title=""></span>
       <div class="run-controls">
-        <button id="btnRun" class="btn btn-run" title="Run">▶</button>
-        <button id="btnStep" class="btn" title="Step">⏭</button>
-        <button id="btnPause" class="btn" title="Pause">⏸</button>
-        <button id="btnReset" class="btn" title="Reset">⟲</button>
+        <button id="btnRun" class="icon-btn icon-run" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path class="solid" d="M7.6 6 17.4 12 7.6 18z"/>
+          </svg>
+        </button>
+        <button id="btnStep" class="icon-btn" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path class="solid" d="M7 6.4 14.9 12 7 17.6z"/>
+            <rect class="solid" x="15.9" y="6" width="2.2" height="12" rx="1.1"/>
+          </svg>
+        </button>
+        <button id="btnPause" class="icon-btn" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <rect class="solid" x="7.5" y="5.8" width="3.4" height="12.4" rx="1.3"/>
+            <rect class="solid" x="13.1" y="5.8" width="3.4" height="12.4" rx="1.3"/>
+          </svg>
+        </button>
+        <button id="btnReset" class="icon-btn" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 4.9a7.1 7.1 0 1 1-6.96 5.7"/>
+            <path d="M14.6 7.2 12 4.9l2.6-2.2"/>
+          </svg>
+        </button>
         <label class="speed-label"><span id="speedLabel">Speed</span>
           <select id="speedSelect">
             <option id="speedOptSlowest" value="800">Slowest</option>
@@ -35,6 +83,7 @@
           </select>
         </label>
       </div>
+      <span class="toolbar-divider" aria-hidden="true"></span>
       <button id="btnHelp" class="btn"></button>
       <select id="langSelect">
         <option value="en">EN</option>
@@ -116,6 +165,6 @@
 
   <div id="modalRoot"></div>
 </div>
-<script type="module" src="js/app.min.js?v=e68d96aab6"></script>
+<script type="module" src="js/app.min.js?v=897b846368"></script>
 </body>
 </html>
