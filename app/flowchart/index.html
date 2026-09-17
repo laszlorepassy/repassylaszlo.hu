@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flowchart</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="stylesheet" href="css/style.css?v=c5c0c6cf3f">
+<link rel="stylesheet" href="css/style.css?v=d8da19e13e">
 </head>
 <body>
 <div id="app">
@@ -90,14 +90,18 @@
           </select>
           <button id="btnCopyCode" class="btn btn-small"></button>
           <button id="btnDownloadCode" class="btn btn-small"></button>
+          <button id="btnEnlargeCode" class="btn btn-small"></button>
         </div>
-        <pre id="codeOutput" class="code-output"></pre>
+        <div class="code-view">
+          <pre id="codeGutter" class="code-gutter" aria-hidden="true"></pre>
+          <pre id="codeOutput" class="code-output"></pre>
+        </div>
       </div>
     </aside>
   </main>
 
   <div id="modalRoot"></div>
 </div>
-<script type="module" src="js/app.min.js?v=fbad49615f"></script>
+<script type="module" src="js/app.min.js?v=a6482eb840"></script>
 </body>
 </html>
