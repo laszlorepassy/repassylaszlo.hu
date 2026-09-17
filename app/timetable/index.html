@@ -5,41 +5,105 @@
   <title>Órarend időzítő</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Répássy László - órarend időzítő alkalmazás." />
+  <meta name="theme-color" content="#b5121b" />
+  <meta name="color-scheme" content="light dark" />
 
   <link rel="icon" type="image/png" href="./table-icon-6369326-512.png">
-  <link rel="stylesheet" href="style.css?v=e8c82a9">
-  <!-- LZ-String a hash-alapú mentéshez (opcionális, de hasznos) -->
-  <script src="./lz-string.min.js?v=e8c82a9"></script>
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css?v=0e3b32b">
+  <!-- LZ-String a hash-alapú mentéshez -->
+  <script src="./lz-string.min.js?v=0e3b32b"></script>
 </head>
 <body>
   <!-- Felső státusz kijelző (nagy betűvel); role="timer": a képernyőolvasó nem olvassa fel másodpercenként -->
-  <div id="statusTop" role="timer">Betöltés...</div>
+  <div id="statusBox">
+    <div id="statusTop" role="timer">Betöltés...</div>
+    <div class="progress" id="progress" hidden><div class="progress-fill" id="progressFill"></div></div>
+  </div>
   <div id="errorMessage" role="alert"></div>
 
   <header>
-    <h1>Órarend időzítő</h1>
+    <h1 id="appTitle">Órarend időzítő</h1>
     <div class="header-actions">
-      <button id="notifyBtn" type="button" hidden>Értesítések bekapcsolása</button>
+      <button id="projectorBtn" type="button">Kivetítés</button>
+      <button id="settingsBtn" type="button">Beállítások</button>
       <button id="newTabBtn" type="button">Új órarend</button>
     </div>
   </header>
 
-  <!-- Órarend neve -->
-  <div class="bar">
-    <input type="text" id="timetableName" value="Új órarend" aria-label="Órarend neve" />
-  </div>
-
-  <!-- Tanítási napok -->
-  <fieldset class="days">
-    <legend>Tanítási napok</legend>
-    <div id="daysList"></div>
-  </fieldset>
-
-  <!-- Órák időpontjai (csak kezdés és befejezés, minden napra közös) -->
-  <section class="times" aria-label="Órák időpontjai">
-    <div id="timesList"></div>
+  <!-- Órák listája, az aktuális kiemelve -->
+  <section class="schedule" aria-label="Órák">
+    <p class="schedule-days" id="scheduleDays"></p>
+    <ol id="scheduleList"></ol>
   </section>
 
-  <script src="script.js?v=e8c82a9"></script>
+  <!-- Beállítások -->
+  <dialog id="settingsDialog" aria-labelledby="settingsTitle">
+    <form method="dialog" class="dialog-head">
+      <h2 id="settingsTitle">Beállítások</h2>
+      <button type="submit" class="icon-btn" aria-label="Bezárás">×</button>
+    </form>
+
+    <section class="settings-section">
+      <h3>Órarend</h3>
+      <label class="field">
+        <span>Név</span>
+        <input type="text" id="timetableName" />
+      </label>
+      <fieldset class="days">
+        <legend>Tanítási napok</legend>
+        <div id="daysList"></div>
+      </fieldset>
+    </section>
+
+    <section class="settings-section">
+      <h3>Órák időpontjai</h3>
+      <div id="timesList"></div>
+      <div class="row-actions">
+        <button type="button" id="addRowBtn" class="secondary">+ Új óra</button>
+        <button type="button" id="resetBtn" class="secondary">Alapértékek visszaállítása</button>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h3>Jelzések</h3>
+      <label class="field">
+        <span>Figyelmeztetés az óra vége előtt (perc, vesszővel)</span>
+        <input type="text" id="warningsInput" inputmode="numeric" placeholder="pl. 5, 1" autocomplete="off" />
+      </label>
+      <label class="check">
+        <input type="checkbox" id="soundInput" />
+        <span>Hangjelzés az óra kezdetén, végén és a figyelmeztetéskor</span>
+      </label>
+      <div class="row-actions">
+        <button type="button" id="testSoundBtn" class="secondary">Hang kipróbálása</button>
+        <button type="button" id="notifyBtn" class="secondary">Értesítések bekapcsolása</button>
+      </div>
+      <p class="hint" id="notifyHint"></p>
+    </section>
+
+    <section class="settings-section">
+      <h3>Megjelenés</h3>
+      <div class="segmented" role="radiogroup" aria-label="Téma">
+        <label><input type="radio" name="theme" value="auto" /> Automatikus</label>
+        <label><input type="radio" name="theme" value="light" /> Világos</label>
+        <label><input type="radio" name="theme" value="dark" /> Sötét</label>
+      </div>
+    </section>
+  </dialog>
+
+  <!-- Kivetítős mód -->
+  <div id="projector" hidden>
+    <button type="button" id="projectorClose" class="icon-btn" aria-label="Kilépés a kivetítésből">×</button>
+    <div class="projector-name" id="projectorName"></div>
+    <div class="projector-label" id="projectorLabel"></div>
+    <div class="projector-countdown" id="projectorCountdown" role="timer"></div>
+    <div class="progress projector-progress" id="projectorProgress" hidden><div class="progress-fill" id="projectorProgressFill"></div></div>
+    <div class="projector-clock" id="projectorClock"></div>
+  </div>
+
+  <script src="logic.js?v=0e3b32b"></script>
+  <script src="script.js?v=0e3b32b"></script>
 </body>
 </html>
