@@ -8,7 +8,7 @@
 <meta name="copyright" content="© 2026 Répássy László. Minden jog fenntartva. All rights reserved.">
 <title>Flowchart</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="stylesheet" href="css/style.css?v=09c058f015">
+<link rel="stylesheet" href="css/style.css?v=56935ffb03">
 </head>
 <body>
 <div id="app">
@@ -46,7 +46,6 @@
           </svg>
         </button>
       </div>
-      <span class="toolbar-divider" aria-hidden="true"></span>
       <input type="text" id="programName" class="program-name-input" value="program">
       <span id="clipboardStatus" class="clipboard-status" hidden title=""></span>
       <div class="run-controls">
@@ -73,19 +72,24 @@
             <path d="M14.6 7.2 12 4.9l2.6-2.2"/>
           </svg>
         </button>
-        <label class="speed-label"><span id="speedLabel">Speed</span>
-          <select id="speedSelect">
-            <option id="speedOptSlowest" value="800">Slowest</option>
-            <option id="speedOptSlow" value="400">Slow</option>
-            <option id="speedOptNormal" value="150" selected>Normal</option>
-            <option id="speedOptFast" value="50">Fast</option>
-            <option id="speedOptFastest" value="0">Fastest</option>
-          </select>
-        </label>
+        <span id="speedLabel" hidden>Speed</span>
+        <select id="speedSelect" hidden>
+          <option id="speedOptSlowest" value="800">Slowest</option>
+          <option id="speedOptSlow" value="400">Slow</option>
+          <option id="speedOptNormal" value="150" selected>Normal</option>
+          <option id="speedOptFast" value="50">Fast</option>
+          <option id="speedOptFastest" value="0">Fastest</option>
+        </select>
       </div>
       <span class="toolbar-divider" aria-hidden="true"></span>
-      <button id="btnHelp" class="btn"></button>
-      <select id="langSelect">
+      <button id="btnHelp" class="icon-btn" title="" aria-label="">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="7.9"/>
+          <path d="M9.9 9.8a2.15 2.15 0 1 1 2.9 2.02c-.53.2-.86.62-.86 1.15v.6"/>
+          <circle class="solid" cx="11.94" cy="16.2" r="0.95"/>
+        </svg>
+      </button>
+      <select id="langSelect" hidden>
         <option value="en">EN</option>
         <option value="hu">HU</option>
       </select>
@@ -105,7 +109,8 @@
         <button id="btnZoomFit" class="btn btn-small" title="Fit to view">⛶</button>
       </div>
     </div>
-    <aside class="side-panel">
+    <div class="panel-resizer" id="panelResizer" role="separator" aria-orientation="vertical" tabindex="0" title="" aria-label=""></div>
+    <aside class="side-panel" id="sidePanel">
       <div class="side-tabs" id="sideTabs">
         <button class="side-tab active" data-tab="console" id="tabBtnConsole"></button>
         <button class="side-tab" data-tab="vars" id="tabBtnVars"></button>
@@ -165,6 +170,6 @@
 
   <div id="modalRoot"></div>
 </div>
-<script type="module" src="js/app.min.js?v=897b846368"></script>
+<script type="module" src="js/app.min.js?v=e990071f24"></script>
 </body>
 </html>

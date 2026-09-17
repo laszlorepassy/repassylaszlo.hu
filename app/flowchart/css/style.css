@@ -114,6 +114,84 @@ header#appHeader {
 .toolbar-group { display: flex; align-items: center; gap: 2px; }
 .toolbar-divider { width: 1px; height: 20px; background: #e0e0e0; }
 
+/* Fluent 2 menu button (speed, language): the same subtle 32px-high button
+   as the icon buttons, but showing the current value and a chevron, and
+   opening a menu of the choices. */
+.menu-btn {
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  color: #242424; /* neutralForeground1 */
+  transition: background-color 100ms cubic-bezier(0.33, 0, 0.67, 1);
+}
+.menu-btn:hover { background: #f0f0f0; }
+.menu-btn:active, .menu-btn[aria-expanded="true"] { background: #e0e0e0; }
+.menu-btn:focus-visible { outline: 2px solid #0f6cbd; outline-offset: 1px; }
+.menu-btn > svg { width: 20px; height: 20px; flex: 0 0 auto; color: #424242; }
+.menu-btn > svg > * { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.menu-btn > svg > .solid { fill: currentColor; stroke-width: 1.2; }
+.menu-btn-value { white-space: nowrap; }
+.menu-btn-chevron { width: 12px !important; height: 12px !important; color: #616161; }
+.menu-btn-chevron > path { stroke-width: 2.2; }
+
+/* The menu surface: Fluent's shadow16 on a rounded card, items 32px high
+   with a check mark in the leading slot for the current value. */
+.fluent-menu {
+  position: fixed;
+  z-index: 60;
+  padding: 4px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.14), 0 0 2px rgba(0,0,0,0.12);
+}
+.fluent-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 32px;
+  padding: 0 10px 0 6px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  color: #242424;
+  text-align: left;
+  white-space: nowrap;
+}
+.fluent-menu-item:hover { background: #f0f0f0; }
+.fluent-menu-item:focus-visible { outline: 2px solid #0f6cbd; outline-offset: -2px; }
+.fluent-menu-check { width: 16px; flex: 0 0 auto; color: #0f6cbd; }
+.fluent-menu-item[aria-checked="true"] { font-weight: 600; }
+.fluent-menu-item[aria-checked="true"] .fluent-menu-check::before { content: "\2713"; }
+
+/* The splitter between the diagram and the side panel. It is a hairline
+   that thickens into the accent color while it is grabbed; the pointer
+   target around it is wider than the line itself. */
+.panel-resizer {
+  flex: 0 0 auto;
+  width: 6px;
+  margin: 0 -3px;
+  z-index: 5;
+  cursor: col-resize;
+  background: none;
+  border: none;
+  touch-action: none;
+}
+.panel-resizer:hover, .panel-resizer.dragging { background: rgba(15, 108, 189, 0.35); }
+.panel-resizer:focus-visible { outline: 2px solid #0f6cbd; outline-offset: -1px; }
+body.resizing-panel { cursor: col-resize; user-select: none; }
+
 .run-controls { display: flex; align-items: center; gap: 2px; }
 .speed-label { display: flex; align-items: center; gap: 4px; margin-left: 10px; font-size: 12px; color: var(--muted); }
 
@@ -205,8 +283,8 @@ svg#flowSvg.panning { cursor: grabbing; }
 .zoom-controls .btn { min-width: 30px; padding: 4px 8px; font-size: 15px; line-height: 1; }
 
 .side-panel {
-  width: 380px;
-  min-width: 300px;
+  width: 380px; /* the starting width; the splitter overrides it inline */
+  flex: 0 0 auto;
   background: var(--panel);
   border-left: 1px solid var(--border);
   display: flex;
@@ -421,7 +499,8 @@ svg#flowSvg { display: block; background: transparent; }
 
 @media (max-width: 820px) {
   main { flex-direction: column; }
-  .side-panel { width: 100%; border-left: none; border-top: 1px solid var(--border); max-height: 45vh; }
+  .side-panel { width: 100% !important; border-left: none; border-top: 1px solid var(--border); max-height: 45vh; }
+  .panel-resizer { display: none; }
 }
 
 /* --- help page (help.html) --- */
