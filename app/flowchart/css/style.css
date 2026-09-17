@@ -323,6 +323,11 @@ svg#flowSvg { display: block; background: transparent; }
 .help-grid section p, .help-grid section ul { margin: 0 0 6px; line-height: 1.45; }
 .help-grid section ul { padding-left: 18px; }
 .modal-dialog.help-dialog { width: min(1000px, 94vw); }
+.help-grid section.help-wide { grid-column: 1 / -1; }
+.help-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 6px; }
+.help-table th { text-align: left; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); padding: 4px 8px; }
+.help-table td { border-bottom: 1px solid #f0f0f0; padding: 4px 8px; vertical-align: top; }
+.help-table td.help-code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 
 .files-toolbar { display: flex; gap: 8px; margin: 10px 0; }
 .files-list { display: flex; flex-direction: column; gap: 6px; }
