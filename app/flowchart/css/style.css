@@ -312,7 +312,6 @@ svg#flowSvg { display: block; background: transparent; }
 .example-btn:hover { border-color: var(--accent); background: #eef2ff; }
 .example-title { font-weight: 600; color: var(--text); }
 .example-desc { font-size: 12px; color: var(--muted); line-height: 1.35; }
-.examples-credit { margin-top: 14px; }
 
 @media (max-width: 820px) {
   main { flex-direction: column; }
