@@ -242,6 +242,8 @@ svg#flowSvg { display: block; background: transparent; }
    filter invalid (and silently ignored), leaving only a thin 3px stroke
    as the sole visible cue, easy to miss on a loop body's blocks flashing
    past quickly during a run. */
+.breakpoint-dot { fill: var(--danger); stroke: #fff; stroke-width: 1.5; pointer-events: none; }
+.vars-table tr.var-changed td { background: #fef9c3; }
 .shape.active-block { filter: drop-shadow(0 0 5px rgba(37,99,235,0.9)); stroke: var(--accent); stroke-width: 3; }
 
 /* Invisible, wide overlay on a plain connector so clicking anywhere along
@@ -256,9 +258,11 @@ svg#flowSvg { display: block; background: transparent; }
   display: flex; align-items: center; justify-content: center; z-index: 100;
 }
 .modal-dialog {
-  background: #fff; border-radius: 10px; padding: 18px 20px; width: 420px; max-width: 92vw;
-  max-height: 86vh; overflow: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  background: #fff; border-radius: 10px; padding: 18px 20px; width: min(760px, 94vw);
+  max-height: 90vh; overflow: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.25);
 }
+/* Short yes/no/OK messages don't need the full width. */
+.modal-dialog.modal-compact { width: min(440px, 94vw); }
 .modal-dialog h3 { margin: 0 0 12px; font-size: 16px; }
 .modal-form { display: flex; flex-direction: column; gap: 10px; }
 .field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
@@ -274,7 +278,7 @@ svg#flowSvg { display: block; background: transparent; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 .form-error { color: var(--danger); font-size: 12px; min-height: 16px; }
 
-.type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
 .type-btn {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 10px 8px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; cursor: pointer; font-size: 13px;
@@ -289,9 +293,26 @@ svg#flowSvg { display: block; background: transparent; }
 .params-header { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 12px; color: var(--muted); }
 .params-list { display: flex; flex-direction: column; gap: 6px; }
 .param-row { display: flex; gap: 6px; align-items: center; }
-.param-row input { flex: 2; padding: 5px 6px; border: 1px solid var(--border); border-radius: 6px; }
-.param-row select { flex: 1; padding: 5px 6px; border: 1px solid var(--border); border-radius: 6px; }
+.param-row > input { flex: 2; min-width: 0; padding: 5px 6px; border: 1px solid var(--border); border-radius: 6px; }
+.param-row > select { flex: 1; min-width: 0; padding: 5px 6px; border: 1px solid var(--border); border-radius: 6px; }
 .byref-label { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+.help-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4px 22px; }
+.help-grid section h4 { margin: 10px 0 4px; font-size: 14px; color: var(--accent-dark); }
+.help-grid section p, .help-grid section ul { margin: 0 0 6px; line-height: 1.45; }
+.help-grid section ul { padding-left: 18px; }
+.modal-dialog.help-dialog { width: min(1000px, 94vw); }
+
+.examples-group-title { margin: 14px 0 6px; font-size: 14px; color: var(--accent-dark); }
+.examples-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.example-btn {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left;
+  padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; cursor: pointer; font: inherit;
+}
+.example-btn:hover { border-color: var(--accent); background: #eef2ff; }
+.example-title { font-weight: 600; color: var(--text); }
+.example-desc { font-size: 12px; color: var(--muted); line-height: 1.35; }
+.examples-credit { margin-top: 14px; }
 
 @media (max-width: 820px) {
   main { flex-direction: column; }
