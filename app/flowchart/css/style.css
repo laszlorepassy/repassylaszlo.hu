@@ -318,6 +318,11 @@ svg#flowSvg { display: block; background: transparent; }
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 .field input[type=checkbox] { width: 18px; height: 18px; }
+/* Assign dialog: [variable] = [expression], labels on top; the "=" is
+   centered on the input row. */
+.assign-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 2fr); gap: 8px; align-items: start; }
+.assign-row .field input[type=text] { width: 100%; box-sizing: border-box; }
+.assign-eq { align-self: end; display: flex; align-items: center; height: 31px; font-size: 20px; font-weight: 600; color: var(--text); }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 .form-error { color: var(--danger); font-size: 12px; min-height: 16px; }
 
