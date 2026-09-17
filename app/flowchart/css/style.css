@@ -280,7 +280,8 @@ svg#flowSvg { display: block; background: transparent; }
 }
 /* Short yes/no/OK messages don't need the full width. */
 .modal-dialog.modal-compact { width: min(440px, 94vw); }
-.modal-dialog h3 { margin: 0 0 12px; font-size: 16px; }
+.modal-dialog h3 { margin: 0 0 12px; font-size: 16px; cursor: move; user-select: none; }
+.modal-dialog.dragging { cursor: move; user-select: none; box-shadow: 0 24px 60px rgba(0,0,0,0.35); }
 .modal-form { display: flex; flex-direction: column; gap: 10px; }
 .field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
 .field input[type=text], .field select, .field textarea {
