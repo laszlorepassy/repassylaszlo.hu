@@ -133,6 +133,10 @@ select#speedSelect:hover, select#langSelect:hover { background: #f1f5f9; }
   font-size: 13px;
 }
 .routine-tab-add:hover { color: var(--accent-dark); border-color: var(--accent); }
+/* Struct definitions sit in the same tab row but have no diagram: they
+   open their editor instead, and look distinct from routine tabs. */
+.routine-tab.struct-tab { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+.routine-tab.struct-tab:hover { background: #ede9fe; }
 
 main { flex: 1; display: flex; min-height: 0; }
 
@@ -213,7 +217,8 @@ svg#flowSvg.panning { cursor: grabbing; }
 .input-row-controls input { flex: 1; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; }
 .run-status { margin-top: 8px; font-size: 12px; color: var(--muted); min-height: 16px; }
 
-.code-actions { display: flex; gap: 6px; margin-bottom: 8px; }
+.code-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.code-actions .btn { white-space: nowrap; }
 .code-output {
   flex: 1;
   margin: 0;
