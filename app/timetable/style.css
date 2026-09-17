@@ -171,14 +171,18 @@ header button:disabled {
   font-weight: 600;
 }
 
-.time-row input[type="time"] {
+.time-row .time-input {
   flex: 1;
+  min-width: 0;
   padding: 6px 8px;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
   border: 1px solid var(--border);
   border-radius: 8px;
 }
 
-.time-row.invalid input[type="time"] {
+.time-row.invalid .time-input {
   border-color: var(--veres-red);
 }
 

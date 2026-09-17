@@ -13,6 +13,10 @@ const DAYS = ['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek
 const DAY_SHORT = ['V', 'H', 'K', 'Sze', 'Cs', 'P', 'Szo'];
 const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // megjelenítés hétfőtől
 
+// Domainzár: a publikált változatban a scripts/publish.py tölti ki az engedélyezett
+// domainekkel; a forrásban null, hogy helyben (file://, localhost) is futtatható legyen
+const ALLOWED_HOSTS = ["repassylaszlo.hu", "www.repassylaszlo.hu"];
+
 // Ennél régebbi eseményről nem küldünk értesítést (pl. alvó gép felébredése után)
 const NOTIFY_WINDOW_MS = 2 * 60 * 1000;
 
@@ -32,15 +36,34 @@ newTabBtn.addEventListener('click', () => { window.open(window.location.pathname
 
 // ---------- Felépítés ----------
 
+// Szöveges időmező: a natív <input type="time"> a böngésző nyelvi beállítása
+// szerint AM/PM formátumot is mutathat, ez mindig 24 órás óó:pp
+function createTimeInput(value, ariaLabel) {
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.className = 'time-input'; inp.value = value;
+  inp.inputMode = 'numeric'; inp.maxLength = 5; inp.placeholder = 'óó:pp'; inp.autocomplete = 'off';
+  inp.setAttribute('aria-label', `${ariaLabel} (óó:pp)`);
+  return inp;
+}
+
+// „7:15”, „07.15”, „715”, „7” → „07:15” / „07:00”; üres → ''; érvénytelen → null
+function normalizeTime(str) {
+  const t = str.trim();
+  if (!t) return '';
+  const m = t.match(/^(\d{1,2})(?:[:.]?(\d{2}))?$/);
+  if (!m) return null;
+  const h = Number(m[1]), min = Number(m[2] ?? 0);
+  if (h > 23 || min > 59) return null;
+  return `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+}
+
 function buildTimes() {
   timesList.innerHTML = '';
   for (let i = 0; i < DEFAULT_STARTS.length; i++) {
     const row = document.createElement('div'); row.className = 'time-row';
     const label = document.createElement('label'); label.textContent = `${i}. óra`; label.htmlFor = `start-${i}`;
-    const s = document.createElement('input'); s.type = 'time'; s.id = `start-${i}`; s.value = DEFAULT_STARTS[i];
-    s.setAttribute('aria-label', `${i}. óra kezdete`);
-    const e = document.createElement('input'); e.type = 'time'; e.value = DEFAULT_ENDS[i];
-    e.setAttribute('aria-label', `${i}. óra vége`);
+    const s = createTimeInput(DEFAULT_STARTS[i], `${i}. óra kezdete`); s.id = `start-${i}`;
+    const e = createTimeInput(DEFAULT_ENDS[i], `${i}. óra vége`);
     const note = document.createElement('span'); note.className = 'small-note';
     row.append(label, s, ' – ', e, note);
     timesList.appendChild(row);
@@ -61,14 +84,14 @@ function buildDays() {
 // ---------- Adatok ----------
 
 const getRows = () => Array.from(timesList.querySelectorAll('.time-row'));
-const timeInputs = row => row.querySelectorAll("input[type='time']");
+const timeInputs = row => row.querySelectorAll('.time-input');
 const getStarts = () => getRows().map(r => timeInputs(r)[0].value);
 const getEnds = () => getRows().map(r => timeInputs(r)[1].value);
 const getDays = () => Array.from(daysList.querySelectorAll('input')).filter(cb => cb.checked).map(cb => Number(cb.value));
 
 // Csak a teljesen kitöltött, kezdés < befejezés sorok számítanak, kezdés szerint rendezve
 function getPeriods() {
-  const s = getStarts(), e = getEnds();
+  const s = getStarts().map(normalizeTime), e = getEnds().map(normalizeTime);
   return s.map((start, index) => ({ index, start, end: e[index] }))
     .filter(p => p.start && p.end && p.start < p.end)
     .sort((a, b) => a.start.localeCompare(b.start));
@@ -95,13 +118,16 @@ function validateTimes() {
   getRows().forEach(row => {
     const [s, e] = timeInputs(row);
     const note = row.querySelector('.small-note');
+    const sv = normalizeTime(s.value), ev = normalizeTime(e.value);
     let msg = '', invalid = false;
-    if (!s.value !== !e.value) {
+    if (sv === null || ev === null) {
+      msg = 'érvénytelen időpont (óó:pp, pl. 07:15)'; invalid = true;
+    } else if (!sv !== !ev) {
       msg = 'hiányos, kimarad';
-    } else if (s.value && e.value) {
-      if (s.value >= e.value) { msg = 'a kezdés nem előzi meg a végét'; invalid = true; }
-      else if (prevEnd && s.value < prevEnd) { msg = 'ütközik az előző órával'; invalid = true; }
-      prevEnd = e.value;
+    } else if (sv && ev) {
+      if (sv >= ev) { msg = 'a kezdés nem előzi meg a végét'; invalid = true; }
+      else if (prevEnd && sv < prevEnd) { msg = 'ütközik az előző órával'; invalid = true; }
+      prevEnd = ev;
     }
     note.textContent = msg;
     row.classList.toggle('invalid', invalid);
@@ -131,7 +157,19 @@ function loadFromURL() {
 function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveToURL, 1200); }
 
 function onEdit() { validateTimes(); tick(); scheduleSave(); }
-function setupAutoSave() { document.querySelectorAll('input').forEach(inp => inp.addEventListener('input', onEdit)); }
+function setupAutoSave() {
+  document.querySelectorAll('input:not(.time-input)').forEach(inp => inp.addEventListener('input', onEdit));
+  timesList.querySelectorAll('.time-input').forEach(inp => {
+    // Gépelés közben csak a már teljes időpont számít, hogy ne villogjon a hibaüzenet
+    inp.addEventListener('input', () => { if (/^\d{2}:\d{2}$/.test(inp.value)) onEdit(); });
+    // Kilépéskor egységes formára hozzuk (pl. 715 → 07:15), és ellenőrzünk
+    inp.addEventListener('change', () => {
+      const t = normalizeTime(inp.value);
+      if (t !== null) inp.value = t;
+      onEdit();
+    });
+  });
+}
 
 // ---------- Időkezelés ----------
 
@@ -268,7 +306,31 @@ function startTicker() {
   document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
 }
 
+// ---------- Domainzár ----------
+
+// Letöltött vagy más oldalba ágyazott másolatban nem engedi a használatot
+function isAllowedHost() {
+  if (!ALLOWED_HOSTS) return true;
+  if (!ALLOWED_HOSTS.includes(location.hostname)) return false;
+  try {
+    if (window.top !== window.self && !ALLOWED_HOSTS.includes(window.top.location.hostname)) return false;
+  } catch {
+    return false; // idegen domainről beágyazva
+  }
+  return true;
+}
+
+function blockUsage() {
+  const url = `https://${ALLOWED_HOSTS[0]}/app/timetable/`;
+  const box = document.createElement('div'); box.id = 'statusTop'; box.className = 'status-none';
+  const link = document.createElement('a'); link.href = url; link.target = '_top'; link.textContent = url;
+  box.append('Ez az alkalmazás csak itt használható: ', link);
+  document.body.replaceChildren(box);
+  document.title = 'Órarend időzítő';
+}
+
 (function init() {
+  if (!isAllowedHost()) { blockUsage(); return; }
   buildTimes();
   buildDays();
   loadFromURL();
