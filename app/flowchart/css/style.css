@@ -23,6 +23,8 @@
   --loop-stroke: #ea580c;
   --call-fill: #fae8ff;
   --call-stroke: #a21caf;
+  --file-fill: #ccfbf1;
+  --file-stroke: #0f766e;
   --comment-fill: #fffbeb;
   --comment-stroke: #b45309;
   font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -249,6 +251,7 @@ svg#flowSvg { display: block; background: transparent; }
 .shape-decision { fill: var(--decision-fill); stroke: var(--decision-stroke); }
 .shape-loop { fill: var(--loop-fill); stroke: var(--loop-stroke); }
 .shape-call { fill: var(--call-fill); stroke: var(--call-stroke); }
+.shape-file { fill: var(--file-fill); stroke: var(--file-stroke); }
 .shape-comment { fill: var(--comment-fill); stroke: var(--comment-stroke); stroke-dasharray: 3 2; }
 
 /* drop-shadow() only takes offset-x/offset-y/blur-radius, not a 4th
@@ -316,6 +319,13 @@ svg#flowSvg { display: block; background: transparent; }
 .help-grid section p, .help-grid section ul { margin: 0 0 6px; line-height: 1.45; }
 .help-grid section ul { padding-left: 18px; }
 .modal-dialog.help-dialog { width: min(1000px, 94vw); }
+
+.files-toolbar { display: flex; gap: 8px; margin: 10px 0; }
+.files-list { display: flex; flex-direction: column; gap: 6px; }
+.files-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; }
+.files-name { flex: 1; min-width: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.files-info { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.field textarea.file-content { min-height: 240px; resize: vertical; }
 
 .examples-group-title { margin: 14px 0 6px; font-size: 14px; color: var(--accent-dark); }
 .examples-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
