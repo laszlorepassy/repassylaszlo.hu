@@ -7,32 +7,39 @@
   <meta name="description" content="Répássy László - órarend időzítő alkalmazás." />
 
   <link rel="icon" type="image/png" href="./table-icon-6369326-512.png">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=001ddc5">
   <!-- LZ-String a hash-alapú mentéshez (opcionális, de hasznos) -->
-  <script src="./lz-string.min.js"></script>
+  <script src="./lz-string.min.js?v=001ddc5"></script>
 </head>
 <body>
-  <!-- Felső státusz kijelző (nagy betűvel) -->
-  <div id="statusTop" aria-live="polite">Betöltés...</div>
-  <div id="errorMessage"></div>
+  <!-- Felső státusz kijelző (nagy betűvel); role="timer": a képernyőolvasó nem olvassa fel másodpercenként -->
+  <div id="statusTop" role="timer">Betöltés...</div>
+  <div id="errorMessage" role="alert"></div>
 
   <header>
     <h1>Órarend időzítő</h1>
-    <button id="newTabBtn">Új órarend</button>
+    <div class="header-actions">
+      <button id="notifyBtn" type="button" hidden>Értesítések bekapcsolása</button>
+      <button id="newTabBtn" type="button">Új órarend</button>
+    </div>
   </header>
 
   <!-- Órarend neve -->
   <div class="bar">
-    <label for="timetableName"></label>
-    <input type="text" id="timetableName" value="Új órarend" />
+    <input type="text" id="timetableName" value="Új órarend" aria-label="Órarend neve" />
   </div>
 
+  <!-- Tanítási napok -->
+  <fieldset class="days">
+    <legend>Tanítási napok</legend>
+    <div id="daysList"></div>
+  </fieldset>
+
   <!-- Órák időpontjai (csak kezdés és befejezés, minden napra közös) -->
-  <section class="times">
-    <h2></h2>
+  <section class="times" aria-label="Órák időpontjai">
     <div id="timesList"></div>
   </section>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=001ddc5"></script>
 </body>
 </html>

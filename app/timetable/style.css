@@ -60,7 +60,30 @@ h1 {
   display: none;
 }
 
-#newTabBtn {
+/* Státusz színek */
+#statusTop.status-class {
+  background: #fff6f6;
+}
+
+#statusTop.status-break {
+  background: #e6ffe6;
+}
+
+#statusTop.status-idle {
+  background: #eef4ff;
+}
+
+#statusTop.status-none {
+  background: #f7f7f7;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+header button {
   cursor: pointer;
   border: none;
   background: var(--veres-red);
@@ -70,8 +93,40 @@ h1 {
   padding: 8px 12px;
 }
 
-#newTabBtn:hover {
+header button:hover:not(:disabled) {
   background: var(--veres-red-dark);
+}
+
+header button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.days {
+  margin: 12px auto;
+  max-width: 400px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.days legend {
+  color: var(--veres-red);
+  font-weight: 600;
+  padding: 0 4px;
+}
+
+#daysList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+#daysList label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
 }
 
 .bar {
@@ -99,17 +154,12 @@ h1 {
   background: none;
 }
 
-.times h2 {
-  margin: 0 0 10px;
-  color: var(--veres-red);
-  font-size: 1.1rem;
-}
-
 /* Idősorok: max 400px, középre igazítva */
 .time-row {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
   margin: 8px auto;
   max-width: 400px;
 }
@@ -128,8 +178,22 @@ h1 {
   border-radius: 8px;
 }
 
-/* Hangsúly nélküli óraszám (visszafogott) */
+.time-row.invalid input[type="time"] {
+  border-color: var(--veres-red);
+}
+
+/* Soronkénti megjegyzés (hiányos / hibás sor) */
 .small-note {
+  flex-basis: 100%;
+  padding-left: 78px;
   font-size: 0.85rem;
   color: #6b7280;
+}
+
+.small-note:empty {
+  display: none;
+}
+
+.time-row.invalid .small-note {
+  color: var(--veres-red);
 }
