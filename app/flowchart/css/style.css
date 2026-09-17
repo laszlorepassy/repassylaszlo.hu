@@ -83,12 +83,20 @@ header#appHeader {
 .run-controls { display: flex; align-items: center; gap: 6px; }
 .speed-label { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); }
 
-select#langSelect {
+/* The header's dropdowns get the same look as the buttons next to them;
+   left unstyled, the browser's native select used a larger font and a grey
+   look that didn't fit the toolbar. */
+select#speedSelect, select#langSelect {
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 5px 8px;
+  padding: 6px;
   background: #fff;
+  cursor: pointer;
 }
+select#speedSelect:hover, select#langSelect:hover { background: #f1f5f9; }
 
 .routine-tabs {
   display: flex;
