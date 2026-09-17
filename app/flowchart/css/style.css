@@ -328,6 +328,13 @@ svg#flowSvg { display: block; background: transparent; }
 .files-info { color: var(--muted); font-size: 12px; white-space: nowrap; }
 .field textarea.file-content { min-height: 240px; resize: vertical; }
 
+.examples-empty-btn {
+  display: block; width: 100%; padding: 18px; font: inherit; font-size: 17px; font-weight: 600;
+  color: #fff; background: var(--accent); border: 1px solid var(--accent-dark); border-radius: 10px; cursor: pointer;
+}
+.examples-empty-btn:hover { background: var(--accent-dark); }
+.examples-intro { margin-top: 22px; }
+
 .examples-group-title { margin: 14px 0 6px; font-size: 14px; color: var(--accent-dark); }
 .examples-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
 .example-btn {
