@@ -8,17 +8,16 @@
 <meta name="copyright" content="© 2026 Répássy László. Minden jog fenntartva. All rights reserved.">
 <title>Flowchart</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="stylesheet" href="css/style.css?v=45c63c803e">
+<link rel="stylesheet" href="css/style.css?v=896480f4ad">
 </head>
 <body>
 <div id="app">
   <header id="appHeader">
     <nav class="menu">
       <button id="btnNew" class="btn"></button>
-      <button id="btnOpen" class="btn"></button>
-      <button id="btnSave" class="btn"></button>
-      <button id="btnExportImage" class="btn"></button>
-      <button id="btnFiles" class="btn"></button>
+      <button id="btnOpen" class="btn btn-icon btn-icon-open" title="">📂</button>
+      <button id="btnSave" class="btn btn-icon btn-icon-save" title="">💾</button>
+      <button id="btnExportImage" class="btn btn-icon btn-icon-image" title="">🖼️</button>
       <input type="text" id="programName" class="program-name-input" value="program">
       <span id="clipboardStatus" class="clipboard-status" hidden title=""></span>
       <div class="run-controls">
@@ -61,6 +60,7 @@
       <div class="side-tabs" id="sideTabs">
         <button class="side-tab active" data-tab="console" id="tabBtnConsole"></button>
         <button class="side-tab" data-tab="vars" id="tabBtnVars"></button>
+        <button class="side-tab" data-tab="files" id="tabBtnFiles"></button>
         <button class="side-tab" data-tab="code" id="tabBtnCode"></button>
       </div>
 
@@ -81,6 +81,17 @@
           <thead><tr><th id="thName"></th><th id="thType"></th><th id="thValue"></th></tr></thead>
           <tbody id="varsBody"></tbody>
         </table>
+      </div>
+
+      <div class="tab-content" id="tabFiles">
+        <p class="hint" id="filesIntro"></p>
+        <div class="files-toolbar">
+          <button id="btnFileUpload" class="btn btn-small"></button>
+          <button id="btnFileNew" class="btn btn-small"></button>
+          <input type="file" id="fileUploadInput" multiple hidden>
+        </div>
+        <div class="files-list" id="filesList"></div>
+        <p class="form-error" id="filesWarning"></p>
       </div>
 
       <div class="tab-content" id="tabCode">
@@ -105,6 +116,6 @@
 
   <div id="modalRoot"></div>
 </div>
-<script type="module" src="js/app.min.js?v=82a531abf9"></script>
+<script type="module" src="js/app.min.js?v=e68d96aab6"></script>
 </body>
 </html>

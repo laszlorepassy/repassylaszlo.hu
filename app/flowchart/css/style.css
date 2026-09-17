@@ -82,6 +82,17 @@ header#appHeader {
 }
 .btn-run:hover { background: #15803d; }
 
+/* Open, Save and Export Image are icon-only buttons: the emoji carries the
+   meaning, the button's name is in its tooltip. Each gets its own tint so
+   the three actions stay easy to tell apart at a glance. */
+.btn-icon { padding: 6px 10px; font-size: 16px; line-height: 1.15; }
+.btn-icon-open { background: #fef3c7; border-color: #fcd34d; }
+.btn-icon-open:hover { background: #fde68a; }
+.btn-icon-save { background: #dbeafe; border-color: #93c5fd; }
+.btn-icon-save:hover { background: #bfdbfe; }
+.btn-icon-image { background: #f3e8ff; border-color: #d8b4fe; }
+.btn-icon-image:hover { background: #e9d5ff; }
+
 .run-controls { display: flex; align-items: center; gap: 6px; }
 .speed-label { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); }
 
@@ -358,11 +369,16 @@ svg#flowSvg { display: block; background: transparent; }
 .help-table td { border-bottom: 1px solid #f0f0f0; padding: 4px 8px; vertical-align: top; }
 .help-table td.help-code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 
-.files-toolbar { display: flex; gap: 8px; margin: 10px 0; }
+/* The Files tab: the name on its own line, then the size and the three
+   per-file buttons — they all fit the narrow side panel that way. */
+.files-toolbar { display: flex; gap: 8px; margin: 8px 0 10px; }
 .files-list { display: flex; flex-direction: column; gap: 6px; }
-.files-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; }
-.files-name { flex: 1; min-width: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.files-info { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.files-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; }
+.files-name { flex: 1 1 100%; min-width: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.files-info { flex: 1; color: var(--muted); font-size: 12px; white-space: nowrap; }
+#tabFiles p { margin: 0; }
+#tabFiles .files-list { flex: 0 0 auto; }
+#filesWarning:empty { display: none; }
 .field textarea.file-content { min-height: 240px; resize: vertical; }
 
 .examples-empty-btn {
