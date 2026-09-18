@@ -6,9 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="author" content="Répássy László">
 <meta name="copyright" content="© 2026 Répássy László. Minden jog fenntartva. All rights reserved.">
-<title>Flowchart</title>
+<title>Folyamatábrázoló</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="stylesheet" href="css/style.css?v=56935ffb03">
+<link rel="stylesheet" href="css/style.css?v=d912895ad9">
 </head>
 <body>
 <div id="app">
@@ -89,10 +89,8 @@
           <circle class="solid" cx="11.94" cy="16.2" r="0.95"/>
         </svg>
       </button>
-      <select id="langSelect" hidden>
-        <option value="en">EN</option>
-        <option value="hu">HU</option>
-      </select>
+      <!-- One option per language, made from the language files (src/main.ts). -->
+      <select id="langSelect" hidden></select>
     </nav>
   </header>
 
@@ -155,6 +153,7 @@
             <option value="python">Python</option>
             <option value="cpp">C++</option>
             <option value="csharp">C#</option>
+            <option value="pseudo" id="codeLangOptPseudo">Pseudocode</option>
           </select>
           <button id="btnCopyCode" class="btn btn-small"></button>
           <button id="btnDownloadCode" class="btn btn-small"></button>
@@ -170,6 +169,6 @@
 
   <div id="modalRoot"></div>
 </div>
-<script type="module" src="js/app.min.js?v=e990071f24"></script>
+<script type="module" src="js/app.min.js?v=840a9c5cc7"></script>
 </body>
 </html>

@@ -262,8 +262,10 @@ main { flex: 1; display: flex; min-height: 0; }
     var(--bg);
   padding: 10px;
 }
-svg#flowSvg.pannable { cursor: grab; }
-svg#flowSvg.panning { cursor: grabbing; }
+.canvas-wrap.pannable { cursor: grab; }
+.canvas-wrap.panning { cursor: grabbing; }
+/* The diagram's shapes (and their labels) and connectors are clicked, not grabbed. */
+#flowSvg [data-block-id], #flowSvg text { cursor: pointer; }
 
 /* Positioned relative to .canvas-outer (which doesn't scroll), not
    .canvas-wrap, so it stays pinned to the canvas's bottom-right corner
@@ -514,9 +516,46 @@ body.help-page { height: auto; min-height: 100%; background: var(--bg); }
 .help-version { color: var(--muted); font-size: 13px; }
 .help-copyright { margin: -24px 16px 24px; color: var(--muted); font-size: 12px; text-align: center; }
 .help-nav { display: flex; gap: 8px; }
+.help-langs { display: flex; gap: 8px; flex-wrap: wrap; }
 .help-nav a { text-decoration: none; }
 .help-nav a.active { background: var(--accent); color: #fff; border-color: var(--accent-dark); }
 .help-content { max-width: 1100px; margin: 0 auto; padding: 16px 24px 48px; }
 .help-content .help-grid { gap: 8px 28px; }
 .help-content .help-grid section { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 4px 16px 10px; }
 @media (max-width: 820px) { .help-content { padding: 12px 16px 40px; } .help-header { padding: 10px 16px; } }
+
+/* The exam edition's download panel at the top of the web app's help. */
+.help-download {
+  margin: 0 0 18px; padding: 18px 22px 22px; border-radius: 14px; color: #fff;
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 55%, #0891b2 100%);
+  box-shadow: 0 8px 24px rgba(30, 58, 138, 0.25);
+}
+.help-download h2 { margin: 0 0 6px; font-size: 24px; }
+.help-download-lead { margin: 0 0 10px; font-size: 15px; line-height: 1.45; opacity: 0.95; }
+.help-download-points { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.help-download-points li {
+  flex: 1 1 220px; background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px; padding: 8px 12px; font-size: 13px; line-height: 1.4;
+}
+.help-download-points strong { display: block; font-size: 15px; margin-bottom: 2px; }
+.help-download-points strong::before { content: '✓ '; color: #a7f3d0; }
+.help-download-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.help-download-btn {
+  display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; border-radius: 12px;
+  background: #fff; color: var(--text); text-decoration: none; border: 2px solid transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18); transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+}
+.help-download-btn:hover, .help-download-btn:focus-visible {
+  transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25); border-color: #fcd34d; outline: none;
+}
+.help-download-icon {
+  flex: none; width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff;
+}
+.help-download-icon svg { width: 30px; height: 30px; }
+.help-download-linux .help-download-icon { background: linear-gradient(135deg, #ea580c, #f59e0b); }
+.help-download-windows .help-download-icon { background: linear-gradient(135deg, #0369a1, #0ea5e9); }
+.help-download-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.help-download-action { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.help-download-label { font-size: 19px; font-weight: 700; color: var(--accent-dark); }
+.help-download-note { font-size: 12px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+@media (max-width: 820px) { .help-download { padding: 14px 16px 16px; } .help-download h2 { font-size: 20px; } }
