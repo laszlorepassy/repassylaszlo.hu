@@ -530,8 +530,15 @@ body.help-page { height: auto; min-height: 100%; background: var(--bg); }
 .help-download h2 { margin: 0 0 6px; font-size: 24px; color: var(--text); }
 .help-download-lead { margin: 0 auto 8px; max-width: 700px; font-size: 15px; line-height: 1.45; color: var(--text); }
 .help-download-points { list-style: none; margin: 0 auto 20px; padding: 0; max-width: 700px; font-size: 14px; line-height: 1.5; color: var(--muted); }
-.help-download-points li { margin: 2px 0; }
-.help-download-points strong { color: var(--text); font-weight: 600; margin-right: 4px; }
+/* Two columns, so the texts after the titles all start on one line. */
+.help-download-points { display: grid; grid-template-columns: auto auto; justify-content: center; column-gap: 8px; row-gap: 2px; text-align: left; }
+.help-download-points li { display: contents; }
+.help-download-points strong { color: var(--text); font-weight: 600; white-space: nowrap; }
+@media (max-width: 560px) {
+  .help-download-points { display: block; }
+  .help-download-points li { display: block; margin: 4px 0; }
+  .help-download-points strong { margin-right: 4px; }
+}
 .help-download-points strong::before { content: '✓ '; color: #047857; }
 .help-download-points strong::after { content: ':'; }
 /* A row per system: Windows on top, Linux below. */
