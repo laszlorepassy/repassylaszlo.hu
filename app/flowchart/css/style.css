@@ -1,0 +1,683 @@
+:root {
+  --bg: #f4f6f9;
+  --panel: #ffffff;
+  --border: #d6dce3;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-dark: #1d4ed8;
+  --danger: #dc2626;
+  /* Shape colors follow Flowgorithm's own palette: yellow declare/assign,
+     blue input, green output, red decision, orange loops, magenta call. */
+  --shape-fill: #fef9c3;
+  --shape-stroke: #ca8a04;
+  --decision-fill: #fee2e2;
+  --decision-stroke: #dc2626;
+  --terminal-fill: #ecfdf5;
+  --terminal-stroke: #047857;
+  --input-fill: #dbeafe;
+  --input-stroke: #2563eb;
+  --output-fill: #dcfce7;
+  --output-stroke: #16a34a;
+  --loop-fill: #ffedd5;
+  --loop-stroke: #ea580c;
+  --call-fill: #fae8ff;
+  --call-stroke: #a21caf;
+  --file-fill: #ccfbf1;
+  --file-stroke: #0f766e;
+  --comment-fill: #fffbeb;
+  --comment-stroke: #b45309;
+  --declare-fill: #e5e7eb;
+  --declare-stroke: #6b7280;
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); font-size: 14px; }
+
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+header#appHeader {
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.menu { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
+.program-name-input {
+  /* Takes all the free room up to the run controls. */
+  flex: 1 1 auto; min-width: 120px; margin-right: 8px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px;
+  font-size: 13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.clipboard-status {
+  font-size: 12px; color: var(--accent-dark); background: #eef2ff; border: 1px solid #c7d2fe;
+  border-radius: 999px; padding: 4px 10px; cursor: pointer; white-space: nowrap;
+}
+
+.btn {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 13px;
+}
+.btn:hover { background: #f1f5f9; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn:disabled:hover { background: #fff; }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent-dark); }
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-small { padding: 3px 8px; font-size: 12px; }
+/* --- header command buttons -------------------------------------------
+   Icon-only buttons following Fluent 2's "subtle" icon button: a 32x32
+   square with a 20px glyph, no border and no resting background, a neutral
+   wash on hover/press, 4px corner radius (borderRadiusMedium) and a 2px
+   focus ring (strokeFocus2). New / Open / Save / Export Image / Run / Step
+   / Pause / Reset are all exactly this one square, so the header reads as
+   a single command bar; each button's name is in its tooltip and
+   aria-label. The colors come from Fluent 2's palette: every file action
+   keeps its own hue, Run is the green primary action, and the other
+   playback controls stay neutral so Run stays the obvious "start the
+   program" button. */
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #424242; /* neutralForeground2 */
+  transition: background-color 100ms cubic-bezier(0.33, 0, 0.67, 1);
+}
+.icon-btn svg { width: 20px; height: 20px; display: block; overflow: visible; }
+/* Fluent's Regular icons are outlines: hairline strokes with round joins.
+   The parts Fluent draws solid (play, pause, skip) opt in with .solid. */
+.icon-btn svg > * { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn svg > .solid { fill: currentColor; stroke-width: 1.2; }
+.icon-btn:hover { background: #f0f0f0; }   /* neutralSubtleBackgroundHover */
+.icon-btn:active { background: #e0e0e0; }  /* neutralSubtleBackgroundPressed */
+.icon-btn:focus-visible { outline: 2px solid #0f6cbd; outline-offset: 1px; }
+.icon-new { color: #0f6cbd; }              /* brand */
+.icon-open { color: #d67c00; }             /* marigold */
+.icon-save { color: #038387; }             /* teal */
+.icon-image { color: #8764b8; }            /* purple */
+.icon-run { color: #107c10; }              /* green: the primary action */
+
+/* The settings popup under the wrench (src/settingsPanel.ts). */
+.settings-panel {
+  position: fixed; z-index: 95; width: 320px; padding: 12px 16px 14px; background: #fff;
+  border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+}
+.settings-panel h3 { margin: 0 0 8px; font-size: 16px; }
+.settings-label { margin: 10px 0 4px; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.settings-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+/* The language: one dropdown, each language named in its own language. */
+.settings-lang { width: 100%; font: inherit; font-size: 13px; }
+.settings-zoom input { width: 64px; padding: 4px 6px; border: 1px solid var(--border); border-radius: 6px; font: inherit; text-align: right; }
+.settings-zoom .btn-small { min-width: 32px; }
+.settings-download { display: inline-block; margin-top: 12px; color: var(--accent-dark); font-weight: 600; }
+.icon-btn:disabled { color: #bdbdbd; cursor: default; background: none; }
+/* Hairline dividers separate the command groups, as in a Fluent toolbar. */
+.toolbar-group { display: flex; align-items: center; gap: 2px; }
+.toolbar-divider { width: 1px; height: 20px; background: #e0e0e0; }
+
+/* Fluent 2 menu button (speed, language): the same subtle 32px-high button
+   as the icon buttons, but showing the current value and a chevron, and
+   opening a menu of the choices. */
+.menu-btn {
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  color: #242424; /* neutralForeground1 */
+  transition: background-color 100ms cubic-bezier(0.33, 0, 0.67, 1);
+}
+.menu-btn:hover { background: #f0f0f0; }
+.menu-btn:active, .menu-btn[aria-expanded="true"] { background: #e0e0e0; }
+.menu-btn:focus-visible { outline: 2px solid #0f6cbd; outline-offset: 1px; }
+.menu-btn > svg { width: 20px; height: 20px; flex: 0 0 auto; color: #424242; }
+.menu-btn > svg > * { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.menu-btn > svg > .solid { fill: currentColor; stroke-width: 1.2; }
+.menu-btn-value { white-space: nowrap; }
+.menu-btn-chevron { width: 12px !important; height: 12px !important; color: #616161; }
+.menu-btn-chevron > path { stroke-width: 2.2; }
+
+/* The menu surface: Fluent's shadow16 on a rounded card, items 32px high
+   with a check mark in the leading slot for the current value. */
+.fluent-menu {
+  position: fixed;
+  z-index: 60;
+  padding: 4px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.14), 0 0 2px rgba(0,0,0,0.12);
+}
+.fluent-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 32px;
+  padding: 0 10px 0 6px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  color: #242424;
+  text-align: left;
+  white-space: nowrap;
+}
+.fluent-menu-item:hover { background: #f0f0f0; }
+.fluent-menu-item:focus-visible { outline: 2px solid #0f6cbd; outline-offset: -2px; }
+.fluent-menu-check { width: 16px; flex: 0 0 auto; color: #0f6cbd; }
+.fluent-menu-item[aria-checked="true"] { font-weight: 600; }
+.fluent-menu-item[aria-checked="true"] .fluent-menu-check::before { content: "\2713"; }
+
+/* The splitter between the diagram and the side panel. It is a hairline
+   that thickens into the accent color while it is grabbed; the pointer
+   target around it is wider than the line itself. */
+.panel-resizer {
+  flex: 0 0 auto;
+  width: 6px;
+  margin: 0 -3px;
+  z-index: 5;
+  cursor: col-resize;
+  background: none;
+  border: none;
+  touch-action: none;
+}
+.panel-resizer:hover, .panel-resizer.dragging { background: rgba(15, 108, 189, 0.35); }
+.panel-resizer:focus-visible { outline: 2px solid #0f6cbd; outline-offset: -1px; }
+body.resizing-panel { cursor: col-resize; user-select: none; }
+
+.run-controls { display: flex; align-items: center; gap: 2px; }
+.speed-label { display: flex; align-items: center; gap: 4px; margin-left: 10px; font-size: 12px; color: var(--muted); }
+
+/* The header's dropdowns get the same look as the buttons next to them;
+   left unstyled, the browser's native select used a larger font and a grey
+   look that didn't fit the toolbar. */
+select#speedSelect, select#langSelect {
+  font: inherit;
+  font-size: 12px;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 4px;
+  height: 32px;
+  background: #fff;
+  cursor: pointer;
+}
+select#speedSelect:hover, select#langSelect:hover { background: #f1f5f9; }
+
+.routine-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 6px 14px 0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.routine-tab {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: #eef1f5;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.routine-tab.active { background: var(--bg); font-weight: 600; color: var(--accent-dark); }
+.routine-tab .edit-icon { opacity: 0.6; font-size: 11px; }
+.routine-tab .edit-icon:hover { opacity: 1; }
+.routine-tab-add {
+  padding: 6px 12px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13px;
+}
+.routine-tab-add:hover { color: var(--accent-dark); border-color: var(--accent); }
+/* Struct definitions sit in the same tab row but have no diagram: they
+   open their editor instead, and look distinct from routine tabs. */
+.routine-tab.struct-tab { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+.routine-tab.struct-tab:hover { background: #ede9fe; }
+
+main { flex: 1; display: flex; min-height: 0; }
+
+.canvas-outer { position: relative; flex: 1; min-width: 0; display: flex; }
+.canvas-wrap {
+  flex: 1;
+  overflow: auto;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px) 0 0/24px 24px,
+    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px) 0 0/24px 24px,
+    var(--bg);
+  padding: 10px;
+}
+.canvas-wrap.pannable { cursor: grab; }
+.canvas-wrap.panning { cursor: grabbing; }
+/* The selection rectangle drawn with the left button on the background. */
+.lasso { position: fixed; z-index: 80; border: 1px dashed var(--accent); background: rgba(37,99,235,0.08); pointer-events: none; }
+/* The diagram's shapes (and their labels) and connectors are clicked, not grabbed. */
+#flowSvg [data-block-id], #flowSvg text { cursor: pointer; }
+
+/* Positioned relative to .canvas-outer (which doesn't scroll), not
+   .canvas-wrap, so it stays pinned to the canvas's bottom-right corner
+   regardless of how far the diagram is scrolled or panned. */
+.zoom-controls {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.zoom-controls .btn { min-width: 30px; padding: 4px 8px; font-size: 15px; line-height: 1; }
+
+.side-panel {
+  width: 380px; /* the starting width; the splitter overrides it inline */
+  flex: 0 0 auto;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+.side-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.side-tab {
+  flex: 1;
+  padding: 10px 6px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--muted);
+}
+.side-tab.active { color: var(--accent-dark); border-bottom-color: var(--accent); font-weight: 600; }
+.tab-content { display: none; flex: 1; min-height: 0; padding: 10px; overflow: auto; }
+.tab-content.active { display: flex; flex-direction: column; }
+
+.vars-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.vars-table th { text-align: left; color: var(--muted); border-bottom: 1px solid var(--border); padding: 4px 6px; }
+.vars-table td { padding: 4px 6px; border-bottom: 1px solid #f0f0f0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+.console-output {
+  flex: 1;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 6px;
+  padding: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+  overflow: auto;
+  min-height: 120px;
+}
+.console-error-line { color: #f87171; font-weight: 600; }
+.console-success-line { color: #4ade80; font-weight: 600; }
+.input-row { margin-top: 8px; }
+.input-row label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.input-row-controls { display: flex; gap: 6px; }
+.input-row-controls input { flex: 1; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; }
+.run-status { margin-top: 8px; font-size: 12px; color: var(--muted); min-height: 16px; }
+
+.code-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.code-actions .btn { white-space: nowrap; }
+/* Code view: a line-number gutter and the highlighted code, scrolling together. */
+.code-view {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.code-gutter, .code-output { margin: 0; padding: 10px; font: inherit; line-height: inherit; white-space: pre; }
+.code-gutter {
+  position: sticky; left: 0; flex: none; text-align: right; color: #94a3b8; background: #f6f8fa;
+  border-right: 1px solid var(--border); user-select: none; min-height: 100%;
+}
+.code-output { flex: 1; color: #24292e; }
+.code-output.hljs { background: transparent; color: #24292e; }
+.code-dialog.modal-dialog { width: min(1400px, 96vw); height: 90vh; display: flex; flex-direction: column; }
+.code-dialog .code-view { font-size: 14.5px; }
+.code-dialog-actions { display: flex; gap: 8px; margin-bottom: 10px; }
+
+/* highlight.js "GitHub" (light) theme (BSD-3-Clause, see js/vendor/highlight/LICENSE) */
+pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5px}/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/.hljs{color:#24292e;background:#fff}.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#d73a49}.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#6f42c1}.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#005cc5}.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#032f62}.hljs-built_in,.hljs-symbol{color:#e36209}.hljs-code,.hljs-comment,.hljs-formula{color:#6a737d}.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#22863a}.hljs-subst{color:#24292e}.hljs-section{color:#005cc5;font-weight:700}.hljs-bullet{color:#735c0f}.hljs-emphasis{color:#24292e;font-style:italic}.hljs-strong{color:#24292e;font-weight:700}.hljs-addition{color:#22863a;background-color:#f0fff4}.hljs-deletion{color:#b31d28;background-color:#ffeef0}
+
+/* --- flowchart SVG --- */
+svg#flowSvg { display: block; background: transparent; }
+.flow-text { font-size: 12px; fill: var(--text); font-family: inherit; pointer-events: none; }
+.branch-label { font-size: 11px; fill: var(--muted); font-weight: 600; }
+.flow-line { stroke: #64748b; stroke-width: 1.6; }
+.arrow-fill { fill: #64748b; }
+.shape-innerline { stroke: var(--call-stroke); stroke-width: 1.2; }
+
+.shape { stroke-width: 1.6; }
+.shape-terminal { fill: var(--terminal-fill); stroke: var(--terminal-stroke); }
+/* Declare only reserves a variable, it does nothing yet: gray and dashed,
+   unlike Assign's solid yellow. */
+.shape-declare { fill: var(--declare-fill); stroke: var(--declare-stroke); stroke-dasharray: 5 3; }
+.shape-assign { fill: var(--shape-fill); stroke: var(--shape-stroke); }
+.shape-input { fill: var(--input-fill); stroke: var(--input-stroke); }
+.shape-output { fill: var(--output-fill); stroke: var(--output-stroke); }
+.shape-decision { fill: var(--decision-fill); stroke: var(--decision-stroke); }
+.shape-loop { fill: var(--loop-fill); stroke: var(--loop-stroke); }
+.shape-call { fill: var(--call-fill); stroke: var(--call-stroke); }
+.shape-file { fill: var(--file-fill); stroke: var(--file-stroke); }
+.shape-breakpoint { fill: #fee2e2; stroke: var(--danger); stroke-width: 2; }
+.shape-comment { fill: var(--comment-fill); stroke: var(--comment-stroke); stroke-dasharray: 3 2; }
+
+/* drop-shadow() only takes offset-x/offset-y/blur-radius, not a 4th
+   "spread" value like box-shadow — a spread value here made the whole
+   filter invalid (and silently ignored), leaving only a thin 3px stroke
+   as the sole visible cue, easy to miss on a loop body's blocks flashing
+   past quickly during a run. */
+.breakpoint-dot { fill: var(--danger); stroke: #fff; stroke-width: 1.5; pointer-events: none; }
+.vars-table tr.var-changed td { background: #fef9c3; }
+.shape.selected-block { stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 6 3; }
+.shape.active-block { filter: drop-shadow(0 0 5px rgba(37,99,235,0.9)); stroke: var(--accent); stroke-width: 3; }
+
+/* Invisible, wide overlay on a plain connector so clicking anywhere along
+   the arrow opens the insert picker (or, on right-click, pastes a cut
+   block) — like clicking a connector in Flowgorithm itself. */
+.flow-line-hit { stroke: transparent; stroke-width: 14px; cursor: pointer; }
+.flow-line-hit:hover { stroke: rgba(37,99,235,0.12); }
+
+/* Commented sections: the comment in a note (a box with a folded corner)
+   in the flow, a round − toggle below it and another, labelled with the
+   comment, after the section; collapsed, the note is a stack of two with a
+   + toggle and the number of hidden symbols. */
+.shape-region { fill: #f5f3ff; stroke: #7c3aed; }
+.shape-region-collapsed { fill: #ede9fe; stroke-width: 2.2; }
+.region-back { fill: #ddd6fe; stroke: #7c3aed; stroke-width: 1.4; pointer-events: none; }
+.region-fold { fill: #ede9fe; stroke: #7c3aed; stroke-width: 1.2; pointer-events: none; }
+.region-text { fill: #4c1d95; font-weight: 600; }
+.region-dot { fill: #7c3aed; stroke: #fff; stroke-width: 2; }
+.region-dot-closed { fill: #6d28d9; }
+.region-dot:hover, .region-dot.pair-hover { fill: #5b21b6; stroke: #c4b5fd; stroke-width: 4; }
+.region-sign { fill: #fff; font: 700 16px sans-serif; pointer-events: none; }
+.region-toggle-label { fill: #6d28d9; font-size: 12px; font-style: italic; }
+
+/* The Assign editor's field list for a struct variable. */
+.struct-assign-fields { display: grid; gap: 6px; padding-left: 18px; }
+.struct-assign-fields .field { display: grid; grid-template-columns: minmax(60px, auto) 1fr; align-items: center; gap: 8px; }
+
+/* The selection's right-click menu. */
+.context-menu {
+  position: fixed; z-index: 90; min-width: 200px; padding: 4px; background: #fff;
+  border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.context-menu-item {
+  background: none; border: 0; border-radius: 4px; padding: 7px 10px; text-align: left; font: inherit; color: var(--text); cursor: pointer;
+}
+.context-menu-item:hover, .context-menu-item:focus-visible { background: #eef2ff; outline: none; }
+
+/* --- modal --- */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(15,23,42,0.45);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+}
+.modal-dialog {
+  background: #fff; border-radius: 10px; padding: 18px 20px; width: min(760px, 94vw);
+  max-height: 90vh; overflow: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+}
+/* Short yes/no/OK messages don't need the full width. */
+.modal-dialog.modal-compact { width: min(440px, 94vw); }
+/* The dialogs' scrollbars (src/scrollbars.ts, OverlayScrollbars): the same
+   on every platform, a thin rounded bar that widens under the pointer. */
+.os-theme-folyab {
+  --os-size: 12px; --os-padding-perpendicular: 3px; --os-padding-axis: 4px;
+  --os-track-border-radius: 6px; --os-handle-border-radius: 6px;
+  --os-track-bg: transparent; --os-track-bg-hover: rgba(0,0,0,0.06); --os-track-bg-active: rgba(0,0,0,0.08);
+  --os-handle-bg: rgba(0,0,0,0.30); --os-handle-bg-hover: rgba(0,0,0,0.45); --os-handle-bg-active: rgba(0,0,0,0.55);
+  --os-handle-perpendicular-size: 60%; --os-handle-perpendicular-size-hover: 100%; --os-handle-perpendicular-size-active: 100%;
+  --os-handle-min-size: 40px; --os-handle-interactive-area-offset: 4px;
+}
+.modal-dialog .os-scrollbar { cursor: default; }
+.modal-dialog h3 { margin: 0 0 12px; font-size: 16px; cursor: move; user-select: none; }
+.modal-dialog.dragging { cursor: move; user-select: none; box-shadow: 0 24px 60px rgba(0,0,0,0.35); }
+.modal-form { display: flex; flex-direction: column; gap: 10px; }
+.field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+.field input[type=text], .field select, .field textarea {
+  font-size: 14px; color: var(--text); padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit;
+}
+/* Expressions, conditions, variable/routine names and arguments are code,
+   not prose — a fixed-width font makes them easier to read and edit. */
+.field input[type=text], .field textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.field input[type=checkbox] { width: 18px; height: 18px; }
+/* Assign dialog: [variable] = [expression], labels on top; the "=" is
+   centered on the input row. */
+.assign-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 2fr); gap: 8px; align-items: start; }
+.assign-row .field input[type=text] { width: 100%; box-sizing: border-box; }
+.assign-eq { align-self: end; display: flex; align-items: center; height: 31px; font-size: 20px; font-weight: 600; color: var(--text); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.form-error { color: var(--danger); font-size: 12px; min-height: 16px; }
+
+.type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.type-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 10px 8px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; cursor: pointer; font-size: 13px;
+}
+.type-btn:hover { border-color: var(--accent); background: #eef2ff; }
+.type-icon { width: 48px; height: 32px; }
+.type-btn-label { line-height: 1.2; }
+
+.args-wrap { display: flex; flex-direction: column; gap: 8px; border-top: 1px dashed var(--border); padding-top: 8px; }
+.hint { color: var(--muted); font-size: 12px; }
+
+.params-header { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 12px; color: var(--muted); }
+.params-list { display: flex; flex-direction: column; gap: 6px; }
+.param-row { display: flex; gap: 6px; align-items: center; }
+.param-row > input { flex: 2; min-width: 0; padding: 5px 6px; border: 1px solid var(--border); border-radius: 6px; }
+.param-row > select { flex: 1; min-width: 0; padding: 5px 6px; border: 1px solid var(--border); border-radius: 6px; }
+/* Struct editor: the field name is the main thing, its type secondary. */
+.param-row > input.struct-field-name { font-size: 15px; }
+.param-row > select.struct-field-type { font-size: 12px; color: var(--muted); }
+.byref-label { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+/* The help: one column of text, at most 800px wide, in a larger type; a
+   table of contents first, then the chapters and their sections. */
+.help-doc { max-width: 800px; margin: 0 auto; font-size: 17px; line-height: 1.6; color: var(--text); }
+.help-doc p, .help-doc ul { margin: 0 0 10px; }
+.help-doc ul { padding-left: 24px; }
+.help-doc li { margin: 0 0 6px; }
+.help-doc h2.help-chapter { margin: 40px 0 8px; padding-bottom: 6px; font-size: 26px; border-bottom: 2px solid var(--border); }
+.help-doc h3 { margin: 24px 0 8px; font-size: 20px; color: var(--accent-dark); }
+.help-doc h2, .help-doc h3 { scroll-margin-top: 16px; }
+.help-toc { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px 24px 14px; margin-bottom: 8px; }
+.help-toc h2 { margin: 0 0 6px; font-size: 22px; }
+.help-toc ol { margin: 0; padding-left: 26px; }
+.help-toc > ol > li { margin: 6px 0 2px; font-weight: 600; }
+.help-toc ol ol { list-style: none; padding-left: 16px; font-weight: 400; font-size: 16px; }
+.help-toc ol ol li { margin: 0; }
+.help-toc a { color: var(--accent-dark); text-decoration: none; }
+.help-toc a:hover { text-decoration: underline; }
+.help-table-wrap { overflow-x: auto; }
+.help-table { width: 100%; border-collapse: collapse; font-size: 15px; margin-bottom: 6px; }
+.help-table th { text-align: left; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); padding: 4px 8px; }
+.help-table td { border-bottom: 1px solid #f0f0f0; padding: 4px 8px; vertical-align: top; }
+.help-table td.help-code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+/* The Files tab: the name on its own line, then the size and the three
+   per-file buttons — they all fit the narrow side panel that way. */
+.files-toolbar { display: flex; gap: 8px; margin: 8px 0 10px; }
+.files-list { display: flex; flex-direction: column; gap: 6px; }
+.files-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; }
+.files-name { flex: 1 1 100%; min-width: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.files-info { flex: 1; color: var(--muted); font-size: 12px; white-space: nowrap; }
+#tabFiles p { margin: 0; }
+#tabFiles .files-list { flex: 0 0 auto; }
+#filesWarning:empty { display: none; }
+.field textarea.file-content { min-height: 240px; resize: vertical; }
+
+.examples-empty-btn {
+  display: block; width: 100%; padding: 18px; font: inherit; font-size: 17px; font-weight: 600;
+  color: #fff; background: var(--accent); border: 1px solid var(--accent-dark); border-radius: 10px; cursor: pointer;
+}
+.examples-empty-btn:hover { background: var(--accent-dark); }
+.examples-intro { margin-top: 22px; }
+
+.examples-toc { margin: 10px 0 4px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; }
+.examples-toc-title { margin: 0 0 6px; font-size: 14px; }
+.examples-toc ul { list-style: none; margin: 0; padding: 0; }
+.examples-toc > ul > li { margin: 3px 0; }
+.examples-toc-chapters { display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 2px 0 6px 16px !important; }
+.examples-toc-link, .examples-toc-back {
+  padding: 0; border: none; background: none; font: inherit; color: var(--accent-dark); cursor: pointer; text-align: left;
+}
+.examples-toc > ul > li > .examples-toc-link { font-weight: 600; }
+.examples-toc-chapters .examples-toc-link { font-size: 13px; }
+.examples-toc-link:hover, .examples-toc-back:hover { text-decoration: underline; }
+.examples-group-title { display: flex; align-items: baseline; gap: 12px; margin: 14px 0 6px; font-size: 14px; color: var(--accent-dark); scroll-margin-top: 8px; }
+.examples-toc-back { margin-left: auto; font-size: 12px; font-weight: normal; color: var(--muted); }
+.examples-chapter-title { margin: 10px 0 5px; font-size: 13px; color: var(--text); scroll-margin-top: 8px; }
+.examples-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.example-btn {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left;
+  padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; cursor: pointer; font: inherit;
+}
+.example-btn:hover { border-color: var(--accent); background: #eef2ff; }
+.example-title { font-weight: 600; color: var(--text); }
+.example-desc { font-size: 12px; color: var(--muted); line-height: 1.35; }
+
+@media (max-width: 820px) {
+  main { flex-direction: column; }
+  .side-panel { width: 100% !important; border-left: none; border-top: 1px solid var(--border); max-height: 45vh; }
+  .panel-resizer { display: none; }
+}
+
+/* --- help page (help.html) --- */
+body.help-page { height: auto; min-height: 100%; background: var(--bg); }
+.help-header {
+  position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 10px 24px; background: var(--panel); border-bottom: 1px solid var(--border);
+}
+.help-heading { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.help-header h1 { margin: 0; font-size: 20px; }
+.help-version { color: var(--muted); font-size: 13px; }
+.help-copyright { margin: -24px 16px 24px; color: var(--muted); font-size: 12px; text-align: center; }
+.help-nav { display: flex; gap: 8px; }
+.help-langs { display: flex; gap: 8px; flex-wrap: wrap; }
+.help-nav a { text-decoration: none; }
+.help-nav a.active { background: var(--accent); color: #fff; border-color: var(--accent-dark); }
+.help-content { max-width: 1100px; margin: 0 auto; padding: 16px 24px 48px; }
+@media (max-width: 820px) { .help-content { padding: 12px 16px 40px; } .help-header { padding: 10px 16px; } }
+
+/* The exam edition's download panel on the download page (download.html):
+   plain text on the page, no boxes; only the buttons stand out. */
+.help-download { margin: 0 0 12px; text-align: center; }
+.help-download h2 { margin: 0 0 6px; font-size: 24px; color: var(--text); }
+.help-download-lead { margin: 0 auto 8px; max-width: 700px; font-size: 15px; line-height: 1.45; color: var(--text); }
+.help-download-points { list-style: none; margin: 0 auto 20px; padding: 0; max-width: 700px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+/* Two columns, so the texts after the titles all start on one line. */
+.help-download-points { display: grid; grid-template-columns: auto auto; justify-content: center; column-gap: 8px; row-gap: 2px; text-align: left; }
+.help-download-points li { display: contents; }
+.help-download-points strong { color: var(--text); font-weight: 600; white-space: nowrap; }
+@media (max-width: 560px) {
+  .help-download-points { display: block; }
+  .help-download-points li { display: block; margin: 4px 0; }
+  .help-download-points strong { margin-right: 4px; }
+}
+.help-download-points strong::before { content: '✓ '; color: #047857; }
+.help-download-points strong::after { content: ':'; }
+/* A row per system: Windows on top, Linux below. */
+.help-download-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 14px; text-align: left; }
+.help-download-btn {
+  display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; border-radius: 12px;
+  background: #fff; color: var(--text); text-decoration: none; border: 2px solid transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+}
+.help-download-btn:hover, .help-download-btn:focus-visible {
+  transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18); border-color: #fcd34d; outline: none;
+}
+.help-download-icon {
+  flex: none; width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff;
+}
+.help-download-icon svg { width: 30px; height: 30px; }
+.help-download-linux .help-download-icon { background: linear-gradient(135deg, #ea580c, #f59e0b); }
+.help-download-windows .help-download-icon { background: linear-gradient(135deg, #0369a1, #0ea5e9); }
+.help-download-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.help-download-action { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.help-download-label { font-size: 19px; font-weight: 700; color: var(--accent-dark); }
+.help-download-note { font-size: 12px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+@media (max-width: 820px) { .help-download h2 { font-size: 20px; } }
+
+/* --- download page (download.html): the online app's big start button,
+   then the exam edition's download panel (.help-download above) --- */
+.download-content { max-width: 960px; }
+.download-hero {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px;
+  margin: 12px 0 36px; padding: 16px 0 0;
+}
+.download-logo { width: 72px; height: 72px; }
+.download-lead { margin: 0; max-width: 620px; font-size: 17px; line-height: 1.45; color: var(--text); }
+.download-start {
+  display: flex; align-items: center; gap: 18px; margin-top: 6px; padding: 20px 34px 20px 22px; border-radius: 16px;
+  text-align: left; text-decoration: none; color: #fff; border: 2px solid transparent;
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 55%, #0891b2 100%);
+  box-shadow: 0 10px 26px rgba(30, 58, 138, 0.35); transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+}
+.download-start:hover, .download-start:focus-visible {
+  transform: translateY(-2px); box-shadow: 0 14px 30px rgba(30, 58, 138, 0.45); border-color: #fcd34d; outline: none;
+}
+.download-start-icon {
+  flex: none; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: #fff; color: var(--accent);
+}
+.download-start-icon svg { width: 34px; height: 34px; margin-left: 4px; }
+.download-start-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.download-start-action { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
+.download-start-label { font-size: 30px; font-weight: 700; line-height: 1.15; }
+.download-start-note { font-size: 14px; opacity: 0.9; line-height: 1.4; }
+@media (max-width: 820px) {
+  .download-start { padding: 16px 20px 16px 16px; gap: 14px; }
+  .download-start-icon { width: 52px; height: 52px; }
+  .download-start-label { font-size: 24px; }
+}

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Journify App</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../icon.png" rel="icon" type="image/png">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-5b0d986ae0ee1868b2ea91687cce331f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Journify App</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="site-nav">
+  <input type="checkbox" id="nav-toggle-en" class="nav-toggle-checkbox">
+  <label for="nav-toggle-en" class="nav-toggle" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </label>
+  <a href="index.html" class="brand">Journify App</a>
+  <div class="links">
+    <a href="index.html">Home</a>
+    <a href="https://forms.gle/bgqgKfRc9oD4qP7K7" target="_blank" rel="noopener">Feedback</a>
+    <a href="support.html">Support</a>
+    <a href="about.html">About</a>
+  </div>
+  <div class="lang-switch">
+    <a href="../index.html">HU</a>
+  </div>
+</div>
+<section id="journify" class="level1 hero">
+<h1>Journify</h1>
+<p class="tagline">
+A modern, private diary app.
+</p>
+</section>
+<div class="download-buttons">
+<p><a href="https://apps.microsoft.com/detail/9NFDLCTDMJQJ" class="btn btn-outline-primary"><i class="bi bi-windows"></i> Microsoft Store</a> <a href="https://github.com/laszlorepassy/journify-releases/releases/latest" class="btn btn-outline-primary dl-apk"><i class="bi bi-android2"></i> Android (APK)<span class="dl-version"></span></a> <a href="https://github.com/laszlorepassy/journify-releases/releases/latest/download/Journify.AppImage" class="btn btn-outline-primary"><i class="bi bi-tux"></i> Linux</a></p>
+</div>
+<div class="download-note">
+<p><span id="dl-latest" hidden="">Latest version: <strong></strong><span class="dl-date"></span> · </span><a href="#android">Installing on Android</a> · Windows installer without the Store: <a href="https://github.com/laszlorepassy/journify-releases/releases/latest" class="dl-exe"><span class="dl-exe-name">Journify-setup.exe</span></a> (<a href="#windows-exe">guide</a>)</p>
+</div>
+<div id="android" class="info-box">
+<section id="installing-on-android" class="level3">
+<h3 class="anchored" data-anchor-id="installing-on-android">Installing on Android</h3>
+<p>The Android version is an APK file you download straight from this page. Since it doesn’t come from a store, Android first asks whether you allow the installation:</p>
+<ol type="1">
+<li>On your phone, tap the <a href="https://github.com/laszlorepassy/journify-releases/releases/latest" class="dl-apk">Android (APK)</a> button and download <code class="dl-apk-name">Journify-&lt;version&gt;.apk</code>.</li>
+<li>Open the downloaded file (from the notification, or from the Files / Downloads app).</li>
+<li>If it says that for your security you can’t install unknown apps from this source, tap <strong>Settings</strong> and turn on <strong>Allow from this source</strong> (Install unknown apps). This applies only to the app you opened the file with (for example your browser).</li>
+<li>Go back and tap <strong>Install</strong>. If Play Protect warns you, choose <strong>More details → Install anyway</strong>.</li>
+<li>If you like, you can turn the permission off again in the same place afterwards.</li>
+</ol>
+<p>The APK version doesn’t update itself. Journify shows its installed version under Settings → About; if the version above is newer, download it and install it over the old one — your diary stays. The Google Play test version is signed with a different key, so if that is on your phone, first back up or sync your diary, uninstall the app, and only then install the APK.</p>
+<section id="google-play-testing" class="level4">
+<h4 class="anchored" data-anchor-id="google-play-testing">Google Play testing</h4>
+<p>Journify is also on its way to the Google Play Store, which first needs a closed testing period with 12 testers over two weeks. If you would like to join in, it takes two steps:</p>
+<ol type="1">
+<li>Join the testers mailing list: <a href="https://accounts.google.com/AccountChooser?continue=https%3A%2F%2Fgroups.google.com%2Fg%2Fjournify-app" target="_blank" rel="noopener">Journify testers</a></li>
+<li>Then open the <a href="https://accounts.google.com/AccountChooser?continue=https%3A%2F%2Fplay.google.com%2Fapps%2Ftesting%2Fhu.repassy.journify" target="_blank" rel="noopener">tester page</a> and press the “Become a tester” button.</li>
+</ol>
+<p>From then on it installs from the Google Play Store like any other app, and updates arrive the same way. Use the same Google account for both steps as the one you are signed in with on your phone — otherwise the store will tell you the app is not available.</p>
+</section>
+</section>
+</div>
+<div id="windows-exe" class="info-box">
+<section id="windows-installer-.exe" class="level3">
+<h3 class="anchored" data-anchor-id="windows-installer-.exe">Windows installer (.exe)</h3>
+<p>On Windows the easiest way is the <a href="https://apps.microsoft.com/detail/9NFDLCTDMJQJ">Microsoft Store</a>: it keeps Journify up to date automatically. If you would rather install without the Store, download <a href="https://github.com/laszlorepassy/journify-releases/releases/latest" class="dl-exe"><span class="dl-exe-name">Journify-setup.exe</span></a>. This installer is not digitally signed, so Windows will warn you:</p>
+<ol type="1">
+<li>If your browser (for example Edge) says the file isn’t commonly downloaded, open the <strong>…</strong> menu next to the download, choose <strong>Keep</strong>, then <strong>Show more → Keep anyway</strong>.</li>
+<li>Run the downloaded <code class="dl-exe-name">Journify-&lt;version&gt;-setup.exe</code>.</li>
+<li>If a “Windows protected your PC” window appears, click <strong>More info</strong>, then <strong>Run anyway</strong>.</li>
+<li>Follow the installer’s steps.</li>
+</ol>
+<p>If Windows 11 Smart App Control is turned on, it won’t let an unsigned installer run at all — use the Microsoft Store version instead. The .exe version doesn’t update itself. Journify shows its installed version under Settings → About; if the version above is newer, download and run the installer again.</p>
+</section>
+</div>
+<script>
+// The APK and the Windows installer don't update themselves, so the page
+// shows which version is current and links the versioned files of the
+// newest journify-releases release (Journify-X.Y.Z.apk,
+// Journify-X.Y.Z-setup.exe). Without JavaScript, or if the GitHub API is
+// unreachable, the links stay on the release page, which lists the files
+// with their version.
+(function () {
+  var box = document.getElementById('dl-latest');
+  fetch('https://api.github.com/repos/laszlorepassy/journify-releases/releases/latest', {
+    headers: { Accept: 'application/vnd.github+json' }
+  }).then(function (response) {
+    if (!response.ok) throw new Error(response.status);
+    return response.json();
+  }).then(function (release) {
+    var version = String(release.tag_name || '').replace(/^v/, '');
+    function asset(pattern) {
+      for (var i = 0; i < release.assets.length; i++) {
+        if (pattern.test(release.assets[i].name)) return release.assets[i];
+      }
+      return null;
+    }
+    var apk = asset(/^Journify-\d+\.\d+\.\d+\.apk$/);
+    var exe = asset(/^Journify-\d+\.\d+\.\d+-setup\.exe$/);
+    [[apk, 'dl-apk'], [exe, 'dl-exe']].forEach(function (pair) {
+      if (!pair[0]) return;
+      document.querySelectorAll('a.' + pair[1]).forEach(function (link) {
+        link.href = pair[0].browser_download_url;
+      });
+      document.querySelectorAll('.' + pair[1] + '-name').forEach(function (node) {
+        node.textContent = pair[0].name;
+      });
+    });
+    if (version) {
+      document.querySelectorAll('.dl-version').forEach(function (node) {
+        node.textContent = version; // the button's own gap spaces it
+      });
+      if (box) {
+        var date = release.published_at ? new Date(release.published_at).toLocaleDateString(document.documentElement.lang || undefined) : '';
+        box.querySelector('strong').textContent = version;
+        box.querySelector('.dl-date').textContent = date ? ' (' + date + ')' : '';
+        box.hidden = false;
+      }
+    }
+  }).catch(function () {});
+})();
+</script>
+<video class="demo-video" src="../video/journify-en.mp4" poster="../video/journify-poster.jpg" controls="" muted="" playsinline="" preload="none">
+</video>
+<div class="screenshot-gallery">
+<figure class="figure">
+<img src="../screenshots/calendar.png" alt="Calendar – events, reminders and your diary in one place" class="figure-img">
+<figcaption>
+Calendar – events, reminders and your diary in one place
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../screenshots/media-gallery.jpg" alt="Media gallery – every photo, grouped by month" class="figure-img">
+<figcaption>
+Media gallery – every photo, grouped by month
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../screenshots/map.jpg" alt="Map – your entries by place" class="figure-img">
+<figcaption>
+Map – your entries by place
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../screenshots/tags.png" alt="Tags and counters – track what matters to you" class="figure-img">
+<figcaption>
+Tags and counters – track what matters to you
+</figcaption>
+</figure>
+<figure class="figure">
+<img src="../screenshots/settings.png" alt="Turn on exactly the features you need" class="figure-img">
+<figcaption>
+Turn on exactly the features you need
+</figcaption>
+</figure>
+</div>
+<section id="what-can-journify-do" class="level2">
+<h2 class="anchored" data-anchor-id="what-can-journify-do">What can Journify do?</h2>
+<ul class="feature-list">
+<li>
+<strong>A real writing experience.</strong> Dictation, voice recording, bold, italic, underlined text, highlight colors, checklists, and embedded photos — write the way a modern app should let you, not in a plain text box.
+</li>
+<li>
+<strong>Browse your diary your own way.</strong> A large monthly calendar with a photo preview for every day, a scrollable timeline of everything you’ve ever written, a photo gallery grouped by month, or search across every date, title, and word.
+</li>
+<li>
+<strong>Tags and counters.</strong> Tag entries however you like, and track numbers over time — weight, mood, step count, anything you can express as a number — with a line chart showing the trend.
+</li>
+<li>
+<strong>On This Day.</strong> See what you wrote on today’s date in earlier years.
+</li>
+<li>
+<strong>Calendar.</strong> Turn on the calendar extension and keep your appointments next to your diary: several calendars each with its own color, repeating and all-day events, reminders, .ics file import, subscribing to an external calendar by URL, and export back to .ics. The monthly view shows your events and your diary entries side by side.
+</li>
+<li>
+<strong>Templates.</strong> Save the starting point of an entry you write often — a daily check-in, a weekly summary — and fill it in with one click.
+</li>
+<li>
+<strong>Attachments.</strong> Attach photos and files to any entry; images show up both in the entry and in the monthly gallery.
+</li>
+<li>
+<strong>Location.</strong> Add or change an entry’s location, and browse your diary on a map, grouped by place.
+</li>
+<li>
+<strong>Export to Word.</strong> Turn any date range of your diary into a nicely formatted DOCX document, complete with a table of contents and your photos.
+</li>
+<li>
+<strong>Back up, and switch from another app.</strong> Save your whole diary — entries and attachments — into a single file you control. If you are coming from Diarium or Day One, Journify can import your existing diary directly, and export back into both formats too.
+</li>
+<li>
+<strong>Cloud storage sync, end-to-end encrypted.</strong> Keep your diary in sync across your devices using your own cloud storage account; everything is encrypted with a passphrase only you know before it ever leaves your device.
+</li>
+<li>
+<strong>Share into Journify.</strong> On Android, share text, an image, or a file from any app straight into a diary entry.
+</li>
+<li>
+<strong>Hungarian and English.</strong> The interface follows your system language automatically, or you can override it in Settings.
+</li>
+</ul>
+</section>
+<div class="policy-section">
+<section id="privacy-policy" class="level2">
+<h2 class="anchored" data-anchor-id="privacy-policy">Privacy policy</h2>
+<p>Protecting your data is the top priority for Journify’s developer. This policy explains how your data is handled.</p>
+<section id="what-data-do-we-collect" class="level3">
+<h3 class="anchored" data-anchor-id="what-data-do-we-collect">1. What data do we collect?</h3>
+<p>None. Journify (and its developer) does not collect, store, or transmit any personal data, diary entries, images, or files to external servers. Everything you create in the app stays exclusively on your own local device.</p>
+</section>
+<section id="cloud-storage-sync-and-permissions" class="level3">
+<h3 class="anchored" data-anchor-id="cloud-storage-sync-and-permissions">2. Cloud storage sync and permissions</h3>
+<p>The app includes an optional sync feature to keep your data safe and reachable from more than one device, using a cloud storage account you connect yourself. To use it, the app requests only the minimum permission needed to create and access its own dedicated sync folder in that account.</p>
+<p><strong>How are these permissions used?</strong></p>
+<p>The app creates a dedicated folder in your own cloud storage account. It only ever accesses the sync files it created itself. Journify does not see, read, or modify your existing personal files, photos, or documents in that account. Access is strictly limited to syncing diary entries.</p>
+<p><strong>End-to-end encryption</strong></p>
+<p>Before a diary entry leaves your device, Journify encrypts it with a passphrase you set yourself and that only you know. That passphrase is never sent to your cloud storage provider, to the developer, or to any other server. As a result, the entries stored in your cloud storage account are encrypted: neither your cloud storage provider nor Journify’s developer can read their contents.</p>
+<p><strong>Important:</strong> since your passphrase is the only way to decrypt your synced data, losing it means your synced diary entries can no longer be recovered — not even by the developer. Keep your passphrase somewhere safe, and consider making local backups too (see Terms of use below).</p>
+</section>
+<section id="sharing-data-with-third-parties" class="level3">
+<h3 class="anchored" data-anchor-id="sharing-data-with-third-parties">3. Sharing data with third parties</h3>
+<p>Since the app’s developer has no access to your data, it can never be sold, transferred, or shared with any third party. Your data travels only between your device and your own cloud storage account, over that provider’s own encrypted channels.</p>
+</section>
+<section id="deleting-your-data" class="level3">
+<h3 class="anchored" data-anchor-id="deleting-your-data">4. Deleting your data</h3>
+<p>To delete your data from your cloud storage account: choose “Disconnect” next to the connected provider in the app’s settings, then delete the journify folder in that account.</p>
+</section>
+</section>
+<section id="terms-of-use" class="level2">
+<h2 class="anchored" data-anchor-id="terms-of-use">Terms of use</h2>
+<p>Journify is provided “as is.” While every effort is made to keep the app reliable, the developer is not responsible for any data loss or damage caused by a software or hardware failure, or by an outage of a third-party service (e.g.&nbsp;your cloud storage provider).</p>
+<p>I recommend making regular local backups of your important entries using the export feature in the app’s settings window.</p>
+<p>If you use cloud storage sync, keep your encryption passphrase somewhere safe: since your entries are end-to-end encrypted, losing the passphrase means permanently losing access to your synced data — neither your cloud storage provider nor the developer can recover or reset it.</p>
+</section>
+<section id="license" class="level2">
+<h2 class="anchored" data-anchor-id="license">License</h2>
+<p>Journify is closed-source software. All rights reserved © Répássy László. The app is not open source: it may not be copied, modified, reverse-engineered, redistributed, or used to create derivative works without the developer’s prior written permission. You are free to use the app as distributed through the official stores.</p>
+</section>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/repassylaszlo\.hu\/app\/journify\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Répássy László</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Journify App</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

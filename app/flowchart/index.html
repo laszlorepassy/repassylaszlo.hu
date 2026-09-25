@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Répássy László">
+<meta name="copyright" content="© 2026 Répássy László. Minden jog fenntartva. All rights reserved.">
+<title>Folyáb - Folyamatábra</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css?v=22fbb9a797">
+</head>
+<body>
+<div id="app">
+  <header id="appHeader">
+    <nav class="menu">
+      <!-- Icon-only command buttons (Fluent 2 "subtle" icon button: a 32x32
+           square, 20px glyph, no border, name in the tooltip). The glyphs are
+           inline SVG in Fluent's own 24px geometry, colored with currentColor. -->
+      <div class="toolbar-group">
+        <button id="btnNew" class="icon-btn icon-new" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M13.3 3.6H7.8A1.5 1.5 0 0 0 6.3 5.1v13.8a1.5 1.5 0 0 0 1.5 1.5h8.4a1.5 1.5 0 0 0 1.5-1.5V7.9z"/>
+            <path d="M13.3 3.6v2.8a1.5 1.5 0 0 0 1.5 1.5h2.9"/>
+            <path d="M12 11.1v5.2M9.4 13.7h5.2"/>
+          </svg>
+        </button>
+        <button id="btnOpen" class="icon-btn icon-open" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M19.4 10.4V8.2a1.7 1.7 0 0 0-1.7-1.7h-5.2l-1.6-1.7a1.7 1.7 0 0 0-1.2-.5H5.8A1.7 1.7 0 0 0 4.1 6v11.6"/>
+            <path d="M4.1 17.6l2.3-6.1a1.7 1.7 0 0 1 1.6-1.1h11.9a1.2 1.2 0 0 1 1.13 1.6l-1.9 5.3a1.7 1.7 0 0 1-1.6 1.1H5.8a1.7 1.7 0 0 1-1.7-1.7z"/>
+          </svg>
+        </button>
+        <button id="btnSave" class="icon-btn icon-save" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6.5 4.5h8.1a2 2 0 0 1 1.42.59l2.4 2.4A2 2 0 0 1 19 8.9v8.6a2 2 0 0 1-2 2H6.5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2z"/>
+            <path d="M8.6 4.6v3.5h5.3V4.6"/>
+            <path d="M7.6 19.4v-4.6h8.4v4.6"/>
+          </svg>
+        </button>
+        <!-- Undo / redo (Ctrl+Z, Ctrl+Y): the arrow curving back, and its
+             mirror image. Both stay disabled while there is nothing to
+             undo or redo (src/main.ts, the edit history). -->
+        <button id="btnUndo" class="icon-btn" title="" aria-label="" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4.6 9.2h8.9a4.8 4.8 0 0 1 0 9.6H8.4"/>
+            <path d="M8.6 5.4 4.4 9.2l4.2 3.8"/>
+          </svg>
+        </button>
+        <button id="btnRedo" class="icon-btn" title="" aria-label="" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M19.4 9.2h-8.9a4.8 4.8 0 0 0 0 9.6h5.1"/>
+            <path d="M15.4 5.4 19.6 9.2l-4.2 3.8"/>
+          </svg>
+        </button>
+        <button id="btnExportImage" class="icon-btn icon-image" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4.6 6.7a2.1 2.1 0 0 1 2.1-2.1h10.6a2.1 2.1 0 0 1 2.1 2.1v10.6a2.1 2.1 0 0 1-2.1 2.1H6.7a2.1 2.1 0 0 1-2.1-2.1z"/>
+            <circle cx="9.4" cy="9.6" r="1.4"/>
+            <path d="M4.8 17.1l3.9-3.7a1.7 1.7 0 0 1 2.3 0l3.1 2.9 1.2-1.1a1.7 1.7 0 0 1 2.3 0l1.7 1.6"/>
+          </svg>
+        </button>
+      </div>
+      <input type="text" id="programName" class="program-name-input" value="program">
+      <span id="clipboardStatus" class="clipboard-status" hidden title=""></span>
+      <div class="run-controls">
+        <button id="btnRun" class="icon-btn icon-run" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path class="solid" d="M7.6 6 17.4 12 7.6 18z"/>
+          </svg>
+        </button>
+        <button id="btnStep" class="icon-btn" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path class="solid" d="M7 6.4 14.9 12 7 17.6z"/>
+            <rect class="solid" x="15.9" y="6" width="2.2" height="12" rx="1.1"/>
+          </svg>
+        </button>
+        <button id="btnPause" class="icon-btn" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <rect class="solid" x="7.5" y="5.8" width="3.4" height="12.4" rx="1.3"/>
+            <rect class="solid" x="13.1" y="5.8" width="3.4" height="12.4" rx="1.3"/>
+          </svg>
+        </button>
+        <button id="btnReset" class="icon-btn" title="" aria-label="">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 4.9a7.1 7.1 0 1 1-6.96 5.7"/>
+            <path d="M14.6 7.2 12 4.9l2.6-2.2"/>
+          </svg>
+        </button>
+        <span id="speedLabel" hidden>Speed</span>
+        <select id="speedSelect" hidden>
+          <option id="speedOptSlowest" value="800">Slowest</option>
+          <option id="speedOptSlow" value="400">Slow</option>
+          <option id="speedOptNormal" value="150" selected>Normal</option>
+          <option id="speedOptFast" value="50">Fast</option>
+          <option id="speedOptFastest" value="0">Fastest</option>
+        </select>
+      </div>
+      <span class="toolbar-divider" aria-hidden="true"></span>
+      <button id="btnHelp" class="icon-btn" title="" aria-label="">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="7.9"/>
+          <path d="M9.9 9.8a2.15 2.15 0 1 1 2.9 2.02c-.53.2-.86.62-.86 1.15v.6"/>
+          <circle class="solid" cx="11.94" cy="16.2" r="0.95"/>
+        </svg>
+      </button>
+      <!-- Settings (language, the app's size, version, download page): a
+           wrench, at the right end (src/settingsPanel.ts). -->
+      <button id="btnSettings" class="icon-btn icon-settings" title="" aria-label="" aria-haspopup="dialog" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M14.7 6.3a3.9 3.9 0 0 0-5 5L4.8 16.2a1.9 1.9 0 0 0 2.7 2.7l4.9-4.9a3.9 3.9 0 0 0 5-5l-2.4 2.4-2.1-.6-.6-2.1z"/>
+        </svg>
+      </button>
+      <!-- One option per language, made from the language files (src/main.ts):
+           the language's value store; it is chosen in the settings. -->
+      <select id="langSelect" hidden></select>
+    </nav>
+  </header>
+
+  <div class="routine-tabs" id="routineTabs"></div>
+
+  <main>
+    <div class="canvas-outer">
+      <div class="canvas-wrap" id="canvasWrap">
+        <svg id="flowSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="zoom-controls">
+        <button id="btnZoomIn" class="btn btn-small" title="Zoom in">+</button>
+        <button id="btnZoomOut" class="btn btn-small" title="Zoom out">−</button>
+        <button id="btnZoomFit" class="btn btn-small" title="Fit to view">⛶</button>
+      </div>
+    </div>
+    <div class="panel-resizer" id="panelResizer" role="separator" aria-orientation="vertical" tabindex="0" title="" aria-label=""></div>
+    <aside class="side-panel" id="sidePanel">
+      <div class="side-tabs" id="sideTabs">
+        <button class="side-tab active" data-tab="console" id="tabBtnConsole"></button>
+        <button class="side-tab" data-tab="vars" id="tabBtnVars"></button>
+        <button class="side-tab" data-tab="files" id="tabBtnFiles"></button>
+        <button class="side-tab" data-tab="code" id="tabBtnCode"></button>
+      </div>
+
+      <div class="tab-content active" id="tabConsole">
+        <div id="consoleOutput" class="console-output"></div>
+        <div id="inputRow" class="input-row" hidden>
+          <label id="inputLabel" for="inputField"></label>
+          <div class="input-row-controls">
+            <input type="text" id="inputField">
+            <button id="inputSubmit" class="btn btn-primary"></button>
+          </div>
+        </div>
+        <div id="runStatus" class="run-status"></div>
+      </div>
+
+      <div class="tab-content" id="tabVars">
+        <table class="vars-table">
+          <thead><tr><th id="thName"></th><th id="thType"></th><th id="thValue"></th></tr></thead>
+          <tbody id="varsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="tab-content" id="tabFiles">
+        <p class="hint" id="filesIntro"></p>
+        <div class="files-toolbar">
+          <button id="btnFileUpload" class="btn btn-small"></button>
+          <button id="btnFileNew" class="btn btn-small"></button>
+          <input type="file" id="fileUploadInput" multiple hidden>
+        </div>
+        <div class="files-list" id="filesList"></div>
+        <p class="form-error" id="filesWarning"></p>
+      </div>
+
+      <div class="tab-content" id="tabCode">
+        <div class="code-actions">
+          <button id="btnGenerateCode" class="btn btn-primary"></button>
+          <select id="codeLangSelect" class="btn btn-small">
+            <option value="python">Python</option>
+            <option value="cpp">C++</option>
+            <option value="csharp">C#</option>
+            <option value="pseudo" id="codeLangOptPseudo">Pseudocode</option>
+          </select>
+          <button id="btnCopyCode" class="btn btn-small"></button>
+          <button id="btnDownloadCode" class="btn btn-small"></button>
+          <button id="btnEnlargeCode" class="btn btn-small"></button>
+        </div>
+        <div class="code-view">
+          <pre id="codeGutter" class="code-gutter" aria-hidden="true"></pre>
+          <pre id="codeOutput" class="code-output"></pre>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <div id="modalRoot"></div>
+</div>
+<script type="module" src="js/app.min.js?v=db577ef93a"></script>
+</body>
+</html>
