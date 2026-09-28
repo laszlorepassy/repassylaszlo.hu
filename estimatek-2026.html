@@ -75,35 +75,6 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <meta name="robots" content="noindex, nofollow">
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <meta property="og:title" content="Répássy László digitális kultúra és matematika szakos tanár">
 <meta property="og:description" content="Digitális kultúra és matematika szakos tanár a Békásmegyeri Veres Péter Gimnáziumban.">
@@ -210,7 +181,7 @@ A <a href="https://www.tankonyvkatalogus.hu/tankonyv/OH-MAT09TA_I">Matematika 9.
 <p>SZÓKRATÉSZ: Örülök, Hippokratészem, hogy olyan jól megértettél; hiszen én mindig nyíltan megmondom, hogy én magam semmit nem tudok, csak – ellentétben sok más emberrel – nem is hiszem magamról, hogy tudom azt, amit nem tudok.</p>
 </blockquote>
 <p><strong>szeptember 28. Összeszámlálás összefoglaló, halmazok</strong><br>
-Áttekintettük az összes összeszámlálási módszert, azokat is, amelyeket eddig még keveset gyakoroltunk. A <a href="https://www.tankonyvkatalogus.hu/tankonyv/OH-MAT09TA_I">Matematika 9. tankönyv I. kötet</a> 6. Halmazok fejezetének végére értünk. Felfedeztük azt is, hogy egy halmaz összes részhalmazainak száma <span class="math inline">\(2^n\)</span>. Házi feladat a 21. oldalon az 1-es feladat és a 22. oldal tetején a 4-es feladat.</p>
+Áttekintettük az összes összeszámlálási módszert, azokat is, amelyeket eddig még keveset gyakoroltunk. A <a href="https://www.tankonyvkatalogus.hu/tankonyv/OH-MAT09TA_I">Matematika 9. tankönyv I. kötet</a> 6. Halmazok fejezetének végére értünk. Felfedeztük azt is, hogy egy halmaz összes részhalmazainak száma 2<sup>n</sup>. Házi feladat a 21. oldalon az 1-es feladat és a 22. oldal tetején a 4-es feladat.</p>
 <blockquote class="blockquote">
 <p>SZÓKRATÉSZ: Hogyan dönthetem én el helyetted, hogy mit csinálj? Ezt mindenkinek magának kell eldöntenie. Én nem tehetek többet, mint hogy bábaként segítek neked, hogy megszüljed elhatározásodat.</p>
 </blockquote>
