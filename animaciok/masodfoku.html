@@ -177,6 +177,26 @@ math { font-size: 1.35em; }
 .hl-sum { color: var(--accent); font-weight: 700; }
 .hl-prod { color: var(--ok); font-weight: 700; }
 .hl-root { color: var(--root); font-weight: 700; }
+.sqrt {
+  display: inline-flex;
+  align-items: stretch;
+  vertical-align: -0.16em;
+  margin: 0 1px;
+}
+.sqrt svg {
+  width: 9px;
+  height: 1.2em;
+  flex-shrink: 0;
+}
+.sqrt .radicand {
+  border-top: 1.6px solid currentColor;
+  padding-top: 0px;
+  padding-left: 2px;
+  padding-right: 3px;
+  line-height: 1.1;
+  display: inline-flex;
+  align-items: center;
+}
 </style>
 </head>
 <body>
@@ -320,7 +340,7 @@ math { font-size: 1.35em; }
       </div>
 
       <div class="panel">
-        <h2>Fejszámolás Viète-formulákkal (Gyakorló tréner)</h2>
+        <h2>Fejszámolás Viète-formulákkal</h2>
         <div style="font-size:0.95rem; margin-bottom:8px;">
           Kitalálod a gyököket fejben a szorzat és az összeg alapján?
         </div>
@@ -351,6 +371,9 @@ function fmt(n) {
   let r = Math.round(n * 100) / 100;
   if (Object.is(r, -0)) r = 0;
   return String(r).replace('.', ',').replace('-', MINUS);
+}
+function sqrtHtml(content) {
+  return '<span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">' + content + '</span></span>';
 }
 function par(n) { return n < 0 ? '(' + fmt(n) + ')' : fmt(n); }
 function term(coef, sym, first) {
@@ -700,7 +723,7 @@ const alg2 = (function () {
     $('#b2o').textContent = b; $('#k2o').textContent = k;
     const val = k + h * h, sq = Math.sqrt(val);
     const x1 = -h + sq, x2 = -h - sq;
-    const rt = Number.isInteger(sq) ? String(sq) : '√' + fmt(val);
+    const rt = Number.isInteger(sq) ? String(sq) : sqrtHtml(fmt(val));
     const lines = [
       'x² + ' + b + 'x = ' + k,
       'x² + ' + fmt(h) + 'x + ' + fmt(h) + 'x = ' + k,
@@ -721,7 +744,7 @@ const alg2 = (function () {
     ul.innerHTML = '';
     lines.forEach((t, i) => {
       const li = document.createElement('li');
-      li.textContent = t;
+      li.innerHTML = t;
       li.className = i === step ? 'cur' : (i < step ? 'done' : '');
       ul.appendChild(li);
     });
@@ -757,7 +780,7 @@ const alg2 = (function () {
     'A konstans tagot átvisszük a jobb oldalra.',
     'Teljes négyzetté egészítünk ki: mindkét oldalhoz hozzáadjuk az x együtthatója felének négyzetét. Ez a hiányzó sarok a területes ábrán.',
     'A bal oldal teljes négyzet. A jobb oldalon közös nevezőre hozunk: b²/(4a²) − 4ac/(4a²).',
-    'Gyököt vonunk. A ± jel lefedi az előjelet, ezért √(4a²) = 2a írható. A gyök alatt a diszkrimináns áll: D = b² − 4ac. Ha D < 0, nincs valós gyök.',
+    'Gyököt vonunk. A ± jel lefedi az előjelet, ezért ' + sqrtHtml('4a²') + ' = 2a írható. A gyök alatt a diszkrimináns áll: D = b² − 4ac. Ha D < 0, nincs valós gyök.',
     'Ez a megoldóképlet. A diszkrimináns előjele dönti el, hány valós gyök van.'
   ];
   const ul = $('#alg3');
@@ -770,7 +793,7 @@ const alg2 = (function () {
       li.className = i === step ? 'cur' : 'done';
       ul.appendChild(li);
     });
-    $('#cap3').textContent = caps[step];
+    $('#cap3').innerHTML = caps[step];
   }, 6000);
   function calc() {
     const A = +$('#a3').value, B = +$('#b3').value, C = +$('#c3').value;
@@ -781,7 +804,7 @@ const alg2 = (function () {
     if (D < 0) s += '<span class="badge none">D &lt; 0</span> nincs valós gyök.';
     else {
       const sq = Math.sqrt(D);
-      s += 'x = (' + MINUS + par(B) + ' ± √' + fmt(D) + ') / (2·' + par(A) + ')';
+      s += 'x = (' + MINUS + par(B) + ' ± ' + sqrtHtml(fmt(D)) + ') / (2·' + par(A) + ')';
       const x1 = (-B - sq) / (2 * A), x2 = (-B + sq) / (2 * A);
       s += D === 0 ? '<br><span class="badge one">D = 0</span> x = <b>' + fmt(x1) + '</b> (kétszeres gyök)'
         : '<br><span class="badge two">D &gt; 0</span> x₁ = <b>' + fmt(Math.min(x1, x2)) + '</b>, x₂ = <b>' + fmt(Math.max(x1, x2)) + '</b>';
@@ -823,7 +846,7 @@ const alg2 = (function () {
       'Kifejtett normálalak: <b>' + eqStr(a, b, c) + '</b><br>' +
       '<div style="margin-top:6px;">' +
       '• <b>Szimmetriatengely:</b> x = (x₁ + x₂) / 2 = <b>' + fmt(midX) + '</b> (a két gyök számtani közepe!)<br>' +
-      '• <b>Gyökök távolsága:</b> |x₂ ' + MINUS + ' x₁| = <b>' + fmt(Math.abs(S.x2 - S.x1)) + '</b> = √D / |a|<br>' +
+      '• <b>Gyökök távolsága:</b> |x₂ ' + MINUS + ' x₁| = <b>' + fmt(Math.abs(S.x2 - S.x1)) + '</b> = ' + sqrtHtml('D') + ' / |a|<br>' +
       '• <b>y-tengelymetszet:</b> a függvény az y tengelyt a (0; ' + fmt(c) + ') pontban metszi (c = a · x₁ · x₂).' +
       '</div>';
 
