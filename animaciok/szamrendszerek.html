@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Számrendszerek és bináris számolás</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1f2937;
+  --muted: #4b5563;
+  --line: #e5e7eb;
+  --panel: #f8fafc;
+  --accent: #15803d;
+  --accent-hover: #166534;
+  --accent-bg: #ecfdf5;
+  --accent-border: #a7f3d0;
+  --danger: #b91c1c;
+  --warn-bg: #fffbeb;
+  --warn-border: #fef3c7;
+  --warn-fg: #92400e;
+  --ok: #15803d;
+  --ok-bg: #ecfdf5;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --radius: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --fg: #f1f5f9;
+    --muted: #94a3b8;
+    --line: #334155;
+    --panel: #1e293b;
+    --accent: #22c55e;
+    --accent-hover: #16a34a;
+    --accent-bg: rgba(34, 197, 94, 0.15);
+    --accent-border: #166534;
+    --danger: #f87171;
+    --warn-bg: rgba(245, 158, 11, 0.15);
+    --warn-border: #78350f;
+    --warn-fg: #fcd34d;
+    --ok: #4ade80;
+    --ok-bg: rgba(74, 222, 128, 0.15);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.5;
+  padding: 16px 20px 60px;
+}
+
+.top-nav {
+  max-width: 1440px;
+  margin: 0 auto 16px;
+  padding-bottom: 8px;
+}
+
+.top-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.top-nav a:hover { text-decoration: underline; }
+
+header {
+  max-width: 1440px;
+  margin: 0 auto 24px;
+}
+
+header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.badge-accent { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); }
+.badge-ok { background: var(--ok-bg); border-color: var(--accent-border); color: var(--ok); }
+.badge-warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-fg); }
+
+main {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.anim-section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.anim-section h2 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.plot-container {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.panel:last-child { margin-bottom: 0; }
+
+.panel h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+button {
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 7px 13px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--fg);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+button:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+button.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.sl {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sl label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 90px;
+}
+.sl input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+.sl output {
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 40px;
+  text-align: right;
+  color: var(--accent);
+}
+
+.formula-box {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formula-line {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin: 16px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+table.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+  background: var(--bg);
+}
+table.matrix-table th, table.matrix-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+table.matrix-table th {
+  background: var(--panel);
+  font-weight: 700;
+  color: var(--fg);
+}
+table.matrix-table tr:last-child td { border-bottom: none; }
+
+.quiz-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+}
+.quiz-q {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.feedback-box {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: none;
+}
+.feedback-ok { background: var(--ok-bg); border: 1px solid var(--accent-border); color: var(--ok); }
+.feedback-bad { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-fg); }
+</style>
+
+<script src="../animaciok/two.min.js"></script>
+<script>
+if (typeof Two === 'undefined') {
+  document.write('<script src="https://cdn.jsdelivr.net/npm/two.js@v0.8.10/build/two.min.js"><\/script>');
+}
+</script>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Számrendszerek és bináris számolás</h1>
+  <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+    <span class="badge badge-accent">2-es (bináris) • 10-es (decimális) • 16-os (hexadecimális)</span>
+    <span class="badge badge-ok">NAT 2020 Digitális kultúra és Matematika</span>
+    <span class="badge badge-warn">Közép- és emelt szint</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= 1. HELYIÉRTÉKEK ÉS 8 BITES KAPCSOLÓTÁBLA ================= -->
+<section class="anim-section" id="num-places">
+  <h2>1. A helyiértékes elv és a 8 bites interaktív kapcsolótábla</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-places" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="bits-zero-btn" type="button">Mind 0</button>
+          <button id="bits-one-btn" type="button">Mind 1 (255)</button>
+          <button id="bits-rand-btn" type="button">Véletlen bájt</button>
+          <button id="bits-inv-btn" type="button">Bitek megfordítása (NOT)</button>
+        </div>
+        <div id="bits-info" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Kattints a fenti bitekre az átkapcsoláshoz</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Helyiértékes felbontás</h3>
+        <div class="formula-box">
+          <div class="formula-line" id="places-bin-line">Bináris: 0b00000000</div>
+          <div class="formula-line" style="font-size:1.25rem; font-weight:700; color:var(--accent);" id="places-dec-line">Decimális: 0</div>
+          <div class="formula-line" id="places-hex-line">Hexadecimális: 0x00</div>
+        </div>
+        <div id="places-calc-text" style="font-size:0.88rem; font-family:monospace; margin-top:8px; line-height:1.5;"></div>
+      </div>
+
+      <div class="panel">
+        <h3>A helyiérték fogalma</h3>
+        <p style="font-size:0.92rem;">
+          Minden helyiértékes rendszerben az alapszám (b) hatványai határozzák meg a pozíciók súlyát:<br>
+          • <strong>10-es rendszer:</strong> 10⁰ = 1, 10¹ = 10, 10² = 100, 10³ = 1000.<br>
+          • <strong>2-es rendszer:</strong> 2⁰ = 1, 2¹ = 2, 2² = 4, 2³ = 8, 2⁴ = 16, 2⁵ = 32, 2⁶ = 64, 2⁷ = 128.<br>
+          • <strong>1 bájt = 8 bit:</strong> 0-tól 255-ig pontosan 2⁸ = 256 különböző érték ábrázolható vele.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2. ÁTVÁLTÁS TÍZESBŐL KETTESBE ================= -->
+<section class="anim-section" id="num-dec-to-bin">
+  <h2>2. Átváltás tízesből kettesbe: folytonos maradékos osztás 2-vel</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-d2b" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="d2b-step-btn" type="button">Következő osztás lépés</button>
+          <button id="d2b-all-btn" type="button">Teljes levezetés</button>
+          <button id="d2b-reset-btn" type="button">Újrakezdés</button>
+        </div>
+        <div id="d2b-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Lépj előre az osztásokban</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Átváltandó decimális szám</h3>
+        <div class="sl">
+          <label for="d2b-num">Szám (N)</label>
+          <input type="range" id="d2b-num" min="1" max="255" value="53">
+          <output id="d2b-num-val">53</output>
+        </div>
+        <div class="formula-box">
+          <div class="formula-line" id="d2b-result-line">Eredmény: 53₁₀ = 110101₂</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Az algoritmus szabálya</h3>
+        <p style="font-size:0.92rem;">
+          1. A számot elosztjuk 2-vel egészosztással (// 2), és feljegyezzük a maradékot (% 2: 0 vagy 1).<br>
+          2. A hányadossal megismételjük a műveletet mindaddig, amíg a hányados 0 nem lesz.<br>
+          3. <strong>Fontos:</strong> A bináris számot a maradékok <strong>alulról felfelé</strong> (fordított sorrendű) kiolvasásával kapjuk meg, mert az elsőként kapott maradék a legkisebb helyiértékű bit (LSB).
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. KETTES ÉS TIZENHATOS SZÁMRENDSZER ================= -->
+<section class="anim-section" id="num-bin-to-hex">
+  <h2>3. Kettes és tizenhatos számrendszer: a 4 bites csoportosítás (nibble)</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-b2h" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="b2h-rand-btn" type="button">Új véletlen bájt</button>
+          <button id="b2h-webcolor-btn" type="button">Webes szín példa (#15803D)</button>
+        </div>
+        <div id="b2h-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">1 hexadecimális jegy = pontosan 4 bit</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Miért nélkülözhetetlen a 16-os számrendszer?</h3>
+        <p style="font-size:0.92rem;">
+          Mivel 16 = 2⁴, pontosan 4 bináris bit (egy úgynevezett <em>nibble</em> vagy félbájt) felel meg 1 hexadecimális számjegynek. A hosszú bináris számsorokat a programozásban áttekinthető, rövid hexadecimális kódokká vonjuk össze.
+        </p>
+        <div class="code-box">
+0000 = 0 &nbsp;&nbsp; 0100 = 4 &nbsp;&nbsp; 1000 = 8 &nbsp;&nbsp; 1100 = C (12)<br>
+0001 = 1 &nbsp;&nbsp; 0101 = 5 &nbsp;&nbsp; 1001 = 9 &nbsp;&nbsp; 1101 = D (13)<br>
+0010 = 2 &nbsp;&nbsp; 0110 = 6 &nbsp;&nbsp; 1010 = A (10) 1110 = E (14)<br>
+0011 = 3 &nbsp;&nbsp; 0111 = 7 &nbsp;&nbsp; 1011 = B (11) 1111 = F (15)
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Gyakorlati alkalmazások</h3>
+        <p style="font-size:0.92rem;">
+          • <strong>RGB színkódok:</strong> #RRGGBB (pl. #15803D: Piros 0x15 = 21, Zöld 0x80 = 128, Kék 0x3D = 61).<br>
+          • <strong>Memóriacímek:</strong> 0x7FFF5FBFFD98 formában a mutatók és debuggerek.<br>
+          • <strong>IPv6 címek és MAC címek:</strong> 16-os számrendszerbeli tagok kettősponttal elválasztva.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4. BINÁRIS ÖSSZEADÁS ================= -->
+<section class="anim-section" id="num-addition">
+  <h2>4. Bináris összeadás és átvitel (Carry)</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-add" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="add-step-btn" type="button">Lépésenként (oszlopról oszlopra)</button>
+          <button id="add-all-btn" type="button">Azonnali eredmény</button>
+          <button id="add-rand-btn" type="button">Új véletlen számok</button>
+        </div>
+        <div id="add-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Összeadás jobbról balra (LSB-től MSB felé)</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Összeadási alapszabályok</h3>
+        <div class="code-box">
+0 + 0 = 0 (átvitel 0)<br>
+0 + 1 = 1 (átvitel 0)<br>
+1 + 0 = 1 (átvitel 0)<br>
+1 + 1 = 0 (átvitel 1 → a balra lévő helyiértékre)<br>
+1 + 1 + 1 (átvitellel) = 1 (átvitel 1)
+        </div>
+        <div class="formula-box" style="margin-top:10px;">
+          <div class="formula-line" id="add-dec-check">Decimális ellenőrzés: 45 + 75 = 120</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Túlcsordulás (Overflow)</h3>
+        <p style="font-size:0.92rem;">
+          Ha az utolsó (legnagyobb helyiértékű) oszlop összeadásakor is 1-es átvitel keletkezik, az adott bájtméretben (pl. 8 biten) a szám már nem fér el. Ez a <strong>túlcsordulás</strong>, ami programozásban hibát vagy modulo körbefordulást eredményez.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. KETTES KOMPLEMENS ================= -->
+<section class="anim-section" id="num-twos-comp">
+  <h2>5. Negatív számok és a kettes komplemens (Two's Complement)</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-comp" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="comp-step-btn" type="button">Lépésenkénti képzés</button>
+          <button id="comp-reset-btn" type="button">Alaphelyzet</button>
+        </div>
+        <div id="comp-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Pozitív érték → Bitek invertálása → +1 hozzáadása</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Előjeles érték beállítása</h3>
+        <div class="sl">
+          <label for="comp-val">Szám</label>
+          <input type="range" id="comp-val" min="-128" max="127" value="-42">
+          <output id="comp-val-out">-42</output>
+        </div>
+        <div class="formula-box">
+          <div class="formula-line" id="comp-steps-text">Kettes komplemens alak: 11010110</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Miért ezt használják a processzorok?</h3>
+        <p style="font-size:0.92rem;">
+          1. <strong>Nincs kettős nulla:</strong> A közvetlen előjelbitnél létezne +0 és −0, a kettes komplemensnél egyetlen nulla van (00000000).<br>
+          2. <strong>A kivonás összeadásra vezethető vissza:</strong> A processzornak nem kell külön kivonó áramkör. A − B műveletet úgy hajtja végre, hogy összeadja A-t és B kettes komplemensét: A + (−B).<br>
+          3. 8 biten a tartomány: −128-tól +127-ig terjed. A legfelső bit (MSB) az előjelbit: ha 1, a szám negatív.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 6. BITENKÉNTI LOGIKAI MŰVELETEK ================= -->
+<section class="anim-section" id="num-bitwise">
+  <h2>6. Bitenkénti logikai műveletek (AND, OR, XOR, NOT, Shift)</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-bitops" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button class="active" data-op="AND" type="button">ÉS (AND &amp;)</button>
+          <button data-op="OR" type="button">VAGY (OR |)</button>
+          <button data-op="XOR" type="button">KIZÁRÓ VAGY (XOR ^)</button>
+          <button data-op="SHL" type="button">Balra tolás (&lt;&lt; 1)</button>
+          <button data-op="SHR" type="button">Jobbra tolás (&gt;&gt; 1)</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Művelet leírása és érettségi jelentősége</h3>
+        <div id="bitop-desc" style="font-size:0.92rem;">
+          <strong>ÉS (AND) művelet:</strong> Az eredmény bitje csak akkor 1, ha mindkét operandus megfelelő bitje 1. Kiválóan alkalmas <em>maszkolásra</em>, azaz bizonyos bitek értékének vizsgálatára vagy törlésére.
+        </div>
+        <div class="code-box" id="bitop-code" style="margin-top:10px;">
+A = 0b11001010<br>
+B = 0b10101100<br>
+C = A &amp; B  # Eredmény: 0b10001000
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Eltolások (Shift) és a 2-vel való szorzás/osztás</h3>
+        <p style="font-size:0.92rem;">
+          • <strong>Balra tolás (x &lt;&lt; 1):</strong> Minden bit 1 hellyel balra lép, jobbról 0 lép be. Ez pontosan megegyezik a <strong>2-vel való szorzással</strong>.<br>
+          • <strong>Jobbra tolás (x &gt;&gt; 1):</strong> Minden bit 1 hellyel jobbra lép, a legkisebb bit kiesik. Ez a <strong>2-vel való egészosztás</strong>.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 7. ÖSSZEFOGLALÓ ÉS FELADATOK ================= -->
+<section class="anim-section" id="num-quiz">
+  <h2>7. Összefoglaló konverziós táblázat és interaktív feladatok</h2>
+
+  <div class="table-wrap">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>Decimális (10)</th>
+          <th>Bináris (2)</th>
+          <th>Hexadecimális (16)</th>
+          <th>4 bites minta (Nibble)</th>
+          <th>Jellemző jelentés</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>0</td><td>0000</td><td>0</td><td>0000</td><td>Minden bit nulla (False)</td></tr>
+        <tr><td>1</td><td>0001</td><td>1</td><td>0001</td><td>Legkisebb helyiérték (páratlan számok)</td></tr>
+        <tr><td>2</td><td>0010</td><td>2</td><td>0010</td><td>2¹</td></tr>
+        <tr><td>3</td><td>0011</td><td>3</td><td>0011</td><td>2¹ + 2⁰</td></tr>
+        <tr><td>4</td><td>0100</td><td>4</td><td>0100</td><td>2²</td></tr>
+        <tr><td>7</td><td>0111</td><td>7</td><td>0111</td><td>Oktális alapszám teteje</td></tr>
+        <tr><td>8</td><td>1000</td><td>8</td><td>1000</td><td>2³</td></tr>
+        <tr><td>9</td><td>1001</td><td>9</td><td>1001</td><td>Utolsó decimális számjegy</td></tr>
+        <tr><td>10</td><td>1010</td><td>A</td><td>1010</td><td>Első betűvel jelölt hexadecimális jegy</td></tr>
+        <tr><td>12</td><td>1100</td><td>C</td><td>1100</td><td>Tucat</td></tr>
+        <tr><td>15</td><td>1111</td><td>F</td><td>1111</td><td>4 biten elérhető maximális érték</td></tr>
+        <tr><td>255</td><td>1111 1111</td><td>FF</td><td>1111 1111</td><td>1 bájt maximális értéke (RGB fehér csatorna)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="layout">
+    <div class="quiz-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span class="badge badge-accent" id="quiz-num">1 / 8. feladat</span>
+        <button id="quiz-next-btn" type="button" style="padding:4px 10px; font-size:0.85rem;">Következő feladat →</button>
+      </div>
+
+      <div class="quiz-q" id="quiz-question"></div>
+
+      <div style="margin: 16px 0; display:flex; flex-direction:column; gap:12px;">
+        <div id="quiz-options-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <button id="quiz-check-btn" type="button" style="width:100%; padding:10px; font-size:1rem;">Válasz ellenőrzése</button>
+      </div>
+
+      <div class="feedback-box" id="quiz-feedback">
+        <div id="quiz-feedback-title" style="font-weight:700;"></div>
+        <div class="feedback-text" id="quiz-feedback-body"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Módszertani tipp az érettségihez</h3>
+      <p style="font-size:0.92rem;">
+        1. <strong>Binárisból hexába váltáskor</strong> soha ne válts át először 10-esbe. Csoportosítsd a biteket jobbról kezdve 4-esével, és mindegyik 4-est egyenként írd át hexadecimális jegyre.<br>
+        2. <strong>Páros vagy páratlan egy bináris szám?</strong> Elég a legutolsó (2⁰) bitet megnézni: ha 0, akkor páros, ha 1, akkor páratlan.<br>
+        3. <strong>2-vel való szorzás / osztás:</strong> Binárisan egy bit balra csúsztatása azonnali szorzás 2-vel, jobbra tolása egészosztás 2-vel.
+      </p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ================= SEGÉDFÜGGVÉNYEK =================
+function createTwo(containerId, W, H) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  const two = new Two({ width: W, height: H, type: Two.Types.svg }).appendTo(el);
+  two.renderer.domElement.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  two.renderer.domElement.style.width = '100%';
+  two.renderer.domElement.style.height = 'auto';
+  two.renderer.domElement.style.display = 'block';
+  return two;
+}
+
+// ================= 1. HELYIÉRTÉKEK ÉS 8 BIT =================
+let bits = [0, 0, 1, 1, 0, 1, 0, 1]; // b7 .. b0
+const weights = [128, 64, 32, 16, 8, 4, 2, 1];
+let twoPlaces = null;
+
+function getByteValue() {
+  return bits.reduce((acc, b, i) => acc + b * weights[i], 0);
+}
+
+function updatePlacesUI() {
+  const val = getByteValue();
+  const binStr = bits.join('');
+  const hexStr = val.toString(16).toUpperCase().padStart(2, '0');
+
+  document.getElementById('places-bin-line').textContent = `Bináris: 0b${binStr}`;
+  document.getElementById('places-dec-line').textContent = `Decimális: ${val}`;
+  document.getElementById('places-hex-line').textContent = `Hexadecimális: 0x${hexStr}`;
+
+  const calcTerms = [];
+  for (let i = 0; i < 8; i++) {
+    if (bits[i] === 1) calcTerms.push(`${weights[i]}`);
+  }
+  document.getElementById('places-calc-text').textContent = 
+    calcTerms.length > 0 ? `${calcTerms.join(' + ')} = ${val}` : 'Minden bit 0 (összeg: 0)';
+
+  drawPlaces();
+}
+
+function drawPlaces() {
+  const W = 700;
+  const H = 220;
+  if (!twoPlaces) twoPlaces = createTwo('canvas-places', W, H);
+  twoPlaces.clear();
+
+  const boxW = 68;
+  const boxH = 75;
+  const startX = 40;
+  const startY = 110;
+
+  for (let i = 0; i < 8; i++) {
+    const x = startX + i * (boxW + 8) + boxW / 2;
+    const y = startY;
+    const isOne = (bits[i] === 1);
+
+    const rect = twoPlaces.makeRoundedRectangle(x, y, boxW, boxH, 8);
+    rect.fill = isOne ? 'var(--accent)' : 'var(--panel)';
+    rect.stroke = isOne ? 'var(--accent-hover)' : 'var(--line)';
+    rect.linewidth = 2;
+
+    const bTxt = twoPlaces.makeText(bits[i] + '', x, y);
+    bTxt.fill = isOne ? '#ffffff' : 'var(--fg)';
+    bTxt.size = 28;
+    bTxt.weight = 700;
+
+    const wTxt = twoPlaces.makeText(`2⁷⁻ⁱ` ? `${weights[i]}` : '', x, y - 52);
+    wTxt.fill = 'var(--muted)';
+    wTxt.size = 13;
+    wTxt.weight = 700;
+
+    const expTxt = twoPlaces.makeText(`2${7 - i}`, x, y + 54);
+    expTxt.fill = 'var(--accent)';
+    expTxt.size = 11;
+  }
+
+  twoPlaces.update();
+}
+
+function initPlacesEvents() {
+  const el = document.getElementById('canvas-places');
+  el.addEventListener('click', function(e) {
+    const rect = el.getBoundingClientRect();
+    const clickX = ((e.clientX - rect.left) / rect.width) * 700;
+    const boxW = 68;
+    const startX = 40;
+
+    for (let i = 0; i < 8; i++) {
+      const bx = startX + i * (boxW + 8);
+      if (clickX >= bx && clickX <= bx + boxW) {
+        bits[i] = bits[i] === 1 ? 0 : 1;
+        updatePlacesUI();
+        break;
+      }
+    }
+  });
+
+  document.getElementById('bits-zero-btn').addEventListener('click', () => {
+    bits = [0, 0, 0, 0, 0, 0, 0, 0];
+    updatePlacesUI();
+  });
+  document.getElementById('bits-one-btn').addEventListener('click', () => {
+    bits = [1, 1, 1, 1, 1, 1, 1, 1];
+    updatePlacesUI();
+  });
+  document.getElementById('bits-rand-btn').addEventListener('click', () => {
+    bits = Array.from({ length: 8 }, () => Math.round(Math.random()));
+    updatePlacesUI();
+  });
+  document.getElementById('bits-inv-btn').addEventListener('click', () => {
+    bits = bits.map(b => 1 - b);
+    updatePlacesUI();
+  });
+}
+
+// ================= 2. ÁTVÁLTÁS 10 -> 2 =================
+let d2bNum = 53;
+let d2bSteps = [];
+let d2bCurStep = 0;
+let twoD2B = null;
+
+function computeD2BSteps(n) {
+  const steps = [];
+  let cur = n;
+  while (cur > 0) {
+    const quotient = Math.floor(cur / 2);
+    const rem = cur % 2;
+    steps.push({ n: cur, q: quotient, rem: rem });
+    cur = quotient;
+  }
+  return steps;
+}
+
+function updateD2BUI() {
+  document.getElementById('d2b-num-val').textContent = d2bNum;
+  d2bSteps = computeD2BSteps(d2bNum);
+  d2bCurStep = d2bSteps.length;
+  const binStr = d2bNum.toString(2);
+  document.getElementById('d2b-result-line').textContent = `Eredmény: ${d2bNum}₁₀ = ${binStr}₂`;
+  drawD2B();
+}
+
+function drawD2B() {
+  const W = 700;
+  const H = 280;
+  if (!twoD2B) twoD2B = createTwo('canvas-d2b', W, H);
+  twoD2B.clear();
+
+  const total = d2bSteps.length;
+  const startX = 140;
+  const startY = 40;
+  const rowH = 26;
+
+  const header1 = twoD2B.makeText('Osztandó : 2', startX, startY - 14);
+  header1.fill = 'var(--muted)';
+  header1.size = 12;
+  header1.weight = 700;
+
+  const header2 = twoD2B.makeText('Hányados', startX + 110, startY - 14);
+  header2.fill = 'var(--muted)';
+  header2.size = 12;
+  header2.weight = 700;
+
+  const header3 = twoD2B.makeText('Maradék', startX + 220, startY - 14);
+  header3.fill = 'var(--accent)';
+  header3.size = 12;
+  header3.weight = 700;
+
+  const line = twoD2B.makeLine(startX - 40, startY - 2, startX + 260, startY - 2);
+  line.stroke = 'var(--line)';
+
+  const shown = d2bSteps.slice(0, d2bCurStep);
+  shown.forEach((s, idx) => {
+    const y = startY + 16 + idx * rowH;
+
+    const t1 = twoD2B.makeText(`${s.n} : 2 =`, startX, y);
+    t1.fill = 'var(--fg)';
+    t1.size = 13;
+
+    const t2 = twoD2B.makeText(`${s.q}`, startX + 110, y);
+    t2.fill = 'var(--fg)';
+    t2.size = 13;
+    t2.weight = 600;
+
+    const rBox = twoD2B.makeRoundedRectangle(startX + 220, y, 32, 20, 4);
+    rBox.fill = 'var(--accent-bg)';
+    rBox.stroke = 'var(--accent-border)';
+
+    const t3 = twoD2B.makeText(`${s.rem}`, startX + 220, y);
+    t3.fill = 'var(--accent)';
+    t3.size = 13;
+    t3.weight = 700;
+  });
+
+  // Ha minden lépés kész, felrajzoljuk a kiolvasási nyilat
+  if (d2bCurStep >= total && total > 0) {
+    const arrowX = startX + 270;
+    const topY = startY + 16;
+    const botY = startY + 16 + (total - 1) * rowH;
+
+    const arrLine = twoD2B.makeLine(arrowX, botY, arrowX, topY);
+    arrLine.stroke = 'var(--accent)';
+    arrLine.linewidth = 2;
+
+    const arrLabel = twoD2B.makeText('Kiolvasás alulról felfelé ↑', arrowX + 90, (topY + botY) / 2);
+    arrLabel.fill = 'var(--accent)';
+    arrLabel.size = 11;
+    arrLabel.weight = 700;
+  }
+
+  twoD2B.update();
+}
+
+function initD2BEvents() {
+  const sl = document.getElementById('d2b-num');
+  sl.addEventListener('input', function() {
+    d2bNum = parseInt(this.value, 10);
+    updateD2BUI();
+  });
+
+  document.getElementById('d2b-step-btn').addEventListener('click', function() {
+    if (d2bCurStep < d2bSteps.length) {
+      d2bCurStep++;
+      drawD2B();
+    }
+  });
+
+  document.getElementById('d2b-all-btn').addEventListener('click', function() {
+    d2bCurStep = d2bSteps.length;
+    drawD2B();
+  });
+
+  document.getElementById('d2b-reset-btn').addEventListener('click', function() {
+    d2bCurStep = 0;
+    drawD2B();
+  });
+}
+
+// ================= 3. KETTES ÉS TIZENHATOS (NIBBLE) =================
+let b2hVal = 0xD6; // 1101 0110
+let twoB2H = null;
+
+function drawB2H() {
+  const W = 700;
+  const H = 220;
+  if (!twoB2H) twoB2H = createTwo('canvas-b2h', W, H);
+  twoB2H.clear();
+
+  const binStr = b2hVal.toString(2).padStart(8, '0');
+  const highNibble = binStr.slice(0, 4);
+  const lowNibble = binStr.slice(4, 8);
+  const highHex = parseInt(highNibble, 2).toString(16).toUpperCase();
+  const lowHex = parseInt(lowNibble, 2).toString(16).toUpperCase();
+
+  const cy = 90;
+  const nibbleW = 200;
+
+  // Felső Nibble (magas 4 bit)
+  const box1 = twoB2H.makeRoundedRectangle(220, cy, nibbleW, 70, 8);
+  box1.fill = 'var(--panel)';
+  box1.stroke = '#3b82f6';
+  box1.linewidth = 2;
+
+  const tHighBin = twoB2H.makeText(highNibble.split('').join('  '), 220, cy - 8);
+  tHighBin.fill = 'var(--fg)';
+  tHighBin.size = 20;
+  tHighBin.weight = 700;
+
+  const tHighHex = twoB2H.makeText(`0x${highHex} (${parseInt(highNibble, 2)})`, 220, cy + 18);
+  tHighHex.fill = '#3b82f6';
+  tHighHex.size = 14;
+  tHighHex.weight = 700;
+
+  const tag1 = twoB2H.makeText('Felső 4 bit (High nibble)', 220, cy - 48);
+  tag1.fill = 'var(--muted)';
+  tag1.size = 11;
+
+  // Alsó Nibble (alacsony 4 bit)
+  const box2 = twoB2H.makeRoundedRectangle(480, cy, nibbleW, 70, 8);
+  box2.fill = 'var(--panel)';
+  box2.stroke = 'var(--accent)';
+  box2.linewidth = 2;
+
+  const tLowBin = twoB2H.makeText(lowNibble.split('').join('  '), 480, cy - 8);
+  tLowBin.fill = 'var(--fg)';
+  tLowBin.size = 20;
+  tLowBin.weight = 700;
+
+  const tLowHex = twoB2H.makeText(`0x${lowHex} (${parseInt(lowNibble, 2)})`, 480, cy + 18);
+  tLowHex.fill = 'var(--accent)';
+  tLowHex.size = 14;
+  tLowHex.weight = 700;
+
+  const tag2 = twoB2H.makeText('Alsó 4 bit (Low nibble)', 480, cy - 48);
+  tag2.fill = 'var(--muted)';
+  tag2.size = 11;
+
+  // Összegzés alul
+  const fullHex = `0x${highHex}${lowHex}`;
+  const sumTxt = twoB2H.makeText(
+    `${binStr.slice(0, 4)} ${binStr.slice(4, 8)}₂ = ${fullHex}₁₆ = ${b2hVal}₁₀`,
+    W / 2, 175
+  );
+  sumTxt.fill = 'var(--fg)';
+  sumTxt.size = 15;
+  sumTxt.weight = 700;
+
+  twoB2H.update();
+}
+
+function initB2HEvents() {
+  document.getElementById('b2h-rand-btn').addEventListener('click', function() {
+    b2hVal = Math.floor(Math.random() * 256);
+    document.getElementById('b2h-status').textContent = `Érték: ${b2hVal} (0x${b2hVal.toString(16).toUpperCase()})`;
+    drawB2H();
+  });
+
+  document.getElementById('b2h-webcolor-btn').addEventListener('click', function() {
+    b2hVal = 0x80;
+    document.getElementById('b2h-status').textContent = '#15803D zöld színcsatorna: 0x80 = 128 = 1000 0000₂';
+    drawB2H();
+  });
+}
+
+// ================= 4. BINÁRIS ÖSSZEADÁS =================
+let addA = 45; // 00101101
+let addB = 75; // 01001011
+let addStep = 8;
+let twoAdd = null;
+
+function drawAdd() {
+  const W = 700;
+  const H = 260;
+  if (!twoAdd) twoAdd = createTwo('canvas-add', W, H);
+  twoAdd.clear();
+
+  const aBits = addA.toString(2).padStart(8, '0').split('').map(Number);
+  const bBits = addB.toString(2).padStart(8, '0').split('').map(Number);
+
+  // Kiszámítjuk az összeget és az átviteleket
+  const carry = Array(9).fill(0);
+  const sumBits = Array(8).fill(0);
+  for (let i = 7; i >= 0; i--) {
+    const s = aBits[i] + bBits[i] + carry[i + 1];
+    sumBits[i] = s % 2;
+    carry[i] = Math.floor(s / 2);
+  }
+
+  const startX = 160;
+  const boxW = 44;
+  const cy = 110;
+
+  // Címkék bal oldalt
+  const lCarry = twoAdd.makeText('Átvitel (Carry):', startX - 60, cy - 45);
+  lCarry.alignment = 'right';
+  lCarry.fill = 'var(--danger)';
+  lCarry.size = 11;
+  lCarry.weight = 700;
+
+  const lA = twoAdd.makeText('A szám:', startX - 60, cy - 15);
+  lA.alignment = 'right';
+  lA.fill = 'var(--fg)';
+  lA.size = 12;
+  lA.weight = 600;
+
+  const lB = twoAdd.makeText('+ B szám:', startX - 60, cy + 18);
+  lB.alignment = 'right';
+  lB.fill = 'var(--fg)';
+  lB.size = 12;
+  lB.weight = 600;
+
+  const lSum = twoAdd.makeText('Összeg (S):', startX - 60, cy + 58);
+  lSum.alignment = 'right';
+  lSum.fill = 'var(--accent)';
+  lSum.size = 13;
+  lSum.weight = 700;
+
+  const sepLine = twoAdd.makeLine(startX - 30, cy + 36, startX + 8 * boxW, cy + 36);
+  sepLine.stroke = 'var(--line)';
+  sepLine.linewidth = 2;
+
+  for (let i = 0; i < 8; i++) {
+    const x = startX + i * boxW + boxW / 2;
+    const isColActive = (7 - i < addStep);
+
+    // Átvitel (Carry)
+    if (isColActive && carry[i + 1] === 1) {
+      const cTxt = twoAdd.makeText('1', x, cy - 45);
+      cTxt.fill = 'var(--danger)';
+      cTxt.size = 13;
+      cTxt.weight = 700;
+    }
+
+    // A bit
+    const aTxt = twoAdd.makeText(aBits[i] + '', x, cy - 15);
+    aTxt.fill = 'var(--fg)';
+    aTxt.size = 16;
+    aTxt.weight = 700;
+
+    // B bit
+    const bTxt = twoAdd.makeText(bBits[i] + '', x, cy + 18);
+    bTxt.fill = 'var(--fg)';
+    bTxt.size = 16;
+    bTxt.weight = 700;
+
+    // Összeg bit
+    if (isColActive) {
+      const sTxt = twoAdd.makeText(sumBits[i] + '', x, cy + 58);
+      sTxt.fill = 'var(--accent)';
+      sTxt.size = 18;
+      sTxt.weight = 700;
+    }
+  }
+
+  document.getElementById('add-dec-check').textContent = 
+    `Decimális ellenőrzés: ${addA} + ${addB} = ${addA + addB}`;
+
+  twoAdd.update();
+}
+
+function initAddEvents() {
+  document.getElementById('add-step-btn').addEventListener('click', function() {
+    addStep = (addStep % 8) + 1;
+    document.getElementById('add-status').textContent = `Összeadás: ${addStep}. oszlop kész (jobbról számolva)`;
+    drawAdd();
+  });
+
+  document.getElementById('add-all-btn').addEventListener('click', function() {
+    addStep = 8;
+    document.getElementById('add-status').textContent = 'Minden oszlop összeadva';
+    drawAdd();
+  });
+
+  document.getElementById('add-rand-btn').addEventListener('click', function() {
+    addA = Math.floor(Math.random() * 120);
+    addB = Math.floor(Math.random() * 120);
+    addStep = 8;
+    drawAdd();
+  });
+}
+
+// ================= 5. KETTES KOMPLEMENS =================
+let compNum = -42;
+let twoComp = null;
+
+function drawComp() {
+  const W = 700;
+  const H = 260;
+  if (!twoComp) twoComp = createTwo('canvas-comp', W, H);
+  twoComp.clear();
+
+  const absVal = Math.abs(compNum);
+  const posBits = absVal.toString(2).padStart(8, '0');
+  const invBits = posBits.split('').map(b => b === '1' ? '0' : '1').join('');
+
+  // Kettes komplemens
+  let compVal = (compNum < 0) ? (256 + compNum) : compNum;
+  const finalBits = compVal.toString(2).padStart(8, '0');
+
+  const startX = 220;
+  const cy = 60;
+  const rowH = 46;
+
+  // 1. Sor: Abszolút érték
+  const l1 = twoComp.makeText(`1. Abszolút érték (+${absVal}):`, startX - 30, cy);
+  l1.alignment = 'right';
+  l1.fill = 'var(--muted)';
+  l1.size = 11;
+  l1.weight = 700;
+
+  const t1 = twoComp.makeText(posBits.split('').join('  '), startX + 90, cy);
+  t1.fill = 'var(--fg)';
+  t1.size = 15;
+  t1.weight = 700;
+
+  // 2. Sor: Invertálás (egyes komplemens)
+  const l2 = twoComp.makeText('2. Invertálás (NOT):', startX - 30, cy + rowH);
+  l2.alignment = 'right';
+  l2.fill = 'var(--muted)';
+  l2.size = 11;
+  l2.weight = 700;
+
+  const t2 = twoComp.makeText(invBits.split('').join('  '), startX + 90, cy + rowH);
+  t2.fill = 'var(--danger)';
+  t2.size = 15;
+  t2.weight = 700;
+
+  // 3. Sor: +1 hozzáadása
+  const l3 = twoComp.makeText('3. + 1 hozzáadása:', startX - 30, cy + 2 * rowH);
+  l3.alignment = 'right';
+  l3.fill = 'var(--muted)';
+  l3.size = 11;
+  l3.weight = 700;
+
+  const t3 = twoComp.makeText(finalBits.split('').join('  '), startX + 90, cy + 2 * rowH);
+  t3.fill = 'var(--accent)';
+  t3.size = 17;
+  t3.weight = 700;
+
+  // Magyarázó lábléc
+  const foot = twoComp.makeText(
+    `Eredmény: ${compNum}₁₀ = ${finalBits}₂ (Előjelbit: ${finalBits[0]} → ${finalBits[0] === '1' ? 'negatív' : 'pozitív'})`,
+    W / 2, cy + 3 * rowH + 10
+  );
+  foot.fill = 'var(--fg)';
+  foot.size = 13;
+  foot.weight = 700;
+
+  twoComp.update();
+}
+
+function initCompEvents() {
+  const sl = document.getElementById('comp-val');
+  sl.addEventListener('input', function() {
+    compNum = parseInt(this.value, 10);
+    document.getElementById('comp-val-out').textContent = compNum;
+    drawComp();
+  });
+}
+
+// ================= 6. BITENKÉNTI MŰVELETEK =================
+let bitOp = 'AND';
+let opA = 0xCA; // 1100 1010
+let opB = 0xAC; // 1010 1100
+let twoBitOps = null;
+
+function drawBitOps() {
+  const W = 700;
+  const H = 240;
+  if (!twoBitOps) twoBitOps = createTwo('canvas-bitops', W, H);
+  twoBitOps.clear();
+
+  let res = 0;
+  if (bitOp === 'AND') res = opA & opB;
+  else if (bitOp === 'OR') res = opA | opB;
+  else if (bitOp === 'XOR') res = opA ^ opB;
+  else if (bitOp === 'SHL') res = (opA << 1) & 0xFF;
+  else if (bitOp === 'SHR') res = (opA >> 1) & 0xFF;
+
+  const aBits = opA.toString(2).padStart(8, '0');
+  const bBits = opB.toString(2).padStart(8, '0');
+  const rBits = res.toString(2).padStart(8, '0');
+
+  const startX = 220;
+  const cy = 60;
+  const boxW = 38;
+
+  // Címkék
+  const lA = twoBitOps.makeText('A:', startX - 30, cy);
+  lA.alignment = 'right';
+  lA.fill = 'var(--fg)';
+  lA.size = 13;
+  lA.weight = 700;
+
+  const lB = twoBitOps.makeText(bitOp.startsWith('SH') ? 'Művelet:' : 'B:', startX - 30, cy + 36);
+  lB.alignment = 'right';
+  lB.fill = 'var(--fg)';
+  lB.size = 13;
+  lB.weight = 700;
+
+  const lR = twoBitOps.makeText(`${bitOp}:`, startX - 30, cy + 86);
+  lR.alignment = 'right';
+  lR.fill = 'var(--accent)';
+  lR.size = 14;
+  lR.weight = 700;
+
+  const line = twoBitOps.makeLine(startX - 20, cy + 60, startX + 8 * boxW, cy + 60);
+  line.stroke = 'var(--line)';
+  line.linewidth = 2;
+
+  for (let i = 0; i < 8; i++) {
+    const x = startX + i * boxW + boxW / 2;
+
+    const tA = twoBitOps.makeText(aBits[i], x, cy);
+    tA.fill = 'var(--fg)';
+    tA.size = 16;
+    tA.weight = 700;
+
+    if (!bitOp.startsWith('SH')) {
+      const tB = twoBitOps.makeText(bBits[i], x, cy + 36);
+      tB.fill = 'var(--fg)';
+      tB.size = 16;
+      tB.weight = 700;
+    }
+
+    const tR = twoBitOps.makeText(rBits[i], x, cy + 86);
+    tR.fill = 'var(--accent)';
+    tR.size = 18;
+    tR.weight = 700;
+  }
+
+  // Frissítjük a kódblokkot és magyarázatot
+  const descEl = document.getElementById('bitop-desc');
+  const codeEl = document.getElementById('bitop-code');
+
+  if (bitOp === 'AND') {
+    descEl.innerHTML = '<strong>ÉS (AND) művelet:</strong> Az eredmény bitje csak akkor 1, ha mindkét bemenő bit 1. Maszkolásra és bitek nullázására használjuk.';
+    codeEl.innerHTML = `A = 0b${aBits}<br>B = 0b${bBits}<br>C = A &amp; B  # Eredmény: 0b${rBits} (${res}₁₀)`;
+  } else if (bitOp === 'OR') {
+    descEl.innerHTML = '<strong>VAGY (OR) művelet:</strong> Az eredmény bitje 1, ha legalább az egyik bemenő bit 1. Bitek beállítására (1-re váltására) alkalmas.';
+    codeEl.innerHTML = `A = 0b${aBits}<br>B = 0b${bBits}<br>C = A | B  # Eredmény: 0b${rBits} (${res}₁₀)`;
+  } else if (bitOp === 'XOR') {
+    descEl.innerHTML = '<strong>KIZÁRÓ VAGY (XOR) művelet:</strong> Az eredmény bitje 1, ha a két bemenő bit különbözik. Két azonos érték XOR-ja 0, egyszerű titkosítás alapja.';
+    codeEl.innerHTML = `A = 0b${aBits}<br>B = 0b${bBits}<br>C = A ^ B  # Eredmény: 0b${rBits} (${res}₁₀)`;
+  } else if (bitOp === 'SHL') {
+    descEl.innerHTML = '<strong>Balra tolás (&lt;&lt; 1):</strong> Minden bit egy pozícióval balra lép, jobbról 0 lép be. Egyenértékű a <strong>2-vel való szorzással</strong>.';
+    codeEl.innerHTML = `A = 0b${aBits} (${opA}₁₀)<br>C = A &lt;&lt; 1  # Eredmény: 0b${rBits} (${res}₁₀)`;
+  } else if (bitOp === 'SHR') {
+    descEl.innerHTML = '<strong>Jobbra tolás (&gt;&gt; 1):</strong> Minden bit egy pozícióval jobbra lép, a legkisebb bit kiesik. Egyenértékű a <strong>2-vel való egészosztással</strong>.';
+    codeEl.innerHTML = `A = 0b${aBits} (${opA}₁₀)<br>C = A &gt;&gt; 1  # Eredmény: 0b${rBits} (${res}₁₀)`;
+  }
+
+  twoBitOps.update();
+}
+
+function initBitOpsEvents() {
+  document.querySelectorAll('#num-bitwise .btns button[data-op]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#num-bitwise .btns button[data-op]').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      bitOp = this.getAttribute('data-op');
+      drawBitOps();
+    });
+  });
+}
+
+// ================= 7. FELADATOK =================
+const QUIZ_QUESTIONS = [
+  {
+    q: 'Mennyi a 1011₂ bináris szám decimális (10-es számrendszerbeli) értéke?',
+    options: ['9', '11', '13', '15'],
+    ans: 1,
+    desc: 'Helyiértékek összege: 1 · 8 + 0 · 4 + 1 · 2 + 1 · 1 = 8 + 2 + 1 = 11.'
+  },
+  {
+    q: 'Hogyan írható fel a 29 decimális szám kettes számrendszerben?',
+    options: ['11101₂', '11011₂', '10111₂', '11110₂'],
+    ans: 0,
+    desc: '29 = 16 + 8 + 4 + 1 = 2⁴ + 2³ + 2² + 2⁰ → 11101₂.'
+  },
+  {
+    q: 'Mi a 0x3F hexadecimális szám decimális értéke?',
+    options: ['35', '47', '63', '79'],
+    ans: 2,
+    desc: '0x3F = 3 · 16 + 15 · 1 = 48 + 15 = 63.'
+  },
+  {
+    q: 'Mennyi a 110₂ + 101₂ bináris összeadás eredménye?',
+    options: ['1011₂', '1001₂', '1111₂', '1101₂'],
+    ans: 0,
+    desc: '110₂ (6) + 101₂ (5) = 11₁₀ = 1011₂ (8 + 2 + 1).'
+  },
+  {
+    q: 'Hány bitből áll egy hexadecimális jegy (nibble)?',
+    options: ['2 bit', '4 bit', '8 bit', '16 bit'],
+    ans: 1,
+    desc: 'Mivel 16 = 2⁴, pontosan 4 bináris bit felel meg 1 hexadecimális jegynek.'
+  },
+  {
+    q: 'Mi történik egy pozitív egész számmal, ha a bitjeit egy pozícióval balra toljuk (<< 1)?',
+    options: ['Megduplázódik (szorzás 2-vel)', 'Megfeleződik (osztás 2-vel)', 'Négyszereződik', 'Nem változik'],
+    ans: 0,
+    desc: 'A helyiértékes rendszerben balra lépve minden helyiérték a kétszeresére nő, így a szám megduplázódik.'
+  },
+  {
+    q: 'Melyik logikai művelet eredményez 1-et akkor és csak akkor, ha a két bemenő bit különböző?',
+    options: ['ÉS (AND)', 'VAGY (OR)', 'KIZÁRÓ VAGY (XOR)', 'NEM (NOT)'],
+    ans: 2,
+    desc: 'A kizáró vagy (XOR) művelet 0 ^ 1 = 1 és 1 ^ 0 = 1, de 0 ^ 0 = 0 és 1 ^ 1 = 0.'
+  },
+  {
+    q: 'Mennyi a 255 decimális szám hexadecimális alakja?',
+    options: ['0xAA', '0xEE', '0xFF', '0x100'],
+    ans: 2,
+    desc: '255 = 15 · 16 + 15 = 0xFF (egy teljes bájt, ahol mind a 8 bit 1).'
+  }
+];
+
+let curQuizIdx = 0;
+
+function loadQuiz(idx) {
+  curQuizIdx = idx;
+  const q = QUIZ_QUESTIONS[idx];
+  document.getElementById('quiz-num').textContent = `${idx + 1} / ${QUIZ_QUESTIONS.length}. feladat`;
+  document.getElementById('quiz-question').textContent = q.q;
+
+  const optContainer = document.getElementById('quiz-options-container');
+  optContainer.innerHTML = '';
+  q.options.forEach((opt, optIdx) => {
+    const label = document.createElement('label');
+    label.style.display = 'flex';
+    label.style.alignItems = 'center';
+    label.style.gap = '8px';
+    label.style.cursor = 'pointer';
+    label.style.fontSize = '0.95rem';
+
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'quiz_opt';
+    radio.value = optIdx;
+
+    label.appendChild(radio);
+    label.appendChild(document.createTextNode(opt));
+    optContainer.appendChild(label);
+  });
+
+  const fb = document.getElementById('quiz-feedback');
+  fb.style.display = 'none';
+  fb.className = 'feedback-box';
+}
+
+function checkQuiz() {
+  const q = QUIZ_QUESTIONS[curQuizIdx];
+  const selected = document.querySelector('input[name="quiz_opt"]:checked');
+  if (!selected) {
+    alert('Kérlek válassz egy választ.');
+    return;
+  }
+
+  const userAns = parseInt(selected.value, 10);
+  const fb = document.getElementById('quiz-feedback');
+  const title = document.getElementById('quiz-feedback-title');
+  const body = document.getElementById('quiz-feedback-body');
+  fb.style.display = 'block';
+
+  if (userAns === q.ans) {
+    fb.className = 'feedback-box feedback-ok';
+    title.textContent = 'Helyes válasz';
+    body.innerHTML = `<strong>Megoldás:</strong> ${q.options[q.ans]}<br><strong>Indoklás:</strong> ${q.desc}`;
+  } else {
+    fb.className = 'feedback-box feedback-bad';
+    title.textContent = 'Nem pontos válasz';
+    body.innerHTML = `<strong>Helyes válasz:</strong> ${q.options[q.ans]}<br><strong>Indoklás:</strong> ${q.desc}`;
+  }
+}
+
+function initQuizEvents() {
+  loadQuiz(0);
+  document.getElementById('quiz-check-btn').addEventListener('click', checkQuiz);
+  document.getElementById('quiz-next-btn').addEventListener('click', () => {
+    loadQuiz((curQuizIdx + 1) % QUIZ_QUESTIONS.length);
+  });
+}
+
+// ================= INICIALIZÁLÁS =================
+window.addEventListener('DOMContentLoaded', function() {
+  updatePlacesUI();
+  initPlacesEvents();
+
+  updateD2BUI();
+  initD2BEvents();
+
+  drawB2H();
+  initB2HEvents();
+
+  drawAdd();
+  initAddEvents();
+
+  drawComp();
+  initCompEvents();
+
+  drawBitOps();
+  initBitOpsEvents();
+
+  initQuizEvents();
+});
+</script>
+
+</body>
+</html>

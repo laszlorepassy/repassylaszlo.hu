@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adatstruktúrák a középiskolában</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1f2937;
+  --muted: #4b5563;
+  --line: #e5e7eb;
+  --panel: #f8fafc;
+  --accent: #15803d;
+  --accent-hover: #166534;
+  --accent-bg: #ecfdf5;
+  --accent-border: #a7f3d0;
+  --danger: #b91c1c;
+  --warn-bg: #fffbeb;
+  --warn-border: #fef3c7;
+  --warn-fg: #92400e;
+  --ok: #15803d;
+  --ok-bg: #ecfdf5;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --radius: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --fg: #f1f5f9;
+    --muted: #94a3b8;
+    --line: #334155;
+    --panel: #1e293b;
+    --accent: #22c55e;
+    --accent-hover: #16a34a;
+    --accent-bg: rgba(34, 197, 94, 0.15);
+    --accent-border: #166534;
+    --danger: #f87171;
+    --warn-bg: rgba(245, 158, 11, 0.15);
+    --warn-border: #78350f;
+    --warn-fg: #fcd34d;
+    --ok: #4ade80;
+    --ok-bg: rgba(74, 222, 128, 0.15);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.5;
+  padding: 16px 20px 60px;
+}
+
+.top-nav {
+  max-width: 1440px;
+  margin: 0 auto 16px;
+  padding-bottom: 8px;
+}
+
+.top-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.top-nav a:hover { text-decoration: underline; }
+
+header {
+  max-width: 1440px;
+  margin: 0 auto 24px;
+}
+
+header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.badge-accent { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); }
+.badge-ok { background: var(--ok-bg); border-color: var(--accent-border); color: var(--ok); }
+.badge-warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-fg); }
+
+main {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.anim-section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.anim-section h2 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.plot-container {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.panel:last-child { margin-bottom: 0; }
+
+.panel h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+button {
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 7px 13px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--fg);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+button:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+button.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.sl {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sl label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 80px;
+}
+.sl input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+.sl output {
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 32px;
+  text-align: right;
+  color: var(--accent);
+}
+
+.code-box {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--fg);
+  overflow-x: auto;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin: 16px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+table.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+  background: var(--bg);
+}
+table.matrix-table th, table.matrix-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+table.matrix-table th {
+  background: var(--panel);
+  font-weight: 700;
+  color: var(--fg);
+}
+table.matrix-table tr:last-child td { border-bottom: none; }
+
+.quiz-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+}
+.quiz-q {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.feedback-box {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: none;
+}
+.feedback-ok { background: var(--ok-bg); border: 1px solid var(--accent-border); color: var(--ok); }
+.feedback-bad { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-fg); }
+</style>
+
+<script src="../animaciok/two.min.js"></script>
+<script>
+if (typeof Two === 'undefined') {
+  document.write('<script src="https://cdn.jsdelivr.net/npm/two.js@v0.8.10/build/two.min.js"><\/script>');
+}
+</script>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Adatstruktúrák a középiskolában</h1>
+  <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+    <span class="badge badge-accent">NAT 2020 Digitális kultúra</span>
+    <span class="badge badge-ok">Közép- és emelt szintű érettségi</span>
+    <span class="badge badge-warn">Python • C# • Pszeudokód</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= 1. EGYDIMENZIÓS TÖMB / LISTA ================= -->
+<section class="anim-section" id="ds-array">
+  <h2>1. Egydimenziós tömb / lista (Array / List): folytonos, indexelt tárolás</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-array" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="arr-append-btn" type="button">Hozzáadás végére (append)</button>
+          <button id="arr-pop-btn" type="button">Utolsó törlése (pop)</button>
+          <button id="arr-insert-btn" type="button">Beszúrás az elejére</button>
+          <button id="arr-rand-btn" type="button">Új véletlen lista</button>
+        </div>
+        <div id="arr-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Indexelés: 0-tól n-1-ig</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Tulajdonságok és elérés</h3>
+        <p style="font-size:0.92rem;">
+          A lista azonos vagy különböző típusú elemek véges, rendezett sorozata. Minden elemhez a sorszáma (indexe) alapján közvetlenül hozzáférhetünk. Középiskolában (Python, C#, C++) a standard számozás <strong>0-tól</strong> indul.
+        </p>
+        <div class="code-box">
+# Elem lekérdezése index alapján: O(1) idő<br>
+elso = lista[0]<br>
+utolso = lista[-1]  # Pythonban hátulról indexelve<br>
+hossz = len(lista)
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Műveletek költsége és indexhatárok</h3>
+        <p style="font-size:0.92rem;">
+          • <strong>Indexelés:</strong> O(1) konstans idő, azonnali elérés a memóriacím alapján.<br>
+          • <strong>Hozzáadás végére:</strong> O(1) amortizált idő.<br>
+          • <strong>Beszúrás / Törlés közbenső helyen:</strong> O(n), mert a mögötte lévő elemeket el kell tolni.<br>
+          • <strong>Indexhatár-túllépés:</strong> Ha olyan indexre hivatkozunk, amely nincs a [0, n − 1] tartományban, a program hibával leáll (IndexError / IndexOutOfRangeException).
+        </p>
+        <div style="font-size:0.86rem; color:var(--muted); border-top:1px solid var(--line); padding-top:6px;">
+          Tankönyvi referencia: Digitális kultúra 9–10. évfolyam (Listák bejárása, összegzés, maximumkiválasztás tömbben).
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2. KÉTDIMENZIÓS TÖMB / MÁTRIX ================= -->
+<section class="anim-section" id="ds-matrix">
+  <h2>2. Kétdimenziós tömb / mátrix: táblázatos elrendezés (sorok és oszlopok)</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-matrix" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="mat-walk-row-btn" type="button">Sorfolytonos bejárás</button>
+          <button id="mat-walk-col-btn" type="button">Oszlopfolytonos bejárás</button>
+          <button id="mat-reset-btn" type="button">Alaphelyzet</button>
+        </div>
+        <div id="mat-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Kattints egy cellára az index megtekintéséhez</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Kettős indexelés: Mátrix[sor][oszlop]</h3>
+        <p style="font-size:0.92rem;">
+          A 2D tömb a valóságban egy olyan egydimenziós lista, amelynek minden eleme maga is egy lista (listák listája). Az első index jelöli a sort (i), a második index az oszlopot (j).
+        </p>
+        <div class="code-box">
+# Mátrix bejárása egymásba ágyazott ciklusokkal:<br>
+for i in range(sorok_szama):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;for j in range(oszlopok_szama):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ertek = matrix[i][j]
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Gyakorlati érettségi alkalmazások</h3>
+        <p style="font-size:0.92rem;">
+          • Sakktábla vagy amőba tábla modellezése (8x8 mező).<br>
+          • Térképek, magassági mátrixok (hegycsúcsok keresése, vízszintes/függőleges szomszédok).<br>
+          • Képpontok (pixelek) fényerő- és színértékeinek tárolása.<br>
+          • Menetrendek, két település közötti távolságmátrixok.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. KARAKTERLÁNC ================= -->
+<section class="anim-section" id="ds-string">
+  <h2>3. Karakterlánc (String): karakterek szekvenciája és szeletelése</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-string" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="custom-input-row" style="display:flex; gap:8px; width:100%; max-width:400px;">
+          <input type="text" id="str-input" value="INFORMATIKA" maxlength="14" style="flex:1; padding:6px 10px; font:inherit; font-size:0.9rem; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg);">
+          <button id="str-set-btn" type="button">Frissítés</button>
+        </div>
+        <div id="str-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Pozitív és negatív indexek</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Szeletelés (Slicing) paraméterei</h3>
+        <div class="sl">
+          <label for="str-start">Kezdő (start)</label>
+          <input type="range" id="str-start" min="0" max="10" value="2">
+          <output id="str-start-val">2</output>
+        </div>
+        <div class="sl">
+          <label for="str-stop">Vég (stop)</label>
+          <input type="range" id="str-stop" min="1" max="11" value="7">
+          <output id="str-stop-val">7</output>
+        </div>
+        <div class="code-box" id="str-slice-code">
+s = "INFORMATIKA"<br>
+resz = s[2:7]  # Eredmény: "FORMA" (a 7. index már nem tartozik bele)
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Megváltoztathatatlanság (Immutability)</h3>
+        <p style="font-size:0.92rem;">
+          A legtöbb modern nyelvben (Python, C#, Java) a szöveg <strong>megváltoztathatatlan</strong> (immutable). Ha módosítani akarunk egy betűt (`s[0] = 'A'`), az hibát ad. Ehelyett új karakterlánc jön létre összefűzéssel (`+`) vagy szeleteléssel.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4. REKORD / OBJEKTUM ================= -->
+<section class="anim-section" id="ds-record">
+  <h2>4. Rekord / objektum és rekordok listája: az érettségi gerince</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-record" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="rec-add-btn" type="button">Új tanuló rögzítése</button>
+          <button id="rec-filter-btn" type="button">Szűrés: átlag ≥ 4.5</button>
+          <button id="rec-all-btn" type="button">Összes mutatása</button>
+        </div>
+        <div id="rec-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Rekord mezői: név, osztály, átlag</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Összetett adatszerkezet logikája</h3>
+        <p style="font-size:0.92rem;">
+          A rekord olyan adatszerkezet, amely összetartozó, de különböző típusú adatmezőket fog össze egyetlen egységbe (pl. egy tanuló neve [szöveg], születési éve [egész], tanulmányi átlaga [valós]).
+        </p>
+        <div class="code-box">
+class Tanulo:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;def __init__(self, sor):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m = sor.strip().split(';')<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.nev = m[0]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.osztaly = m[1]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.atlag = float(m[2])<br>
+<br>
+tanulok = []  # Rekordok listája a fájlból
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Miért nélkülözhetetlen az érettségin?</h3>
+        <p style="font-size:0.92rem;">
+          Az emelt szintű programozási feladatok szinte kivétel nélkül egy bemeneti fájl (pl. `adatok.txt`) feldolgozásával indulnak. A rekordok listáján futnak le a klasszikus programozási tételek: megszámolás (pl. hányan buktak), maximumkiválasztás (legmagasabb átlag), kiválogatás (kitűnő tanulók).
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. VEREM ================= -->
+<section class="anim-section" id="ds-stack">
+  <h2>5. Verem (Stack): LIFO elv (Last-In, First-Out)</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-stack" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="st-push-btn" type="button">Betesz (push)</button>
+          <button id="st-pop-btn" type="button">Kivesz (pop)</button>
+          <button id="st-clear-btn" type="button">Verem ürítése</button>
+        </div>
+        <div id="st-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">LIFO: mindig a legfelső elem távozik</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Műveletek és működés</h3>
+        <p style="font-size:0.92rem;">
+          A verembe csak felülről lehet elemet tenni (`push`), és csak felülről lehet kivenni (`pop`). A legkésőbb érkezett elem kerül ki legelőször. Olyan, mint egy palacsintarakás vagy egy rugós tányértartó a menzán.
+        </p>
+        <div class="code-box">
+verem = []<br>
+verem.append(elem)   # push: elem verem tetejére<br>
+teteje = verem.pop() # pop: legfelső kivesz és visszatér
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Klasszikus alkalmazások</h3>
+        <p style="font-size:0.92rem;">
+          • <strong>Visszavonás (Undo / Redo):</strong> Szerkesztőprogramokban az utolsó lépések visszavonása.<br>
+          • <strong>Függvényhívási verem (Call Stack):</strong> A számítógép a veremben jegyzi meg a visszatérési címeket és helyi változókat függvényhíváskor és rekurzióban.<br>
+          • <strong>Zárójelezés helyessége:</strong> Nyitó zárójel érkezésekor verembe tesszük, csukó zárójelkor a tetején lévő párját ellenőrizzük.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 6. SOR ================= -->
+<section class="anim-section" id="ds-queue">
+  <h2>6. Sor (Queue): FIFO elv (First-In, First-Out)</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-queue" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="q-enqueue-btn" type="button">Beáll a sorba (enqueue)</button>
+          <button id="q-dequeue-btn" type="button">Kiszolgálás (dequeue)</button>
+          <button id="q-clear-btn" type="button">Sor kiürítése</button>
+        </div>
+        <div id="q-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">FIFO: az elsőként érkező távozik először</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Műveletek és működés</h3>
+        <p style="font-size:0.92rem;">
+          A sorba új elem mindig a sor végén érkezik (`enqueue`), és az elemek feldolgozása a sor elején történik (`dequeue`). Aki először érkezik, azt szolgálják ki először.
+        </p>
+        <div class="code-box">
+from collections import deque<br>
+sor = deque()<br>
+sor.append(elem)      # enqueue: végére rak<br>
+elso = sor.popleft()  # dequeue: elejéről levesz O(1)
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Gyakorlati alkalmazások</h3>
+        <p style="font-size:0.92rem;">
+          • <strong>Nyomtatási feladatok ütemezése:</strong> A dokumentumok a beküldés sorrendjében nyomtatódnak.<br>
+          • <strong>Operációs rendszerek taszk-ütemezése:</strong> Várakozó folyamatok kiszolgálása.<br>
+          • <strong>Szélességi gráfbejárás (BFS):</strong> Labirintus leggyorsabb útvonalának felderítése szintenként.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 7. HALMAZ ÉS SZÓTÁR ================= -->
+<section class="anim-section" id="ds-set-dict">
+  <h2>7. Halmaz (Set) és Szótár (Dictionary / Map): egyedi elemek és kulcs-érték tárak</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-setdict" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="sd-add-apple" type="button">+ "alma"</button>
+          <button id="sd-add-pear" type="button">+ "körte"</button>
+          <button id="sd-add-banana" type="button">+ "banán"</button>
+          <button id="sd-clear-btn" type="button">Törlés</button>
+        </div>
+        <div id="sd-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Kattints a gyümölcs gombokra a beszúráshoz</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Halmaz (Set)</h3>
+        <p style="font-size:0.92rem;">
+          Egyedi elemek rendezetlen gyűjteménye. Az azonos elemeket automatikusan kiszűri (nem lehetnek duplikátumok). A bennfoglaltság vizsgálata (`elem in halmaz`) hash tábla révén rendkívül gyors: átlagosan <strong>O(1)</strong> idő.
+        </p>
+        <div class="code-box">
+szinek = set()<br>
+szinek.add("piros")<br>
+szinek.add("piros")  # nem változik, már benne van<br>
+if "piros" in szinek: ...
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Szótár (Dictionary / Kulcs-érték tár)</h3>
+        <p style="font-size:0.92rem;">
+          Minden bejegyzés egy egyedi <strong>kulcsból</strong> és a hozzá tartozó <strong>értékből</strong> áll. Nem számindexszel, hanem a kulccsal hivatkozunk rá. Tipikus feladat: gyakoriság számlálás.
+        </p>
+        <div class="code-box">
+gyakorisag = {}<br>
+for gyumolcs in kosar:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;gyakorisag[gyumolcs] = gyakorisag.get(gyumolcs, 0) + 1
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 8. ÖSSZEFOGLALÓ DÖNTÉSI MÁTRIX ÉS GYAKORLÓ FELADATOK ================= -->
+<section class="anim-section" id="ds-matrix-feladatok">
+  <h2>8. Összefoglaló összehasonlító mátrix és feladatfelismerő gyakorlás</h2>
+
+  <div class="table-wrap">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>Adatstruktúra</th>
+          <th>Rendezett?</th>
+          <th>Elérés módja</th>
+          <th>Ismétlődés megengedett?</th>
+          <th>Műveletigény</th>
+          <th>Fő felhasználási terület</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1D Tömb / Lista</strong></td>
+          <td>Igen</td>
+          <td>Egész index alapján: L[i]</td>
+          <td>Igen</td>
+          <td>Indexelés: O(1), Beszúrás: O(n)</td>
+          <td>Adatsorok tárolása, rendezések, bejárások</td>
+        </tr>
+        <tr>
+          <td><strong>2D Tömb / Mátrix</strong></td>
+          <td>Igen</td>
+          <td>Sor- és oszlopindex: M[i][j]</td>
+          <td>Igen</td>
+          <td>Cella elérés: O(1)</td>
+          <td>Táblázatok, sakktábla, képpontok, labirintusok</td>
+        </tr>
+        <tr>
+          <td><strong>Karakterlánc (String)</strong></td>
+          <td>Igen</td>
+          <td>Index szerint, megváltoztathatatlan</td>
+          <td>Igen</td>
+          <td>Indexelés: O(1), Szelet: O(k)</td>
+          <td>Szövegfeldolgozás, bemeneti sorok bontása</td>
+        </tr>
+        <tr>
+          <td><strong>Rekord / Objektum</strong></td>
+          <td>Mezők szerint</td>
+          <td>Mezőnév szerint: r.nev</td>
+          <td>Igen</td>
+          <td>Mező elérés: O(1)</td>
+          <td>Összetartozó tulajdonságok egy adatként kezelése</td>
+        </tr>
+        <tr>
+          <td><strong>Verem (Stack)</strong></td>
+          <td>Igen (LIFO)</td>
+          <td>Csak a legfelső elem: top()</td>
+          <td>Igen</td>
+          <td>Push: O(1), Pop: O(1)</td>
+          <td>Visszavonás (Undo), zárójelezés, rekurzió</td>
+        </tr>
+        <tr>
+          <td><strong>Sor (Queue)</strong></td>
+          <td>Igen (FIFO)</td>
+          <td>Elejéről kivesz, végére tesz</td>
+          <td>Igen</td>
+          <td>Enqueue: O(1), Dequeue: O(1)</td>
+          <td>Nyomtatási sor, ütemezés, szélességi bejárás</td>
+        </tr>
+        <tr>
+          <td><strong>Halmaz (Set)</strong></td>
+          <td>Nem</td>
+          <td>Csak tagságvizsgálat: x in H</td>
+          <td>Nem (egyedi)</td>
+          <td>Keresés/Beszúrás: átlag O(1)</td>
+          <td>Duplikációk szűrése, halmazműveletek</td>
+        </tr>
+        <tr>
+          <td><strong>Szótár (Dictionary)</strong></td>
+          <td>Kulcsok szerint</td>
+          <td>Kulcs alapján: D[kulcs]</td>
+          <td>Kulcs egyedi, érték bármi</td>
+          <td>Keresés/Beszúrás: átlag O(1)</td>
+          <td>Gyakoriságszámítás, asszociációk, telefonkönyv</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="layout">
+    <div class="quiz-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span class="badge badge-accent" id="quiz-num">1 / 8. feladat</span>
+        <button id="quiz-next-btn" type="button" style="padding:4px 10px; font-size:0.85rem;">Következő feladat →</button>
+      </div>
+
+      <div class="quiz-q" id="quiz-question"></div>
+
+      <div style="margin: 16px 0; display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <div style="font-weight:600; font-size:0.92rem; margin-bottom:6px;">Válaszd ki a legmegfelelőbb adatstruktúrát:</div>
+          <select id="quiz-ds-select" style="width:100%; padding:8px 12px; font:inherit; font-size:0.95rem; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg);">
+            <option value="">Válassz adatstruktúrát...</option>
+            <option value="array">1D Tömb / Lista</option>
+            <option value="matrix">2D Tömb / Mátrix</option>
+            <option value="string">Karakterlánc (String)</option>
+            <option value="record">Rekord / Rekordok listája</option>
+            <option value="stack">Verem (Stack)</option>
+            <option value="queue">Sor (Queue)</option>
+            <option value="set">Halmaz (Set)</option>
+            <option value="dict">Szótár (Dictionary)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <button id="quiz-check-btn" type="button" style="width:100%; padding:10px; font-size:1rem;">Válasz ellenőrzése</button>
+      </div>
+
+      <div class="feedback-box" id="quiz-feedback">
+        <div id="quiz-feedback-title" style="font-weight:700;"></div>
+        <div class="feedback-text" id="quiz-feedback-body"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Gyakorlati tanács az érettségihez</h3>
+      <p style="font-size:0.92rem;">
+        1. Ha több összetartozó tulajdonsága van egy tételnek (pl. név, időpont, helyezés), mindig hozz létre <strong>osztályt vagy rekordot</strong>, és azokból készíts listát.<br>
+        2. Ha gyorsan el kell dönteni, hogy egy elem szerepelt-e már korábban (és nem kellenek duplikátumok), a <strong>halmaz (set)</strong> a leghatékonyabb választás.<br>
+        3. Ha meg kell számolni, melyik típusból / névből hány darab fordult elő, a <strong>szótár (dictionary)</strong> használata a legegyszerűbb és leggyorsabb.
+      </p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ================= SEGÉDFÜGGVÉNYEK =================
+const PALETTE = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316'];
+
+function createTwo(containerId, W, H) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  const two = new Two({ width: W, height: H, type: Two.Types.svg }).appendTo(el);
+  two.renderer.domElement.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  two.renderer.domElement.style.width = '100%';
+  two.renderer.domElement.style.height = 'auto';
+  two.renderer.domElement.style.display = 'block';
+  return two;
+}
+
+// ================= 1. TÖMB / LISTA =================
+let arrayData = [12, 45, 7, 89, 34, 61];
+let twoArray = null;
+
+function drawArray() {
+  const W = 700;
+  const H = 220;
+  if (!twoArray) twoArray = createTwo('canvas-array', W, H);
+  twoArray.clear();
+
+  const n = arrayData.length;
+  const boxW = Math.min(65, (W - 80) / Math.max(n, 1));
+  const boxH = 65;
+  const startX = (W - (n * boxW + (n - 1) * 8)) / 2 + boxW / 2;
+  const startY = 110;
+
+  const title = twoArray.makeText(`Lista hossza (len): ${n} elem`, 30, 30);
+  title.alignment = 'left';
+  title.fill = 'var(--muted)';
+  title.size = 13;
+  title.weight = 700;
+
+  for (let i = 0; i < n; i++) {
+    const x = startX + i * (boxW + 8);
+    const y = startY;
+
+    const rect = twoArray.makeRoundedRectangle(x, y, boxW, boxH, 8);
+    rect.fill = 'var(--panel)';
+    rect.stroke = PALETTE[i % PALETTE.length];
+    rect.linewidth = 2;
+
+    const valTxt = twoArray.makeText(arrayData[i] + '', x, y);
+    valTxt.fill = 'var(--fg)';
+    valTxt.size = 18;
+    valTxt.weight = 700;
+
+    const idxTxt = twoArray.makeText(`[${i}]`, x, y - 48);
+    idxTxt.fill = 'var(--accent)';
+    idxTxt.size = 12;
+    idxTxt.weight = 700;
+
+    const negIdxTxt = twoArray.makeText(`[${i - n}]`, x, y + 48);
+    negIdxTxt.fill = 'var(--muted)';
+    negIdxTxt.size = 11;
+  }
+
+  twoArray.update();
+}
+
+function initArrayEvents() {
+  document.getElementById('arr-append-btn').addEventListener('click', function() {
+    if (arrayData.length < 8) {
+      arrayData.push(Math.floor(Math.random() * 90) + 10);
+      drawArray();
+    }
+  });
+
+  document.getElementById('arr-pop-btn').addEventListener('click', function() {
+    if (arrayData.length > 1) {
+      arrayData.pop();
+      drawArray();
+    }
+  });
+
+  document.getElementById('arr-insert-btn').addEventListener('click', function() {
+    if (arrayData.length < 8) {
+      arrayData.unshift(Math.floor(Math.random() * 90) + 10);
+      drawArray();
+    }
+  });
+
+  document.getElementById('arr-rand-btn').addEventListener('click', function() {
+    arrayData = Array.from({ length: 6 }, () => Math.floor(Math.random() * 90) + 10);
+    drawArray();
+  });
+}
+
+// ================= 2. 2D TÖMB / MÁTRIX =================
+const matRows = 3;
+const matCols = 4;
+let matrixData = [
+  [10, 20, 30, 40],
+  [50, 60, 70, 80],
+  [90, 15, 25, 35]
+];
+let twoMatrix = null;
+let matHighlight = null;
+
+function drawMatrix() {
+  const W = 700;
+  const H = 260;
+  if (!twoMatrix) twoMatrix = createTwo('canvas-matrix', W, H);
+  twoMatrix.clear();
+
+  const cellW = 80;
+  const cellH = 50;
+  const startX = 180;
+  const startY = 60;
+
+  for (let c = 0; c < matCols; c++) {
+    const colHeader = twoMatrix.makeText(`Oszlop [${c}]`, startX + c * (cellW + 6), startY - 32);
+    colHeader.fill = 'var(--accent)';
+    colHeader.size = 11;
+    colHeader.weight = 700;
+  }
+
+  for (let r = 0; r < matRows; r++) {
+    const rowHeader = twoMatrix.makeText(`Sor [${r}]`, startX - 58, startY + r * (cellH + 6));
+    rowHeader.alignment = 'right';
+    rowHeader.fill = 'var(--accent)';
+    rowHeader.size = 11;
+    rowHeader.weight = 700;
+
+    for (let c = 0; c < matCols; c++) {
+      const x = startX + c * (cellW + 6);
+      const y = startY + r * (cellH + 6);
+      const isHl = (matHighlight && matHighlight.r === r && matHighlight.c === c);
+
+      const cell = twoMatrix.makeRoundedRectangle(x, y, cellW, cellH, 6);
+      cell.fill = isHl ? 'var(--accent)' : 'var(--panel)';
+      cell.stroke = isHl ? 'var(--accent-hover)' : 'var(--line)';
+      cell.linewidth = isHl ? 2.5 : 1.5;
+
+      const txt = twoMatrix.makeText(matrixData[r][c] + '', x, y - 2);
+      txt.fill = isHl ? '#ffffff' : 'var(--fg)';
+      txt.size = 15;
+      txt.weight = 700;
+
+      const sub = twoMatrix.makeText(`[${r}][${c}]`, x, y + 15);
+      sub.fill = isHl ? '#ffffff' : 'var(--muted)';
+      sub.size = 9;
+    }
+  }
+
+  twoMatrix.update();
+}
+
+function initMatrixEvents() {
+  let timer = null;
+
+  document.getElementById('mat-walk-row-btn').addEventListener('click', function() {
+    clearInterval(timer);
+    let step = 0;
+    const total = matRows * matCols;
+    timer = setInterval(() => {
+      if (step >= total) {
+        clearInterval(timer);
+        matHighlight = null;
+        drawMatrix();
+        return;
+      }
+      const r = Math.floor(step / matCols);
+      const c = step % matCols;
+      matHighlight = { r, c };
+      document.getElementById('mat-status').textContent = `Sorfolytonos: matrix[${r}][${c}] = ${matrixData[r][c]}`;
+      drawMatrix();
+      step++;
+    }, 400);
+  });
+
+  document.getElementById('mat-walk-col-btn').addEventListener('click', function() {
+    clearInterval(timer);
+    let step = 0;
+    const total = matRows * matCols;
+    timer = setInterval(() => {
+      if (step >= total) {
+        clearInterval(timer);
+        matHighlight = null;
+        drawMatrix();
+        return;
+      }
+      const c = Math.floor(step / matRows);
+      const r = step % matRows;
+      matHighlight = { r, c };
+      document.getElementById('mat-status').textContent = `Oszlopfolytonos: matrix[${r}][${c}] = ${matrixData[r][c]}`;
+      drawMatrix();
+      step++;
+    }, 400);
+  });
+
+  document.getElementById('mat-reset-btn').addEventListener('click', function() {
+    clearInterval(timer);
+    matHighlight = null;
+    document.getElementById('mat-status').textContent = 'Kattints egy cellára az index megtekintéséhez';
+    drawMatrix();
+  });
+}
+
+// ================= 3. KARAKTERLÁNC =================
+let strText = 'INFORMATIKA';
+let sliceStart = 2;
+let sliceStop = 7;
+let twoString = null;
+
+function updateStringUI() {
+  document.getElementById('str-start-val').textContent = sliceStart;
+  document.getElementById('str-stop-val').textContent = sliceStop;
+
+  const sliced = strText.slice(sliceStart, sliceStop);
+  document.getElementById('str-slice-code').innerHTML = 
+    `s = "${strText}"<br>` +
+    `resz = s[${sliceStart}:${sliceStop}]  # Eredmény: "${sliced}" (hossza: ${sliced.length})`;
+
+  drawString();
+}
+
+function drawString() {
+  const W = 700;
+  const H = 220;
+  if (!twoString) twoString = createTwo('canvas-string', W, H);
+  twoString.clear();
+
+  const n = strText.length;
+  const boxW = Math.min(48, (W - 60) / Math.max(n, 1));
+  const boxH = 56;
+  const startX = (W - (n * boxW + (n - 1) * 6)) / 2 + boxW / 2;
+  const startY = 110;
+
+  for (let i = 0; i < n; i++) {
+    const x = startX + i * (boxW + 6);
+    const y = startY;
+    const inSlice = (i >= sliceStart && i < sliceStop);
+
+    const rect = twoString.makeRoundedRectangle(x, y, boxW, boxH, 6);
+    rect.fill = inSlice ? 'var(--accent)' : 'var(--panel)';
+    rect.stroke = inSlice ? 'var(--accent-hover)' : 'var(--line)';
+    rect.linewidth = inSlice ? 2.5 : 1.5;
+
+    const charTxt = twoString.makeText(strText[i], x, y);
+    charTxt.fill = inSlice ? '#ffffff' : 'var(--fg)';
+    charTxt.size = 20;
+    charTxt.weight = 700;
+
+    const posTxt = twoString.makeText(i + '', x, y - 40);
+    posTxt.fill = inSlice ? 'var(--accent)' : 'var(--muted)';
+    posTxt.size = 11;
+    posTxt.weight = 700;
+
+    const negTxt = twoString.makeText((i - n) + '', x, y + 42);
+    negTxt.fill = 'var(--muted)';
+    negTxt.size = 10;
+  }
+
+  twoString.update();
+}
+
+function initStringEvents() {
+  const startSl = document.getElementById('str-start');
+  const stopSl = document.getElementById('str-stop');
+
+  startSl.addEventListener('input', function() {
+    sliceStart = parseInt(this.value, 10);
+    if (sliceStart >= sliceStop) {
+      sliceStop = Math.min(sliceStart + 1, strText.length);
+      stopSl.value = sliceStop;
+    }
+    updateStringUI();
+  });
+
+  stopSl.addEventListener('input', function() {
+    sliceStop = parseInt(this.value, 10);
+    if (sliceStop <= sliceStart) {
+      sliceStart = Math.max(0, sliceStop - 1);
+      startSl.value = sliceStart;
+    }
+    updateStringUI();
+  });
+
+  document.getElementById('str-set-btn').addEventListener('click', function() {
+    const v = document.getElementById('str-input').value.trim().toUpperCase();
+    if (v.length >= 2) {
+      strText = v;
+      startSl.max = strText.length - 1;
+      stopSl.max = strText.length;
+      sliceStart = 0;
+      sliceStop = strText.length;
+      startSl.value = 0;
+      stopSl.value = strText.length;
+      updateStringUI();
+    }
+  });
+}
+
+// ================= 4. REKORD / OBJEKTUM =================
+const INITIAL_STUDENTS = [
+  { nev: 'Kovács Anna', osztaly: '12.A', atlag: 4.8 },
+  { nev: 'Nagy Bence', osztaly: '12.B', atlag: 3.9 },
+  { nev: 'Szabó Dániel', osztaly: '12.A', atlag: 4.6 },
+  { nev: 'Tóth Eszter', osztaly: '12.C', atlag: 4.2 }
+];
+let studentRecords = [...INITIAL_STUDENTS];
+let recordFilter = false;
+let twoRecord = null;
+
+function drawRecord() {
+  const W = 700;
+  const H = 260;
+  if (!twoRecord) twoRecord = createTwo('canvas-record', W, H);
+  twoRecord.clear();
+
+  const disp = recordFilter ? studentRecords.filter(s => s.atlag >= 4.5) : studentRecords;
+  const cardW = 150;
+  const cardH = 170;
+  const count = disp.length;
+  const startX = (W - (count * cardW + (count - 1) * 16)) / 2 + cardW / 2;
+  const startY = 130;
+
+  const title = twoRecord.makeText(
+    `Rekordok a memóriában (lista hossza: ${count} db)${recordFilter ? ' [Szűrve: átlag ≥ 4.5]' : ''}`,
+    30, 25
+  );
+  title.alignment = 'left';
+  title.fill = 'var(--muted)';
+  title.size = 13;
+  title.weight = 700;
+
+  for (let i = 0; i < count; i++) {
+    const x = startX + i * (cardW + 16);
+    const y = startY;
+    const s = disp[i];
+
+    const card = twoRecord.makeRoundedRectangle(x, y, cardW, cardH, 8);
+    card.fill = 'var(--panel)';
+    card.stroke = s.atlag >= 4.5 ? 'var(--accent)' : 'var(--line)';
+    card.linewidth = 2;
+
+    const tag = twoRecord.makeText(`Tanulo[${i}]`, x, y - 62);
+    tag.fill = 'var(--muted)';
+    tag.size = 11;
+    tag.weight = 700;
+
+    const nTxt = twoRecord.makeText(s.nev, x, y - 32);
+    nTxt.fill = 'var(--fg)';
+    nTxt.size = 13;
+    nTxt.weight = 700;
+
+    const oLabel = twoRecord.makeText('osztaly:', x - 25, y + 2);
+    oLabel.alignment = 'right';
+    oLabel.fill = 'var(--muted)';
+    oLabel.size = 11;
+
+    const oVal = twoRecord.makeText(s.osztaly, x - 15, y + 2);
+    oVal.alignment = 'left';
+    oVal.fill = 'var(--fg)';
+    oVal.size = 12;
+    oVal.weight = 600;
+
+    const aLabel = twoRecord.makeText('atlag:', x - 25, y + 28);
+    aLabel.alignment = 'right';
+    aLabel.fill = 'var(--muted)';
+    aLabel.size = 11;
+
+    const aVal = twoRecord.makeText(s.atlag.toFixed(1), x - 15, y + 28);
+    aVal.alignment = 'left';
+    aVal.fill = s.atlag >= 4.5 ? 'var(--accent)' : 'var(--fg)';
+    aVal.size = 14;
+    aVal.weight = 700;
+  }
+
+  twoRecord.update();
+}
+
+function initRecordEvents() {
+  document.getElementById('rec-add-btn').addEventListener('click', function() {
+    if (studentRecords.length < 5) {
+      const names = ['Varga Zsófia', 'Kiss Márton', 'Horváth Lili', 'Molnár Ádám'];
+      const nextName = names[studentRecords.length % names.length];
+      const nextAvg = Math.round((3.8 + Math.random() * 1.2) * 10) / 10;
+      studentRecords.push({ nev: nextName, osztaly: '12.A', atlag: nextAvg });
+      drawRecord();
+    }
+  });
+
+  document.getElementById('rec-filter-btn').addEventListener('click', function() {
+    recordFilter = true;
+    drawRecord();
+  });
+
+  document.getElementById('rec-all-btn').addEventListener('click', function() {
+    recordFilter = false;
+    drawRecord();
+  });
+}
+
+// ================= 5. VEREM (STACK) =================
+let stackItems = ['A', 'B', 'C'];
+let twoStack = null;
+
+function drawStack() {
+  const W = 700;
+  const H = 260;
+  if (!twoStack) twoStack = createTwo('canvas-stack', W, H);
+  twoStack.clear();
+
+  const cx = W / 2;
+  const btmY = 220;
+  const itemW = 140;
+  const itemH = 34;
+
+  const leftWall = twoStack.makeLine(cx - itemW / 2 - 8, 40, cx - itemW / 2 - 8, btmY + 8);
+  leftWall.stroke = 'var(--line)';
+  leftWall.linewidth = 3;
+
+  const rightWall = twoStack.makeLine(cx + itemW / 2 + 8, 40, cx + itemW / 2 + 8, btmY + 8);
+  rightWall.stroke = 'var(--line)';
+  rightWall.linewidth = 3;
+
+  const btmWall = twoStack.makeLine(cx - itemW / 2 - 8, btmY + 8, cx + itemW / 2 + 8, btmY + 8);
+  btmWall.stroke = 'var(--line)';
+  btmWall.linewidth = 3;
+
+  for (let i = 0; i < stackItems.length; i++) {
+    const y = btmY - (i + 0.5) * (itemH + 6);
+    const isTop = (i === stackItems.length - 1);
+
+    const rect = twoStack.makeRoundedRectangle(cx, y, itemW, itemH, 6);
+    rect.fill = isTop ? 'var(--accent)' : 'var(--panel)';
+    rect.stroke = isTop ? 'var(--accent-hover)' : 'var(--line)';
+    rect.linewidth = 2;
+
+    const txt = twoStack.makeText(stackItems[i], cx, y);
+    txt.fill = isTop ? '#ffffff' : 'var(--fg)';
+    txt.size = 14;
+    txt.weight = 700;
+
+    if (isTop) {
+      const topLabel = twoStack.makeText('← TOP (Tető)', cx + itemW / 2 + 18, y);
+      topLabel.alignment = 'left';
+      topLabel.fill = 'var(--accent)';
+      topLabel.size = 12;
+      topLabel.weight = 700;
+    }
+  }
+
+  twoStack.update();
+}
+
+function initStackEvents() {
+  const letters = ['D', 'E', 'F', 'G'];
+  let lIdx = 0;
+
+  document.getElementById('st-push-btn').addEventListener('click', function() {
+    if (stackItems.length < 5) {
+      stackItems.push(letters[lIdx % letters.length]);
+      lIdx++;
+      document.getElementById('st-status').textContent = `Push: '${stackItems[stackItems.length - 1]}' behelyezve a verem tetejére`;
+      drawStack();
+    }
+  });
+
+  document.getElementById('st-pop-btn').addEventListener('click', function() {
+    if (stackItems.length > 0) {
+      const popped = stackItems.pop();
+      document.getElementById('st-status').textContent = `Pop: '${popped}' levéve a verem tetejéről`;
+      drawStack();
+    }
+  });
+
+  document.getElementById('st-clear-btn').addEventListener('click', function() {
+    stackItems = [];
+    document.getElementById('st-status').textContent = 'A verem kiürítve';
+    drawStack();
+  });
+}
+
+// ================= 6. SOR (QUEUE) =================
+let queueItems = ['X', 'Y', 'Z'];
+let twoQueue = null;
+
+function drawQueue() {
+  const W = 700;
+  const H = 220;
+  if (!twoQueue) twoQueue = createTwo('canvas-queue', W, H);
+  twoQueue.clear();
+
+  const cy = 110;
+  const itemW = 55;
+  const itemH = 55;
+  const startX = 200;
+
+  const topWall = twoQueue.makeLine(120, cy - itemH / 2 - 6, 560, cy - itemH / 2 - 6);
+  topWall.stroke = 'var(--line)';
+  topWall.linewidth = 3;
+
+  const btmWall = twoQueue.makeLine(120, cy + itemH / 2 + 6, 560, cy + itemH / 2 + 6);
+  btmWall.stroke = 'var(--line)';
+  btmWall.linewidth = 3;
+
+  const outTag = twoQueue.makeText('KIJÁRAT (Front)\n← Kiszolgálás', 70, cy);
+  outTag.alignment = 'center';
+  outTag.fill = 'var(--accent)';
+  outTag.size = 11;
+  outTag.weight = 700;
+
+  const inTag = twoQueue.makeText('BEJÁRAT (Rear)\nÉrkezés ←', 620, cy);
+  inTag.alignment = 'center';
+  inTag.fill = 'var(--muted)';
+  inTag.size = 11;
+  inTag.weight = 700;
+
+  for (let i = 0; i < queueItems.length; i++) {
+    const x = startX + i * (itemW + 12);
+    const isFront = (i === 0);
+
+    const rect = twoQueue.makeRoundedRectangle(x, cy, itemW, itemH, 8);
+    rect.fill = isFront ? 'var(--accent)' : 'var(--panel)';
+    rect.stroke = isFront ? 'var(--accent-hover)' : 'var(--line)';
+    rect.linewidth = 2;
+
+    const txt = twoQueue.makeText(queueItems[i], x, cy);
+    txt.fill = isFront ? '#ffffff' : 'var(--fg)';
+    txt.size = 16;
+    txt.weight = 700;
+
+    const posTag = twoQueue.makeText(i === 0 ? 'Első' : `${i + 1}.`, x, cy + 42);
+    posTag.fill = 'var(--muted)';
+    posTag.size = 10;
+  }
+
+  twoQueue.update();
+}
+
+function initQueueEvents() {
+  const letters = ['P', 'Q', 'R', 'S'];
+  let qIdx = 0;
+
+  document.getElementById('q-enqueue-btn').addEventListener('click', function() {
+    if (queueItems.length < 5) {
+      queueItems.push(letters[qIdx % letters.length]);
+      qIdx++;
+      document.getElementById('q-status').textContent = `Enqueue: '${queueItems[queueItems.length - 1]}' beállt a sor végére`;
+      drawQueue();
+    }
+  });
+
+  document.getElementById('q-dequeue-btn').addEventListener('click', function() {
+    if (queueItems.length > 0) {
+      const dequeued = queueItems.shift();
+      document.getElementById('q-status').textContent = `Dequeue: '${dequeued}' kiszolgálva a sor elejéről`;
+      drawQueue();
+    }
+  });
+
+  document.getElementById('q-clear-btn').addEventListener('click', function() {
+    queueItems = [];
+    document.getElementById('q-status').textContent = 'A sor kiürítve';
+    drawQueue();
+  });
+}
+
+// ================= 7. HALMAZ ÉS SZÓTÁR =================
+let setData = new Set(['alma', 'körte']);
+let dictData = { 'alma': 2, 'körte': 1 };
+let twoSetDict = null;
+
+function drawSetDict() {
+  const W = 700;
+  const H = 260;
+  if (!twoSetDict) twoSetDict = createTwo('canvas-setdict', W, H);
+  twoSetDict.clear();
+
+  // Bal oldal: Halmaz
+  const setX = 180;
+  const setY = 135;
+  const setR = 85;
+
+  const setCircle = twoSetDict.makeCircle(setX, setY, setR);
+  setCircle.fill = 'var(--panel)';
+  setCircle.stroke = 'var(--line)';
+  setCircle.linewidth = 2;
+
+  const setHeader = twoSetDict.makeText('Halmaz (Set) — egyedi elemek', setX, 30);
+  setHeader.fill = 'var(--accent)';
+  setHeader.size = 12;
+  setHeader.weight = 700;
+
+  const setArr = Array.from(setData);
+  setArr.forEach((item, idx) => {
+    const angle = (idx * 2 * Math.PI / Math.max(setArr.length, 1)) - Math.PI / 2;
+    const x = setX + (setR * 0.5) * Math.cos(angle);
+    const y = setY + (setR * 0.5) * Math.sin(angle);
+
+    const badge = twoSetDict.makeRoundedRectangle(x, y, 64, 26, 6);
+    badge.fill = 'var(--bg)';
+    badge.stroke = 'var(--accent)';
+    badge.linewidth = 1.5;
+
+    const t = twoSetDict.makeText(item, x, y);
+    t.fill = 'var(--fg)';
+    t.size = 11;
+    t.weight = 600;
+  });
+
+  // Jobb oldal: Szótár
+  const dictX = 490;
+  const dictY = 135;
+
+  const dictHeader = twoSetDict.makeText('Szótár (Dict) — kulcs: érték', dictX, 30);
+  dictHeader.fill = 'var(--accent)';
+  dictHeader.size = 12;
+  dictHeader.weight = 700;
+
+  const dictEntries = Object.entries(dictData);
+  dictEntries.forEach(([k, v], idx) => {
+    const y = 70 + idx * 36;
+
+    const row = twoSetDict.makeRoundedRectangle(dictX, y, 220, 28, 6);
+    row.fill = 'var(--panel)';
+    row.stroke = 'var(--line)';
+    row.linewidth = 1.5;
+
+    const kTxt = twoSetDict.makeText(`"${k}":`, dictX - 45, y);
+    kTxt.fill = 'var(--accent)';
+    kTxt.size = 12;
+    kTxt.weight = 700;
+
+    const vTxt = twoSetDict.makeText(`${v} db`, dictX + 45, y);
+    vTxt.fill = 'var(--fg)';
+    vTxt.size = 12;
+    vTxt.weight = 600;
+  });
+
+  twoSetDict.update();
+}
+
+function initSetDictEvents() {
+  function addItem(name) {
+    const alreadyInSet = setData.has(name);
+    setData.add(name);
+    dictData[name] = (dictData[name] || 0) + 1;
+
+    document.getElementById('sd-status').textContent = alreadyInSet ?
+      `'${name}' már benne volt a halmazban (nem duplázódik), de a szótárban nőtt a számlálója (${dictData[name]} db)` :
+      `'${name}' új elemként bekerült a halmazba és a szótárba`;
+    drawSetDict();
+  }
+
+  document.getElementById('sd-add-apple').addEventListener('click', () => addItem('alma'));
+  document.getElementById('sd-add-pear').addEventListener('click', () => addItem('körte'));
+  document.getElementById('sd-add-banana').addEventListener('click', () => addItem('banán'));
+
+  document.getElementById('sd-clear-btn').addEventListener('click', () => {
+    setData.clear();
+    dictData = {};
+    document.getElementById('sd-status').textContent = 'Halmaz és szótár kiürítve';
+    drawSetDict();
+  });
+}
+
+// ================= 8. FELADATOK =================
+const QUIZ_QUESTIONS = [
+  {
+    q: 'Egy szöveges állományban egy futóverseny célbaérkezőinek adatai vannak soronként: rajtszám, név, születési év, célidő. Milyen adatszerkezetbe érdemes beolvasni az adatokat a hatékony feldolgozáshoz?',
+    ans: 'record',
+    desc: 'Több különböző típusú (számok, szövegek), de egy személyhez szorosan összetartozó adatot egy rekordban (osztályban) célszerű tárolni, és a fájl sorait egy rekordokból álló listába (tömbbe) gyűjtjük.'
+  },
+  {
+    q: 'Egy webböngésző "Vissza" gombját implementálod, ahol a felhasználó a legutóbb meglátogatott oldalra ugorhat vissza, majd az azelőttire. Melyik adatszerkezet valósítja meg ezt a LIFO elvet?',
+    ans: 'stack',
+    desc: 'A legutoljára meglátogatott oldalnak kell legelsőként visszajönnie (Last-In, First-Out), amit a verem (stack) valósít meg tökéletesen.'
+  },
+  {
+    q: 'Egy feladatban meg kell adni, hogy egy 100 000 elemű listában hány darab különböző (egyedi) szám található. Melyik adatszerkezettel oldható meg a legegyszerűbben?',
+    ans: 'set',
+    desc: 'A halmaz (set) definíció szerint kizárja a duplikátumokat. Pythonban a len(set(lista)) egyetlen lépésben O(n) idő alatt megadja a különböző elemek számát.'
+  },
+  {
+    q: 'Egy iskolai hálózaton a nyomtatóra egyszerre több diák küld nyomtatási feladatot. A nyomtatónak az érkezés sorrendjében kell kinyomtatnia a dokumentumokat. Melyik struktúra szükséges?',
+    ans: 'queue',
+    desc: 'Az elsőként beküldött feladatot kell elsőként kinyomtatni (First-In, First-Out), amit a sor (queue) adatszerkezet kezel.'
+  },
+  {
+    q: 'Egy szöveges fájlban tárolt regény szavait olvasod be, és meg kell állapítani, hogy melyik szó hányszor szerepel a szövegben. Melyik a legalkalmasabb adatstruktúra?',
+    ans: 'dict',
+    desc: 'A szótár (dictionary / map) kulcsként tárolja az egyes szavakat, értékként pedig az adott szó előfordulásainak számát (gyakoriságszámlálás).'
+  },
+  {
+    q: 'Egy 10x10-es tengeri csata (torpedó) játék mezőit szeretnéd ábrázolni, ahol minden mezőnek van egy vízszintes és egy függőleges koordinátája. Melyik a természetes struktúra?',
+    ans: 'matrix',
+    desc: 'A sorokból és oszlopokból álló négyzetrács reprezentációjára a kétdimenziós tömb (mátrix) a legalkalmasabb: tabla[sor][oszlop].'
+  },
+  {
+    q: 'Egy matematikai kifejezésben (pl. "{[(a+b)*c]-d}") ellenőrizni kell, hogy a zárójelek szabályosan záródnak-e be. Melyik adatszerkezet az algoritmus alapja?',
+    ans: 'stack',
+    desc: 'A nyitó zárójeleket a verembe helyezzük. Záró zárójel esetén kivesszük a verem tetejét és ellenőrizzük, hogy összeillő párt alkotnak-e.'
+  },
+  {
+    q: 'Egy felhasználó által beírt email címből szeretnéd kinyerni a kukac előtti felhasználónevet és a kukac utáni domain nevet. Milyen struktúrán végzel műveletet?',
+    ans: 'string',
+    desc: 'A karakterlánc (string) szöveges adatszerkezet, amelyen a find(), split() vagy szeletelési operátorokkal keresünk és bontunk részszövegekre.'
+  }
+];
+
+let curQuizIdx = 0;
+
+function loadQuiz(idx) {
+  curQuizIdx = idx;
+  const q = QUIZ_QUESTIONS[idx];
+  document.getElementById('quiz-num').textContent = `${idx + 1} / ${QUIZ_QUESTIONS.length}. feladat`;
+  document.getElementById('quiz-question').textContent = q.q;
+  document.getElementById('quiz-ds-select').value = '';
+  const fb = document.getElementById('quiz-feedback');
+  fb.style.display = 'none';
+  fb.className = 'feedback-box';
+}
+
+function checkQuiz() {
+  const q = QUIZ_QUESTIONS[curQuizIdx];
+  const userVal = document.getElementById('quiz-ds-select').value;
+  if (!userVal) {
+    alert('Kérlek válassz ki egy adatstruktúrát.');
+    return;
+  }
+
+  const fb = document.getElementById('quiz-feedback');
+  const title = document.getElementById('quiz-feedback-title');
+  const body = document.getElementById('quiz-feedback-body');
+  fb.style.display = 'block';
+
+  const dsNames = {
+    'array': '1D Tömb / Lista',
+    'matrix': '2D Tömb / Mátrix',
+    'string': 'Karakterlánc (String)',
+    'record': 'Rekord / Rekordok listája',
+    'stack': 'Verem (Stack)',
+    'queue': 'Sor (Queue)',
+    'set': 'Halmaz (Set)',
+    'dict': 'Szótár (Dictionary)'
+  };
+
+  if (userVal === q.ans) {
+    fb.className = 'feedback-box feedback-ok';
+    title.textContent = 'Helyes válasz';
+    body.innerHTML = `<strong>Választott módszer:</strong> ${dsNames[q.ans]}<br><strong>Indoklás:</strong> ${q.desc}`;
+  } else {
+    fb.className = 'feedback-box feedback-bad';
+    title.textContent = 'Nem a legoptimálisabb választás';
+    body.innerHTML = `<strong>Helyes megoldás:</strong> ${dsNames[q.ans]}<br><strong>Indoklás:</strong> ${q.desc}`;
+  }
+}
+
+function initQuizEvents() {
+  loadQuiz(0);
+  document.getElementById('quiz-check-btn').addEventListener('click', checkQuiz);
+  document.getElementById('quiz-next-btn').addEventListener('click', () => {
+    loadQuiz((curQuizIdx + 1) % QUIZ_QUESTIONS.length);
+  });
+}
+
+// ================= INICIALIZÁLÁS =================
+window.addEventListener('DOMContentLoaded', function() {
+  drawArray();
+  initArrayEvents();
+
+  drawMatrix();
+  initMatrixEvents();
+
+  updateStringUI();
+  initStringEvents();
+
+  drawRecord();
+  initRecordEvents();
+
+  drawStack();
+  initStackEvents();
+
+  drawQueue();
+  initQueueEvents();
+
+  drawSetDict();
+  initSetDictEvents();
+
+  initQuizEvents();
+});
+</script>
+
+</body>
+</html>
