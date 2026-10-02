@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A kör kerülete – animáció és levezetés darabolással</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --panel: #f5f7fa;
+  --panel-border: #d5dae0;
+  --fg: #1b1f24;
+  --muted: #59636e;
+  --line: #d5dae0;
+  --grid: #e6e9ed;
+  --axis: #64748b;
+  --accent: #2563eb;
+  --top-col: #2563eb;    /* kék (felső félkör) */
+  --bot-col: #ea580c;    /* narancs (alsó félkör) */
+  --radius-col: #16a34a; /* zöld (sugár) */
+  --pi-col: #8b5cf6;     /* lila */
+  --ok: #16a34a;
+  --warn: #d97706;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171b;
+    --panel: #1d2228;
+    --panel-border: #333b44;
+    --fg: #e8ebef;
+    --muted: #9aa4af;
+    --line: #333b44;
+    --grid: #262c33;
+    --axis: #8b95a1;
+    --accent: #6ea0ff;
+    --top-col: #60a5fa;
+    --bot-col: #fb923c;
+    --radius-col: #4ade80;
+    --pi-col: #a78bfa;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.top-nav {
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.top-nav a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.top-nav a:hover {
+  text-decoration: underline;
+}
+header {
+  padding: 18px 20px 0;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+h1 {
+  font-size: 1.6rem;
+  margin: 0 0 6px;
+}
+.subtitle {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+}
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border-bottom: 2px solid var(--line);
+}
+nav button {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 16px;
+  border: 2px solid var(--line);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: var(--panel);
+  color: var(--muted);
+  transition: all 0.15s;
+}
+nav button[aria-selected="true"] {
+  background: var(--bg);
+  color: var(--accent);
+  border-color: var(--accent);
+  margin-bottom: -2px;
+}
+main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 16px 20px 40px;
+}
+section[hidden] { display: none; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.card h2 {
+  font-size: 1.1rem;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-weight: 700;
+}
+svg.canvas-plot {
+  width: 100%;
+  height: auto;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: block;
+}
+.sl-group {
+  margin: 12px 0;
+}
+.sl {
+  display: grid;
+  grid-template-columns: 8em 1fr 4.5em;
+  gap: 12px;
+  align-items: center;
+  margin: 8px 0;
+}
+.sl label { font-weight: 700; }
+.sl output { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+.btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.btn {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  transition: all 0.15s;
+}
+.btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.val-pill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+.val-pill {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+.val-pill.top { border-left: 4px solid var(--top-col); }
+.val-pill.bot { border-left: 4px solid var(--bot-col); }
+.val-pill.rad { border-left: 4px solid var(--radius-col); }
+.val-pill.tot { border-left: 4px solid var(--pi-col); }
+.vp-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); }
+.vp-val { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.vp-sub { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+.hl-top { color: var(--top-col); font-weight: 700; }
+.hl-bot { color: var(--bot-col); font-weight: 700; }
+.hl-rad { color: var(--radius-col); font-weight: 700; }
+.hl-pi { color: var(--pi-col); font-weight: 700; }
+.info-box {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 14px;
+  margin-top: 14px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+  <span style="color:var(--muted)">Matematika: Geometria</span>
+</div>
+
+<header>
+  <h1>A kör kerülete – magyarázat darabolással</h1>
+  <div class="subtitle">
+    Miért <strong>K = 2 · π · r</strong>? Nézd meg a kör cikkekre darabolását és kigörgetését lépésről lépésre!
+  </div>
+
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-tab="tabSector">1. Cikkekre darabolás és kiterítés</button>
+    <button role="tab" aria-selected="false" data-tab="tabRoll">2. A kör kigörgetése a számegyenesre</button>
+    <button role="tab" aria-selected="false" data-tab="tabArchimedes">3. Sokszögek darabolása (Arkhimédész)</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ================= 1. FÜL: DARABOLÁS CIKKEKRE ================= -->
+<section id="tabSector">
+  <div class="card">
+    <h2>Interaktív darabolás és fésűs átrendezés</h2>
+    <svg class="canvas-plot" id="svgSector" viewBox="0 0 960 480" role="img" aria-label="A kör darabolása és átrendezése téglalappá"></svg>
+
+    <div class="sl-group">
+      <div class="sl">
+        <label>Cikkek száma (n):</label>
+        <input type="range" id="slSectors" min="4" max="64" step="4" value="16">
+        <output id="outSectors">16 cikk</output>
+      </div>
+      <div class="sl">
+        <label>Szétnyitás:</label>
+        <input type="range" id="slUnfold" min="0" max="100" step="1" value="0">
+        <output id="outUnfold">0% (kör)</output>
+      </div>
+    </div>
+
+    <div class="btns">
+      <button class="btn btn-primary" id="btnAnimUnfold">▶ Átalakulás lejátszása</button>
+      <button class="btn" id="btnResetUnfold">↺ Visszaállít körré</button>
+      <button class="btn" data-sec="8">8 cikk</button>
+      <button class="btn" data-sec="16">16 cikk</button>
+      <button class="btn" data-sec="32">32 cikk</button>
+      <button class="btn" data-sec="64">64 cikk (szinte téglalap)</button>
+    </div>
+
+    <div class="val-pill-grid">
+      <div class="val-pill top">
+        <div class="vp-title">Felső félkör íve (kék)</div>
+        <div class="vp-val">K / 2 = π · r</div>
+        <div class="vp-sub">az alakzat felső hullámos éle</div>
+      </div>
+      <div class="val-pill bot">
+        <div class="vp-title">Alsó félkör íve (narancs)</div>
+        <div class="vp-val">K / 2 = π · r</div>
+        <div class="vp-sub">az alakzat alsó hullámos éle</div>
+      </div>
+      <div class="val-pill rad">
+        <div class="vp-title">A cikkek szára (magasság)</div>
+        <div class="vp-val">r (a sugár)</div>
+        <div class="vp-sub">a kör sugara</div>
+      </div>
+      <div class="val-pill tot">
+        <div class="vp-title">Teljes kerület</div>
+        <div class="vp-val">K = π·r + π·r = 2πr</div>
+        <div class="vp-sub">a két szél összege</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Hogyan bizonyítja ez a kerület és terület képletét?</strong><br>
+      1. A kört <span id="infoN">16</span> egyenlő körcikkre vágjuk. A felső felét <span class="hl-top">kékre</span>, az alsó felét <span class="hl-bot">narancsra</span> színezzük.<br>
+      2. A cikkeket egymásba fésülve átrendezzük: egy fogazott, téglalaphoz hasonló alakzatot kapunk.<br>
+      3. Az alsó és a felső él mindegyikét a félkörívek alkotják, így hosszuk pontosan <strong>π · r</strong>. A kettő összege adja a teljes kerületet: <strong>K = 2 · π · r</strong>.<br>
+      4. Ahogy a cikkek száma (n) nő, a hullámos perem teljesen kiegyenesedik, az alakzat egy pontos <strong>π · r</strong> alapú és <strong>r</strong> magasságú téglalappá válik. Így a terület: <strong>T = (π · r) · r = π · r²</strong>!
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2. FÜL: KIGÖRGETÉS ================= -->
+<section id="tabRoll" hidden>
+  <div class="card">
+    <h2>A kör kerületének kiterítése a számegyenesen</h2>
+    <svg class="canvas-plot" id="svgRoll" viewBox="0 0 960 380" role="img" aria-label="A kör gördülése és a kerület kiterítése"></svg>
+
+    <div class="sl-group">
+      <div class="sl">
+        <label>Gördülés (szög):</label>
+        <input type="range" id="slRoll" min="0" max="360" step="1" value="0">
+        <output id="outRoll">0°</output>
+      </div>
+    </div>
+
+    <div class="btns">
+      <button class="btn btn-primary" id="btnPlayRoll">▶ Gördítés lejátszása</button>
+      <button class="btn" id="btnResetRoll">↺ Vissza a startra</button>
+    </div>
+
+    <div class="val-pill-grid">
+      <div class="val-pill rad">
+        <div class="vp-title">Átmérő (d = 2r)</div>
+        <div class="vp-val" id="rollDiam">d = 1 egység</div>
+        <div class="vp-sub">a kör szélessége</div>
+      </div>
+      <div class="val-pill tot">
+        <div class="vp-title">Megtett út 1 fordulat után</div>
+        <div class="vp-val">K ≈ 3,1416 · d = π · d</div>
+        <div class="vp-sub">pontosan 2 · π · r</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Miért éppen π ≈ 3,14?</strong><br>
+      Bármilyen méretű kört veszünk, ha pontosan <strong>1 teljes fordulatot</strong> gurítunk rajta egy egyenes mentén, a kiterített kerület hossza mindig kicsivel több lesz, mint az átmérő 3-szorosa: pontosan <strong>3,14159… · d</strong>! Ez az állandó arány maga a <strong>π (pi)</strong> szám:
+      <div style="font-size:1.15rem; font-weight:700; margin:6px 0; color:var(--accent);">
+        π = Kerület / Átmérő  →  Kerület = π · d = 2 · π · r
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. FÜL: ARKHIMÉDÉSZ SOKSZÖGEI ================= -->
+<section id="tabArchimedes" hidden>
+  <div class="card">
+    <h2>Közelítés beírt és körülírt szabályos sokszögekkel</h2>
+    <svg class="canvas-plot" id="svgArch" viewBox="0 0 960 480" role="img" aria-label="Arkhimédész módszere: beírt és körülírt sokszögek"></svg>
+
+    <div class="sl-group">
+      <div class="sl">
+        <label>Sokszög oldalszáma (n):</label>
+        <input type="range" id="slArchN" min="3" max="48" step="1" value="6">
+        <output id="outArchN">n = 6</output>
+      </div>
+    </div>
+
+    <div class="btns">
+      <button class="btn" data-an="3">n = 3 (háromszög)</button>
+      <button class="btn" data-an="4">n = 4 (négyzet)</button>
+      <button class="btn" data-an="6">n = 6 (hatszög)</button>
+      <button class="btn" data-an="12">n = 12</button>
+      <button class="btn" data-an="24">n = 24</button>
+      <button class="btn" data-an="48">n = 48</button>
+    </div>
+
+    <div class="val-pill-grid">
+      <div class="val-pill top">
+        <div class="vp-title">Beírt sokszög kerülete (K_be)</div>
+        <div class="vp-val" id="valInscr">3,0000 · d</div>
+        <div class="vp-sub">alulról becsli a kör kerületét</div>
+      </div>
+      <div class="val-pill tot">
+        <div class="vp-title">Valódi körkerület (K_kör)</div>
+        <div class="vp-val">3,1416 · d = π · d</div>
+        <div class="vp-sub">a pontos elméleti érték</div>
+      </div>
+      <div class="val-pill bot">
+        <div class="vp-title">Körülírt sokszög kerülete (K_ki)</div>
+        <div class="vp-val" id="valCircum">3,4641 · d</div>
+        <div class="vp-sub">felülről becsli a kör kerületét</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      Arkhimédész Kr. e. 250 körül úgy határozta meg a π értékét, hogy a kört egyre több oldalú (egészen 96 oldalú) szabályos sokszögre darabolta belülről és kívülről. Mivel a kör a két sokszög közé szorul: <strong>K_beírt &lt; K_kör &lt; K_körülírt</strong>, így a π értékét két határ közé tudta zárni: <strong>3 + 10/71 &lt; π &lt; 3 + 1/7</strong> (azaz 3,1408 &lt; π &lt; 3,1428).
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const NS = 'http://www.w3.org/2000/svg';
+
+function el(name, attrs, parent) {
+  const e = document.createElementNS(NS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+// ================= 1. FÜL: CIKKEKRE DARABOLÁS =================
+(function() {
+  const svg = $('#svgSector');
+  const cx = 220, cy = 240, R = 150;
+  const unfoldTargetX = 580; // az átrendezett alakzat közepe
+
+  const gCircle = el('g', {}, svg);
+  const gSlices = el('g', {}, svg);
+  const gDims = el('g', {}, svg);
+
+  // Kiegészítő feliratok és méretvonalak
+  const dimTop = el('text', { 'font-size': 15, 'font-weight': 700, fill: 'var(--top-col)', 'text-anchor': 'middle' }, gDims);
+  const dimBot = el('text', { 'font-size': 15, 'font-weight': 700, fill: 'var(--bot-col)', 'text-anchor': 'middle' }, gDims);
+  const dimRad = el('text', { 'font-size': 14, 'font-weight': 700, fill: 'var(--radius-col)', 'text-anchor': 'start' }, gDims);
+
+  let animTimer = null;
+
+  function render(n, unfoldT) { // unfoldT: 0 (kör) .. 1 (teljesen átrendezett téglalap)
+    gSlices.innerHTML = '';
+    const sliceAngle = (2 * Math.PI) / n;
+    const arcLen = R * sliceAngle;
+
+    // A kiterített alakzat teljes hossza = (n / 2) * arcLen = π * R
+    const totalW = (n / 2) * arcLen;
+    const startX = unfoldTargetX - totalW / 2;
+
+    for (let i = 0; i < n; i++) {
+      const isTop = i < n / 2;
+      const col = isTop ? 'var(--top-col)' : 'var(--bot-col)';
+
+      // Kezdeti pozíció (a körben)
+      const aStart = i * sliceAngle;
+      const aMid = aStart + sliceAngle / 2;
+      const aEnd = aStart + sliceAngle;
+
+      const p0 = { x: cx, y: cy };
+      const p1 = { x: cx + R * Math.cos(aStart), y: cy + R * Math.sin(aStart) };
+      const p2 = { x: cx + R * Math.cos(aEnd), y: cy + R * Math.sin(aEnd) };
+
+      // Cél pozíció (az átrendezett fésűben)
+      // Az alsó cikkek csúcsa felfelé néz (bázisuk lent), a felsőké lefelé
+      let targetBaseX = startX + (i % (n / 2)) * arcLen + arcLen / 2;
+      let targetTipY = isTop ? cy + R / 2 : cy - R / 2;
+      let targetBaseY = isTop ? cy - R / 2 : cy + R / 2;
+
+      // Interpolált csúcspont
+      const curTipX = (1 - unfoldT) * cx + unfoldT * targetBaseX;
+      const curTipY = (1 - unfoldT) * cy + unfoldT * targetTipY;
+
+      // Cikk rajzolása
+      if (unfoldT === 0) {
+        // Tiszta körcikk ívvel
+        const d = `M ${cx} ${cy} L ${p1.x} ${p1.y} A ${R} ${R} 0 0 1 ${p2.x} ${p2.y} Z`;
+        el('path', { d, fill: col, stroke: 'var(--bg)', 'stroke-width': 1.5, opacity: 0.88 }, gSlices);
+      } else {
+        // Interpolált háromszög / cikk
+        const b1X = targetBaseX - arcLen / 2;
+        const b2X = targetBaseX + arcLen / 2;
+
+        const curB1X = (1 - unfoldT) * p1.x + unfoldT * b1X;
+        const curB1Y = (1 - unfoldT) * p1.y + unfoldT * targetBaseY;
+        const curB2X = (1 - unfoldT) * p2.x + unfoldT * b2X;
+        const curB2Y = (1 - unfoldT) * p2.y + unfoldT * targetBaseY;
+
+        const d = `M ${curTipX} ${curTipY} L ${curB1X} ${curB1Y} Q ${targetBaseX} ${targetBaseY + (isTop ? -R/n : R/n) * (1-unfoldT)} ${curB2X} ${curB2Y} Z`;
+        el('path', { d, fill: col, stroke: 'var(--bg)', 'stroke-width': 1.5, opacity: 0.88 }, gSlices);
+      }
+    }
+
+    // Méretvonalak mutatása ha kiterített
+    if (unfoldT > 0.5) {
+      gDims.style.display = '';
+      dimTop.setAttribute('x', unfoldTargetX);
+      dimTop.setAttribute('y', cy - R / 2 - 16);
+      dimTop.textContent = 'π · r (felső ív, K / 2)';
+
+      dimBot.setAttribute('x', unfoldTargetX);
+      dimBot.setAttribute('y', cy + R / 2 + 28);
+      dimBot.textContent = 'π · r (alsó ív, K / 2)';
+
+      dimRad.setAttribute('x', unfoldTargetX + totalW / 2 + 16);
+      dimRad.setAttribute('y', cy + 5);
+      dimRad.textContent = 'magasság = r';
+    } else {
+      gDims.style.display = 'none';
+    }
+  }
+
+  function update() {
+    const n = +$('#slSectors').value;
+    const u = +$('#slUnfold').value / 100;
+    $('#outSectors').textContent = `${n} cikk`;
+    $('#outUnfold').textContent = `${Math.round(u * 100)}% ${u === 0 ? '(kör)' : (u === 1 ? '(átrendezett)' : '')}`;
+    $('#infoN').textContent = n;
+    render(n, u);
+  }
+
+  $('#slSectors').addEventListener('input', update);
+  $('#slUnfold').addEventListener('input', () => {
+    if (animTimer) clearInterval(animTimer);
+    update();
+  });
+
+  $$('[data-sec]').forEach(b => {
+    b.addEventListener('click', () => {
+      $('#slSectors').value = +b.dataset.sec;
+      update();
+    });
+  });
+
+  $('#btnAnimUnfold').addEventListener('click', () => {
+    if (animTimer) clearInterval(animTimer);
+    let u = 0;
+    $('#slUnfold').value = 0;
+    update();
+    animTimer = setInterval(() => {
+      u += 2;
+      if (u > 100) { u = 100; clearInterval(animTimer); animTimer = null; }
+      $('#slUnfold').value = u;
+      update();
+    }, 25);
+  });
+
+  $('#btnResetUnfold').addEventListener('click', () => {
+    if (animTimer) clearInterval(animTimer);
+    $('#slUnfold').value = 0;
+    update();
+  });
+
+  update();
+})();
+
+// ================= 2. FÜL: KIGÖRGETÉS A SZÁMEGYENESRE =================
+(function() {
+  const svg = $('#svgRoll');
+  const startX = 140;
+  const groundY = 280;
+  const R = 60; // Kör sugara
+  const D = 2 * R; // Átmérő (120px)
+  const fullDist = Math.PI * D; // π * d ≈ 377px
+
+  // Számegyenes talaj
+  el('line', { x1: 40, y1: groundY, x2: 920, y2: groundY, stroke: 'var(--axis)', 'stroke-width': 2 }, svg);
+
+  // Átmérő osztások a talajon
+  [0, 1, 2, 3].forEach(m => {
+    const x = startX + m * D;
+    el('line', { x1: x, y1: groundY - 6, x2: x, y2: groundY + 6, stroke: 'var(--axis)', 'stroke-width': 2 }, svg);
+    const t = el('text', { x, y: groundY + 24, font: '13px sans-serif', fill: 'var(--muted)', 'text-anchor': 'middle', 'font-weight': 600 }, svg);
+    t.textContent = m === 0 ? '0' : `${m} · d`;
+  });
+
+  // Pi végpont jelölés
+  const piX = startX + fullDist;
+  el('line', { x1: piX, y1: groundY - 14, x2: piX, y2: groundY + 14, stroke: 'var(--pi-col)', 'stroke-width': 3 }, svg);
+  const piLabel = el('text', { x: piX, y: groundY + 36, font: '15px sans-serif', fill: 'var(--pi-col)', 'text-anchor': 'middle', 'font-weight': 700 }, svg);
+  piLabel.textContent = 'π · d ≈ 3,14 d';
+
+  // Kiterített peremvonal a földön
+  const rollTrace = el('line', { x1: startX, y1: groundY, x2: startX, y2: groundY, stroke: 'var(--top-col)', 'stroke-width': 4, 'stroke-linecap': 'round' }, svg);
+
+  // Gördülő kör
+  const gWheel = el('g', {}, svg);
+  const wheelCircle = el('circle', { r: R, fill: 'none', stroke: 'var(--top-col)', 'stroke-width': 4 }, gWheel);
+  const spoke = el('line', { x1: 0, y1: 0, x2: 0, y2: R, stroke: 'var(--pi-col)', 'stroke-width': 3 }, gWheel);
+  const dotP = el('circle', { cx: 0, cy: R, r: 6, fill: 'var(--pi-col)' }, gWheel);
+
+  let rollTimer = null;
+
+  function render(deg) {
+    const progress = deg / 360;
+    const currentX = startX + progress * fullDist;
+    const currentY = groundY - R;
+
+    gWheel.setAttribute('transform', `translate(${currentX}, ${currentY}) rotate(${deg})`);
+    rollTrace.setAttribute('x2', currentX);
+
+    $('#outRoll').textContent = `${deg}°`;
+  }
+
+  function updateFromSlider() {
+    render(+$('#slRoll').value);
+  }
+
+  $('#slRoll').addEventListener('input', () => {
+    if (rollTimer) clearInterval(rollTimer);
+    updateFromSlider();
+  });
+
+  $('#btnPlayRoll').addEventListener('click', () => {
+    if (rollTimer) { clearInterval(rollTimer); rollTimer = null; return; }
+    let curr = +$('#slRoll').value;
+    rollTimer = setInterval(() => {
+      curr += 2;
+      if (curr > 360) { curr = 360; clearInterval(rollTimer); rollTimer = null; }
+      $('#slRoll').value = curr;
+      render(curr);
+    }, 25);
+  });
+
+  $('#btnResetRoll').addEventListener('click', () => {
+    if (rollTimer) clearInterval(rollTimer);
+    $('#slRoll').value = 0;
+    render(0);
+  });
+
+  render(0);
+})();
+
+// ================= 3. FÜL: ARKHIMÉDÉSZ SOKSZÖGEI =================
+(function() {
+  const svg = $('#svgArch');
+  const cx = 480, cy = 240, R = 160;
+
+  // Kör rajzolása
+  el('circle', { cx, cy, r: R, fill: 'none', stroke: 'var(--pi-col)', 'stroke-width': 3, 'stroke-dasharray': '6 4' }, svg);
+
+  const polyIn = el('polygon', { fill: 'rgba(37, 99, 235, 0.1)', stroke: 'var(--top-col)', 'stroke-width': 2.5 }, svg);
+  const polyOut = el('polygon', { fill: 'none', stroke: 'var(--bot-col)', 'stroke-width': 2.5 }, svg);
+
+  function render(n) {
+    let ptsIn = [];
+    let ptsOut = [];
+    const rOut = R / Math.cos(Math.PI / n);
+
+    for (let i = 0; i < n; i++) {
+      const a = (i * 2 * Math.PI) / n - Math.PI / 2;
+      ptsIn.push(`${cx + R * Math.cos(a)},${cy + R * Math.sin(a)}`);
+      ptsOut.push(`${cx + rOut * Math.cos(a)},${cy + rOut * Math.sin(a)}`);
+    }
+
+    polyIn.setAttribute('points', ptsIn.join(' '));
+    polyOut.setAttribute('points', ptsOut.join(' '));
+
+    // Kerületszámítás: D = 1 esetén r = 0.5
+    // Beírt sokszög: K_in = n * 2 * r * sin(pi / n) = n * D * sin(pi / n)
+    // Körülírt sokszög: K_out = n * D * tan(pi / n)
+    const kIn = n * Math.sin(Math.PI / n);
+    const kOut = n * Math.tan(Math.PI / n);
+
+    $('#valInscr').textContent = `${kIn.toFixed(4).replace('.', ',')} · d`;
+    $('#valCircum').textContent = `${kOut.toFixed(4).replace('.', ',')} · d`;
+    $('#outArchN').textContent = `n = ${n}`;
+  }
+
+  $('#slArchN').addEventListener('input', e => render(+e.target.value));
+
+  $$('[data-an]').forEach(b => {
+    b.addEventListener('click', () => {
+      const val = +b.dataset.an;
+      $('#slArchN').value = val;
+      render(val);
+    });
+  });
+
+  render(6);
+})();
+
+// ================= FÜLVÁLTÓ =================
+$$('nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('nav button').forEach(b => b.setAttribute('aria-selected', 'false'));
+    btn.setAttribute('aria-selected', 'true');
+    $$('main > section').forEach(s => s.hidden = s.id !== btn.dataset.tab);
+  });
+});
+</script>
+</body>
+</html>
