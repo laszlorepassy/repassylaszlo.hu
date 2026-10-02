@@ -4,7 +4,21 @@
     "href": "animaciok.html",
     "title": "Animációk",
     "section": "",
-    "text": "Interaktív matematikai és informatikai animációk a fogalmak és összefüggések szemléltetéséhez.\n\n  \n    \n    Másodfokú egyenletek\n    Grafikus megoldás, teljes négyzetté alakítás geometriai területekkel, a megoldóképlet levezetése, valamint a gyöktényezős alak és a Viète-formulák összefüggései.\n  \n  \n    \n    Programozási tételek\n    Az elemi algoritmusok lépésről lépésre követhető szemléltetése a Folyáb példatára alapján: összegzés, megszámolás, eldöntés, kiválasztás, lineáris keresés, másolás, kiválogatás, szétválogatás, metszet, unió, maximum és minimum.\n  \n  \n    \n    Szögfüggvények\n    A szögfüggvények bevezetése a derékszögű háromszögben, kiterjesztésük az egységkörön, szinusz és koszinusz hullámok valós idejű kirajzolása, valamint a nevezetes hegyesszögek.\n  \n  \n    \n    A kör kerülete\n    Miért K = 2 · π · r? A kör cikkekre darabolása és átrendezése téglalappá, a kerület kiterítése a számegyenesen, valamint Arkhimédész közelítése szabályos sokszögekkel.\n  \n  \n    \n    Összeszámlálási módszerek\n    Permutáció, variáció és kombináció (ismétléses és ismétlés nélküli esetek), körben ülés, golyók és falak modellje, összefoglaló döntési mátrix és feladatfelismerő gyakorlás."
+    "text": "Interaktív matematikai és informatikai animációk a fogalmak és összefüggések szemléltetéséhez."
+  },
+  {
+    "objectID": "animaciok.html#matematika",
+    "href": "animaciok.html#matematika",
+    "title": "Animációk",
+    "section": "Matematika",
+    "text": "Matematika\nMásodfokú egyenletek\nGrafikus megoldás, teljes négyzetté alakítás geometriai területekkel, a megoldóképlet levezetése, valamint a gyöktényezős alak és a Viète-formulák összefüggései.\nSzögfüggvények\nA szögfüggvények bevezetése a derékszögű háromszögben, kiterjesztésük az egységkörön, szinusz és koszinusz hullámok valós idejű kirajzolása, valamint a nevezetes hegyesszögek.\nA kör kerülete\nMiért K = 2 · π · r? A kör cikkekre darabolása és átrendezése téglalappá, a kerület kiterítése a számegyenesen, valamint Arkhimédész közelítése szabályos sokszögekkel.\nÖsszeszámlálási módszerek\nLineáris és ciklikus permutáció, ismétléses permutáció, variáció és kombináció (ismétléses és ismétlés nélküli esetek), nyaklánc-modell, golyók és falak elve, összefoglaló döntési mátrix és feladatfelismerő gyakorlás."
+  },
+  {
+    "objectID": "animaciok.html#informatika",
+    "href": "animaciok.html#informatika",
+    "title": "Animációk",
+    "section": "Informatika",
+    "text": "Informatika\nProgramozási tételek\nAz elemi algoritmusok lépésről lépésre követhető szemléltetése a Folyáb példatára alapján: összegzés, megszámolás, eldöntés, kiválasztás, lineáris keresés, másolás, kiválogatás, szétválogatás, metszet, unió, maximum és minimum."
   },
   {
     "objectID": "legzogyakorlatok.html",
@@ -39,7 +53,21 @@
     "href": "en/animations.html",
     "title": "Animations",
     "section": "",
-    "text": "Interactive mathematics and computer science animations designed to illustrate key concepts and theorems.\n\n  \n    \n    Quadratic Equations\n    Graphical solution, completing the square with geometric areas, algebraic derivation of the quadratic formula, factored form, and Viète formulas.\n  \n  \n    \n    Basic Algorithms\n    Step-by-step visual exploration of classic programming theorems: summation, counting, decision, selection, linear search, copy, filter, partition, intersection, union, maximum, and minimum.\n  \n  \n    \n    Trigonometric Functions\n    Trigonometric ratios in right-angled triangles, extension to the unit circle (0°–360°), real-time sine and cosine wave generation, and special angles.\n  \n  \n    \n    Circumference of a Circle\n    Why is C = 2 · π · r? Slicing the circle into sectors and rearranging into a rectangle, unrolling the circle along a number line, and Archimedes' polygon approximation.\n  \n  \n    \n    Counting Methods\n    Permutations, variations, and combinations (with and without repetition), circular arrangements, stars and bars model, decision matrix, and interactive problem solver."
+    "text": "Interactive mathematics and computer science animations designed to illustrate key concepts and theorems."
+  },
+  {
+    "objectID": "en/animations.html#mathematics",
+    "href": "en/animations.html#mathematics",
+    "title": "Animations",
+    "section": "Mathematics",
+    "text": "Mathematics\nQuadratic Equations\nGraphical solution, completing the square with geometric areas, algebraic derivation of the quadratic formula, factored form, and Viète formulas.\nTrigonometric Functions\nTrigonometric ratios in right-angled triangles, extension to the unit circle (0°–360°), real-time sine and cosine wave generation, and special angles.\nCircumference of a Circle\nWhy is C = 2 · π · r? Slicing the circle into sectors and rearranging into a rectangle, unrolling the circle along a number line, and Archimedes’ polygon approximation.\nCounting Methods\nLinear and cyclic permutations, permutations with repetition, variations and combinations (with and without repetition), necklace model, stars and bars principle, decision matrix, and practice problems."
+  },
+  {
+    "objectID": "en/animations.html#informatics",
+    "href": "en/animations.html#informatics",
+    "title": "Animations",
+    "section": "Informatics",
+    "text": "Informatics\nBasic Algorithms\nStep-by-step visual exploration of classic programming theorems: summation, counting, decision, selection, linear search, copy, filter, partition, intersection, union, maximum, and minimum."
   },
   {
     "objectID": "index.html",

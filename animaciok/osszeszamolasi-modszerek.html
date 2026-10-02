@@ -399,7 +399,7 @@ if (typeof Two === 'undefined') {
 
 <!-- ================= 1. RÉSZ: ISMÉTLÉS NÉLKÜLI PERMUTÁCIÓ ================= -->
 <section class="anim-section" id="perm-no-rep">
-  <h2>1. Ismétlés nélküli permutáció: n különböző elem összes lehetséges sorrendje</h2>
+  <h2>1. Ismétlés nélküli permutáció: n különböző elem egyenes vonalú sorba rendezése</h2>
   <div class="layout">
     <div class="plot-container">
       <div id="canvas-perm" style="width:100%; height:auto;"></div>
@@ -419,12 +419,6 @@ if (typeof Two === 'undefined') {
           <label for="perm-n">n</label>
           <input type="range" id="perm-n" min="2" max="6" value="4">
           <output id="perm-n-val">4</output>
-        </div>
-        <div style="margin-top: 10px;">
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.95rem;">
-            <input type="checkbox" id="perm-cyclic-cb">
-            Körben ülés (ciklikus permutáció)
-          </label>
         </div>
       </div>
 
@@ -452,9 +446,73 @@ if (typeof Two === 'undefined') {
   </div>
 </section>
 
-<!-- ================= 2. RÉSZ: ISMÉTLÉSES PERMUTÁCIÓ ================= -->
+<!-- ================= 2. RÉSZ: CIKLIKUS PERMUTÁCIÓ ================= -->
+<section class="anim-section" id="perm-cyclic">
+  <h2>2. Ciklikus permutáció: elemek zárt láncba (körbe) rendezése</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-cyclic" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="cyclic-rotate-btn" type="button">Forgatás 1 hellyel</button>
+          <button id="cyclic-shuffle-btn" type="button">Új véletlen körsorrend</button>
+        </div>
+        <div id="cyclic-info" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Az elforgatás nem változtatja meg a körsorrendet</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Paraméterek</h3>
+        <div class="sl">
+          <label for="cyclic-n">n</label>
+          <input type="range" id="cyclic-n" min="3" max="8" value="5">
+          <output id="cyclic-n-val">5</output>
+        </div>
+        <div style="margin-top: 10px;">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.95rem;">
+            <input type="checkbox" id="cyclic-flip-cb">
+            Megfordítható nyaklánc / karkötő (osztás 2-vel)
+          </label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Képlet és levezetés az emelt szintű tankönyvből</h3>
+        <div class="formula-box">
+          <div class="formula-line" id="cyclic-formula">
+            P<sub>ciklikus</sub> = (n − 1)! = 
+            <span class="frac">
+              <span class="num">n!</span>
+              <span class="den">n</span>
+            </span>
+          </div>
+          <div class="formula-line" style="font-size:1.35rem; font-weight:700; color:var(--accent);" id="cyclic-calc">
+            P<sub>ciklikus</sub> = (5 − 1)! = 4! = 24
+          </div>
+        </div>
+        <p style="font-size:0.95rem; margin:8px 0 0;" id="cyclic-desc">
+          <strong>A rögzítéses bizonyítás (OH-MAT912AE, 87. oldal):</strong> Egy elemet (jelöljük A-val) kiválasztunk és rögzítünk bármelyik tetszőleges helyre a körben. Hozzá képest a többi helynek már van rögzített iránya és sorrendje (A-tól jobbra az 1., 2. stb.). Erre a megmaradt n − 1 helyre a többi n − 1 elemet (n − 1)!-féleképpen rendezhetjük el.
+        </p>
+        <p style="font-size:0.95rem; margin:8px 0 0;" id="cyclic-rot-desc">
+          <strong>A forgatási ekvivalencia:</strong> Ha az n elemet egyenes mentén állítanánk sorba, n! eset lenne. Mivel a zárt kör mentén bármely elrendezés n elforgatása ugyanazt az ülésrendet adja, n-nel osztunk: n! / n = (n − 1)!.
+        </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-MAT912AE (A Gyűjtemény a Matematika emelt szintű oktatásához 9–12, 87. oldal), OH-MAT1112BE (B Gyűjtemény emelt szintű oktatáshoz 11–12, körök száma és irányok).
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Különböző körsorrendek (<span id="cyclic-list-count">24</span> db)</h3>
+        <div class="list-box" id="cyclic-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. RÉSZ: ISMÉTLÉSES PERMUTÁCIÓ ================= -->
 <section class="anim-section" id="perm-rep">
-  <h2>2. Ismétléses permutáció: sorba rendezés, ha vannak azonos elemek</h2>
+  <h2>3. Ismétléses permutáció: sorba rendezés, ha vannak azonos elemek</h2>
   <div class="layout">
     <div class="plot-container">
       <div id="canvas-perm-rep" style="width:100%; height:auto;"></div>
@@ -514,9 +572,9 @@ if (typeof Two === 'undefined') {
   </div>
 </section>
 
-<!-- ================= 3. RÉSZ: ISMÉTLÉS NÉLKÜLI VARIÁCIÓ ================= -->
+<!-- ================= 4. RÉSZ: ISMÉTLÉS NÉLKÜLI VARIÁCIÓ ================= -->
 <section class="anim-section" id="vari-no-rep">
-  <h2>3. Ismétlés nélküli variáció: n elemből k kiválasztása, a sorrend számít</h2>
+  <h2>4. Ismétlés nélküli variáció: n elemből k kiválasztása, a sorrend számít</h2>
   <div class="layout">
     <div class="plot-container">
       <div id="canvas-vari" style="width:100%; height:auto;"></div>
@@ -574,9 +632,9 @@ if (typeof Two === 'undefined') {
   </div>
 </section>
 
-<!-- ================= 4. RÉSZ: ISMÉTLÉSES VARIÁCIÓ ================= -->
+<!-- ================= 5. RÉSZ: ISMÉTLÉSES VARIÁCIÓ ================= -->
 <section class="anim-section" id="vari-rep">
-  <h2>4. Ismétléses variáció: sorrend számít, az elemek ismétlődhetnek (n^k)</h2>
+  <h2>5. Ismétléses variáció: sorrend számít, az elemek ismétlődhetnek (n^k)</h2>
   <div class="layout">
     <div class="plot-container">
       <div id="canvas-varirep" style="width:100%; height:auto;"></div>
@@ -634,9 +692,9 @@ if (typeof Two === 'undefined') {
   </div>
 </section>
 
-<!-- ================= 5. RÉSZ: ISMÉTLÉS NÉLKÜLI KOMBINÁCIÓ ================= -->
+<!-- ================= 6. RÉSZ: ISMÉTLÉS NÉLKÜLI KOMBINÁCIÓ ================= -->
 <section class="anim-section" id="comb-no-rep">
-  <h2>5. Ismétlés nélküli kombináció: n elemből k kiválasztása, a sorrend nem számít</h2>
+  <h2>6. Ismétlés nélküli kombináció: n elemből k kiválasztása, a sorrend nem számít</h2>
   <div class="layout">
     <div class="plot-container">
       <div id="canvas-comb" style="width:100%; height:auto;"></div>
@@ -703,9 +761,9 @@ if (typeof Two === 'undefined') {
   </div>
 </section>
 
-<!-- ================= 6. RÉSZ: ISMÉTLÉSES KOMBINÁCIÓ ================= -->
+<!-- ================= 7. RÉSZ: ISMÉTLÉSES KOMBINÁCIÓ ================= -->
 <section class="anim-section" id="comb-rep">
-  <h2>6. Ismétléses kombináció: golyók és falak modellje (fagyis tölcsérek)</h2>
+  <h2>7. Ismétléses kombináció: golyók és falak modellje (fagyis tölcsérek)</h2>
   <div class="layout">
     <div class="plot-container">
       <div id="canvas-combrep" style="width:100%; height:auto;"></div>
@@ -765,9 +823,9 @@ if (typeof Two === 'undefined') {
   </div>
 </section>
 
-<!-- ================= 7. RÉSZ: ÖSSZEFOGLALÓ DÖNTÉSI MÁTRIX ÉS GYAKORLÓ FELADATOK ================= -->
+<!-- ================= 8. RÉSZ: ÖSSZEFOGLALÓ DÖNTÉSI MÁTRIX ÉS GYAKORLÓ FELADATOK ================= -->
 <section class="anim-section" id="matrix-gyakorlas">
-  <h2>7. Összefoglaló döntési mátrix és feladatfelismerő gyakorlás</h2>
+  <h2>8. Összefoglaló döntési mátrix és feladatfelismerő gyakorlás</h2>
 
   <p style="font-size:0.95rem; color:var(--muted); margin:0 0 16px;">
     A döntési mátrix és a gyakorló feladatok a hivatalos középiskolai tankönyvek (OH-MAT09TA, OH-MAT11TA, OH-MAT12TA) és a Négyjegyű függvénytáblázat (OH-FGV912GY 12–14. oldal) tananyagát, jelöléseit és az érettségi vizsgák klasszikus típusfeladatait dolgozzák fel.
@@ -793,6 +851,14 @@ if (typeof Two === 'undefined') {
           <td><span class="badge badge-warn">Nem</span></td>
           <td>P<sub>n</sub> = n!</td>
           <td>Könyvek sorrendje a polcon</td>
+        </tr>
+        <tr>
+          <td><strong>Ciklikus permutáció</strong></td>
+          <td><span class="badge badge-ok">Igen</span> (körkörös)</td>
+          <td>Igen (k = n)</td>
+          <td><span class="badge badge-warn">Nem</span> (zárt kör)</td>
+          <td>P<sub>ciklikus</sub> = (n − 1)!</td>
+          <td>Kerek asztal körül leülés, nyaklánc</td>
         </tr>
         <tr>
           <td><strong>Ismétléses permutáció</strong></td>
@@ -877,6 +943,7 @@ if (typeof Two === 'undefined') {
           <select id="quiz-method-select" style="width:100%; padding:8px 12px; font:inherit; font-size:0.95rem; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg);">
             <option value="">Válassz módszert...</option>
             <option value="perm_norep">Ismétlés nélküli permutáció</option>
+            <option value="perm_cyclic">Ciklikus permutáció</option>
             <option value="perm_rep">Ismétléses permutáció</option>
             <option value="vari_norep">Ismétlés nélküli variáció</option>
             <option value="vari_rep">Ismétléses variáció</option>
@@ -984,7 +1051,6 @@ function createTwo(containerId, W, H) {
 
 // ================= 1. ISMÉTLÉS NÉLKÜLI PERMUTÁCIÓ =================
 let permN = 4;
-let permCyclic = false;
 let permStep = 0;
 let permOrder = [0, 1, 2, 3];
 let twoPerm = null;
@@ -1003,35 +1069,22 @@ function getPermutations(arr) {
 }
 
 function updatePermUI() {
-  const total = permCyclic ? fact(permN - 1) : fact(permN);
+  const total = fact(permN);
   document.getElementById('perm-n-val').textContent = permN;
   document.getElementById('perm-list-count').textContent = total;
 
-  if (permCyclic) {
-    document.getElementById('perm-formula').innerHTML = 'P<sub>ciklikus</sub> = (n − 1)!';
-    document.getElementById('perm-calc').innerHTML = `P<sub>ciklikus</sub> = (${permN} − 1)! = ${permN - 1}! = ${total}`;
-    document.getElementById('perm-desc').textContent = 
-      'Körben ülés esetén n lehetséges elforgatás ugyanazt az ülésrendet eredményezi, mivel csak az egymáshoz viszonyított relatív elhelyezkedés számít. Ezért n-nel osztunk: n! / n = (n − 1)!.';
-  } else {
-    let mul = [];
-    for (let i = permN; i >= 1; i--) mul.push(i);
-    document.getElementById('perm-formula').innerHTML = 'P<sub>n</sub> = n! = n · (n − 1) · … · 2 · 1';
-    document.getElementById('perm-calc').innerHTML = `P<sub>${permN}</sub> = ${permN}! = ${mul.join(' · ')} = ${total}`;
-    document.getElementById('perm-desc').textContent = 
-      'Az 1. pozícióra még n elem közül választhatunk, a 2. helyre már csak (n − 1) marad, és így tovább az utolsó egyetlen elemig. A szorzási szabály miatt a lehetőségek száma n!.';
-  }
+  let mul = [];
+  for (let i = permN; i >= 1; i--) mul.push(i);
+  document.getElementById('perm-formula').innerHTML = 'P<sub>n</sub> = n! = n · (n − 1) · … · 2 · 1';
+  document.getElementById('perm-calc').innerHTML = `P<sub>${permN}</sub> = ${permN}! = ${mul.join(' · ')} = <strong>${total}</strong>`;
+  document.getElementById('perm-desc').textContent = 
+    'Az 1. pozícióra még n elem közül választhatunk, a 2. helyre már csak (n − 1) marad, és így tovább az utolsó egyetlen elemig. A szorzási szabály miatt a lehetőségek száma n!.';
 
   // Permutációk listája
   const baseArr = LETTERS.slice(0, permN);
   const allPerms = getPermutations(baseArr);
   const listEl = document.getElementById('perm-list');
-  if (permCyclic) {
-    // Csak a fix kezdőeleműeket listázzuk
-    const fixed = allPerms.filter(p => p[0] === baseArr[0]);
-    listEl.innerHTML = fixed.map((p, idx) => `${idx + 1}. (${p.join(' – ')})`).join('<br>');
-  } else {
-    listEl.innerHTML = allPerms.map((p, idx) => `${idx + 1}. ${p.join('')}`).join('<br>');
-  }
+  listEl.innerHTML = allPerms.map((p, idx) => `${idx + 1}. ${p.join('')}`).join('<br>');
 
   drawPerm();
 }
@@ -1042,125 +1095,80 @@ function drawPerm() {
   if (!twoPerm) twoPerm = createTwo('canvas-perm', W, H);
   twoPerm.clear();
 
-  if (permCyclic) {
-    // Körben ülés rajzolása
-    const cx = W / 2;
-    const cy = H / 2 + 10;
-    const r = 85;
+  // Lineáris sorba rendezés
+  const gap = W / (permN + 1);
 
-    // Asztal
-    const table = twoPerm.makeCircle(cx, cy, r - 25);
-    table.fill = 'var(--panel)';
-    table.stroke = 'var(--line)';
-    table.linewidth = 2;
+  // Felső medence (választható elemek)
+  const poolTitle = twoPerm.makeText('Kiválasztásra váró elemek:', 20, 25);
+  poolTitle.alignment = 'left';
+  poolTitle.fill = 'var(--muted)';
+  poolTitle.size = 13;
+  poolTitle.weight = 600;
 
-    const tableLabel = twoPerm.makeText('Kerek asztal', cx, cy);
-    tableLabel.fill = 'var(--muted)';
-    tableLabel.size = 14;
-    tableLabel.weight = 600;
+  for (let i = 0; i < permN; i++) {
+    const x = (i + 1) * gap;
+    const y = 65;
+    const isPlaced = (permStep > 0 && permOrder.slice(0, permStep).includes(i));
 
-    for (let i = 0; i < permN; i++) {
-      const angle = (i * 2 * Math.PI / permN) - Math.PI / 2;
-      const x = cx + r * Math.cos(angle);
-      const y = cy + r * Math.sin(angle);
-
-      const seatIdx = permOrder[i];
+    if (!isPlaced) {
       const circle = twoPerm.makeCircle(x, y, 22);
-      circle.fill = PALETTE[seatIdx];
+      circle.fill = PALETTE[i];
       circle.stroke = '#ffffff';
       circle.linewidth = 2;
 
-      const txt = twoPerm.makeText(LETTERS[seatIdx], x, y + 1);
+      const txt = twoPerm.makeText(LETTERS[i], x, y + 1);
       txt.fill = '#ffffff';
       txt.size = 15;
       txt.weight = 700;
-
-      if (i === 0) {
-        // Fixált kiindulási pont
-        const tag = twoPerm.makeText('Fix kezdőpont', x, y - 32);
-        tag.fill = 'var(--accent)';
-        tag.size = 12;
-        tag.weight = 700;
-      }
+    } else {
+      const circle = twoPerm.makeCircle(x, y, 22);
+      circle.fill = 'var(--panel)';
+      circle.stroke = 'var(--line)';
+      circle.linewidth = 1.5;
+      circle.dashes = [4, 4];
     }
-  } else {
-    // Lineáris sorba rendezés
-    const gap = W / (permN + 1);
+  }
 
-    // Felső medence (választható elemek)
-    const poolTitle = twoPerm.makeText('Kiválasztásra váró elemek:', 20, 25);
-    poolTitle.alignment = 'left';
-    poolTitle.fill = 'var(--muted)';
-    poolTitle.size = 13;
-    poolTitle.weight = 600;
+  // Alsó rekeszek (1..n. helyek)
+  const slotTitle = twoPerm.makeText('Sorrend a pozíciókon (szorzási elv):', 20, 140);
+  slotTitle.alignment = 'left';
+  slotTitle.fill = 'var(--muted)';
+  slotTitle.size = 13;
+  slotTitle.weight = 600;
 
-    for (let i = 0; i < permN; i++) {
-      const x = (i + 1) * gap;
-      const y = 65;
-      const isPlaced = (permStep > 0 && permOrder.slice(0, permStep).includes(i));
+  for (let pos = 0; pos < permN; pos++) {
+    const x = (pos + 1) * gap;
+    const y = 195;
 
-      if (!isPlaced) {
-        const circle = twoPerm.makeCircle(x, y, 22);
-        circle.fill = PALETTE[i];
-        circle.stroke = '#ffffff';
-        circle.linewidth = 2;
+    const slot = twoPerm.makeRoundedRectangle(x, y, 54, 54, 8);
+    slot.fill = 'var(--panel)';
+    slot.stroke = (pos === permStep) ? 'var(--accent)' : 'var(--line)';
+    slot.linewidth = (pos === permStep) ? 2.5 : 1.5;
 
-        const txt = twoPerm.makeText(LETTERS[i], x, y + 1);
-        txt.fill = '#ffffff';
-        txt.size = 15;
-        txt.weight = 700;
-      } else {
-        const circle = twoPerm.makeCircle(x, y, 22);
-        circle.fill = 'var(--panel)';
-        circle.stroke = 'var(--line)';
-        circle.linewidth = 1.5;
-        circle.dashes = [4, 4];
-      }
-    }
+    const posLabel = twoPerm.makeText((pos + 1) + '. hely', x, y + 42);
+    posLabel.fill = 'var(--muted)';
+    posLabel.size = 11;
+    posLabel.weight = 600;
 
-    // Alsó rekeszek (1..n. helyek)
-    const slotTitle = twoPerm.makeText('Sorrend a pozíciókon (szorzási elv):', 20, 140);
-    slotTitle.alignment = 'left';
-    slotTitle.fill = 'var(--muted)';
-    slotTitle.size = 13;
-    slotTitle.weight = 600;
+    // Választási lehetőségek száma felirat
+    const choicesLeft = permN - pos;
+    const choicesLabel = twoPerm.makeText(choicesLeft + ' választás', x, y - 40);
+    choicesLabel.fill = (pos === permStep) ? 'var(--accent)' : 'var(--muted)';
+    choicesLabel.size = 11;
+    choicesLabel.weight = 700;
 
-    for (let pos = 0; pos < permN; pos++) {
-      const x = (pos + 1) * gap;
-      const y = 195;
+    // Ha már be van helyezve elem
+    if (pos < permStep || permStep === 0) {
+      const itemIdx = permOrder[pos];
+      const circle = twoPerm.makeCircle(x, y, 20);
+      circle.fill = PALETTE[itemIdx];
+      circle.stroke = '#ffffff';
+      circle.linewidth = 2;
 
-      const slot = twoPerm.makeRoundedRectangle(x, y, 54, 54, 8);
-      slot.fill = 'var(--panel)';
-      slot.stroke = (pos === permStep) ? 'var(--accent)' : 'var(--line)';
-      slot.linewidth = (pos === permStep) ? 2.5 : 1.5;
-
-      const posLabel = twoPerm.makeText((pos + 1) + '. hely', x, y + 42);
-      posLabel.fill = 'var(--muted)';
-      posLabel.size = 11;
-      posLabel.weight = 600;
-
-      // Választási lehetőségek száma felirat
-      const choicesLeft = permN - pos;
-      const choicesLabel = twoPerm.makeText(choicesLeft + ' választás', x, y - 40);
-      choicesLabel.fill = (pos === permStep) ? 'var(--accent)' : 'var(--muted)';
-      choicesLabel.size = 11;
-      choicesLabel.weight = 700;
-
-      // Ha már be van helyezve elem
-      if (pos < permStep || permStep === 0) {
-        const itemIdx = (permStep === 0) ? permOrder[pos] : permOrder[pos];
-        if (permStep > 0 || true) {
-          const circle = twoPerm.makeCircle(x, y, 20);
-          circle.fill = PALETTE[itemIdx];
-          circle.stroke = '#ffffff';
-          circle.linewidth = 2;
-
-          const txt = twoPerm.makeText(LETTERS[itemIdx], x, y + 1);
-          txt.fill = '#ffffff';
-          txt.size = 14;
-          txt.weight = 700;
-        }
-      }
+      const txt = twoPerm.makeText(LETTERS[itemIdx], x, y + 1);
+      txt.fill = '#ffffff';
+      txt.size = 14;
+      txt.weight = 700;
     }
   }
 
@@ -1173,13 +1181,6 @@ function initPermEvents() {
     permN = parseInt(this.value, 10);
     permStep = 0;
     permOrder = Array.from({ length: permN }, (_, i) => i);
-    updatePermUI();
-  });
-
-  const cyclicCb = document.getElementById('perm-cyclic-cb');
-  cyclicCb.addEventListener('change', function() {
-    permCyclic = this.checked;
-    permStep = 0;
     updatePermUI();
   });
 
@@ -1205,7 +1206,205 @@ function initPermEvents() {
   });
 }
 
-// ================= 2. ISMÉTLÉSES PERMUTÁCIÓ =================
+// ================= 2. CIKLIKUS PERMUTÁCIÓ =================
+let cyclicN = 5;
+let cyclicFlip = false;
+let cyclicOrder = [0, 1, 2, 3, 4];
+let cyclicRotation = 0;
+let twoCyclic = null;
+
+function updateCyclicUI() {
+  document.getElementById('cyclic-n-val').textContent = cyclicN;
+  const baseTotal = fact(cyclicN - 1);
+  const total = cyclicFlip ? Math.round(baseTotal / 2) : baseTotal;
+  document.getElementById('cyclic-list-count').textContent = total;
+
+  if (cyclicFlip) {
+    document.getElementById('cyclic-formula').innerHTML = 
+      'P<sub>nyaklánc</sub> = ' +
+      '<span class="frac"><span class="num">(n − 1)!</span><span class="den">2</span></span> = ' +
+      '<span class="frac"><span class="num">n!</span><span class="den">2n</span></span>';
+    document.getElementById('cyclic-calc').innerHTML = 
+      `P<sub>nyaklánc</sub> = <span class="frac"><span class="num">(${cyclicN} − 1)!</span><span class="den">2</span></span> = ` +
+      `<span class="frac"><span class="num">${fact(cyclicN - 1)}</span><span class="den">2</span></span> = <strong>${total}</strong>`;
+  } else {
+    document.getElementById('cyclic-formula').innerHTML = 
+      'P<sub>ciklikus</sub> = (n − 1)! = ' +
+      '<span class="frac"><span class="num">n!</span><span class="den">n</span></span>';
+    document.getElementById('cyclic-calc').innerHTML = 
+      `P<sub>ciklikus</sub> = (${cyclicN} − 1)! = ${cyclicN - 1}! = <strong>${total}</strong>`;
+  }
+
+  // Lista generálása: A rögzített elem (A) utáni permutációk
+  const remElements = LETTERS.slice(1, cyclicN);
+  const remPerms = getPermutations(remElements);
+
+  if (cyclicFlip) {
+    // Csak a nem tükrös párok felét listázzuk
+    const canonical = [];
+    const seen = new Set();
+    for (const p of remPerms) {
+      const full = ['A'].concat(p);
+      const str = full.join(' – ');
+      const rev = ['A'].concat([...p].reverse()).join(' – ');
+      if (!seen.has(str) && !seen.has(rev)) {
+        canonical.push(str);
+        seen.add(str);
+        seen.add(rev);
+      }
+    }
+    document.getElementById('cyclic-list').innerHTML = 
+      canonical.map((c, idx) => `${idx + 1}. (${c})`).join('<br>');
+  } else {
+    document.getElementById('cyclic-list').innerHTML = 
+      remPerms.map((p, idx) => `${idx + 1}. (A – ${p.join(' – ')})`).join('<br>');
+  }
+
+  drawCyclic();
+}
+
+function drawCyclic() {
+  const W = 700;
+  const H = 300;
+  if (!twoCyclic) twoCyclic = createTwo('canvas-cyclic', W, H);
+  twoCyclic.clear();
+
+  const cx = 220;
+  const cy = 150;
+  const r = 85;
+
+  // Asztal / kör
+  const table = twoCyclic.makeCircle(cx, cy, r - 25);
+  table.fill = 'var(--panel)';
+  table.stroke = 'var(--line)';
+  table.linewidth = 2;
+
+  const tLabel = twoCyclic.makeText('Kerek asztal', cx, cy - 8);
+  tLabel.fill = 'var(--muted)';
+  tLabel.size = 13;
+  tLabel.weight = 700;
+
+  const tSub = twoCyclic.makeText('zárt kör', cx, cy + 12);
+  tSub.fill = 'var(--muted)';
+  tSub.size = 11;
+
+  // Helyek rajzolása
+  for (let i = 0; i < cyclicN; i++) {
+    const angle = ((i + cyclicRotation) * 2 * Math.PI / cyclicN) - Math.PI / 2;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+
+    const elemIdx = cyclicOrder[i];
+    const isAnchor = (elemIdx === 0);
+
+    const seat = twoCyclic.makeCircle(x, y, 20);
+    seat.fill = PALETTE[elemIdx];
+    seat.stroke = isAnchor ? 'var(--accent)' : '#ffffff';
+    seat.linewidth = isAnchor ? 3.5 : 2;
+
+    const txt = twoCyclic.makeText(LETTERS[elemIdx], x, y + 1);
+    txt.fill = '#ffffff';
+    txt.size = 14;
+    txt.weight = 700;
+
+    if (isAnchor) {
+      const ax = cx + (r + 34) * Math.cos(angle);
+      const ay = cy + (r + 34) * Math.sin(angle);
+      const aTag = twoCyclic.makeText('Rögzített horgony (A)', ax, ay);
+      aTag.fill = 'var(--accent)';
+      aTag.size = 11;
+      aTag.weight = 700;
+    }
+  }
+
+  // Jobb oldal: Forgatási ekvivalencia bemutatása
+  const rightX = 520;
+  const rightY = 150;
+  const rightW = 310;
+  const rightH = 250;
+
+  const rBox = twoCyclic.makeRoundedRectangle(rightX, rightY, rightW, rightH, 12);
+  rBox.fill = 'var(--panel)';
+  rBox.stroke = 'var(--line)';
+  rBox.linewidth = 1.5;
+
+  const rTitle = twoCyclic.makeText('Azonos elforgatások (n db):', rightX, rightY - 95);
+  rTitle.fill = 'var(--fg)';
+  rTitle.size = 12;
+  rTitle.weight = 700;
+
+  // Kiírjuk a jelenlegi körsorrend n különböző elforgatását egyenes szakaszként
+  const curElements = cyclicOrder.map(i => LETTERS[i]);
+  const dispN = Math.min(cyclicN, 5);
+  for (let shift = 0; shift < dispN; shift++) {
+    const rotated = curElements.slice(shift).concat(curElements.slice(0, shift));
+    const sy = rightY - 65 + shift * 26;
+    const isCur = (shift === (cyclicRotation % cyclicN + cyclicN) % cyclicN);
+
+    const strTxt = twoCyclic.makeText(
+      `${shift + 1}. forgatás: ${rotated.join(' – ')}`,
+      rightX, sy
+    );
+    strTxt.fill = isCur ? 'var(--accent)' : 'var(--muted)';
+    strTxt.size = 12;
+    strTxt.weight = isCur ? 700 : 500;
+  }
+
+  const rFoot1 = twoCyclic.makeText(
+    `Ez a(z) ${cyclicN} egyenes sorrend a körben`,
+    rightX, rightY + 76
+  );
+  rFoot1.fill = 'var(--ok)';
+  rFoot1.size = 11;
+  rFoot1.weight = 600;
+
+  const rFoot2 = twoCyclic.makeText(
+    'egyetlen ülésrendet jelent (osztás n-nel)',
+    rightX, rightY + 94
+  );
+  rFoot2.fill = 'var(--ok)';
+  rFoot2.size = 11;
+  rFoot2.weight = 600;
+
+  twoCyclic.update();
+}
+
+function initCyclicEvents() {
+  const nSlider = document.getElementById('cyclic-n');
+  nSlider.addEventListener('input', function() {
+    cyclicN = parseInt(this.value, 10);
+    cyclicOrder = Array.from({ length: cyclicN }, (_, i) => i);
+    cyclicRotation = 0;
+    updateCyclicUI();
+  });
+
+  document.getElementById('cyclic-flip-cb').addEventListener('change', function() {
+    cyclicFlip = this.checked;
+    updateCyclicUI();
+  });
+
+  document.getElementById('cyclic-rotate-btn').addEventListener('click', function() {
+    cyclicRotation = (cyclicRotation + 1) % cyclicN;
+    document.getElementById('cyclic-info').textContent = 
+      `Elforgatva ${cyclicRotation} hellyel: a szomszédsági viszonyok változatlanok maradnak`;
+    drawCyclic();
+  });
+
+  document.getElementById('cyclic-shuffle-btn').addEventListener('click', function() {
+    // Rögzítjük az A elemet a 0. indexen, a maradék n-1 elemet keverjük
+    const rem = Array.from({ length: cyclicN - 1 }, (_, i) => i + 1);
+    for (let i = rem.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [rem[i], rem[j]] = [rem[j], rem[i]];
+    }
+    cyclicOrder = [0].concat(rem);
+    cyclicRotation = 0;
+    document.getElementById('cyclic-info').textContent = 'Új körsorrend beállítva (A horgony rögzítve)';
+    drawCyclic();
+  });
+}
+
+// ================= 3. ISMÉTLÉSES PERMUTÁCIÓ =================
 let permRepWord = 'ALMA';
 let permRepIndexed = false;
 let twoPermRep = null;
@@ -1373,7 +1572,7 @@ function initPermRepEvents() {
   });
 }
 
-// ================= 3. ISMÉTLÉS NÉLKÜLI VARIÁCIÓ =================
+// ================= 4. ISMÉTLÉS NÉLKÜLI VARIÁCIÓ =================
 let variN = 5;
 let variK = 3;
 let variDrawn = [0, 1, 2];
@@ -1574,7 +1773,7 @@ function initVariEvents() {
   });
 }
 
-// ================= 4. ISMÉTLÉSES VARIÁCIÓ =================
+// ================= 5. ISMÉTLÉSES VARIÁCIÓ =================
 let variRepN = 3;
 let variRepK = 3;
 let variRepCode = [0, 1, 2];
@@ -1729,7 +1928,7 @@ function initVariRepEvents() {
   });
 }
 
-// ================= 5. ISMÉTLÉS NÉLKÜLI KOMBINÁCIÓ =================
+// ================= 6. ISMÉTLÉS NÉLKÜLI KOMBINÁCIÓ =================
 let combN = 5;
 let combK = 3;
 let combSelected = [0, 1, 2];
@@ -1927,7 +2126,7 @@ function initCombEvents() {
   });
 }
 
-// ================= 6. ISMÉTLÉSES KOMBINÁCIÓ =================
+// ================= 7. ISMÉTLÉSES KOMBINÁCIÓ =================
 let combRepN = 3;
 let combRepK = 4;
 let combRepDist = [2, 1, 1]; // scoops per flavor
@@ -2113,8 +2312,28 @@ function randomizeCombRepDist() {
   }
 }
 
-// ================= 7. FELADATFELISMERŐ GYAKORLÁS =================
+// ================= 8. FELADATFELISMERŐ GYAKORLÁS =================
 const QUIZ_QUESTIONS = [
+  {
+    q: '6 barát leül egy kerek asztal köré vacsorázni. Hány különböző ülésrend alakulhat ki, ha az elforgatással egymásba vihető ültetéseket azonosnak tekintjük?',
+    order: 'yes',
+    all: 'yes',
+    rep: 'no',
+    method: 'perm_cyclic',
+    n: 6, k: 6,
+    calc: 'P_ciklikus = (6 − 1)! = 5! = 120',
+    desc: 'Körbe rendezés esetén nincs kitüntetett első hely. Egy embert leültetve rögzítünk, a maradék 5 embert a megmaradt 5 helyre 5! = 120-féleképpen ültethetjük le (OH-MAT912AE emelt szintű tankönyv, 87. oldal).'
+  },
+  {
+    q: 'Hányféle különböző nyaklánc készíthető 7 különböző színű gyöngy felfűzésével, ha a nyaklánc a térben átfordítható?',
+    order: 'yes',
+    all: 'yes',
+    rep: 'no',
+    method: 'perm_cyclic',
+    n: 7, k: 7,
+    calc: '(7 − 1)! / 2 = 6! / 2 = 720 / 2 = 360',
+    desc: 'A gyöngyök zárt kört alkotnak ((7 − 1)! = 6! = 720). Mivel a nyaklánc a térben megfordítható (tükrözhető), az óramutató járásával egyező és ellentétes körüljárási irány ugyanazt a nyakláncot adja, így 2-vel osztunk (OH-MAT1112BE emelt szintű gyűjtemény).'
+  },
   {
     q: 'Egy 30 fős osztályban elnököt, titkárt és jegyzőt választanak. Hányféle kimenetel lehetséges?',
     order: 'yes',
@@ -2288,6 +2507,7 @@ function checkQuiz() {
 function getMethodName(val) {
   const map = {
     'perm_norep': 'Ismétlés nélküli permutáció',
+    'perm_cyclic': 'Ciklikus permutáció',
     'perm_rep': 'Ismétléses permutáció',
     'vari_norep': 'Ismétlés nélküli variáció',
     'vari_rep': 'Ismétléses variáció',
@@ -2312,6 +2532,9 @@ function initQuizEvents() {
 window.addEventListener('DOMContentLoaded', function() {
   updatePermUI();
   initPermEvents();
+
+  updateCyclicUI();
+  initCyclicEvents();
 
   updatePermRepUI();
   initPermRepEvents();
