@@ -11,7 +11,7 @@
     "href": "animaciok.html#matematika",
     "title": "Animációk",
     "section": "Matematika",
-    "text": "Matematika\nMásodfokú egyenletek\nGrafikus megoldás, teljes négyzetté alakítás geometriai területekkel, a megoldóképlet levezetése, valamint a gyöktényezős alak és a Viète-formulák összefüggései.\nSzögfüggvények\nA szögfüggvények bevezetése a derékszögű háromszögben, kiterjesztésük az egységkörön, szinusz és koszinusz hullámok valós idejű kirajzolása, valamint a nevezetes hegyesszögek.\nA kör kerülete\nA kör cikkekre darabolása és átrendezése téglalappá, a kerület kiterítése a számegyenesen, valamint Arkhimédész közelítése szabályos sokszögekkel.\nÖsszeszámlálási módszerek\nLineáris és ciklikus permutáció, ismétléses permutáció, variáció és kombináció (ismétléses és ismétlés nélküli esetek), nyaklánc-modell, golyók és falak elve, összefoglaló döntési mátrix és feladatfelismerő gyakorlás."
+    "text": "Matematika\nMásodfokú egyenletek\nGrafikus megoldás, teljes négyzetté alakítás geometriai területekkel, a megoldóképlet levezetése, valamint a gyöktényezős alak és a Viète-formulák összefüggései.\nSzögfüggvények\nA szögfüggvények bevezetése a derékszögű háromszögben, kiterjesztésük az egységkörön, szinusz és koszinusz hullámok valós idejű kirajzolása, valamint a nevezetes hegyesszögek.\nA kör kerülete\nA kör cikkekre darabolása és átrendezése téglalappá, a kerület kiterítése a számegyenesen, valamint Arkhimédész közelítése szabályos sokszögekkel.\nÖsszeszámlálási módszerek\nPermutáció, variáció és kombináció."
   },
   {
     "objectID": "animaciok.html#informatika",
@@ -60,7 +60,7 @@
     "href": "en/animations.html#mathematics",
     "title": "Animations",
     "section": "Mathematics",
-    "text": "Mathematics\nQuadratic Equations\nGraphical solution, completing the square with geometric areas, algebraic derivation of the quadratic formula, factored form, and Viète formulas.\nTrigonometric Functions\nTrigonometric ratios in right-angled triangles, extension to the unit circle (0°–360°), real-time sine and cosine wave generation, and special angles.\nCircumference of a Circle\nSlicing the circle into sectors and rearranging into a rectangle, unrolling the circle along a number line, and Archimedes’ polygon approximation.\nCounting Methods\nLinear and cyclic permutations, permutations with repetition, variations and combinations (with and without repetition), necklace model, stars and bars principle, decision matrix, and practice problems."
+    "text": "Mathematics\nQuadratic Equations\nGraphical solution, completing the square with geometric areas, algebraic derivation of the quadratic formula, factored form, and Viète formulas.\nTrigonometric Functions\nTrigonometric ratios in right-angled triangles, extension to the unit circle (0°–360°), real-time sine and cosine wave generation, and special angles.\nCircumference of a Circle\nSlicing the circle into sectors and rearranging into a rectangle, unrolling the circle along a number line, and Archimedes’ polygon approximation.\nCounting Methods\nPermutations, variations, and combinations."
   },
   {
     "objectID": "en/animations.html#informatics",
