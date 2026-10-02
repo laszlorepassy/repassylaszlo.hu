@@ -385,8 +385,13 @@ if (typeof Two === 'undefined') {
 
 <header>
   <h1>Összeszámlálási módszerek a középiskolában</h1>
+  <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+    <span class="badge badge-accent">NAT 2020 tanterv</span>
+    <span class="badge badge-ok">OH-MAT09TA • OH-MAT11TA • OH-MAT12TA</span>
+    <span class="badge badge-warn">Négyjegyű függvénytáblázat (OH-FGV912GY, 12–14. oldal)</span>
+  </div>
   <p class="intro-lead">
-    A kombinatorika alapjai: permutáció, variáció és kombináció. A módszer kiválasztásához mindössze három alapkérdést kell tisztázni: számít-e az elemek sorrendje, minden elemet felhasználunk-e, és megengedett-e az ismétlődés.
+    A középiskolai kombinatorika teljes tananyaga a 9–12. évfolyamos tankönyvek és a hivatalos érettségi függvénytáblázat alapján: permutáció, variáció és kombináció (ismétléses és ismétlés nélküli esetek), a rekeszek és fiókok modellje, a golyók és falak elve, valamint az összefoglaló feladatfelismerő tréner.
   </p>
 </header>
 
@@ -434,6 +439,9 @@ if (typeof Two === 'undefined') {
         <p style="font-size:0.95rem; margin:8px 0 0;" id="perm-desc">
           Az 1. pozícióra még n elem közül választhatunk, a 2. helyre már csak (n − 1) marad, és így tovább az utolsó egyetlen elemig. A szorzási szabály miatt a lehetőségek száma n! (n faktoriális).
         </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-MAT09TA 1. lecke (8. oldal), OH-MAT11TA 17. lecke (52. oldal), OH-MAT12TA 110. oldal (rekeszek és tálcák modell, tornapadon ülők, könyvek sorrendje, táncoló párok).
+        </div>
       </div>
 
       <div class="panel">
@@ -493,6 +501,9 @@ if (typeof Two === 'undefined') {
         <p style="font-size:0.95rem; margin:8px 0 0;" id="permrep-desc">
           Ha a betűk mind különböznének (pl. A₁, L, M, A₂), akkor 4! = 24 sorrend lenne. Mivel a két darab A betű 2! féle felcserélése ugyanazt a szót eredményezi, a 24-et el kell osztani 2!-sal.
         </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-FGV912GY 13. oldal, OH-MAT912AE (Emelt szintű gyűjtemény). Azonos betűkből vagy golyókból álló sorozatok (pl. ANANÁSZ, ALMA).
+        </div>
       </div>
 
       <div class="panel">
@@ -550,6 +561,9 @@ if (typeof Two === 'undefined') {
         <p style="font-size:0.95rem; margin:8px 0 0;" id="vari-desc">
           Példa: 5 versenyző közül az arany-, ezüst- és bronzérmes helyek kiosztása. Az 1. helyre még 5 jelölt van, a 2. helyre 4, a 3. helyre 3. A sorrend számít (nem mindegy, ki az aranyérmes), és egy versenyző csak egy érmet kaphat.
         </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-MAT12TA 110. oldal, OH-MAT11TA 16. lecke (50. oldal), OH-FGV912GY 13. oldal (8 versenyző dobogósai: 8 · 7 · 6 = 336, jelszavak rekeszekkel).
+        </div>
       </div>
 
       <div class="panel">
@@ -607,6 +621,9 @@ if (typeof Two === 'undefined') {
         <p style="font-size:0.95rem; margin:8px 0 0;">
           Minden egyes pozícióra (tárcsára) a teljes, n elemű készletből választhatunk, az előző választások nem korlátozzák a következőt. Ezért minden lépésben n szorzótényező szerepel.
         </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-MAT09TA 2. lecke (Számzárak), OH-MAT12TA 110. oldal, OH-FGV912GY 13. oldal (3 kockadobás sorrendje: 6³ = 216, 4 jegyű PIN kód: 10⁴, TOTÓ: 3¹³).
+        </div>
       </div>
 
       <div class="panel">
@@ -673,6 +690,9 @@ if (typeof Two === 'undefined') {
         <p style="font-size:0.95rem; margin:8px 0 0;" id="comb-desc">
           Miért osztunk k!-sal? Ha a sorrend számítana (variáció), 60 eset lenne. De a kiválasztott 3 elem (pl. A, B, C) bármelyik belső átrendezése (ABC, ACB, BAC, BCA, CAB, CBA, azaz 3! = 6 sorrend) ugyanazt az egyetlen csapatot alkotja. Ezért a variációk számát el kell osztani k!-sal.
         </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-MAT11TA 18–19. lecke (54–56. oldal), OH-MAT12TA 110. oldal, OH-FGV912GY 14. oldal (8 gyerekből 3 fős csoport: (8 alatt a 3) = 56, Ötöslottó: (90 alatt az 5), kézfogások: (n alatt a 2)).
+        </div>
       </div>
 
       <div class="panel">
@@ -732,6 +752,9 @@ if (typeof Two === 'undefined') {
         <p style="font-size:0.95rem; margin:8px 0 0;" id="combrep-desc">
           Miért n + k − 1 elemből választunk? A k darab gombócot n darab rekeszbe kell szétosztanunk. A rekeszek elválasztásához pontosan (n − 1) darab falra van szükség. Ha a k darab golyót és az (n − 1) darab falat egymás mellé tesszük, összesen k + n − 1 pozíció keletkezik. Ebből a k + n − 1 helyből kell kiválasztani a k golyó helyét, ami egy közönséges ismétlés nélküli kombináció.
         </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-MAT11TA 2. fejezet bevezető, OH-FGV912GY 14. oldal (fagylaltválasztás, dobozokba helyezés, golyók és falak elve).
+        </div>
       </div>
 
       <div class="panel">
@@ -745,6 +768,10 @@ if (typeof Two === 'undefined') {
 <!-- ================= 7. RÉSZ: ÖSSZEFOGLALÓ DÖNTÉSI MÁTRIX ÉS GYAKORLÓ TRÉNER ================= -->
 <section class="anim-section" id="matrix-trainer">
   <h2>7. Összefoglaló döntési mátrix és feladatfelismerő tréner</h2>
+
+  <p style="font-size:0.95rem; color:var(--muted); margin:0 0 16px;">
+    A döntési mátrix és a tréner feladatai a hivatalos középiskolai tankönyvek (OH-MAT09TA, OH-MAT11TA, OH-MAT12TA) és a Négyjegyű függvénytáblázat (OH-FGV912GY 12–14. oldal) tananyagát, jelöléseit és az érettségi vizsgák klasszikus típusfeladatait dolgozzák fel.
+  </p>
 
   <div class="table-wrap">
     <table class="matrix-table">
