@@ -288,7 +288,12 @@ input[type=range] {
   align-items: center;
 }
 </style>
-<script src="two.min.js"></script>
+<script src="two.min.js?v=0.8.14"></script>
+<script>
+if (typeof Two === 'undefined') {
+  document.write('<script src="https://cdn.jsdelivr.net/npm/two.js@0.8.14/build/two.min.js"><\/script>');
+}
+</script>
 </head>
 <body>
 
