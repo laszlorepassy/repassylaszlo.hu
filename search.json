@@ -4,21 +4,21 @@
     "href": "animaciok.html",
     "title": "Animációk",
     "section": "",
-    "text": "Interaktív matematikai és informatikai animációk a fogalmak és összefüggések szemléltetéséhez."
+    "text": "Interaktív matematikai és informatikai animációk."
   },
   {
     "objectID": "animaciok.html#matematika",
     "href": "animaciok.html#matematika",
     "title": "Animációk",
     "section": "Matematika",
-    "text": "Matematika\nMásodfokú egyenletek\nGrafikus megoldás, teljes négyzetté alakítás geometriai területekkel, a megoldóképlet levezetése, valamint a gyöktényezős alak és a Viète-formulák összefüggései.\nSzögfüggvények\nA szögfüggvények bevezetése a derékszögű háromszögben, kiterjesztésük az egységkörön, szinusz és koszinusz hullámok valós idejű kirajzolása, valamint a nevezetes hegyesszögek.\nA kör kerülete\nMiért K = 2 · π · r? A kör cikkekre darabolása és átrendezése téglalappá, a kerület kiterítése a számegyenesen, valamint Arkhimédész közelítése szabályos sokszögekkel.\nÖsszeszámlálási módszerek\nLineáris és ciklikus permutáció, ismétléses permutáció, variáció és kombináció (ismétléses és ismétlés nélküli esetek), nyaklánc-modell, golyók és falak elve, összefoglaló döntési mátrix és feladatfelismerő gyakorlás."
+    "text": "Matematika\nMásodfokú egyenletek\nGrafikus megoldás, teljes négyzetté alakítás geometriai területekkel, a megoldóképlet levezetése, valamint a gyöktényezős alak és a Viète-formulák összefüggései.\nSzögfüggvények\nA szögfüggvények bevezetése a derékszögű háromszögben, kiterjesztésük az egységkörön, szinusz és koszinusz hullámok valós idejű kirajzolása, valamint a nevezetes hegyesszögek.\nA kör kerülete\nA kör cikkekre darabolása és átrendezése téglalappá, a kerület kiterítése a számegyenesen, valamint Arkhimédész közelítése szabályos sokszögekkel.\nÖsszeszámlálási módszerek\nLineáris és ciklikus permutáció, ismétléses permutáció, variáció és kombináció (ismétléses és ismétlés nélküli esetek), nyaklánc-modell, golyók és falak elve, összefoglaló döntési mátrix és feladatfelismerő gyakorlás."
   },
   {
     "objectID": "animaciok.html#informatika",
     "href": "animaciok.html#informatika",
     "title": "Animációk",
     "section": "Informatika",
-    "text": "Informatika\nProgramozási tételek\nAz elemi algoritmusok lépésről lépésre követhető szemléltetése a Folyáb példatára alapján: összegzés, megszámolás, eldöntés, kiválasztás, lineáris keresés, másolás, kiválogatás, szétválogatás, metszet, unió, maximum és minimum.\nAdatstruktúrák\nA középiskolában előforduló összes adatstruktúra: egy- és kétdimenziós tömbök, karakterláncok és szeletelés, rekordok és összetett típusok, verem (LIFO), sor (FIFO), halmazok és szótárak.\nSzámrendszerek és bináris számolás\nKettes (bináris), tízes (decimális) és tizenhatos (hexadecimális) számrendszerek, helyiértékes átváltások, oszlopos bináris összeadás és átvitel, kettes komplemens és bitenkénti műveletek."
+    "text": "Informatika\nFolyáb\nFolyamatábra alapú programozás és algoritmus-futtatás a böngészőben lépésről lépésre, animált nyomkövetéssel. Flowgorithm-kompatibilis.\nProgramozási tételek\nAz elemi algoritmusok lépésről lépésre követhető szemléltetése a Folyáb példatára alapján: összegzés, megszámolás, eldöntés, kiválasztás, lineáris keresés, másolás, kiválogatás, szétválogatás, metszet, unió, maximum és minimum.\nAdatstruktúrák\nA középiskolában előforduló összes adatstruktúra: egy- és kétdimenziós tömbök, karakterláncok és szeletelés, rekordok és összetett típusok, verem (LIFO), sor (FIFO), halmazok és szótárak.\nSzámrendszerek és bináris számolás\nKettes (bináris), tízes (decimális) és tizenhatos (hexadecimális) számrendszerek, helyiértékes átváltások, oszlopos bináris összeadás és átvitel, kettes komplemens és bitenkénti műveletek."
   },
   {
     "objectID": "legzogyakorlatok.html",
@@ -53,21 +53,21 @@
     "href": "en/animations.html",
     "title": "Animations",
     "section": "",
-    "text": "Interactive mathematics and computer science animations designed to illustrate key concepts and theorems."
+    "text": "Interactive mathematics and computer science animations."
   },
   {
     "objectID": "en/animations.html#mathematics",
     "href": "en/animations.html#mathematics",
     "title": "Animations",
     "section": "Mathematics",
-    "text": "Mathematics\nQuadratic Equations\nGraphical solution, completing the square with geometric areas, algebraic derivation of the quadratic formula, factored form, and Viète formulas.\nTrigonometric Functions\nTrigonometric ratios in right-angled triangles, extension to the unit circle (0°–360°), real-time sine and cosine wave generation, and special angles.\nCircumference of a Circle\nWhy is C = 2 · π · r? Slicing the circle into sectors and rearranging into a rectangle, unrolling the circle along a number line, and Archimedes’ polygon approximation.\nCounting Methods\nLinear and cyclic permutations, permutations with repetition, variations and combinations (with and without repetition), necklace model, stars and bars principle, decision matrix, and practice problems."
+    "text": "Mathematics\nQuadratic Equations\nGraphical solution, completing the square with geometric areas, algebraic derivation of the quadratic formula, factored form, and Viète formulas.\nTrigonometric Functions\nTrigonometric ratios in right-angled triangles, extension to the unit circle (0°–360°), real-time sine and cosine wave generation, and special angles.\nCircumference of a Circle\nSlicing the circle into sectors and rearranging into a rectangle, unrolling the circle along a number line, and Archimedes’ polygon approximation.\nCounting Methods\nLinear and cyclic permutations, permutations with repetition, variations and combinations (with and without repetition), necklace model, stars and bars principle, decision matrix, and practice problems."
   },
   {
     "objectID": "en/animations.html#informatics",
     "href": "en/animations.html#informatics",
     "title": "Animations",
     "section": "Informatics",
-    "text": "Informatics\nBasic Algorithms\nStep-by-step visual exploration of classic programming theorems: summation, counting, decision, selection, linear search, copy, filter, partition, intersection, union, maximum, and minimum.\nData Structures\nEssential secondary school data structures: 1D and 2D arrays, strings and slicing, records and composite types, stack (LIFO), queue (FIFO), sets, and dictionaries.\nNumber Systems and Binary Arithmetic\nBinary, decimal, and hexadecimal number systems, base conversions, column-by-column binary addition with carry, two’s complement representation, and bitwise operations."
+    "text": "Informatics\nFolyab\nFlowchart-based programming and algorithm execution in the browser step by step, with animated tracing. Flowgorithm-compatible.\nBasic Algorithms\nStep-by-step visual exploration of classic programming theorems: summation, counting, decision, selection, linear search, copy, filter, partition, intersection, union, maximum, and minimum.\nData Structures\nEssential secondary school data structures: 1D and 2D arrays, strings and slicing, records and composite types, stack (LIFO), queue (FIFO), sets, and dictionaries.\nNumber Systems and Binary Arithmetic\nBinary, decimal, and hexadecimal number systems, base conversions, column-by-column binary addition with carry, two’s complement representation, and bitwise operations."
   },
   {
     "objectID": "index.html",
