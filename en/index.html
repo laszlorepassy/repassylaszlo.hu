@@ -98,9 +98,7 @@ ul.task-list li input[type="checkbox"] {
   document.addEventListener("DOMContentLoaded", function () {
     var items = [
       { text: "Home", href: "index.html" },
-      { text: "Breathing exercises", href: "breathing-exercises.html" },
       { text: "My apps", href: "index.html#my-apps" },
-      { text: "Animations", href: "animations.html" },
     ];
 
     // A jelenlegi oldal fájlneve; a kezdőlap "/en/" alakban is érkezhet.
@@ -160,20 +158,16 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Kezdőlap</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../legzogyakorlatok.html"> 
-<span class="menu-text">Légzőgyakorlatok</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../estimatek-2026.html"> 
-<span class="menu-text">Esti matek</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="../index.html#programjaim"> 
 <span class="menu-text">Programjaim</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../animaciok.html"> 
-<span class="menu-text">Animációk</span></a>
+    <a class="nav-link" href="../olvasnivalok.html"> 
+<span class="menu-text">Olvasnivalók</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../estimatek-2026.html"> 
+<span class="menu-text">Esti matek</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -278,7 +272,6 @@ teacher of informatics and mathematics
 <section id="links" class="level3">
 <h3 data-anchor-id="links">Links</h3>
 <ul>
-<li><a href="../en/animations.html">Animations (quadratic equations, basic algorithms, trigonometric functions, circle circumference)</a></li>
 <li><a href="https://verespg.hu/">Veres Péter Gimnázium, Békásmegyer</a> — the secondary school where I teach</li>
 <li><a href="../en/breathing-exercises.html">Breathing exercises (not just) for exam season</a></li>
 <li><a href="../en/project-week.html">Project week: game development in Python</a></li>
@@ -324,7 +317,6 @@ teacher of informatics and mathematics
     // [magyar oldal, angol oldal az en/ mappán belül]
     var pairs = [
       ["index.html", "index.html"],
-      ["animaciok.html", "animations.html"],
       ["legzogyakorlatok.html", "breathing-exercises.html"],
       ["projekthet.html", "project-week.html"],
     ];
