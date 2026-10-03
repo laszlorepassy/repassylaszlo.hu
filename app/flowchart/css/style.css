@@ -353,6 +353,7 @@ main { flex: 1; display: flex; min-height: 0; }
 .code-actions .btn { white-space: nowrap; }
 /* Code view: a line-number gutter and the highlighted code, scrolling together. */
 .code-view {
+  position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -364,6 +365,17 @@ main { flex: 1; display: flex; min-height: 0; }
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 12.5px;
   line-height: 1.5;
+}
+.code-line-highlight {
+  position: absolute;
+  left: 0;
+  min-width: 100%;
+  display: none;
+  pointer-events: none;
+  z-index: 4;
+  background: rgba(37, 99, 235, 0.12);
+  border-left: 3px solid var(--accent, #2563eb);
+  box-sizing: border-box;
 }
 .code-gutter, .code-output { margin: 0; padding: 10px; font: inherit; line-height: inherit; white-space: pre; }
 .code-gutter {
