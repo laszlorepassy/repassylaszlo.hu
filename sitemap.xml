@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://repassylaszlo.hu/projekthet.html</loc>
+    <loc>https://repassylaszlo.hu/index.html</loc>
+    <lastmod>2026-10-03T12:30:00.935Z</lastmod>
+  </url>
+  <url>
+    <loc>https://repassylaszlo.hu/legzogyakorlatok.html</loc>
     <lastmod>2026-10-03T09:27:24.781Z</lastmod>
   </url>
   <url>
-    <loc>https://repassylaszlo.hu/index.html</loc>
-    <lastmod>2026-10-03T11:51:24.556Z</lastmod>
-  </url>
-  <url>
-    <loc>https://repassylaszlo.hu/en/project-week.html</loc>
-    <lastmod>2026-10-03T09:27:24.745Z</lastmod>
+    <loc>https://repassylaszlo.hu/en/index.html</loc>
+    <lastmod>2026-10-03T12:30:00.795Z</lastmod>
   </url>
   <url>
     <loc>https://repassylaszlo.hu/en/breathing-exercises.html</loc>
@@ -25,15 +25,15 @@
     <lastmod>2026-10-03T11:56:47.775Z</lastmod>
   </url>
   <url>
-    <loc>https://repassylaszlo.hu/en/index.html</loc>
-    <lastmod>2026-10-03T11:51:29.740Z</lastmod>
+    <loc>https://repassylaszlo.hu/en/project-week.html</loc>
+    <lastmod>2026-10-03T09:27:24.745Z</lastmod>
   </url>
   <url>
     <loc>https://repassylaszlo.hu/estimatek-2026.html</loc>
     <lastmod>2026-10-03T11:54:14.315Z</lastmod>
   </url>
   <url>
-    <loc>https://repassylaszlo.hu/legzogyakorlatok.html</loc>
+    <loc>https://repassylaszlo.hu/projekthet.html</loc>
     <lastmod>2026-10-03T09:27:24.781Z</lastmod>
   </url>
 </urlset>
