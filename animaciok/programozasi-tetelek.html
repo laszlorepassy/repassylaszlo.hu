@@ -100,46 +100,54 @@ h1 {
   font-size: 0.95rem;
   margin-bottom: 16px;
 }
-.tabs-container {
+.toc {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
 }
-.tab-group-title {
+.toc-title {
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--muted);
   letter-spacing: 0.05em;
-  margin-top: 4px;
 }
-.tab-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.tab-btn {
-  font: inherit;
+.toc-group { display: flex; flex-direction: column; gap: 6px; }
+.toc-group-title { font-weight: 700; font-size: 0.95rem; }
+.toc-links { display: flex; flex-wrap: wrap; gap: 6px; }
+.toc-links a {
   font-size: 0.9rem;
   font-weight: 600;
-  cursor: pointer;
-  padding: 6px 14px;
+  padding: 5px 12px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: var(--panel);
+  background: var(--bg);
+  color: var(--accent);
+  text-decoration: none;
+}
+.toc-links a:hover { border-color: var(--accent); }
+.group-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--muted);
-  transition: all 0.15s ease;
+  margin: 40px 0 0;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--line);
 }
-.tab-btn:hover {
-  color: var(--fg);
-  border-color: var(--accent);
+.section-title {
+  font-size: 1.35rem;
+  margin: 28px 0 14px;
+  color: var(--accent);
+  scroll-margin-top: 12px;
 }
-.tab-btn[aria-selected="true"] {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
+.theorem + .theorem { margin-top: 12px; }
 main {
   max-width: 1240px;
   margin: 0 auto;
@@ -161,7 +169,7 @@ main {
   padding: 16px;
   margin-bottom: 16px;
 }
-.card h2 {
+.card h2, .card h3 {
   font-size: 1.05rem;
   margin: 0 0 10px;
   color: var(--muted);
@@ -439,64 +447,71 @@ main {
     Az elemi algoritmusok lépésről lépésre követhető, interaktív szemléltetése a <strong>Folyáb</strong> példatára alapján.
   </div>
 
-  <div class="tabs-container">
-    <div class="tab-group-title">1. Egy sorozat feldolgozása (elemi tételek)</div>
-    <div class="tab-row" role="tablist">
-      <button class="tab-btn" role="tab" aria-selected="true" data-t="summation">Összegzés</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-t="counting">Megszámolás</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-t="decision">Eldöntés</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-t="selection">Kiválasztás</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-t="linearSearch">Lineáris keresés</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-t="maximum">Maximumkiválasztás</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-t="minimum">Minimumkiválasztás</button>
+  <nav class="toc" aria-label="Tartalomjegyzék">
+    <div class="toc-title">Tartalomjegyzék</div>
+    <div class="toc-group">
+      <div class="toc-group-title">1. Egy sorozat feldolgozása (elemi tételek)</div>
+      <div class="toc-links">
+        <a href="#t-summation">Összegzés</a>
+        <a href="#t-counting">Megszámolás</a>
+        <a href="#t-decision">Eldöntés</a>
+        <a href="#t-selection">Kiválasztás</a>
+        <a href="#t-linearSearch">Lineáris keresés</a>
+        <a href="#t-maximum">Maximumkiválasztás</a>
+        <a href="#t-minimum">Minimumkiválasztás</a>
+      </div>
     </div>
-
-    <div class="tab-group-title" style="margin-top:6px;">2. Sorozatok másolása és szétválogatása</div>
-    <div class="tab-row" role="tablist">
-      <button class="tab-btn" role="tab" aria-selected="false" data-t="copy">Másolás</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-t="filter">Kiválogatás</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-t="partition">Szétválogatás</button>
+    <div class="toc-group">
+      <div class="toc-group-title">2. Sorozatok másolása és szétválogatása</div>
+      <div class="toc-links">
+        <a href="#t-copy">Másolás</a>
+        <a href="#t-filter">Kiválogatás</a>
+        <a href="#t-partition">Szétválogatás</a>
+      </div>
     </div>
-
-    <div class="tab-group-title" style="margin-top:6px;">3. Két sorozat összehasonlítása</div>
-    <div class="tab-row" role="tablist">
-      <button class="tab-btn" role="tab" aria-selected="false" data-t="intersection">Metszet</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-t="union">Unió</button>
+    <div class="toc-group">
+      <div class="toc-group-title">3. Két sorozat összehasonlítása</div>
+      <div class="toc-links">
+        <a href="#t-intersection">Metszet</a>
+        <a href="#t-union">Unió</a>
+      </div>
     </div>
-  </div>
+  </nav>
 </header>
 
-<main>
+<main id="theorems"></main>
+
+<template id="viewerTpl">
   <div class="app-grid">
     <!-- Bal oldal: Vizualizáció és vezérlés -->
     <div>
       <div class="card">
-        <h2>
-          <span id="visTitle">Tömb animáció</span>
-          <span id="stepCounter" style="font-size:0.85rem; font-weight:normal; color:var(--muted);">0. lépés</span>
-        </h2>
+        <h3>
+          <span data-r="visTitle">Tömb animáció</span>
+          <span data-r="stepCounter" style="font-size:0.85rem; font-weight:normal; color:var(--muted);">0. lépés</span>
+        </h3>
 
-        <div class="vis-area" id="visArea">
-          <div class="array-container" id="arrayContainer">
+        <div class="vis-area" data-r="visArea">
+          <div class="array-container" data-r="arrayContainer">
             <!-- Dinamikus tömbök -->
           </div>
         </div>
 
-        <div id="targetControls" class="target-input-wrap" style="display:none;">
-          <label>Keresett érték (ker): <input type="number" id="targetInput" value="12"></label>
-          <button class="btn" id="btnApplyTarget">Beállít</button>
+        <div data-r="targetControls" class="target-input-wrap" style="display:none;">
+          <label>Keresett érték (ker): <input type="number" data-r="targetInput" value="12"></label>
+          <button class="btn" data-r="btnApplyTarget">Beállít</button>
         </div>
 
         <div class="controls-bar">
-          <button class="btn btn-primary" id="btnPlay">▶ Lejátszás</button>
-          <button class="btn" id="btnPrev" title="Előző lépés">◀ Lépés</button>
-          <button class="btn" id="btnNext" title="Következő lépés">Lépés ▶</button>
-          <button class="btn" id="btnReset" title="Újra a kezdettől">↺ Újra</button>
-          <button class="btn" id="btnRandom" title="Új véletlen adatok">🎲 Új adatok</button>
+          <button class="btn btn-primary" data-r="btnPlay">▶ Lejátszás</button>
+          <button class="btn" data-r="btnPrev" title="Előző lépés">◀ Lépés</button>
+          <button class="btn" data-r="btnNext" title="Következő lépés">Lépés ▶</button>
+          <button class="btn" data-r="btnReset" title="Újra a kezdettől">↺ Újra</button>
+          <button class="btn" data-r="btnRandom" title="Új véletlen adatok">🎲 Új adatok</button>
 
           <div class="speed-wrap">
-            <label for="speedSelect">Sebesség:</label>
-            <select id="speedSelect">
+            <label >Sebesség:</label>
+            <select data-r="speedSelect">
               <option value="1200">0.5×</option>
               <option value="600" selected>1×</option>
               <option value="300">2×</option>
@@ -505,40 +520,40 @@ main {
           </div>
         </div>
 
-        <div class="preset-buttons" id="presetButtons">
+        <div class="preset-buttons" data-r="presetButtons">
           <!-- Dinamikus preset gombok az adott tételhez -->
         </div>
 
-        <div class="explanation-box" id="stepExplanation">
+        <div class="explanation-box" data-r="stepExplanation">
           Kattints a „Lejátszás” vagy „Lépés ▶” gombra az algoritmus futtatásához.
         </div>
       </div>
 
       <!-- Tétel elméleti leírása -->
       <div class="card">
-        <h2>A tétel feladata és lényege</h2>
-        <div class="theorem-desc" id="theoremDesc"></div>
+        <h3>A tétel feladata és lényege</h3>
+        <div class="theorem-desc" data-r="theoremDesc"></div>
       </div>
     </div>
 
     <!-- Jobb oldal: Változók és Pszeudokód -->
     <div>
       <div class="card">
-        <h2>Változók állapota</h2>
-        <div class="var-grid" id="varGrid">
+        <h3>Változók állapota</h3>
+        <div class="var-grid" data-r="varGrid">
           <!-- Dinamikusan megjelenő változókártyák -->
         </div>
       </div>
 
       <div class="card">
-        <h2>Algoritmus (pszeudokód)</h2>
-        <div class="code-box" id="codeBox">
+        <h3>Algoritmus (pszeudokód)</h3>
+        <div class="code-box" data-r="codeBox">
           <!-- Dinamikus kód kiemelése -->
         </div>
       </div>
     </div>
   </div>
-</main>
+</template>
 
 <script>
 const $ = (s, r = document) => r.querySelector(s);
@@ -1396,229 +1411,249 @@ const THEOREMS = {
   }
 };
 
-// ======================= VEZÉRLÉS ÉS RENDERELÉS =======================
-let currentTheoremKey = 'summation';
-let currentTheorem = THEOREMS.summation;
-let currentData = currentTheorem.initData();
-let steps = [];
-let currentStepIdx = 0;
-let playTimer = null;
+// ======================= EGY TÉTEL MEGJELENÍTŐJE =======================
+// Minden tételhez külön, önálló példány készül (saját állapottal és vezérlőkkel).
+function createViewer(key, root) {
+  let currentTheoremKey = key;
+  let currentTheorem = THEOREMS[key];
+  let currentData = currentTheorem.initData();
+  let steps = [];
+  let currentStepIdx = 0;
+  let playTimer = null;
+  const codeLines = [];
+  const R = id => root.querySelector('[data-r="' + id + '"]');
 
-function loadTheorem(key) {
-  currentTheoremKey = key;
-  currentTheorem = THEOREMS[key];
-  currentData = currentTheorem.initData();
+  function loadTheorem(key) {
+    currentTheoremKey = key;
+    currentTheorem = THEOREMS[key];
+    currentData = currentTheorem.initData();
 
-  $('#visTitle').textContent = currentTheorem.title;
-  $('#theoremDesc').innerHTML = currentTheorem.desc;
+    R('visTitle').textContent = 'Animáció';
+    R('theoremDesc').innerHTML = currentTheorem.desc;
 
-  // Cél érték mező megjelenítése ha szükséges
-  if (currentTheorem.hasTarget) {
-    $('#targetControls').style.display = 'flex';
-    $('#targetInput').value = currentData.target !== undefined ? currentData.target : currentTheorem.defaultTarget;
-  } else {
-    $('#targetControls').style.display = 'none';
-  }
-
-  // Presets renderelése
-  const pBox = $('#presetButtons');
-  pBox.innerHTML = '';
-  if (currentTheorem.presets) {
-    currentTheorem.presets.forEach(p => {
-      const btn = document.createElement('button');
-      btn.className = 'preset-btn';
-      btn.textContent = p.name;
-      btn.addEventListener('click', () => {
-        pause();
-        currentData = p.data();
-        if (currentTheorem.hasTarget && currentData.target !== undefined) {
-          $('#targetInput').value = currentData.target;
-        }
-        recalc();
-      });
-      pBox.appendChild(btn);
-    });
-  }
-
-  // Pszeudokód renderelése
-  const codeBox = $('#codeBox');
-  codeBox.innerHTML = '';
-  currentTheorem.code.forEach((line, idx) => {
-    const div = document.createElement('div');
-    div.className = 'code-line';
-    div.id = `codeLine${idx}`;
-    div.innerHTML = line;
-    codeBox.appendChild(div);
-  });
-
-  recalc();
-}
-
-function recalc() {
-  pause();
-  steps = currentTheorem.generateSteps(currentData);
-  currentStepIdx = 0;
-  renderStep(currentStepIdx);
-}
-
-function renderStep(idx) {
-  if (!steps || steps.length === 0) return;
-  const s = steps[idx];
-  currentStepIdx = idx;
-
-  $('#stepCounter').textContent = `${idx + 1} / ${steps.length}. lépés`;
-  $('#stepExplanation').innerHTML = s.text;
-
-  // Gombok tiltása
-  $('#btnPrev').disabled = idx === 0;
-  $('#btnNext').disabled = idx === steps.length - 1;
-
-  // Pszeudokód aktív sor
-  $$('.code-line').forEach(l => l.classList.remove('active'));
-  if (s.line !== undefined && $(`#codeLine${s.line}`)) {
-    $(`#codeLine${s.line}`).classList.add('active');
-  }
-
-  // Változók frissítése
-  const varGrid = $('#varGrid');
-  varGrid.innerHTML = '';
-  for (const [k, v] of Object.entries(s.vars)) {
-    const card = document.createElement('div');
-    card.className = 'var-card';
-    card.innerHTML = `<div class="var-name">${k}</div><div class="var-val">${v}</div>`;
-    varGrid.appendChild(card);
-  }
-
-  // Tömbök vizualizációja
-  const container = $('#arrayContainer');
-  container.innerHTML = '';
-
-  for (const [arrName, items] of Object.entries(s.arrays)) {
-    const row = document.createElement('div');
-    row.className = 'array-row';
-
-    const lbl = document.createElement('div');
-    lbl.className = 'array-label';
-    lbl.textContent = arrName + ':';
-    row.appendChild(lbl);
-
-    const pointers = s.pointers && s.pointers[arrName] ? s.pointers[arrName] : {};
-
-    items.forEach((item, i) => {
-      const cell = document.createElement('div');
-      cell.className = 'bar-cell';
-
-      // Magasság az érték alapján (min 36px, max 90px)
-      const absVal = Math.abs(item.v);
-      const h = Math.max(36, Math.min(100, 34 + absVal * 3));
-
-      const box = document.createElement('div');
-      box.className = `bar-box ${item.state || 'normal'}`;
-      box.style.height = `${h}px`;
-      box.textContent = item.v;
-      cell.appendChild(box);
-
-      const idxLabel = document.createElement('div');
-      idxLabel.className = 'bar-idx';
-      idxLabel.textContent = i;
-      cell.appendChild(idxLabel);
-
-      // Mutatók
-      for (const [pName, pIdx] of Object.entries(pointers)) {
-        if (pIdx === i) {
-          const badge = document.createElement('div');
-          badge.className = `pointer-badge ${pName}`;
-          badge.textContent = pName;
-          cell.appendChild(badge);
-        }
-      }
-
-      row.appendChild(cell);
-    });
-
-    container.appendChild(row);
-  }
-}
-
-// Vezérlő események
-function pause() {
-  if (playTimer) {
-    clearInterval(playTimer);
-    playTimer = null;
-    $('#btnPlay').textContent = '▶ Lejátszás';
-  }
-}
-
-function play() {
-  if (playTimer) {
-    pause();
-    return;
-  }
-  if (currentStepIdx >= steps.length - 1) {
-    currentStepIdx = 0;
-    renderStep(0);
-  }
-  $('#btnPlay').textContent = '⏸ Szünet';
-  const speed = +$('#speedSelect').value;
-  playTimer = setInterval(() => {
-    if (currentStepIdx < steps.length - 1) {
-      renderStep(currentStepIdx + 1);
-    } else {
-      pause();
-    }
-  }, speed);
-}
-
-$('#btnPlay').addEventListener('click', play);
-$('#btnNext').addEventListener('click', () => { pause(); if (currentStepIdx < steps.length - 1) renderStep(currentStepIdx + 1); });
-$('#btnPrev').addEventListener('click', () => { pause(); if (currentStepIdx > 0) renderStep(currentStepIdx - 1); });
-$('#btnReset').addEventListener('click', () => { pause(); renderStep(0); });
-
-$('#btnRandom').addEventListener('click', () => {
-  pause();
-  if (currentTheoremKey === 'intersection' || currentTheoremKey === 'union') {
-    currentData = {
-      a: Array.from({ length: 4 + Math.floor(Math.random() * 3) }, () => Math.floor(Math.random() * 15) + 1),
-      b: Array.from({ length: 4 + Math.floor(Math.random() * 3) }, () => Math.floor(Math.random() * 15) + 1)
-    };
-  } else {
-    const len = 6 + Math.floor(Math.random() * 4);
-    const arr = Array.from({ length: len }, () => Math.floor(Math.random() * 30) + 1);
-    currentData = { t: arr, a: arr };
+    // Cél érték mező megjelenítése ha szükséges
     if (currentTheorem.hasTarget) {
-      const willContain = Math.random() > 0.3;
-      const target = willContain ? arr[Math.floor(Math.random() * arr.length)] : 99;
-      currentData.target = target;
-      $('#targetInput').value = target;
+      R('targetControls').style.display = 'flex';
+      R('targetInput').value = currentData.target !== undefined ? currentData.target : currentTheorem.defaultTarget;
+    } else {
+      R('targetControls').style.display = 'none';
+    }
+
+    // Presets renderelése
+    const pBox = R('presetButtons');
+    pBox.innerHTML = '';
+    if (currentTheorem.presets) {
+      currentTheorem.presets.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'preset-btn';
+        btn.textContent = p.name;
+        btn.addEventListener('click', () => {
+          pause();
+          currentData = p.data();
+          if (currentTheorem.hasTarget && currentData.target !== undefined) {
+            R('targetInput').value = currentData.target;
+          }
+          recalc();
+        });
+        pBox.appendChild(btn);
+      });
+    }
+
+    // Pszeudokód renderelése
+    const codeBox = R('codeBox');
+    codeBox.innerHTML = '';
+    codeLines.length = 0;
+    currentTheorem.code.forEach((line, idx) => {
+      const div = document.createElement('div');
+      div.className = 'code-line';
+      codeLines.push(div);
+      div.innerHTML = line;
+      codeBox.appendChild(div);
+    });
+
+    recalc();
+  }
+
+  function recalc() {
+    pause();
+    steps = currentTheorem.generateSteps(currentData);
+    currentStepIdx = 0;
+    renderStep(currentStepIdx);
+  }
+
+  function renderStep(idx) {
+    if (!steps || steps.length === 0) return;
+    const s = steps[idx];
+    currentStepIdx = idx;
+
+    R('stepCounter').textContent = `${idx + 1} / ${steps.length}. lépés`;
+    R('stepExplanation').innerHTML = s.text;
+
+    // Gombok tiltása
+    R('btnPrev').disabled = idx === 0;
+    R('btnNext').disabled = idx === steps.length - 1;
+
+    // Pszeudokód aktív sor
+    codeLines.forEach(l => l.classList.remove('active'));
+    if (s.line !== undefined && codeLines[s.line]) {
+      codeLines[s.line].classList.add('active');
+    }
+
+    // Változók frissítése
+    const varGrid = R('varGrid');
+    varGrid.innerHTML = '';
+    for (const [k, v] of Object.entries(s.vars)) {
+      const card = document.createElement('div');
+      card.className = 'var-card';
+      card.innerHTML = `<div class="var-name">${k}</div><div class="var-val">${v}</div>`;
+      varGrid.appendChild(card);
+    }
+
+    // Tömbök vizualizációja
+    const container = R('arrayContainer');
+    container.innerHTML = '';
+
+    for (const [arrName, items] of Object.entries(s.arrays)) {
+      const row = document.createElement('div');
+      row.className = 'array-row';
+
+      const lbl = document.createElement('div');
+      lbl.className = 'array-label';
+      lbl.textContent = arrName + ':';
+      row.appendChild(lbl);
+
+      const pointers = s.pointers && s.pointers[arrName] ? s.pointers[arrName] : {};
+
+      items.forEach((item, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'bar-cell';
+
+        // Magasság az érték alapján (min 36px, max 90px)
+        const absVal = Math.abs(item.v);
+        const h = Math.max(36, Math.min(100, 34 + absVal * 3));
+
+        const box = document.createElement('div');
+        box.className = `bar-box ${item.state || 'normal'}`;
+        box.style.height = `${h}px`;
+        box.textContent = item.v;
+        cell.appendChild(box);
+
+        const idxLabel = document.createElement('div');
+        idxLabel.className = 'bar-idx';
+        idxLabel.textContent = i;
+        cell.appendChild(idxLabel);
+
+        // Mutatók
+        for (const [pName, pIdx] of Object.entries(pointers)) {
+          if (pIdx === i) {
+            const badge = document.createElement('div');
+            badge.className = `pointer-badge ${pName}`;
+            badge.textContent = pName;
+            cell.appendChild(badge);
+          }
+        }
+
+        row.appendChild(cell);
+      });
+
+      container.appendChild(row);
     }
   }
-  recalc();
-});
 
-$('#btnApplyTarget').addEventListener('click', () => {
-  pause();
-  currentData.target = +$('#targetInput').value;
-  recalc();
-});
-
-$('#speedSelect').addEventListener('change', () => {
-  if (playTimer) {
-    pause();
-    play();
+  // Vezérlő események
+  function pause() {
+    if (playTimer) {
+      clearInterval(playTimer);
+      playTimer = null;
+      R('btnPlay').textContent = '▶ Lejátszás';
+    }
   }
-});
 
-// Fülváltó események
-$$('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    $$('.tab-btn').forEach(b => b.setAttribute('aria-selected', 'false'));
-    btn.setAttribute('aria-selected', 'true');
-    loadTheorem(btn.dataset.t);
+  function play() {
+    if (playTimer) {
+      pause();
+      return;
+    }
+    if (currentStepIdx >= steps.length - 1) {
+      currentStepIdx = 0;
+      renderStep(0);
+    }
+    R('btnPlay').textContent = '⏸ Szünet';
+    const speed = +R('speedSelect').value;
+    playTimer = setInterval(() => {
+      if (currentStepIdx < steps.length - 1) {
+        renderStep(currentStepIdx + 1);
+      } else {
+        pause();
+      }
+    }, speed);
+  }
+
+  R('btnPlay').addEventListener('click', play);
+  R('btnNext').addEventListener('click', () => { pause(); if (currentStepIdx < steps.length - 1) renderStep(currentStepIdx + 1); });
+  R('btnPrev').addEventListener('click', () => { pause(); if (currentStepIdx > 0) renderStep(currentStepIdx - 1); });
+  R('btnReset').addEventListener('click', () => { pause(); renderStep(0); });
+
+  R('btnRandom').addEventListener('click', () => {
+    pause();
+    if (currentTheoremKey === 'intersection' || currentTheoremKey === 'union') {
+      currentData = {
+        a: Array.from({ length: 4 + Math.floor(Math.random() * 3) }, () => Math.floor(Math.random() * 15) + 1),
+        b: Array.from({ length: 4 + Math.floor(Math.random() * 3) }, () => Math.floor(Math.random() * 15) + 1)
+      };
+    } else {
+      const len = 6 + Math.floor(Math.random() * 4);
+      const arr = Array.from({ length: len }, () => Math.floor(Math.random() * 30) + 1);
+      currentData = { t: arr, a: arr };
+      if (currentTheorem.hasTarget) {
+        const willContain = Math.random() > 0.3;
+        const target = willContain ? arr[Math.floor(Math.random() * arr.length)] : 99;
+        currentData.target = target;
+        R('targetInput').value = target;
+      }
+    }
+    recalc();
+  });
+
+  R('btnApplyTarget').addEventListener('click', () => {
+    pause();
+    currentData.target = +R('targetInput').value;
+    recalc();
+  });
+
+  R('speedSelect').addEventListener('change', () => {
+    if (playTimer) {
+      pause();
+      play();
+    }
+  });
+
+  loadTheorem(key);
+
+}
+
+// ======================= AZ OLDAL FELÉPÍTÉSE =======================
+const GROUPS = [{title:"1. Egy sorozat feldolgozása (elemi tételek)",items:[["summation","Összegzés"],["counting","Megszámolás"],["decision","Eldöntés"],["selection","Kiválasztás"],["linearSearch","Lineáris keresés"],["maximum","Maximumkiválasztás"],["minimum","Minimumkiválasztás"]]},{title:"2. Sorozatok másolása és szétválogatása",items:[["copy","Másolás"],["filter","Kiválogatás"],["partition","Szétválogatás"]]},{title:"3. Két sorozat összehasonlítása",items:[["intersection","Metszet"],["union","Unió"]]}];
+const host = $('#theorems');
+const tpl = $('#viewerTpl');
+GROUPS.forEach(g => {
+  const gt = document.createElement('div');
+  gt.className = 'group-title';
+  gt.textContent = g.title;
+  host.appendChild(gt);
+  g.items.forEach(([key, label]) => {
+    const sec = document.createElement('section');
+    sec.className = 'theorem';
+    sec.id = 't-' + key;
+    const h = document.createElement('h2');
+    h.className = 'section-title';
+    h.textContent = THEOREMS[key].title;
+    sec.appendChild(h);
+    sec.appendChild(tpl.content.cloneNode(true));
+    host.appendChild(sec);
+    createViewer(key, sec);
   });
 });
-
-// Kezdő betöltés
-loadTheorem('summation');
 </script>
 </body>
 </html>
