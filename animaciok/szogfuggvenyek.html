@@ -72,36 +72,21 @@ h1 {
   font-size: 1.6rem;
   margin: 0 0 16px;
 }
-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  border-bottom: 2px solid var(--line);
-}
-nav button {
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 8px 16px;
-  border: 2px solid var(--line);
-  border-bottom: none;
-  border-radius: 8px 8px 0 0;
-  background: var(--panel);
-  color: var(--muted);
-  transition: all 0.15s;
-}
-nav button[aria-selected="true"] {
-  background: var(--bg);
+.section-title {
+  font-size: 1.35rem;
+  margin: 0 0 14px;
   color: var(--accent);
-  border-color: var(--accent);
-  margin-bottom: -2px;
+}
+main > section + section {
+  margin-top: 44px;
+  padding-top: 28px;
+  border-top: 2px solid var(--line);
 }
 main {
   max-width: 1240px;
   margin: 0 auto;
   padding: 16px 20px 40px;
 }
-section[hidden] { display: none; }
 .layout {
   display: grid;
   grid-template-columns: minmax(360px, 1.25fr) 1fr;
@@ -127,7 +112,7 @@ svg.canvas-plot {
   padding: 16px;
   margin-bottom: 16px;
 }
-.card h2 {
+.card h2, .card h3 {
   font-size: 1.05rem;
   margin: 0 0 10px;
   color: var(--muted);
@@ -249,23 +234,18 @@ table.math-table th {
 
 <header>
   <h1>Szögfüggvények</h1>
-  <nav role="tablist">
-    <button role="tab" aria-selected="true" data-tab="tabTriangle">1. Derékszögű háromszög</button>
-    <button role="tab" aria-selected="false" data-tab="tabCircle">2. Az egységkör (0°–360°)</button>
-    <button role="tab" aria-selected="false" data-tab="tabWaves">3. Hullám animáció (sin &amp; cos)</button>
-    <button role="tab" aria-selected="false" data-tab="tabAngles">4. Nevezetes szögek</button>
-  </nav>
 </header>
 
 <main>
 
 <!-- ================= FÜL 1: DERÉKSZÖGŰ HÁROMSZÖG ================= -->
 <section id="tabTriangle">
+  <h2 class="section-title">1. Derékszögű háromszög</h2>
   <div class="layout">
     <svg class="canvas-plot" id="svgTriangle" viewBox="0 0 540 400" role="img" aria-label="Derékszögű háromszög szögfüggvényei"></svg>
     <div>
       <div class="card">
-        <h2>Nevezetes hegyesszög kiválasztása</h2>
+        <h3>Nevezetes hegyesszög kiválasztása</h3>
         <div class="sl">
           <label>α =</label>
           <input type="range" id="triAngle" min="0" max="2" step="1" value="0">
@@ -280,7 +260,7 @@ table.math-table th {
       </div>
 
       <div class="card">
-        <h2>Definíciók és pontos értékek</h2>
+        <h3>Definíciók és pontos értékek</h3>
         <div class="val-pill-grid">
           <div class="val-pill sin">
             <div class="vp-title">Szinusz (sin α)</div>
@@ -315,12 +295,13 @@ table.math-table th {
 </section>
 
 <!-- ================= FÜL 2: EGYSÉGKÖR ================= -->
-<section id="tabCircle" hidden>
+<section id="tabCircle">
+  <h2 class="section-title">2. Az egységkör (0°–360°)</h2>
   <div class="layout">
     <svg class="canvas-plot" id="svgCircle" viewBox="0 0 540 500" role="img" aria-label="Egységkör és nevezetes szögek"></svg>
     <div>
       <div class="card">
-        <h2>Nevezetes szögek az egységkörön (0°–360°)</h2>
+        <h3>Nevezetes szögek az egységkörön (0°–360°)</h3>
         <div class="sl">
           <label>α =</label>
           <input type="range" id="circAngle" min="0" max="16" step="1" value="2">
@@ -335,7 +316,7 @@ table.math-table th {
       </div>
 
       <div class="card">
-        <h2>Pontos értékek az egységkörön (R = 1)</h2>
+        <h3>Pontos értékek az egységkörön (R = 1)</h3>
         <div class="val-pill-grid">
           <div class="val-pill cos">
             <div class="vp-title">x koordináta = cos α</div>
@@ -367,9 +348,10 @@ table.math-table th {
 </section>
 
 <!-- ================= FÜL 3: HULLÁMOK GENERÁLÁSA ================= -->
-<section id="tabWaves" hidden>
+<section id="tabWaves">
+  <h2 class="section-title">3. Hullám animáció (sin &amp; cos)</h2>
   <div class="card">
-    <h2>Hullámrajzolás az egységkörből (vízszintes vetítéssel)</h2>
+    <h3>Hullámrajzolás az egységkörből (vízszintes vetítéssel)</h3>
     <svg class="canvas-plot" id="svgWaves" viewBox="0 0 960 420" role="img" aria-label="Szinusz és koszinusz hullámok rajzolása egységkörből"></svg>
 
     <div class="btns" style="align-items:center; margin-top:12px;">
@@ -420,9 +402,10 @@ table.math-table th {
 </section>
 
 <!-- ================= FÜL 4: NEVEZETES SZÖGEK ================= -->
-<section id="tabAngles" hidden>
+<section id="tabAngles">
+  <h2 class="section-title">4. Nevezetes szögek</h2>
   <div class="card">
-    <h2>Nevezetes hegyesszögek szögfüggvényei (0°, 30°, 45°, 60°, 90°)</h2>
+    <h3>Nevezetes hegyesszögek szögfüggvényei (0°, 30°, 45°, 60°, 90°)</h3>
     <div class="table-wrap">
       <table class="math-table">
         <thead>
@@ -1044,14 +1027,6 @@ function el(name, attrs, parent) {
   renderWave();
 })();
 
-// ================= FÜLVÁLTÓ =================
-$$('nav button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    $$('nav button').forEach(b => b.setAttribute('aria-selected', 'false'));
-    btn.setAttribute('aria-selected', 'true');
-    $$('main > section').forEach(s => s.hidden = s.id !== btn.dataset.tab);
-  });
-});
 </script>
 </body>
 </html>

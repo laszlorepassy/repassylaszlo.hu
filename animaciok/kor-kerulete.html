@@ -479,9 +479,13 @@ function el(name, attrs, parent) {
     const startX = targetCenterX - totalW / 2;
 
     // Minden cikk geometriailag 100%-ban megegyezik, egyetlen mester körcikkből készül
+    // A mester körcikk csúcsa az origóban van, az íve alul (lefelé néz). Az SVG y tengelye
+    // lefelé nő, ezért az "A" parancs "sweep" jelzője 0: az óramutató járásával ellentétes
+    // irányban, az origó körül rajzolja a rövid, DOMBORÚ ívet. (Az 1 jelző a tükörképét adná,
+    // vagyis homorú, befelé hajló cikkeket.)
     const p1x = -R * Math.sin(half), p1y = R * Math.cos(half);
     const p2x = R * Math.sin(half), p2y = R * Math.cos(half);
-    const sectorD = `M 0 0 L ${p1x} ${p1y} A ${R} ${R} 0 0 1 ${p2x} ${p2y} Z`;
+    const sectorD = `M 0 0 L ${p1x} ${p1y} A ${R} ${R} 0 0 0 ${p2x} ${p2y} Z`;
 
     // Kétfázisú mozgás:
     // 0 .. 0.5: a körcikkek két vízszintes sorrá nyílnak szét
@@ -492,16 +496,16 @@ function el(name, attrs, parent) {
     // 1. Felső félkör (kék cikkek, n/2 darab)
     for (let i = 0; i < halfN; i++) {
       const circleAngle = Math.PI - (i + 0.5) * dTheta;
-      const cRot = (Math.PI / 2 - circleAngle) * 180 / Math.PI;
+      const cRot = (Math.PI / 2 - circleAngle) * 180 / Math.PI + 180; // a lefelé néző cikk +180°-kal áll a kör megfelelő helyére
 
       const rowX = startX + i * arcLen + arcLen / 2;
-      const unmeshY = targetCenterY - R - 15;
-      const meshY = targetCenterY - R / 2;
+      const unmeshY = targetCenterY - 15;           // a csúcs magassága a szétnyitott sorban (az ív fölötte, felül)
+      const meshY = targetCenterY + R / 2;          // összefésülve: az ív a téglalap felső peremén
       const rowY = unmeshY + t2 * (meshY - unmeshY);
 
       const curX = (1 - t1) * cx + t1 * rowX;
       const curY = (1 - t1) * cy + t1 * rowY;
-      const curRot = (1 - t1) * cRot + t1 * 0; // lefelé mutat
+      const curRot = (1 - t1) * cRot + t1 * 180; // az ív felül, a csúcs alul
 
       const g = el('g', { transform: `translate(${curX}, ${curY}) rotate(${curRot})` }, gSlices);
       el('path', { d: sectorD, fill: 'var(--top-col)', stroke: 'var(--bg)', 'stroke-width': 1.2 }, g);
@@ -510,16 +514,16 @@ function el(name, attrs, parent) {
     // 2. Alsó félkör (narancs cikkek, n/2 darab)
     for (let i = 0; i < halfN; i++) {
       const circleAngle = Math.PI + (i + 0.5) * dTheta;
-      const cRot = (Math.PI / 2 - circleAngle) * 180 / Math.PI;
+      const cRot = (Math.PI / 2 - circleAngle) * 180 / Math.PI + 180; // a lefelé néző cikk +180°-kal áll a kör megfelelő helyére
 
       const rowX = startX + i * arcLen + arcLen;
-      const unmeshY = targetCenterY + R + 15;
-      const meshY = targetCenterY + R / 2;
+      const unmeshY = targetCenterY + 15;           // a csúcs magassága a szétnyitott sorban (az ív alatta, alul)
+      const meshY = targetCenterY - R / 2;          // összefésülve: az ív a téglalap alsó peremén
       const rowY = unmeshY + t2 * (meshY - unmeshY);
 
       const curX = (1 - t1) * cx + t1 * rowX;
       const curY = (1 - t1) * cy + t1 * rowY;
-      const curRot = (1 - t1) * cRot + t1 * 180; // felfelé mutat
+      const curRot = (1 - t1) * cRot + t1 * 0; // az ív alul, a csúcs felül
 
       const g = el('g', { transform: `translate(${curX}, ${curY}) rotate(${curRot})` }, gSlices);
       el('path', { d: sectorD, fill: 'var(--bot-col)', stroke: 'var(--bg)', 'stroke-width': 1.2 }, g);
