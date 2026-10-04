@@ -1,0 +1,1659 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programozási tételek – interaktív animációk</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --panel: #f5f7fa;
+  --panel-border: #d5dae0;
+  --fg: #1b1f24;
+  --muted: #59636e;
+  --line: #d5dae0;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --accent-border: #93c5fd;
+  --ok: #16a34a;
+  --ok-light: #f0fdf4;
+  --warn: #d97706;
+  --warn-light: #fffbeb;
+  --bad: #dc2626;
+  --bad-light: #fef2f2;
+  --code-bg: #1e293b;
+  --code-fg: #f8fafc;
+  --code-hl: #334155;
+  --code-hl-border: #38bdf8;
+  --bar-default: #3b82f6;
+  --bar-check: #f59e0b;
+  --bar-match: #10b981;
+  --bar-dim: #94a3b8;
+  --bar-target: #8b5cf6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171b;
+    --panel: #1d2228;
+    --panel-border: #333b44;
+    --fg: #e8ebef;
+    --muted: #9aa4af;
+    --line: #333b44;
+    --accent: #6ea0ff;
+    --accent-light: #1e293b;
+    --accent-border: #3b82f6;
+    --ok: #4ade80;
+    --ok-light: #064e3b;
+    --warn: #fbbf24;
+    --warn-light: #451a03;
+    --bad: #f87171;
+    --bad-light: #450a0a;
+    --code-bg: #0f172a;
+    --code-fg: #f1f5f9;
+    --code-hl: #1e293b;
+    --code-hl-border: #0ea5e9;
+    --bar-default: #60a5fa;
+    --bar-check: #fbbf24;
+    --bar-match: #34d399;
+    --bar-dim: #475569;
+    --bar-target: #a78bfa;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.top-nav {
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.top-nav a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.top-nav a:hover {
+  text-decoration: underline;
+}
+header {
+  padding: 18px 20px 0;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+h1 {
+  font-size: 1.6rem;
+  margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.subtitle {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+}
+.toc {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.toc-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+.toc-group { display: flex; flex-direction: column; gap: 6px; }
+.toc-group-title { font-weight: 700; font-size: 0.95rem; }
+.toc-links { display: flex; flex-wrap: wrap; gap: 6px; }
+.toc-links a {
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--accent);
+  text-decoration: none;
+}
+.toc-links a:hover { border-color: var(--accent); }
+.group-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 40px 0 0;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--line);
+}
+.section-title {
+  font-size: 1.35rem;
+  margin: 28px 0 14px;
+  color: var(--accent);
+  scroll-margin-top: 12px;
+}
+.theorem + .theorem { margin-top: 12px; }
+main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
+}
+.app-grid {
+  display: grid;
+  grid-template-columns: minmax(400px, 1.4fr) 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .app-grid { grid-template-columns: 1fr; }
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.card h2, .card h3 {
+  font-size: 1.05rem;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.vis-area {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 16px;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow-x: auto;
+}
+.array-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 10px 0;
+}
+.array-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  min-height: 120px;
+  padding: 10px 4px 30px;
+  position: relative;
+}
+.array-label {
+  font-weight: 700;
+  font-size: 1.1rem;
+  min-width: 32px;
+  padding-bottom: 30px;
+  color: var(--accent);
+}
+.bar-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 44px;
+  transition: transform 0.2s;
+}
+.bar-box {
+  width: 40px;
+  border-radius: 6px;
+  background: var(--bar-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: background 0.25s, height 0.3s, transform 0.2s;
+}
+.bar-idx {
+  position: absolute;
+  bottom: -24px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.pointer-badge {
+  position: absolute;
+  bottom: -46px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: #fff;
+  white-space: nowrap;
+}
+.pointer-badge.j { background: var(--warn); bottom: -64px; }
+.pointer-badge.k { background: var(--ok); bottom: -82px; }
+
+/* Színek állapot szerint */
+.bar-box.checking {
+  background: var(--bar-check) !important;
+  transform: scale(1.08);
+}
+.bar-box.matched {
+  background: var(--bar-match) !important;
+}
+.bar-box.target {
+  background: var(--bar-target) !important;
+}
+.bar-box.dimmed {
+  background: var(--bar-dim) !important;
+  opacity: 0.6;
+}
+
+/* Vezérlők */
+.controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+}
+.btn {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+.speed-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-left: auto;
+}
+.speed-wrap select {
+  font: inherit;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--fg);
+}
+.target-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+.target-input-wrap input {
+  font: inherit;
+  width: 5em;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* Magyarázat doboz */
+.explanation-box {
+  background: var(--accent-light);
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  margin-top: 12px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+/* Változók rács */
+.var-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.var-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.var-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.var-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+/* Kód blokk */
+.code-box {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border-radius: 6px;
+  padding: 12px 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.88rem;
+  overflow-x: auto;
+}
+.code-line {
+  padding: 2px 14px;
+  border-left: 3px solid transparent;
+  white-space: pre;
+}
+.code-line.active {
+  background: var(--code-hl);
+  border-left-color: var(--code-hl-border);
+  font-weight: 600;
+}
+.kw { color: #f472b6; font-weight: 600; }
+.fn { color: #38bdf8; }
+.cm { color: #94a3b8; font-style: italic; }
+.num { color: #fbbf24; }
+.str { color: #34d399; }
+
+/* Leírás */
+.theorem-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--fg);
+}
+.theorem-desc strong {
+  color: var(--accent);
+}
+.preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.preset-btn {
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+}
+.preset-btn:hover {
+  color: var(--fg);
+  border-color: var(--accent);
+}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Programozási tételek</h1>
+  <div class="subtitle">
+    Az elemi algoritmusok lépésről lépésre követhető, interaktív szemléltetése a <strong>Folyáb</strong> példatára alapján.
+  </div>
+
+  <nav class="toc" aria-label="Tartalomjegyzék">
+    <div class="toc-title">Tartalomjegyzék</div>
+    <div class="toc-group">
+      <div class="toc-group-title">1. Egy sorozat feldolgozása (elemi tételek)</div>
+      <div class="toc-links">
+        <a href="#t-summation">Összegzés</a>
+        <a href="#t-counting">Megszámolás</a>
+        <a href="#t-decision">Eldöntés</a>
+        <a href="#t-selection">Kiválasztás</a>
+        <a href="#t-linearSearch">Lineáris keresés</a>
+        <a href="#t-maximum">Maximumkiválasztás</a>
+        <a href="#t-minimum">Minimumkiválasztás</a>
+      </div>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-title">2. Sorozatok másolása és szétválogatása</div>
+      <div class="toc-links">
+        <a href="#t-copy">Másolás</a>
+        <a href="#t-filter">Kiválogatás</a>
+        <a href="#t-partition">Szétválogatás</a>
+      </div>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-title">3. Két sorozat összehasonlítása</div>
+      <div class="toc-links">
+        <a href="#t-intersection">Metszet</a>
+        <a href="#t-union">Unió</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="theorems"></main>
+
+<template id="viewerTpl">
+  <div class="app-grid">
+    <!-- Bal oldal: Vizualizáció és vezérlés -->
+    <div>
+      <div class="card">
+        <h3>
+          <span data-r="visTitle">Tömb animáció</span>
+          <span data-r="stepCounter" style="font-size:0.85rem; font-weight:normal; color:var(--muted);">0. lépés</span>
+        </h3>
+
+        <div class="vis-area" data-r="visArea">
+          <div class="array-container" data-r="arrayContainer">
+            <!-- Dinamikus tömbök -->
+          </div>
+        </div>
+
+        <div data-r="targetControls" class="target-input-wrap" style="display:none;">
+          <label>Keresett érték (ker): <input type="number" data-r="targetInput" value="12"></label>
+          <button class="btn" data-r="btnApplyTarget">Beállít</button>
+        </div>
+
+        <div class="controls-bar">
+          <button class="btn btn-primary" data-r="btnPlay">▶ Lejátszás</button>
+          <button class="btn" data-r="btnPrev" title="Előző lépés">◀ Lépés</button>
+          <button class="btn" data-r="btnNext" title="Következő lépés">Lépés ▶</button>
+          <button class="btn" data-r="btnReset" title="Újra a kezdettől">↺ Újra</button>
+          <button class="btn" data-r="btnRandom" title="Új véletlen adatok">🎲 Új adatok</button>
+
+          <div class="speed-wrap">
+            <label >Sebesség:</label>
+            <select data-r="speedSelect">
+              <option value="1200">0.5×</option>
+              <option value="600" selected>1×</option>
+              <option value="300">2×</option>
+              <option value="120">5×</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="preset-buttons" data-r="presetButtons">
+          <!-- Dinamikus preset gombok az adott tételhez -->
+        </div>
+
+        <div class="explanation-box" data-r="stepExplanation">
+          Kattints a „Lejátszás” vagy „Lépés ▶” gombra az algoritmus futtatásához.
+        </div>
+      </div>
+
+      <!-- Tétel elméleti leírása -->
+      <div class="card">
+        <h3>A tétel feladata és lényege</h3>
+        <div class="theorem-desc" data-r="theoremDesc"></div>
+      </div>
+    </div>
+
+    <!-- Jobb oldal: Változók és Pszeudokód -->
+    <div>
+      <div class="card">
+        <h3>Változók állapota</h3>
+        <div class="var-grid" data-r="varGrid">
+          <!-- Dinamikusan megjelenő változókártyák -->
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Algoritmus (pszeudokód)</h3>
+        <div class="code-box" data-r="codeBox">
+          <!-- Dinamikus kód kiemelése -->
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+// ======================= TÉTELEK DEFINÍCIÓJA =======================
+const THEOREMS = {
+  summation: {
+    title: 'Összegzés tétele',
+    desc: 'Adott egy n elemű számsorozat (tömb). Feladatunk meghatározni a tömb elemeinek összegét. Az <code>osszeg</code> akkumulátor változót 0-ra állítjuk, majd egy számlálós ciklussal végigmegyünk a tömbön, és minden elemet hozzáadunk.',
+    code: [
+      '<span class="cm">// Összegzés</span>',
+      '<span class="kw">osszeg</span> = <span class="num">0</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">0</span>-tól <span class="num">n - 1</span>-ig',
+      '    <span class="kw">osszeg</span> = <span class="kw">osszeg</span> + t[i]',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="fn">Kiír</span> <span class="str">"Összeg: "</span> & osszeg'
+    ],
+    initData: () => ({ t: [4, 7, 2, 9, 3, 6, 8, 5] }),
+    presets: [
+      { name: 'Kis számok', data: () => ({ t: [1, 2, 3, 4, 5, 6, 7, 8] }) },
+      { name: 'Vegyes számok', data: () => ({ t: [12, 5, 20, 8, 15, 3] }) }
+    ],
+    generateSteps: (data) => {
+      const steps = [];
+      const t = [...data.t];
+      const n = t.length;
+      let sum = 0;
+
+      steps.push({
+        line: 1, vars: { i: '-', osszeg: 0, n },
+        arrays: { t: t.map(v => ({ v, state: 'normal' })) },
+        pointers: { t: { i: null } },
+        text: 'Kezdőértékadás: az összeg változót 0-ra állítjuk.'
+      });
+
+      for (let i = 0; i < n; i++) {
+        steps.push({
+          line: 2, vars: { i, 't[i]': t[i], osszeg: sum, n },
+          arrays: { t: t.map((v, idx) => ({ v, state: idx < i ? 'matched' : (idx === i ? 'checking' : 'normal') })) },
+          pointers: { t: { i } },
+          text: `Ciklusfej: a(z) ${i}. indexű elemnél járunk (t[${i}] = ${t[i]}).`
+        });
+
+        sum += t[i];
+        steps.push({
+          line: 3, vars: { i, 't[i]': t[i], osszeg: sum, n },
+          arrays: { t: t.map((v, idx) => ({ v, state: idx <= i ? 'matched' : 'normal' })) },
+          pointers: { t: { i } },
+          text: `Hozzáadjuk a t[${i}] (${t[i]}) értékét az összeghez. Új összeg: ${sum}.`
+        });
+      }
+
+      steps.push({
+        line: 5, vars: { i: n, osszeg: sum, n },
+        arrays: { t: t.map(v => ({ v, state: 'matched' })) },
+        pointers: { t: { i: null } },
+        text: `A ciklus befejeződött. A tömb elemeinek végleges összege: ${sum}.`
+      });
+      return steps;
+    }
+  },
+
+  counting: {
+    title: 'Megszámolás tétele',
+    desc: 'Adott egy feltétel (T tulajdonság). Megszámoljuk, hány olyan elem van a tömbben, amely kielégíti ezt a feltételt (itt a példában: <strong>páros számok</strong>). A számlálót 0-ra állítjuk, majd ciklussal vizsgáljuk az elemeket; ha a feltétel igaz, 1-gyel növeljük a számlálót.',
+    code: [
+      '<span class="cm">// Megszámolás: páros számok (t[i] mod 2 = 0)</span>',
+      '<span class="kw">db</span> = <span class="num">0</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">0</span>-tól <span class="num">n - 1</span>-ig',
+      '    <span class="kw">Ha</span> t[i] <span class="kw">mod</span> <span class="num">2</span> == <span class="num">0</span> <span class="kw">Akkor</span>',
+      '        <span class="kw">db</span> = <span class="kw">db</span> + <span class="num">1</span>',
+      '    <span class="kw">Feltétel vége</span>',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="fn">Kiír</span> <span class="str">"Páros számok: "</span> & db'
+    ],
+    initData: () => ({ t: [5, 12, 7, 8, 14, 3, 6, 9] }),
+    presets: [
+      { name: 'Sok páros', data: () => ({ t: [2, 4, 6, 8, 10, 11] }) },
+      { name: 'Csak páratlan', data: () => ({ t: [1, 3, 5, 7, 9, 11] }) }
+    ],
+    generateSteps: (data) => {
+      const steps = [];
+      const t = [...data.t];
+      const n = t.length;
+      let count = 0;
+
+      steps.push({
+        line: 1, vars: { i: '-', db: 0, n },
+        arrays: { t: t.map(v => ({ v, state: 'normal' })) },
+        pointers: { t: { i: null } },
+        text: 'Kezdőértékadás: a db számlálót 0-ra állítjuk.'
+      });
+
+      for (let i = 0; i < n; i++) {
+        const isMatch = t[i] % 2 === 0;
+        steps.push({
+          line: 3, vars: { i, 't[i]': t[i], 'páros?': isMatch ? 'IGEN' : 'NEM', db: count, n },
+          arrays: { t: t.map((v, idx) => ({ v, state: idx < i ? (v % 2 === 0 ? 'matched' : 'dimmed') : (idx === i ? 'checking' : 'normal') })) },
+          pointers: { t: { i } },
+          text: `Vizsgálat: t[${i}] = ${t[i]}. Páros szám? ${isMatch ? 'Igen!' : 'Nem.'}`
+        });
+
+        if (isMatch) {
+          count++;
+          steps.push({
+            line: 4, vars: { i, 't[i]': t[i], db: count, n },
+            arrays: { t: t.map((v, idx) => ({ v, state: idx < i ? (v % 2 === 0 ? 'matched' : 'dimmed') : (idx === i ? 'matched' : 'normal') })) },
+            pointers: { t: { i } },
+            text: `A feltétel teljesült, ezért növeljük a darabszámot: db = ${count}.`
+          });
+        }
+      }
+
+      steps.push({
+        line: 7, vars: { i: n, db: count, n },
+        arrays: { t: t.map(v => ({ v, state: v % 2 === 0 ? 'matched' : 'dimmed' })) },
+        pointers: { t: { i: null } },
+        text: `Vége a vizsgálatnak. Összesen ${count} páros szám található a tömbben.`
+      });
+      return steps;
+    }
+  },
+
+  decision: {
+    title: 'Eldöntés tétele',
+    desc: 'Azt vizsgáljuk, szerepel-e a keresett érték a tömbben. <strong>Megállunk, amint megtaláltuk</strong> (elöltesztelő ciklus). Ha a ciklus a tömb végéig ért (<code>i >= n</code>), akkor nincs benne.',
+    hasTarget: true,
+    defaultTarget: 14,
+    code: [
+      '<span class="cm">// Eldöntés (van-e ker a tömbben?)</span>',
+      '<span class="kw">i</span> = <span class="num">0</span>',
+      '<span class="kw">Ciklus amíg</span> i &lt; n <span class="kw">és</span> t[i] &lt;&gt; ker',
+      '    <span class="kw">i</span> = <span class="kw">i</span> + <span class="num">1</span>',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="kw">Ha</span> i &lt; n <span class="kw">Akkor</span> <span class="fn">Kiír</span> <span class="str">"Van ilyen elem"</span>',
+      '<span class="kw">Különben</span> <span class="fn">Kiír</span> <span class="str">"Nincs ilyen elem"</span>'
+    ],
+    initData: () => ({ t: [5, 8, 12, 14, 9, 3, 20], target: 14 }),
+    presets: [
+      { name: 'Van benne (középen)', data: () => ({ t: [5, 8, 12, 14, 9, 3], target: 14 }) },
+      { name: 'Nincs benne', data: () => ({ t: [5, 8, 12, 9, 3], target: 99 }) },
+      { name: 'Legelső elem az', data: () => ({ t: [7, 15, 23, 4], target: 7 }) }
+    ],
+    generateSteps: (data) => {
+      const steps = [];
+      const t = [...data.t];
+      const target = data.target;
+      const n = t.length;
+      let i = 0;
+
+      steps.push({
+        line: 1, vars: { i: 0, ker: target, n },
+        arrays: { t: t.map(v => ({ v, state: 'normal' })) },
+        pointers: { t: { i: 0 } },
+        text: `Keresett érték: ker = ${target}. i = 0 indexről indítjuk a keresést.`
+      });
+
+      while (i < n && t[i] !== target) {
+        steps.push({
+          line: 2, vars: { i, 't[i]': t[i], ker: target, 'egyezik?': 'NEM' },
+          arrays: { t: t.map((v, idx) => ({ v, state: idx < i ? 'dimmed' : (idx === i ? 'checking' : 'normal') })) },
+          pointers: { t: { i } },
+          text: `Összehasonlítás: t[${i}] = ${t[i]} ≠ ${target}. Nem egyezik, megyünk tovább.`
+        });
+        i++;
+      }
+
+      if (i < n) {
+        steps.push({
+          line: 2, vars: { i, 't[i]': t[i], ker: target, 'egyezik?': 'IGEN!' },
+          arrays: { t: t.map((v, idx) => ({ v, state: idx === i ? 'matched' : (idx < i ? 'dimmed' : 'normal') })) },
+          pointers: { t: { i } },
+          text: `Találat! t[${i}] = ${t[i]} == ${target}. A ciklus feltétele sérül (t[i] == ker), azonnal kilépünk!`
+        });
+        steps.push({
+          line: 5, vars: { i, ker: target, eredmény: 'VAN ILYEN' },
+          arrays: { t: t.map((v, idx) => ({ v, state: idx === i ? 'matched' : 'dimmed' })) },
+          pointers: { t: { i } },
+          text: `Mivel i < n (${i} < ${n}), az eredmény: VAN ilyen elem a tömbben.`
+        });
+      } else {
+        steps.push({
+          line: 2, vars: { i: n, ker: target, 'túlléptünk?': 'IGEN' },
+          arrays: { t: t.map(v => ({ v, state: 'dimmed' })) },
+          pointers: { t: { i: null } },
+          text: `Elértük a tömb végét (i = ${n}). Nincs több ellenőrizhető elem.`
+        });
+        steps.push({
+          line: 6, vars: { i: n, ker: target, eredmény: 'NINCS ILYEN' },
+          arrays: { t: t.map(v => ({ v, state: 'dimmed' })) },
+          pointers: { t: { i: null } },
+          text: `Mivel i == n (${n}), a keresett érték (${target}) NINCS a tömbben.`
+        });
+      }
+      return steps;
+    }
+  },
+
+  selection: {
+    title: 'Kiválasztás tétele',
+    desc: 'Akkor alkalmazzuk, ha <strong>biztosan tudjuk, hogy az elem szerepel a tömbben</strong> (pl. a feladat garantálja). Ezért nem szükséges vizsgálni az <code>i < n</code> feltételt, elég addig lépegetni, amíg meg nem találjuk.',
+    hasTarget: true,
+    defaultTarget: 17,
+    code: [
+      '<span class="cm">// Kiválasztás (biztosan benne van!)</span>',
+      '<span class="kw">i</span> = <span class="num">0</span>',
+      '<span class="kw">Ciklus amíg</span> t[i] &lt;&gt; ker',
+      '    <span class="kw">i</span> = <span class="kw">i</span> + <span class="num">1</span>',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="fn">Kiír</span> <span class="str">"A keresett elem indexe: "</span> & i',
+      '<span class="fn">Kiír</span> <span class="str">"Sorszáma (1-től): "</span> & (i + 1)'
+    ],
+    initData: () => ({ t: [6, 11, 25, 17, 8, 30], target: 17 }),
+    presets: [
+      { name: 'Középen van', data: () => ({ t: [6, 11, 25, 17, 8, 30], target: 17 }) },
+      { name: 'Az elején van', data: () => ({ t: [42, 10, 20, 30], target: 42 }) },
+      { name: 'A legvégén van', data: () => ({ t: [3, 9, 12, 99], target: 99 }) }
+    ],
+    generateSteps: (data) => {
+      const steps = [];
+      const t = [...data.t];
+      let target = data.target;
+      if (!t.includes(target)) target = t[Math.floor(t.length / 2)];
+      let i = 0;
+
+      steps.push({
+        line: 1, vars: { i: 0, ker: target },
+        arrays: { t: t.map(v => ({ v, state: 'normal' })) },
+        pointers: { t: { i: 0 } },
+        text: `Keresett érték: ker = ${target} (garantáltan a tömbben van). Indulás: i = 0.`
+      });
+
+      while (t[i] !== target) {
+        steps.push({
+          line: 2, vars: { i, 't[i]': t[i], ker: target },
+          arrays: { t: t.map((v, idx) => ({ v, state: idx < i ? 'dimmed' : (idx === i ? 'checking' : 'normal') })) },
+          pointers: { t: { i } },
+          text: `t[${i}] = ${t[i]} ≠ ${target}. Továbblépünk a következő elemre.`
+        });
+        i++;
+      }
+
+      steps.push({
+        line: 2, vars: { i, 't[i]': t[i], ker: target, találat: 'IGEN!' },
+        arrays: { t: t.map((v, idx) => ({ v, state: idx === i ? 'matched' : (idx < i ? 'dimmed' : 'normal') })) },
+        pointers: { t: { i } },
+        text: `Megtaláltuk! t[${i}] = ${t[i]} == ${target}. Kilépünk a ciklusból.`
+      });
+
+      steps.push({
+        line: 5, vars: { i, 'sorszám': i + 1, ker: target },
+        arrays: { t: t.map((v, idx) => ({ v, state: idx === i ? 'matched' : 'dimmed' })) },
+        pointers: { t: { i } },
+        text: `Eredmény: a keresett elem indexe: ${i}, azaz a(z) ${i + 1}. helyen található.`
+      });
+      return steps;
+    }
+  },
+
+  linearSearch: {
+    title: 'Lineáris keresés',
+    desc: 'Az <strong>eldöntés</strong> és a <strong>kiválasztás</strong> ötvözete: megvizsgálja, hogy szerepel-e a keresett érték, és ha igen, megadja az indexét is.',
+    hasTarget: true,
+    defaultTarget: 19,
+    code: [
+      '<span class="cm">// Lineáris keresés</span>',
+      '<span class="kw">i</span> = <span class="num">0</span>',
+      '<span class="kw">Ciklus amíg</span> i &lt; n <span class="kw">és</span> t[i] &lt;&gt; ker',
+      '    <span class="kw">i</span> = <span class="kw">i</span> + <span class="num">1</span>',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="kw">Ha</span> i &lt; n <span class="kw">Akkor</span>',
+      '    <span class="fn">Kiír</span> <span class="str">"Van ilyen, indexe: "</span> & i',
+      '<span class="kw">Különben</span>',
+      '    <span class="fn">Kiír</span> <span class="str">"Nem található a tömbben"</span>'
+    ],
+    initData: () => ({ t: [7, 14, 3, 19, 28, 5], target: 19 }),
+    presets: [
+      { name: 'Sikeres keresés', data: () => ({ t: [7, 14, 3, 19, 28, 5], target: 19 }) },
+      { name: 'Sikertelen keresés', data: () => ({ t: [7, 14, 3, 19, 28, 5], target: 50 }) }
+    ],
+    generateSteps: (data) => {
+      const steps = [];
+      const t = [...data.t];
+      const target = data.target;
+      const n = t.length;
+      let i = 0;
+
+      steps.push({
+        line: 1, vars: { i: 0, ker: target, n },
+        arrays: { t: t.map(v => ({ v, state: 'normal' })) },
+        pointers: { t: { i: 0 } },
+        text: `Keresett érték: ker = ${target}. Ciklus indul: i = 0.`
+      });
+
+      while (i < n && t[i] !== target) {
+        steps.push({
+          line: 2, vars: { i, 't[i]': t[i], ker: target, egyezik: 'nem' },
+          arrays: { t: t.map((v, idx) => ({ v, state: idx < i ? 'dimmed' : (idx === i ? 'checking' : 'normal') })) },
+          pointers: { t: { i } },
+          text: `Ellenőrzés: t[${i}] = ${t[i]} nem egyezik ${target}-cel. Lépünk: i = ${i + 1}.`
+        });
+        i++;
+      }
+
+      if (i < n) {
+        steps.push({
+          line: 5, vars: { i, 't[i]': t[i], ker: target, van: 'IGEN' },
+          arrays: { t: t.map((v, idx) => ({ v, state: idx === i ? 'matched' : 'dimmed' })) },
+          pointers: { t: { i } },
+          text: `Találat! t[${i}] = ${t[i]} egyezik a keresett számmal. A ciklus leáll.`
+        });
+        steps.push({
+          line: 6, vars: { i, index: i, sorszám: i + 1 },
+          arrays: { t: t.map((v, idx) => ({ v, state: idx === i ? 'matched' : 'dimmed' })) },
+          pointers: { t: { i } },
+          text: `Sikeres keresés! Az érték a(z) ${i}. indexen (a ${i + 1}. helyen) található.`
+        });
+      } else {
+        steps.push({
+          line: 8, vars: { i: n, van: 'NEM' },
+          arrays: { t: t.map(v => ({ v, state: 'dimmed' })) },
+          pointers: { t: { i: null } },
+          text: `Sikertelen keresés! Végigértünk a tömbön (i = ${n}), a keresett szám (${target}) nincs a tömbben.`
+        });
+      }
+      return steps;
+    }
+  },
+
+  maximum: {
+    title: 'Maximumkiválasztás tétele',
+    desc: 'Meghatározza a tömb legnagyobb elemének értékét és annak helyét (indexét). A feltételezés: az első elem a legnagyobb (<code>max = t[0], maxIndex = 0</code>), majd az 1. indextől végignézzük a tömböt; ha találunk nagyobbat, frissítjük a maximumot.',
+    code: [
+      '<span class="cm">// Maximumkiválasztás</span>',
+      '<span class="kw">maxErtek</span> = t[<span class="num">0</span>]',
+      '<span class="kw">maxIndex</span> = <span class="num">0</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">1</span>-től <span class="num">n - 1</span>-ig',
+      '    <span class="kw">Ha</span> t[i] &gt; maxErtek <span class="kw">Akkor</span>',
+      '        <span class="kw">maxErtek</span> = t[i]',
+      '        <span class="kw">maxIndex</span> = i',
+      '    <span class="kw">Feltétel vége</span>',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="fn">Kiír</span> <span class="str">"Legnagyobb: "</span> & maxErtek & <span class="str">" (helye: "</span> & maxIndex & <span class="str">")"</span>'
+    ],
+    initData: () => ({ t: [14, 28, 9, 35, 21, 35, 17] }),
+    presets: [
+      { name: 'Vegyes számok', data: () => ({ t: [14, 28, 9, 35, 21, 17] }) },
+      { name: 'Legelső a legnagyobb', data: () => ({ t: [99, 45, 32, 18, 5] }) },
+      { name: 'Legutolsó a legnagyobb', data: () => ({ t: [10, 20, 30, 40, 88] }) }
+    ],
+    generateSteps: (data) => {
+      const steps = [];
+      const t = [...data.t];
+      const n = t.length;
+      let maxVal = t[0];
+      let maxIdx = 0;
+
+      steps.push({
+        line: 1, vars: { maxErtek: maxVal, maxIndex: 0, i: '-' },
+        arrays: { t: t.map((v, idx) => ({ v, state: idx === 0 ? 'target' : 'normal' })) },
+        pointers: { t: { maxIndex: 0 } },
+        text: `Kezdetben feltesszük, hogy az első elem a legnagyobb: maxErtek = ${maxVal}, maxIndex = 0.`
+      });
+
+      for (let i = 1; i < n; i++) {
+        const isBigger = t[i] > maxVal;
+        steps.push({
+          line: 4, vars: { i, 't[i]': t[i], maxErtek: maxVal, maxIndex: maxIdx, 'nagyobb?': isBigger ? 'IGEN' : 'NEM' },
+          arrays: { t: t.map((v, idx) => ({ v, state: idx === maxIdx ? 'target' : (idx === i ? 'checking' : (idx < i ? 'dimmed' : 'normal')) })) },
+          pointers: { t: { i, maxIndex: maxIdx } },
+          text: `Összehasonlítás: t[${i}] (${t[i]}) > jelenlegi max (${maxVal})? ${isBigger ? 'Igen, új csúcs!' : 'Nem.'}`
+        });
+
+        if (isBigger) {
+          maxVal = t[i];
+          maxIdx = i;
+          steps.push({
+            line: 5, vars: { i, maxErtek: maxVal, maxIndex: maxIdx },
+            arrays: { t: t.map((v, idx) => ({ v, state: idx === maxIdx ? 'target' : 'dimmed' })) },
+            pointers: { t: { i, maxIndex: maxIdx } },
+            text: `Új maximum rögzítve: maxErtek = ${maxVal}, maxIndex = ${maxIdx}.`
+          });
+        }
+      }
+
+      steps.push({
+        line: 9, vars: { maxErtek: maxVal, maxIndex: maxIdx, helye: maxIdx + 1 },
+        arrays: { t: t.map((v, idx) => ({ v, state: idx === maxIdx ? 'matched' : 'dimmed' })) },
+        pointers: { t: { maxIndex: maxIdx } },
+        text: `Kész! A legnagyobb elem értéke: ${maxVal}, a(z) ${maxIdx}. indexen (a ${maxIdx + 1}. helyen).`
+      });
+      return steps;
+    }
+  },
+
+  minimum: {
+    title: 'Minimumkiválasztás tétele',
+    desc: 'Meghatározza a tömb legkisebb elemének értékét és annak indexét. Az első elemet tekintjük a kezdeti legkisebbnek (<code>min = t[0], minIndex = 0</code>), majd sorra összevetjük a többivel.',
+    code: [
+      '<span class="cm">// Minimumkiválasztás</span>',
+      '<span class="kw">minErtek</span> = t[<span class="num">0</span>]',
+      '<span class="kw">minIndex</span> = <span class="num">0</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">1</span>-től <span class="num">n - 1</span>-ig',
+      '    <span class="kw">Ha</span> t[i] &lt; minErtek <span class="kw">Akkor</span>',
+      '        <span class="kw">minErtek</span> = t[i]',
+      '        <span class="kw">minIndex</span> = i',
+      '    <span class="kw">Feltétel vége</span>',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="fn">Kiír</span> <span class="str">"Legkisebb: "</span> & minErtek & <span class="str">" (helye: "</span> & minIndex & <span class="str">")"</span>'
+    ],
+    initData: () => ({ t: [24, 15, 38, 7, 19, 12] }),
+    presets: [
+      { name: 'Vegyes számok', data: () => ({ t: [24, 15, 38, 7, 19, 12] }) },
+      { name: 'Legelső a legkisebb', data: () => ({ t: [3, 14, 28, 45, 90] }) }
+    ],
+    generateSteps: (data) => {
+      const steps = [];
+      const t = [...data.t];
+      const n = t.length;
+      let minVal = t[0];
+      let minIdx = 0;
+
+      steps.push({
+        line: 1, vars: { minErtek: minVal, minIndex: 0, i: '-' },
+        arrays: { t: t.map((v, idx) => ({ v, state: idx === 0 ? 'target' : 'normal' })) },
+        pointers: { t: { minIndex: 0 } },
+        text: `Kezdetben feltesszük, hogy az első elem a legkisebb: minErtek = ${minVal}, minIndex = 0.`
+      });
+
+      for (let i = 1; i < n; i++) {
+        const isSmaller = t[i] < minVal;
+        steps.push({
+          line: 4, vars: { i, 't[i]': t[i], minErtek: minVal, minIndex: minIdx, 'kisebb?': isSmaller ? 'IGEN' : 'NEM' },
+          arrays: { t: t.map((v, idx) => ({ v, state: idx === minIdx ? 'target' : (idx === i ? 'checking' : (idx < i ? 'dimmed' : 'normal')) })) },
+          pointers: { t: { i, minIndex: minIdx } },
+          text: `Összehasonlítás: t[${i}] (${t[i]}) < jelenlegi min (${minVal})? ${isSmaller ? 'Igen, új minimum!' : 'Nem.'}`
+        });
+
+        if (isSmaller) {
+          minVal = t[i];
+          minIdx = i;
+          steps.push({
+            line: 5, vars: { i, minErtek: minVal, minIndex: minIdx },
+            arrays: { t: t.map((v, idx) => ({ v, state: idx === minIdx ? 'target' : 'dimmed' })) },
+            pointers: { t: { i, minIndex: minIdx } },
+            text: `Új minimum rögzítve: minErtek = ${minVal}, minIndex = ${minIdx}.`
+          });
+        }
+      }
+
+      steps.push({
+        line: 9, vars: { minErtek: minVal, minIndex: minIdx, helye: minIdx + 1 },
+        arrays: { t: t.map((v, idx) => ({ v, state: idx === minIdx ? 'matched' : 'dimmed' })) },
+        pointers: { t: { minIndex: minIdx } },
+        text: `Kész! A legkisebb elem: ${minVal}, a(z) ${minIdx}. indexen (a ${minIdx + 1}. helyen).`
+      });
+      return steps;
+    }
+  },
+
+  copy: {
+    title: 'Másolás tétele',
+    desc: 'Egy tömb minden elemére alkalmazunk egy műveletet / függvényt (leképezést), és az eredményt egy új tömb azonos indexű helyére írjuk (példánkban: minden szám dupláját képezzük: <code>b[i] = a[i] * 2</code>).',
+    code: [
+      '<span class="cm">// Másolás: b[i] = a[i] * 2</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">0</span>-tól <span class="num">n - 1</span>-ig',
+      '    <span class="kw">b[i]</span> = a[i] * <span class="num">2</span>',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="fn">Kiír</span> <span class="str">"Kész a másolat tömb"</span>'
+    ],
+    initData: () => ({ a: [3, 7, 2, 8, 5] }),
+    generateSteps: (data) => {
+      const steps = [];
+      const a = [...data.a];
+      const n = a.length;
+      const b = [];
+
+      steps.push({
+        line: 1, vars: { i: 0, n },
+        arrays: { a: a.map(v => ({ v, state: 'normal' })), b: [] },
+        pointers: { a: { i: 0 } },
+        text: 'Indulás: az a tömb elemeit egyenként megduplázva átmásoljuk a b tömbbe.'
+      });
+
+      for (let i = 0; i < n; i++) {
+        const dbl = a[i] * 2;
+        steps.push({
+          line: 2, vars: { i, 'a[i]': a[i], 'új érték': dbl },
+          arrays: {
+            a: a.map((v, idx) => ({ v, state: idx === i ? 'checking' : (idx < i ? 'matched' : 'normal') })),
+            b: b.map(v => ({ v, state: 'normal' }))
+          },
+          pointers: { a: { i }, b: { i } },
+          text: `Vesszük az a[${i}] = ${a[i]} értéket, megduplázzuk: ${a[i]} · 2 = ${dbl}.`
+        });
+
+        b.push(dbl);
+        steps.push({
+          line: 2, vars: { i, 'b[i]': dbl },
+          arrays: {
+            a: a.map((v, idx) => ({ v, state: idx <= i ? 'matched' : 'normal' })),
+            b: b.map((v, idx) => ({ v, state: idx === i ? 'matched' : 'normal' }))
+          },
+          pointers: { a: { i }, b: { i } },
+          text: `Beírjuk a b[${i}] helyre az új értéket: ${dbl}.`
+        });
+      }
+
+      steps.push({
+        line: 4, vars: { i: n },
+        arrays: {
+          a: a.map(v => ({ v, state: 'matched' })),
+          b: b.map(v => ({ v, state: 'matched' }))
+        },
+        pointers: {},
+        text: 'A másolás befejeződött, a b tömb minden eleme elkészült.'
+      });
+      return steps;
+    }
+  },
+
+  filter: {
+    title: 'Kiválogatás tétele',
+    desc: 'Az <code>a</code> tömbből kigyűjtjük egy új <code>b</code> tömbbe azokat az elemeket, amelyek kielégítik a feltételt (példánkban: <strong>5-nél kisebb számok</strong>). A <code>b</code> tömbnek külön indexe van (<code>j</code>), amely csak akkor nő, ha találtunk megfelelő elemet!',
+    code: [
+      '<span class="cm">// Kiválogatás: 5-nél kisebb elemek átrakása b-be</span>',
+      '<span class="kw">j</span> = <span class="num">0</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">0</span>-tól <span class="num">n - 1</span>-ig',
+      '    <span class="kw">Ha</span> a[i] &lt; <span class="num">5</span> <span class="kw">Akkor</span>',
+      '        <span class="kw">b[j]</span> = a[i]',
+      '        <span class="kw">j</span> = <span class="kw">j</span> + <span class="num">1</span>',
+      '    <span class="kw">Feltétel vége</span>',
+      '<span class="kw">Ciklus vége</span>'
+    ],
+    initData: () => ({ a: [6, 2, 8, 3, 4, 9, 1, 7] }),
+    generateSteps: (data) => {
+      const steps = [];
+      const a = [...data.a];
+      const n = a.length;
+      const b = [];
+      let j = 0;
+
+      steps.push({
+        line: 1, vars: { j: 0, i: 0, n },
+        arrays: { a: a.map(v => ({ v, state: 'normal' })), b: [] },
+        pointers: { a: { i: 0 }, b: { j: 0 } },
+        text: 'Kezdés: j = 0 (a cél tömb kezdetben üres).'
+      });
+
+      for (let i = 0; i < n; i++) {
+        const match = a[i] < 5;
+        steps.push({
+          line: 3, vars: { i, 'a[i]': a[i], '< 5?': match ? 'IGEN' : 'NEM', j },
+          arrays: {
+            a: a.map((v, idx) => ({ v, state: idx === i ? 'checking' : (idx < i ? (v < 5 ? 'matched' : 'dimmed') : 'normal') })),
+            b: b.map(v => ({ v, state: 'normal' }))
+          },
+          pointers: { a: { i }, b: { j } },
+          text: `Vizsgálat: a[${i}] = ${a[i]} < 5? ${match ? 'Igen! Átmásoljuk.' : 'Nem, átlépjük.'}`
+        });
+
+        if (match) {
+          b.push(a[i]);
+          steps.push({
+            line: 4, vars: { i, 'b[j]': a[i], j },
+            arrays: {
+              a: a.map((v, idx) => ({ v, state: idx === i ? 'matched' : (idx < i ? (v < 5 ? 'matched' : 'dimmed') : 'normal') })),
+              b: b.map((v, idx) => ({ v, state: idx === j ? 'matched' : 'normal' }))
+            },
+            pointers: { a: { i }, b: { j } },
+            text: `b[${j}] = ${a[i]}. Beírtuk a b tömb ${j}. helyére.`
+          });
+          j++;
+        }
+      }
+
+      steps.push({
+        line: 7, vars: { j, 'összes találat': j },
+        arrays: {
+          a: a.map(v => ({ v, state: v < 5 ? 'matched' : 'dimmed' })),
+          b: b.map(v => ({ v, state: 'matched' }))
+        },
+        pointers: { b: { j } },
+        text: `Kiválogatás kész! Összesen ${j} db 5-nél kisebb elem került a b tömbbe.`
+      });
+      return steps;
+    }
+  },
+
+  partition: {
+    title: 'Szétválogatás tétele',
+    desc: 'A tömb minden elemét pontosan két csoport egyikébe osztjuk egy feltétel szerint (itt: 5-nél kisebbek a <code>b</code> tömbbe, a többi a <code>c</code> tömbbe). Két független célmutatót használunk: <code>j</code> a <code>b</code>-nek, <code>k</code> a <code>c</code>-nek.',
+    code: [
+      '<span class="cm">// Szétválogatás két tömbbe</span>',
+      '<span class="kw">j</span> = <span class="num">0</span>; <span class="kw">k</span> = <span class="num">0</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">0</span>-tól <span class="num">n - 1</span>-ig',
+      '    <span class="kw">Ha</span> a[i] &lt; <span class="num">5</span> <span class="kw">Akkor</span>',
+      '        <span class="kw">b[j]</span> = a[i]; <span class="kw">j</span> = <span class="kw">j</span> + <span class="num">1</span>',
+      '    <span class="kw">Különben</span>',
+      '        <span class="kw">c[k]</span> = a[i]; <span class="kw">k</span> = <span class="kw">k</span> + <span class="num">1</span>',
+      '<span class="kw">Ciklus vége</span>'
+    ],
+    initData: () => ({ a: [3, 7, 1, 8, 4, 6] }),
+    generateSteps: (data) => {
+      const steps = [];
+      const a = [...data.a];
+      const n = a.length;
+      const b = [], c = [];
+      let j = 0, k = 0;
+
+      steps.push({
+        line: 1, vars: { j: 0, k: 0, i: 0 },
+        arrays: { a: a.map(v => ({ v, state: 'normal' })), b: [], c: [] },
+        pointers: { a: { i: 0 } },
+        text: 'Kezdet: j = 0 (b tömb mutatója), k = 0 (c tömb mutatója).'
+      });
+
+      for (let i = 0; i < n; i++) {
+        const isB = a[i] < 5;
+        steps.push({
+          line: 3, vars: { i, 'a[i]': a[i], cél: isB ? 'b (< 5)' : 'c (>= 5)', j, k },
+          arrays: {
+            a: a.map((v, idx) => ({ v, state: idx === i ? 'checking' : 'normal' })),
+            b: b.map(v => ({ v, state: 'normal' })),
+            c: c.map(v => ({ v, state: 'normal' }))
+          },
+          pointers: { a: { i } },
+          text: `a[${i}] = ${a[i]}. ${isB ? '5-nél kisebb -> b tömbbe kerül!' : 'Nem kisebb 5-nél -> c tömbbe kerül!'}`
+        });
+
+        if (isB) {
+          b.push(a[i]);
+          steps.push({
+            line: 4, vars: { i, 'b[j]': a[i], j: j + 1, k },
+            arrays: {
+              a: a.map((v, idx) => ({ v, state: idx <= i ? 'matched' : 'normal' })),
+              b: b.map((v, idx) => ({ v, state: idx === j ? 'matched' : 'normal' })),
+              c: c.map(v => ({ v, state: 'normal' }))
+            },
+            pointers: { a: { i }, b: { j } },
+            text: `b[${j}] = ${a[i]}, j nő ${j + 1}-re.`
+          });
+          j++;
+        } else {
+          c.push(a[i]);
+          steps.push({
+            line: 6, vars: { i, 'c[k]': a[i], j, k: k + 1 },
+            arrays: {
+              a: a.map((v, idx) => ({ v, state: idx <= i ? 'matched' : 'normal' })),
+              b: b.map(v => ({ v, state: 'normal' })),
+              c: c.map((v, idx) => ({ v, state: idx === k ? 'matched' : 'normal' }))
+            },
+            pointers: { a: { i }, c: { k } },
+            text: `c[${k}] = ${a[i]}, k nő ${k + 1}-re.`
+          });
+          k++;
+        }
+      }
+
+      steps.push({
+        line: 7, vars: { j, k, összes: n },
+        arrays: {
+          a: a.map(v => ({ v, state: 'matched' })),
+          b: b.map(v => ({ v, state: 'matched' })),
+          c: c.map(v => ({ v, state: 'matched' }))
+        },
+        pointers: {},
+        text: `Szétválogatás kész! ${j} elem került b-be és ${k} elem került c-be.`
+      });
+      return steps;
+    }
+  },
+
+  intersection: {
+    title: 'Metszet tétele',
+    desc: 'Két halmaz (tömb) <strong>közös elemeit</strong> gyűjti össze a <code>c</code> tömbbe. Az <code>a</code> tömb minden elemére lineáris kereséssel megvizsgáljuk, hogy benne van-e <code>b</code>-ben (belső ciklus). Ha igen, átmásoljuk.',
+    code: [
+      '<span class="cm">// Metszet: A és B közös elemei C-be</span>',
+      '<span class="kw">k</span> = <span class="num">0</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">0</span>-tól <span class="num">n - 1</span>-ig',
+      '    <span class="kw">j</span> = <span class="num">0</span>',
+      '    <span class="kw">Ciklus amíg</span> j &lt; m <span class="kw">és</span> b[j] &lt;&gt; a[i]',
+      '        <span class="kw">j</span> = <span class="kw">j</span> + <span class="num">1</span>',
+      '    <span class="kw">Ciklus vége</span>',
+      '    <span class="kw">Ha</span> j &lt; m <span class="kw">Akkor</span>',
+      '        <span class="kw">c[k]</span> = a[i]; <span class="kw">k</span> = <span class="kw">k</span> + <span class="num">1</span>',
+      '<span class="kw">Ciklus vége</span>'
+    ],
+    initData: () => ({ a: [5, 3, 6, 2, 1], b: [6, 2, 7, 8, 9] }),
+    generateSteps: (data) => {
+      const steps = [];
+      const a = [...data.a];
+      const b = [...data.b];
+      const c = [];
+      let k = 0;
+
+      steps.push({
+        line: 1, vars: { k: 0, i: 0, j: '-' },
+        arrays: { a: a.map(v => ({ v, state: 'normal' })), b: b.map(v => ({ v, state: 'normal' })), c: [] },
+        pointers: { a: { i: 0 } },
+        text: 'Kezdés: k = 0 (a metszet tömb mérete).'
+      });
+
+      for (let i = 0; i < a.length; i++) {
+        let j = 0;
+        steps.push({
+          line: 2, vars: { i, 'a[i]': a[i], j: 0, k },
+          arrays: {
+            a: a.map((v, idx) => ({ v, state: idx === i ? 'checking' : 'normal' })),
+            b: b.map(v => ({ v, state: 'normal' })),
+            c: c.map(v => ({ v, state: 'normal' }))
+          },
+          pointers: { a: { i }, b: { j: 0 } },
+          text: `Megnézzük, hogy az a[${i}] = ${a[i]} elem szerepel-e a b tömbben.`
+        });
+
+        while (j < b.length && b[j] !== a[i]) {
+          j++;
+        }
+
+        const found = j < b.length;
+        if (found) {
+          c.push(a[i]);
+          steps.push({
+            line: 7, vars: { i, 'a[i]': a[i], 'b-ben van?': 'IGEN', k },
+            arrays: {
+              a: a.map((v, idx) => ({ v, state: idx === i ? 'matched' : 'normal' })),
+              b: b.map((v, idx) => ({ v, state: idx === j ? 'matched' : 'normal' })),
+              c: c.map((v, idx) => ({ v, state: idx === k ? 'matched' : 'normal' }))
+            },
+            pointers: { a: { i }, b: { j }, c: { k } },
+            text: `Közös elem! ${a[i]} szerepel b-ben (index: ${j}). c[${k}] = ${a[i]}.`
+          });
+          k++;
+        } else {
+          steps.push({
+            line: 4, vars: { i, 'a[i]': a[i], 'b-ben van?': 'NEM', k },
+            arrays: {
+              a: a.map((v, idx) => ({ v, state: idx === i ? 'dimmed' : 'normal' })),
+              b: b.map(v => ({ v, state: 'normal' })),
+              c: c.map(v => ({ v, state: 'normal' }))
+            },
+            pointers: { a: { i } },
+            text: `${a[i]} nem található a b tömbben.`
+          });
+        }
+      }
+
+      steps.push({
+        line: 9, vars: { 'metszet mérete': k },
+        arrays: {
+          a: a.map(v => ({ v, state: 'normal' })),
+          b: b.map(v => ({ v, state: 'normal' })),
+          c: c.map(v => ({ v, state: 'matched' }))
+        },
+        pointers: {},
+        text: `Metszetképzés kész! Közös elemek: [${c.join(', ')}].`
+      });
+      return steps;
+    }
+  },
+
+  union: {
+    title: 'Unió tétele',
+    desc: 'Két halmaz (tömb) egyesítése. Először az <code>A</code> tömb minden elemét átmásoljuk a <code>C</code> tömbbe, majd a <code>B</code> tömb azon elemeit fűzzük hozzá, amelyek még nincsenek benne az <code>A</code>-ban.',
+    code: [
+      '<span class="cm">// Unió: A összes eleme, majd B-ből a hiányzók</span>',
+      '<span class="cm">// 1. A másolása C-be</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">0</span>-tól <span class="num">n - 1</span>-ig: <span class="kw">c[i]</span> = a[i]',
+      '<span class="kw">k</span> = n',
+      '<span class="cm">// 2. B elemeinek ellenőrzése és hozzáadása</span>',
+      '<span class="kw">Ciklus</span> j = <span class="num">0</span>-tól <span class="num">m - 1</span>-ig',
+      '    <span class="kw">i</span> = <span class="num">0</span>',
+      '    <span class="kw">Ciklus amíg</span> i &lt; n <span class="kw">és</span> b[j] &lt;&gt; a[i]: <span class="kw">i</span> = <span class="kw">i</span> + <span class="num">1</span>',
+      '    <span class="kw">Ha</span> i &gt;= n <span class="kw">Akkor</span>: <span class="kw">c[k]</span> = b[j]; <span class="kw">k</span> = <span class="kw">k</span> + <span class="num">1</span>',
+      '<span class="kw">Ciklus vége</span>'
+    ],
+    initData: () => ({ a: [5, 3, 6], b: [6, 2, 7] }),
+    generateSteps: (data) => {
+      const steps = [];
+      const a = [...data.a];
+      const b = [...data.b];
+      const c = [];
+      let k = 0;
+
+      steps.push({
+        line: 1, vars: { k: 0 },
+        arrays: { a: a.map(v => ({ v, state: 'normal' })), b: b.map(v => ({ v, state: 'normal' })), c: [] },
+        pointers: {},
+        text: '1. Lépés: az a tömb összes elemét átmásoljuk c-be.'
+      });
+
+      for (let i = 0; i < a.length; i++) {
+        c.push(a[i]);
+        k++;
+      }
+
+      steps.push({
+        line: 3, vars: { k },
+        arrays: {
+          a: a.map(v => ({ v, state: 'matched' })),
+          b: b.map(v => ({ v, state: 'normal' })),
+          c: c.map(v => ({ v, state: 'matched' }))
+        },
+        pointers: {},
+        text: `a tömb átmásolva (${k} elem). Most vizsgáljuk b elemeit.`
+      });
+
+      for (let j = 0; j < b.length; j++) {
+        const val = b[j];
+        let i = 0;
+        while (i < a.length && a[i] !== val) i++;
+        const inA = i < a.length;
+
+        steps.push({
+          line: 7, vars: { j, 'b[j]': val, 'már a-ban volt?': inA ? 'IGEN' : 'NEM', k },
+          arrays: {
+            a: a.map((v, idx) => ({ v, state: idx === i ? 'checking' : 'normal' })),
+            b: b.map((v, idx) => ({ v, state: idx === j ? 'checking' : 'normal' })),
+            c: c.map(v => ({ v, state: 'normal' }))
+          },
+          pointers: { b: { j } },
+          text: `b[${j}] = ${val}. Szerepel az a tömbben? ${inA ? 'Igen, már benne van, nem duplázzuk.' : 'Nem, bekerül c-be!'}`
+        });
+
+        if (!inA) {
+          c.push(val);
+          steps.push({
+            line: 8, vars: { j, 'új elem c-ben': val, k: k + 1 },
+            arrays: {
+              a: a.map(v => ({ v, state: 'normal' })),
+              b: b.map((v, idx) => ({ v, state: idx === j ? 'matched' : 'normal' })),
+              c: c.map((v, idx) => ({ v, state: idx === k ? 'matched' : 'normal' }))
+            },
+            pointers: { b: { j }, c: { k } },
+            text: `c[${k}] = ${val}. Hozzáadva az unióhoz!`
+          });
+          k++;
+        }
+      }
+
+      steps.push({
+        line: 9, vars: { 'unió mérete': k },
+        arrays: {
+          a: a.map(v => ({ v, state: 'normal' })),
+          b: b.map(v => ({ v, state: 'normal' })),
+          c: c.map(v => ({ v, state: 'matched' }))
+        },
+        pointers: {},
+        text: `Unió képzés befejezve! Az unió elemei: [${c.join(', ')}].`
+      });
+      return steps;
+    }
+  }
+};
+
+// ======================= EGY TÉTEL MEGJELENÍTŐJE =======================
+// Minden tételhez külön, önálló példány készül (saját állapottal és vezérlőkkel).
+function createViewer(key, root) {
+  let currentTheoremKey = key;
+  let currentTheorem = THEOREMS[key];
+  let currentData = currentTheorem.initData();
+  let steps = [];
+  let currentStepIdx = 0;
+  let playTimer = null;
+  const codeLines = [];
+  const R = id => root.querySelector('[data-r="' + id + '"]');
+
+  function loadTheorem(key) {
+    currentTheoremKey = key;
+    currentTheorem = THEOREMS[key];
+    currentData = currentTheorem.initData();
+
+    R('visTitle').textContent = 'Animáció';
+    R('theoremDesc').innerHTML = currentTheorem.desc;
+
+    // Cél érték mező megjelenítése ha szükséges
+    if (currentTheorem.hasTarget) {
+      R('targetControls').style.display = 'flex';
+      R('targetInput').value = currentData.target !== undefined ? currentData.target : currentTheorem.defaultTarget;
+    } else {
+      R('targetControls').style.display = 'none';
+    }
+
+    // Presets renderelése
+    const pBox = R('presetButtons');
+    pBox.innerHTML = '';
+    if (currentTheorem.presets) {
+      currentTheorem.presets.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'preset-btn';
+        btn.textContent = p.name;
+        btn.addEventListener('click', () => {
+          pause();
+          currentData = p.data();
+          if (currentTheorem.hasTarget && currentData.target !== undefined) {
+            R('targetInput').value = currentData.target;
+          }
+          recalc();
+        });
+        pBox.appendChild(btn);
+      });
+    }
+
+    // Pszeudokód renderelése
+    const codeBox = R('codeBox');
+    codeBox.innerHTML = '';
+    codeLines.length = 0;
+    currentTheorem.code.forEach((line, idx) => {
+      const div = document.createElement('div');
+      div.className = 'code-line';
+      codeLines.push(div);
+      div.innerHTML = line;
+      codeBox.appendChild(div);
+    });
+
+    recalc();
+  }
+
+  function recalc() {
+    pause();
+    steps = currentTheorem.generateSteps(currentData);
+    currentStepIdx = 0;
+    renderStep(currentStepIdx);
+  }
+
+  function renderStep(idx) {
+    if (!steps || steps.length === 0) return;
+    const s = steps[idx];
+    currentStepIdx = idx;
+
+    R('stepCounter').textContent = `${idx + 1} / ${steps.length}. lépés`;
+    R('stepExplanation').innerHTML = s.text;
+
+    // Gombok tiltása
+    R('btnPrev').disabled = idx === 0;
+    R('btnNext').disabled = idx === steps.length - 1;
+
+    // Pszeudokód aktív sor
+    codeLines.forEach(l => l.classList.remove('active'));
+    if (s.line !== undefined && codeLines[s.line]) {
+      codeLines[s.line].classList.add('active');
+    }
+
+    // Változók frissítése
+    const varGrid = R('varGrid');
+    varGrid.innerHTML = '';
+    for (const [k, v] of Object.entries(s.vars)) {
+      const card = document.createElement('div');
+      card.className = 'var-card';
+      card.innerHTML = `<div class="var-name">${k}</div><div class="var-val">${v}</div>`;
+      varGrid.appendChild(card);
+    }
+
+    // Tömbök vizualizációja
+    const container = R('arrayContainer');
+    container.innerHTML = '';
+
+    for (const [arrName, items] of Object.entries(s.arrays)) {
+      const row = document.createElement('div');
+      row.className = 'array-row';
+
+      const lbl = document.createElement('div');
+      lbl.className = 'array-label';
+      lbl.textContent = arrName + ':';
+      row.appendChild(lbl);
+
+      const pointers = s.pointers && s.pointers[arrName] ? s.pointers[arrName] : {};
+
+      items.forEach((item, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'bar-cell';
+
+        // Magasság az érték alapján (min 36px, max 90px)
+        const absVal = Math.abs(item.v);
+        const h = Math.max(36, Math.min(100, 34 + absVal * 3));
+
+        const box = document.createElement('div');
+        box.className = `bar-box ${item.state || 'normal'}`;
+        box.style.height = `${h}px`;
+        box.textContent = item.v;
+        cell.appendChild(box);
+
+        const idxLabel = document.createElement('div');
+        idxLabel.className = 'bar-idx';
+        idxLabel.textContent = i;
+        cell.appendChild(idxLabel);
+
+        // Mutatók
+        for (const [pName, pIdx] of Object.entries(pointers)) {
+          if (pIdx === i) {
+            const badge = document.createElement('div');
+            badge.className = `pointer-badge ${pName}`;
+            badge.textContent = pName;
+            cell.appendChild(badge);
+          }
+        }
+
+        row.appendChild(cell);
+      });
+
+      container.appendChild(row);
+    }
+  }
+
+  // Vezérlő események
+  function pause() {
+    if (playTimer) {
+      clearInterval(playTimer);
+      playTimer = null;
+      R('btnPlay').textContent = '▶ Lejátszás';
+    }
+  }
+
+  function play() {
+    if (playTimer) {
+      pause();
+      return;
+    }
+    if (currentStepIdx >= steps.length - 1) {
+      currentStepIdx = 0;
+      renderStep(0);
+    }
+    R('btnPlay').textContent = '⏸ Szünet';
+    const speed = +R('speedSelect').value;
+    playTimer = setInterval(() => {
+      if (currentStepIdx < steps.length - 1) {
+        renderStep(currentStepIdx + 1);
+      } else {
+        pause();
+      }
+    }, speed);
+  }
+
+  R('btnPlay').addEventListener('click', play);
+  R('btnNext').addEventListener('click', () => { pause(); if (currentStepIdx < steps.length - 1) renderStep(currentStepIdx + 1); });
+  R('btnPrev').addEventListener('click', () => { pause(); if (currentStepIdx > 0) renderStep(currentStepIdx - 1); });
+  R('btnReset').addEventListener('click', () => { pause(); renderStep(0); });
+
+  R('btnRandom').addEventListener('click', () => {
+    pause();
+    if (currentTheoremKey === 'intersection' || currentTheoremKey === 'union') {
+      currentData = {
+        a: Array.from({ length: 4 + Math.floor(Math.random() * 3) }, () => Math.floor(Math.random() * 15) + 1),
+        b: Array.from({ length: 4 + Math.floor(Math.random() * 3) }, () => Math.floor(Math.random() * 15) + 1)
+      };
+    } else {
+      const len = 6 + Math.floor(Math.random() * 4);
+      const arr = Array.from({ length: len }, () => Math.floor(Math.random() * 30) + 1);
+      currentData = { t: arr, a: arr };
+      if (currentTheorem.hasTarget) {
+        const willContain = Math.random() > 0.3;
+        const target = willContain ? arr[Math.floor(Math.random() * arr.length)] : 99;
+        currentData.target = target;
+        R('targetInput').value = target;
+      }
+    }
+    recalc();
+  });
+
+  R('btnApplyTarget').addEventListener('click', () => {
+    pause();
+    currentData.target = +R('targetInput').value;
+    recalc();
+  });
+
+  R('speedSelect').addEventListener('change', () => {
+    if (playTimer) {
+      pause();
+      play();
+    }
+  });
+
+  loadTheorem(key);
+
+}
+
+// ======================= AZ OLDAL FELÉPÍTÉSE =======================
+const GROUPS = [{title:"1. Egy sorozat feldolgozása (elemi tételek)",items:[["summation","Összegzés"],["counting","Megszámolás"],["decision","Eldöntés"],["selection","Kiválasztás"],["linearSearch","Lineáris keresés"],["maximum","Maximumkiválasztás"],["minimum","Minimumkiválasztás"]]},{title:"2. Sorozatok másolása és szétválogatása",items:[["copy","Másolás"],["filter","Kiválogatás"],["partition","Szétválogatás"]]},{title:"3. Két sorozat összehasonlítása",items:[["intersection","Metszet"],["union","Unió"]]}];
+const host = $('#theorems');
+const tpl = $('#viewerTpl');
+GROUPS.forEach(g => {
+  const gt = document.createElement('div');
+  gt.className = 'group-title';
+  gt.textContent = g.title;
+  host.appendChild(gt);
+  g.items.forEach(([key, label]) => {
+    const sec = document.createElement('section');
+    sec.className = 'theorem';
+    sec.id = 't-' + key;
+    const h = document.createElement('h2');
+    h.className = 'section-title';
+    h.textContent = THEOREMS[key].title;
+    sec.appendChild(h);
+    sec.appendChild(tpl.content.cloneNode(true));
+    host.appendChild(sec);
+    createViewer(key, sec);
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,2549 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Összeszámlálási módszerek – animációk és összefüggések</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --panel: #f5f7fa;
+  --panel-hover: #eef2f6;
+  --fg: #1b1f24;
+  --muted: #59636e;
+  --line: #d5dae0;
+  --grid: #e6e9ed;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --ok: #16a34a;
+  --ok-bg: #f0fdf4;
+  --warn: #d97706;
+  --warn-bg: #fffbeb;
+  --bad: #dc2626;
+  --bad-bg: #fef2f2;
+  --c1: #ef4444;
+  --c2: #3b82f6;
+  --c3: #10b981;
+  --c4: #f59e0b;
+  --c5: #8b5cf6;
+  --c6: #06b6d4;
+  --c7: #ec4899;
+  --c8: #84cc16;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171b;
+    --panel: #1d2228;
+    --panel-hover: #252c34;
+    --fg: #e8ebef;
+    --muted: #9aa4af;
+    --line: #333b44;
+    --grid: #262c33;
+    --accent: #6ea0ff;
+    --accent-light: #172554;
+    --ok: #22c55e;
+    --ok-bg: #052e16;
+    --warn: #f59e0b;
+    --warn-bg: #451a03;
+    --bad: #ef4444;
+    --bad-bg: #450a0a;
+    --c1: #f87171;
+    --c2: #60a5fa;
+    --c3: #34d399;
+    --c4: #fbbf24;
+    --c5: #a78bfa;
+    --c6: #22d3ee;
+    --c7: #f472b6;
+    --c8: #a3e635;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.top-nav {
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.top-nav a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.top-nav a:hover {
+  text-decoration: underline;
+}
+header {
+  padding: 24px 24px 12px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+h1 {
+  font-size: 1.85rem;
+  margin: 0 0 12px;
+}
+.intro-lead {
+  font-size: 1.08rem;
+  color: var(--muted);
+  max-width: 1100px;
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+main {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+.anim-section {
+  margin-bottom: 50px;
+  scroll-margin-top: 20px;
+}
+.anim-section h2 {
+  font-size: 1.35rem;
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--line);
+  color: var(--fg);
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(360px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+.plot-container {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.panel h3 {
+  font-size: 1.05rem;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-weight: 700;
+}
+.sl {
+  display: grid;
+  grid-template-columns: 2.2em 1fr 3.8em;
+  gap: 10px;
+  align-items: center;
+  margin: 8px 0;
+}
+.sl label {
+  font-weight: 700;
+  font-style: italic;
+}
+.sl output {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--accent);
+}
+input[type=range] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+.btns button, .quiz button {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  transition: all 0.15s;
+}
+.btns button:hover, .quiz button:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.btns button.active {
+  background: var(--accent);
+  color: #fff;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-right: 6px;
+}
+.badge-ok { background: #dcfce7; color: #15803d; }
+.badge-warn { background: #fef3c7; color: #b45309; }
+.badge-accent { background: var(--accent-light); color: var(--accent); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .badge-ok { background: #14532d; color: #86efac; }
+  :root:not([data-theme="light"]) .badge-warn { background: #78350f; color: #fde68a; }
+}
+.formula-box {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-size: 1.15rem;
+  display: flex;
+  flex-direction: column;
+}
+.formula-line {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  margin: 2px 0;
+}
+.formula-line sub, .formula-line sup {
+  font-size: 0.72em;
+}
+.frac {
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: middle;
+  text-align: center;
+  padding: 0 4px;
+  font-size: 0.92em;
+}
+.frac .num {
+  border-bottom: 1.5px solid currentColor;
+  padding-bottom: 2px;
+}
+.frac .den {
+  padding-top: 2px;
+}
+.binom {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  padding: 0 2px;
+  font-size: 1.05em;
+}
+.binom .paren {
+  font-size: 1.45em;
+  font-weight: 300;
+  line-height: 0.9;
+}
+.binom-stack {
+  display: inline-flex;
+  flex-direction: column;
+  text-align: center;
+  line-height: 1.15;
+  padding: 0 2px;
+}
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+table.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.95rem;
+}
+table.matrix-table th, table.matrix-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+table.matrix-table th {
+  background: var(--panel);
+  font-weight: 700;
+  color: var(--fg);
+}
+table.matrix-table tr:hover td {
+  background: var(--panel-hover);
+}
+.quiz-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.quiz-q {
+  font-weight: 700;
+  margin-bottom: 12px;
+  font-size: 1.05rem;
+}
+.quiz-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.quiz-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: background 0.15s;
+}
+.quiz-opt:hover {
+  background: var(--panel-hover);
+}
+.quiz-opt input {
+  accent-color: var(--accent);
+}
+.feedback-box {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-top: 12px;
+  display: none;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.feedback-ok {
+  background: var(--ok-bg);
+  border: 1px solid var(--ok);
+  color: var(--ok);
+}
+.feedback-bad {
+  background: var(--bad-bg);
+  border: 1px solid var(--bad);
+  color: var(--bad);
+}
+.feedback-text {
+  color: var(--fg);
+  margin-top: 4px;
+}
+.list-box {
+  max-height: 160px;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.custom-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 10px 0;
+}
+.custom-input-row input[type=text] {
+  flex: 1;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+}
+</style>
+<script src="two.min.js?v=0.8.14"></script>
+<script>
+if (typeof Two === 'undefined') {
+  document.write('<script src="https://cdn.jsdelivr.net/npm/two.js@0.8.14/build/two.min.js"><\/script>');
+}
+</script>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Összeszámlálási módszerek</h1>
+</header>
+
+<main>
+
+<!-- ================= 1. RÉSZ: ISMÉTLÉS NÉLKÜLI PERMUTÁCIÓ ================= -->
+<section class="anim-section" id="perm-no-rep">
+  <h2>1. Ismétlés nélküli permutáció: n különböző elem sorba rendezése</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-perm" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="perm-step-btn" type="button">Lépésenkénti kitöltés</button>
+          <button id="perm-shuffle-btn" type="button">Új véletlen sorrend</button>
+        </div>
+        <div id="perm-step-info" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Kattints a gombokra az animációhoz</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Paraméterek</h3>
+        <div class="sl">
+          <label for="perm-n">n</label>
+          <input type="range" id="perm-n" min="2" max="6" value="4">
+          <output id="perm-n-val">4</output>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Képlet és számítás</h3>
+        <div class="formula-box">
+          <div class="formula-line" id="perm-formula">P<sub>n</sub> = n! = n · (n − 1) · … · 2 · 1</div>
+          <div class="formula-line" style="font-size:1.35rem; font-weight:700; color:var(--accent);" id="perm-calc">
+            P<sub>4</sub> = 4! = 24
+          </div>
+        </div>
+        <p style="font-size:0.95rem; margin:8px 0 0;" id="perm-desc">
+          Az 1. pozícióra még n elem közül választhatunk, a 2. helyre már csak (n − 1) marad, és így tovább az utolsó egyetlen elemig. A szorzási szabály miatt a lehetőségek száma n! (n faktoriális).
+        </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-MAT09TA 1. lecke (8. oldal), OH-MAT11TA 17. lecke (52. oldal), OH-MAT12TA 110. oldal (rekeszek és tálcák modell, tornapadon ülők, könyvek sorrendje, táncoló párok).
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Összes lehetséges sorrend (<span id="perm-list-count">24</span> db)</h3>
+        <div class="list-box" id="perm-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2. RÉSZ: CIKLIKUS PERMUTÁCIÓ ================= -->
+<section class="anim-section" id="perm-cyclic">
+  <h2>2. Ciklikus permutáció: elemek zárt láncba (körbe) rendezése</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-cyclic" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="cyclic-rotate-btn" type="button">Forgatás 1 hellyel</button>
+          <button id="cyclic-shuffle-btn" type="button">Új véletlen körsorrend</button>
+        </div>
+        <div id="cyclic-info" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Az elforgatás nem változtatja meg a körsorrendet</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Paraméterek</h3>
+        <div class="sl">
+          <label for="cyclic-n">n</label>
+          <input type="range" id="cyclic-n" min="3" max="8" value="5">
+          <output id="cyclic-n-val">5</output>
+        </div>
+        <div style="margin-top: 10px;">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.95rem;">
+            <input type="checkbox" id="cyclic-flip-cb">
+            Megfordítható nyaklánc / karkötő (osztás 2-vel)
+          </label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Képlet és levezetés az emelt szintű tankönyvből</h3>
+        <div class="formula-box">
+          <div class="formula-line" id="cyclic-formula">
+            P<sub>ciklikus</sub> = (n − 1)! = 
+            <span class="frac">
+              <span class="num">n!</span>
+              <span class="den">n</span>
+            </span>
+          </div>
+          <div class="formula-line" style="font-size:1.35rem; font-weight:700; color:var(--accent);" id="cyclic-calc">
+            P<sub>ciklikus</sub> = (5 − 1)! = 4! = 24
+          </div>
+        </div>
+        <p style="font-size:0.95rem; margin:8px 0 0;" id="cyclic-desc">
+          <strong>A rögzítéses bizonyítás (OH-MAT912AE, 87. oldal):</strong> Egy elemet (jelöljük A-val) kiválasztunk és rögzítünk bármelyik tetszőleges helyre a körben. Hozzá képest a többi helynek már van rögzített iránya és sorrendje (A-tól jobbra az 1., 2. stb.). Erre a megmaradt n − 1 helyre a többi n − 1 elemet (n − 1)!-féleképpen rendezhetjük el.
+        </p>
+        <p style="font-size:0.95rem; margin:8px 0 0;" id="cyclic-rot-desc">
+          <strong>A forgatási ekvivalencia:</strong> Ha az n elemet egyenes mentén állítanánk sorba, n! eset lenne. Mivel a zárt kör mentén bármely elrendezés n elforgatása ugyanazt az ülésrendet adja, n-nel osztunk: n! / n = (n − 1)!.
+        </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-MAT912AE (A Gyűjtemény a Matematika emelt szintű oktatásához 9–12, 87. oldal), OH-MAT1112BE (B Gyűjtemény emelt szintű oktatáshoz 11–12, körök száma és irányok).
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Különböző körsorrendek (<span id="cyclic-list-count">24</span> db)</h3>
+        <div class="list-box" id="cyclic-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. RÉSZ: ISMÉTLÉSES PERMUTÁCIÓ ================= -->
+<section class="anim-section" id="perm-rep">
+  <h2>3. Ismétléses permutáció: sorba rendezés, ha vannak azonos elemek</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-perm-rep" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="permrep-shuffle-btn" type="button">Új véletlen átrendezés</button>
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.9rem;">
+          <input type="checkbox" id="permrep-indexed-cb">
+          Azonos betűk megkülönböztetése indexszel
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Szó vagy elemhalmaz</h3>
+        <div class="btns">
+          <button type="button" class="active" data-word="ALMA">ALMA</button>
+          <button type="button" data-word="MAMA">MAMA</button>
+          <button type="button" data-word="ANANÁSZ">ANANÁSZ</button>
+          <button type="button" data-word="PIROS-KÉK">3P + 2K</button>
+        </div>
+        <div class="custom-input-row">
+          <input type="text" id="permrep-input" value="ALMA" maxlength="8" placeholder="Saját szó (max 8 betű)">
+          <button id="permrep-set-btn" class="btns button" style="padding:6px 12px; margin:0;" type="button">Beállítás</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Képlet és levezetés</h3>
+        <div class="formula-box">
+          <div class="formula-line">
+            P<sub>n</sub><sup>k<sub>1</sub>, k<sub>2</sub>, …</sup> = 
+            <span class="frac">
+              <span class="num">n!</span>
+              <span class="den">k<sub>1</sub>! · k<sub>2</sub>! · … · k<sub>r</sub>!</span>
+            </span>
+          </div>
+          <div class="formula-line" style="font-size:1.35rem; font-weight:700; color:var(--accent);" id="permrep-calc">
+            P<sub>4</sub><sup>2, 1, 1</sup> = 12
+          </div>
+        </div>
+        <p style="font-size:0.95rem; margin:8px 0 0;" id="permrep-desc">
+          Ha a betűk mind különböznének (pl. A₁, L, M, A₂), akkor 4! = 24 sorrend lenne. Mivel a két darab A betű 2! féle felcserélése ugyanazt a szót eredményezi, a 24-et el kell osztani 2!-sal.
+        </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-FGV912GY 13. oldal, OH-MAT912AE (Emelt szintű gyűjtemény). Azonos betűkből vagy golyókból álló sorozatok (pl. ANANÁSZ, ALMA).
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Különböző szavak listája (<span id="permrep-list-count">12</span> db)</h3>
+        <div class="list-box" id="permrep-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4. RÉSZ: ISMÉTLÉS NÉLKÜLI VARIÁCIÓ ================= -->
+<section class="anim-section" id="vari-no-rep">
+  <h2>4. Ismétlés nélküli variáció: n elemből k kiválasztása, a sorrend számít</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-vari" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="vari-step-btn" type="button">Húzás lépésenként</button>
+          <button id="vari-shuffle-btn" type="button">Új véletlen húzás</button>
+        </div>
+        <div id="vari-step-info" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Urna modell: nincs visszatevés</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Paraméterek</h3>
+        <div class="sl">
+          <label for="vari-n">n</label>
+          <input type="range" id="vari-n" min="3" max="8" value="5">
+          <output id="vari-n-val">5</output>
+        </div>
+        <div class="sl">
+          <label for="vari-k">k</label>
+          <input type="range" id="vari-k" min="1" max="5" value="3">
+          <output id="vari-k-val">3</output>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Képlet és értelmezés</h3>
+        <div class="formula-box">
+          <div class="formula-line">
+            V<sub>n</sub><sup>k</sup> = n · (n − 1) · … · (n − k + 1) = 
+            <span class="frac">
+              <span class="num">n!</span>
+              <span class="den">(n − k)!</span>
+            </span>
+          </div>
+          <div class="formula-line" style="font-size:1.35rem; font-weight:700; color:var(--accent);" id="vari-calc">
+            V<sub>5</sub><sup>3</sup> = 5 · 4 · 3 = 60
+          </div>
+        </div>
+        <p style="font-size:0.95rem; margin:8px 0 0;" id="vari-desc">
+          Példa: 5 versenyző közül az arany-, ezüst- és bronzérmes helyek kiosztása. Az 1. helyre még 5 jelölt van, a 2. helyre 4, a 3. helyre 3. A sorrend számít (nem mindegy, ki az aranyérmes), és egy versenyző csak egy érmet kaphat.
+        </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-MAT12TA 110. oldal, OH-MAT11TA 16. lecke (50. oldal), OH-FGV912GY 13. oldal (8 versenyző dobogósai: 8 · 7 · 6 = 336, jelszavak rekeszekkel).
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Lehetséges k-asok (<span id="vari-list-count">60</span> db)</h3>
+        <div class="list-box" id="vari-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. RÉSZ: ISMÉTLÉSES VARIÁCIÓ ================= -->
+<section class="anim-section" id="vari-rep">
+  <h2>5. Ismétléses variáció: sorrend számít, az elemek ismétlődhetnek (n^k)</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-varirep" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="varirep-rand-btn" type="button">Új véletlen kód</button>
+        </div>
+        <div id="varirep-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Forgótárcsák visszatevéssel</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Típuspéldák és beállítások</h3>
+        <div class="btns">
+          <button type="button" class="active" data-n="3" data-k="3">3 tárcsa, 3 jel (27)</button>
+          <button type="button" data-n="2" data-k="4">Pénzérme: 2 oldal, 4 dobás (16)</button>
+          <button type="button" data-n="3" data-k="4">TOTÓ: 3 jel, 4 mérkőzés (81)</button>
+        </div>
+        <div class="sl">
+          <label for="varirep-n">n</label>
+          <input type="range" id="varirep-n" min="2" max="5" value="3">
+          <output id="varirep-n-val">3</output>
+        </div>
+        <div class="sl">
+          <label for="varirep-k">k</label>
+          <input type="range" id="varirep-k" min="2" max="5" value="3">
+          <output id="varirep-k-val">3</output>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Képlet és magyarázat</h3>
+        <div class="formula-box">
+          <div class="formula-line">
+            V<sub>n</sub><sup>k,(i)</sup> = n<sup>k</sup> = n · n · … · n (k tényező)
+          </div>
+          <div class="formula-line" style="font-size:1.35rem; font-weight:700; color:var(--accent);" id="varirep-calc">
+            3<sup>3</sup> = 27
+          </div>
+        </div>
+        <p style="font-size:0.95rem; margin:8px 0 0;">
+          Minden egyes pozícióra (tárcsára) a teljes, n elemű készletből választhatunk, az előző választások nem korlátozzák a következőt. Ezért minden lépésben n szorzótényező szerepel.
+        </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-MAT09TA 2. lecke (Számzárak), OH-MAT12TA 110. oldal, OH-FGV912GY 13. oldal (3 kockadobás sorrendje: 6³ = 216, 4 jegyű PIN kód: 10⁴, TOTÓ: 3¹³).
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Összes kombináció (<span id="varirep-list-count">27</span> db)</h3>
+        <div class="list-box" id="varirep-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 6. RÉSZ: ISMÉTLÉS NÉLKÜLI KOMBINÁCIÓ ================= -->
+<section class="anim-section" id="comb-no-rep">
+  <h2>6. Ismétlés nélküli kombináció: n elemből k kiválasztása, a sorrend nem számít</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-comb" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="comb-pick-btn" type="button">Új kiválasztott csoport</button>
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.9rem;">
+          <input type="checkbox" id="comb-show-order-cb" checked>
+          Mutasd a belső k! sorrend összevonását
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Paraméterek</h3>
+        <div class="sl">
+          <label for="comb-n">n</label>
+          <input type="range" id="comb-n" min="3" max="8" value="5">
+          <output id="comb-n-val">5</output>
+        </div>
+        <div class="sl">
+          <label for="comb-k">k</label>
+          <input type="range" id="comb-k" min="1" max="4" value="3">
+          <output id="comb-k-val">3</output>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Képlet és a variációval való kapcsolat</h3>
+        <div class="formula-box">
+          <div class="formula-line">
+            C<sub>n</sub><sup>k</sup> = 
+            <span class="binom"><span class="paren">(</span><span class="binom-stack"><span class="top">n</span><span class="bot">k</span></span><span class="paren">)</span></span>
+             = 
+            <span class="frac">
+              <span class="num">V<sub>n</sub><sup>k</sup></span>
+              <span class="den">k!</span>
+            </span>
+             = 
+            <span class="frac">
+              <span class="num">n!</span>
+              <span class="den">k! · (n − k)!</span>
+            </span>
+          </div>
+          <div class="formula-line" style="font-size:1.35rem; font-weight:700; color:var(--accent);" id="comb-calc">
+            <span class="binom"><span class="paren">(</span><span class="binom-stack"><span class="top">5</span><span class="bot">3</span></span><span class="paren">)</span></span> = 10
+          </div>
+        </div>
+        <p style="font-size:0.95rem; margin:8px 0 0;" id="comb-desc">
+          Miért osztunk k!-sal? Ha a sorrend számítana (variáció), 60 eset lenne. De a kiválasztott 3 elem (pl. A, B, C) bármelyik belső átrendezése (ABC, ACB, BAC, BCA, CAB, CBA, azaz 3! = 6 sorrend) ugyanazt az egyetlen csapatot alkotja. Ezért a variációk számát el kell osztani k!-sal.
+        </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-MAT11TA 18–19. lecke (54–56. oldal), OH-MAT12TA 110. oldal, OH-FGV912GY 14. oldal (8 gyerekből 3 fős csoport: (8 alatt a 3) = 56, Ötöslottó: (90 alatt az 5), kézfogások: (n alatt a 2)).
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Csoportok listája (<span id="comb-list-count">10</span> db)</h3>
+        <div class="list-box" id="comb-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 7. RÉSZ: ISMÉTLÉSES KOMBINÁCIÓ ================= -->
+<section class="anim-section" id="comb-rep">
+  <h2>7. Ismétléses kombináció: golyók és falak modellje (fagyis tölcsérek)</h2>
+  <div class="layout">
+    <div class="plot-container">
+      <div id="canvas-combrep" style="width:100%; height:auto;"></div>
+      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="btns" style="margin:0;">
+          <button id="combrep-rand-btn" type="button">Új véletlen eloszlás</button>
+        </div>
+        <div style="font-size:0.9rem; color:var(--muted); font-weight:600;">Golyók és elválasztófalak sorba rendezése</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Paraméterek</h3>
+        <div class="sl">
+          <label for="combrep-n">n</label>
+          <input type="range" id="combrep-n" min="2" max="5" value="3">
+          <output id="combrep-n-val">3</output>
+        </div>
+        <div class="sl">
+          <label for="combrep-k">k</label>
+          <input type="range" id="combrep-k" min="2" max="6" value="4">
+          <output id="combrep-k-val">4</output>
+        </div>
+        <div style="font-size:0.88rem; color:var(--muted); margin-top:6px;">
+          n = fagylaltfajták (rekeszek) száma, k = gombócok (golyók) száma.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Képlet és a zseniális levezetés</h3>
+        <div class="formula-box">
+          <div class="formula-line">
+            C<sub>n</sub><sup>k,(i)</sup> = 
+            <span class="binom"><span class="paren">(</span><span class="binom-stack"><span class="top">n + k − 1</span><span class="bot">k</span></span><span class="paren">)</span></span>
+             = 
+            <span class="binom"><span class="paren">(</span><span class="binom-stack"><span class="top">n + k − 1</span><span class="bot">n − 1</span></span><span class="paren">)</span></span>
+          </div>
+          <div class="formula-line" style="font-size:1.35rem; font-weight:700; color:var(--accent);" id="combrep-calc">
+            <span class="binom"><span class="paren">(</span><span class="binom-stack"><span class="top">3 + 4 − 1</span><span class="bot">4</span></span><span class="paren">)</span></span> = 
+            <span class="binom"><span class="paren">(</span><span class="binom-stack"><span class="top">6</span><span class="bot">4</span></span><span class="paren">)</span></span> = 15
+          </div>
+        </div>
+        <p style="font-size:0.95rem; margin:8px 0 0;" id="combrep-desc">
+          Miért n + k − 1 elemből választunk? A k darab gombócot n darab rekeszbe kell szétosztanunk. A rekeszek elválasztásához pontosan (n − 1) darab falra van szükség. Ha a k darab golyót és az (n − 1) darab falat egymás mellé tesszük, összesen k + n − 1 pozíció keletkezik. Ebből a k + n − 1 helyből kell kiválasztani a k golyó helyét, ami egy közönséges ismétlés nélküli kombináció.
+        </p>
+        <div style="font-size:0.86rem; color:var(--muted); margin-top:10px; border-top:1px solid var(--line); padding-top:8px;">
+          Tankönyvi referencia: OH-MAT11TA 2. fejezet bevezető, OH-FGV912GY 14. oldal (fagylaltválasztás, dobozokba helyezés, golyók és falak elve).
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Eloszlások listája (<span id="combrep-list-count">15</span> db)</h3>
+        <div class="list-box" id="combrep-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 8. RÉSZ: ÖSSZEFOGLALÓ DÖNTÉSI MÁTRIX ÉS GYAKORLÓ FELADATOK ================= -->
+<section class="anim-section" id="matrix-gyakorlas">
+  <h2>8. Összefoglaló döntési mátrix és feladatfelismerő gyakorlás</h2>
+
+
+  <div class="table-wrap">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>Módszer neve</th>
+          <th>Számít a sorrend?</th>
+          <th>Minden elemet használunk?</th>
+          <th>Ismétlődés megengedett?</th>
+          <th>Képlet</th>
+          <th>Jellemző példa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ismétlés nélküli permutáció</strong></td>
+          <td><span class="badge badge-ok">Igen</span></td>
+          <td>Igen (k = n)</td>
+          <td><span class="badge badge-warn">Nem</span></td>
+          <td>P<sub>n</sub> = n!</td>
+          <td>Könyvek sorrendje a polcon</td>
+        </tr>
+        <tr>
+          <td><strong>Ciklikus permutáció</strong></td>
+          <td><span class="badge badge-ok">Igen</span> (körkörös)</td>
+          <td>Igen (k = n)</td>
+          <td><span class="badge badge-warn">Nem</span> (zárt kör)</td>
+          <td>P<sub>ciklikus</sub> = (n − 1)!</td>
+          <td>Kerek asztal körül leülés, nyaklánc</td>
+        </tr>
+        <tr>
+          <td><strong>Ismétléses permutáció</strong></td>
+          <td><span class="badge badge-ok">Igen</span></td>
+          <td>Igen (k = n)</td>
+          <td><span class="badge badge-ok">Igen</span> (azonosak vannak)</td>
+          <td>P<sub>n</sub><sup>k₁,…</sup> = <span class="frac"><span class="num">n!</span><span class="den">k₁!…</span></span></td>
+          <td>ANANÁSZ szó betűinek keverése</td>
+        </tr>
+        <tr>
+          <td><strong>Ismétlés nélküli variáció</strong></td>
+          <td><span class="badge badge-ok">Igen</span></td>
+          <td>Nem (k &lt; n)</td>
+          <td><span class="badge badge-warn">Nem</span></td>
+          <td>V<sub>n</sub><sup>k</sup> = <span class="frac"><span class="num">n!</span><span class="den">(n−k)!</span></span></td>
+          <td>Futóverseny 1., 2., 3. helyezettje</td>
+        </tr>
+        <tr>
+          <td><strong>Ismétléses variáció</strong></td>
+          <td><span class="badge badge-ok">Igen</span></td>
+          <td>Akárhány (k)</td>
+          <td><span class="badge badge-ok">Igen</span></td>
+          <td>V<sub>n</sub><sup>k,(i)</sup> = n<sup>k</sup></td>
+          <td>Számzáras lakat, PIN-kód, TOTÓ</td>
+        </tr>
+        <tr>
+          <td><strong>Ismétlés nélküli kombináció</strong></td>
+          <td><span class="badge badge-warn">Nem</span></td>
+          <td>Nem (k &lt; n)</td>
+          <td><span class="badge badge-warn">Nem</span></td>
+          <td>C<sub>n</sub><sup>k</sup> = <span class="binom"><span class="paren">(</span><span class="binom-stack"><span class="top">n</span><span class="bot">k</span></span><span class="paren">)</span></span></td>
+          <td>Ötöslottó (90-ből 5), kézfogások</td>
+        </tr>
+        <tr>
+          <td><strong>Ismétléses kombináció</strong></td>
+          <td><span class="badge badge-warn">Nem</span></td>
+          <td>Akárhány (k)</td>
+          <td><span class="badge badge-ok">Igen</span></td>
+          <td>C<sub>n</sub><sup>k,(i)</sup> = <span class="binom"><span class="paren">(</span><span class="binom-stack"><span class="top">n+k−1</span><span class="bot">k</span></span><span class="paren">)</span></span></td>
+          <td>Fagylaltgombócok választása ízekből</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="layout">
+    <div class="quiz-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span class="badge badge-accent" id="quiz-num">1 / 10. feladat</span>
+        <button id="quiz-next-btn" class="btns button" style="padding:4px 10px; font-size:0.85rem;" type="button">Következő feladat →</button>
+      </div>
+
+      <div class="quiz-q" id="quiz-question"></div>
+
+      <div style="margin: 16px 0; display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <div style="font-weight:600; font-size:0.92rem; margin-bottom:6px;">1. Számít a kiválasztott elemek sorrendje?</div>
+          <div style="display:flex; gap:16px;">
+            <label style="cursor:pointer;"><input type="radio" name="q_order" value="yes"> Igen</label>
+            <label style="cursor:pointer;"><input type="radio" name="q_order" value="no"> Nem</label>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-weight:600; font-size:0.92rem; margin-bottom:6px;">2. Minden megadott elemet felhasználunk a sorrendben (k = n)?</div>
+          <div style="display:flex; gap:16px;">
+            <label style="cursor:pointer;"><input type="radio" name="q_all" value="yes"> Igen (k = n)</label>
+            <label style="cursor:pointer;"><input type="radio" name="q_all" value="no"> Nem (k &lt; n, vagy tetszőleges)</label>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-weight:600; font-size:0.92rem; margin-bottom:6px;">3. Megengedett az ismétlődés vagy vannak azonos elemek?</div>
+          <div style="display:flex; gap:16px;">
+            <label style="cursor:pointer;"><input type="radio" name="q_rep" value="yes"> Igen (visszatevéssel / azonos elemekkel)</label>
+            <label style="cursor:pointer;"><input type="radio" name="q_rep" value="no"> Nem (különböző elemek, nincs visszatevés)</label>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-weight:600; font-size:0.92rem; margin-bottom:6px;">Alkalmazandó módszer:</div>
+          <select id="quiz-method-select" style="width:100%; padding:8px 12px; font:inherit; font-size:0.95rem; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg);">
+            <option value="">Válassz módszert...</option>
+            <option value="perm_norep">Ismétlés nélküli permutáció</option>
+            <option value="perm_cyclic">Ciklikus permutáció</option>
+            <option value="perm_rep">Ismétléses permutáció</option>
+            <option value="vari_norep">Ismétlés nélküli variáció</option>
+            <option value="vari_rep">Ismétléses variáció</option>
+            <option value="comb_norep">Ismétlés nélküli kombináció</option>
+            <option value="comb_rep">Ismétléses kombináció</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <button id="quiz-check-btn" class="btns button" style="width:100%; padding:10px; font-size:1rem;" type="button">Válasz ellenőrzése</button>
+      </div>
+
+      <div class="feedback-box" id="quiz-feedback">
+        <div id="quiz-feedback-title" style="font-weight:700;"></div>
+        <div class="feedback-text" id="quiz-feedback-body"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Döntési segítség a gondolatmenethez</h3>
+      <div style="display:flex; flex-direction:column; gap:12px; font-size:0.95rem;">
+        <div style="border-left:3px solid var(--accent); padding-left:12px;">
+          <strong>1. Lépés: Számít-e a sorrend?</strong><br>
+          Ha felcserélem két kiválasztott elem helyét, más eset keletkezik-e?
+          <ul style="margin:4px 0 0; padding-left:20px;">
+            <li>Ha igen: <em>Permutáció vagy Variáció</em>.</li>
+            <li>Ha nem (csapat, kézfogás, lottó, halmaz): <em>Kombináció</em>.</li>
+          </ul>
+        </div>
+        <div style="border-left:3px solid var(--accent); padding-left:12px;">
+          <strong>2. Lépés: Hány elemet választunk?</strong><br>
+          <ul style="margin:4px 0 0; padding-left:20px;">
+            <li>Minden rendelkezésre álló elemet sorba rendezünk (k = n): <em>Permutáció</em>.</li>
+            <li>Csak egy részhalmazt választunk ki sorrendben (k &lt; n): <em>Variáció</em>.</li>
+          </ul>
+        </div>
+        <div style="border-left:3px solid var(--accent); padding-left:12px;">
+          <strong>3. Lépés: Lehet-e ismétlődés?</strong><br>
+          <ul style="margin:4px 0 0; padding-left:20px;">
+            <li>Egy elem csak egyszer szerepelhet: <em>Ismétlés nélküli</em>.</li>
+            <li>Egy elem többször is szerepelhet (visszatevés, azonos betűk/golyók): <em>Ismétléses</em>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ================= MATEMATIKAI SEGÉDFÜGGVÉNYEK =================
+function fact(n) {
+  if (n <= 1) return 1;
+  let res = 1;
+  for (let i = 2; i <= n; i++) res *= i;
+  return res;
+}
+function perm(n) {
+  return fact(n);
+}
+function permRep(counts) {
+  const n = counts.reduce((a, b) => a + b, 0);
+  let denom = 1;
+  for (const c of counts) denom *= fact(c);
+  return Math.round(fact(n) / denom);
+}
+function vari(n, k) {
+  if (k > n || k < 0) return 0;
+  let res = 1;
+  for (let i = 0; i < k; i++) res *= (n - i);
+  return res;
+}
+function variRep(n, k) {
+  return Math.pow(n, k);
+}
+function comb(n, k) {
+  if (k > n || k < 0) return 0;
+  if (k === 0 || k === n) return 1;
+  k = Math.min(k, n - k);
+  let res = 1;
+  for (let i = 1; i <= k; i++) {
+    res = (res * (n - i + 1)) / i;
+  }
+  return Math.round(res);
+}
+function combRep(n, k) {
+  return comb(n + k - 1, k);
+}
+
+const PALETTE = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16'];
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+function createTwo(containerId, W, H) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  const two = new Two({ width: W, height: H, type: Two.Types.svg }).appendTo(el);
+  two.renderer.domElement.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  two.renderer.domElement.style.width = '100%';
+  two.renderer.domElement.style.height = 'auto';
+  two.renderer.domElement.style.display = 'block';
+  return two;
+}
+
+// ================= 1. ISMÉTLÉS NÉLKÜLI PERMUTÁCIÓ =================
+let permN = 4;
+let permStep = 0;
+let permOrder = [0, 1, 2, 3];
+let twoPerm = null;
+
+function getPermutations(arr) {
+  if (arr.length <= 1) return [arr];
+  const res = [];
+  for (let i = 0; i < arr.length; i++) {
+    const cur = arr[i];
+    const rem = arr.slice(0, i).concat(arr.slice(i + 1));
+    for (const p of getPermutations(rem)) {
+      res.push([cur].concat(p));
+    }
+  }
+  return res;
+}
+
+function updatePermUI() {
+  const total = fact(permN);
+  document.getElementById('perm-n-val').textContent = permN;
+  document.getElementById('perm-list-count').textContent = total;
+
+  let mul = [];
+  for (let i = permN; i >= 1; i--) mul.push(i);
+  document.getElementById('perm-formula').innerHTML = 'P<sub>n</sub> = n! = n · (n − 1) · … · 2 · 1';
+  document.getElementById('perm-calc').innerHTML = `P<sub>${permN}</sub> = ${permN}! = ${mul.join(' · ')} = <strong>${total}</strong>`;
+  document.getElementById('perm-desc').textContent = 
+    'Az 1. pozícióra még n elem közül választhatunk, a 2. helyre már csak (n − 1) marad, és így tovább az utolsó egyetlen elemig. A szorzási szabály miatt a lehetőségek száma n!.';
+
+  // Permutációk listája
+  const baseArr = LETTERS.slice(0, permN);
+  const allPerms = getPermutations(baseArr);
+  const listEl = document.getElementById('perm-list');
+  listEl.innerHTML = allPerms.map((p, idx) => `${idx + 1}. ${p.join('')}`).join('<br>');
+
+  drawPerm();
+}
+
+function drawPerm() {
+  const W = 700;
+  const H = 280;
+  if (!twoPerm) twoPerm = createTwo('canvas-perm', W, H);
+  twoPerm.clear();
+
+  // Lineáris sorba rendezés
+  const gap = W / (permN + 1);
+
+  // Felső medence (választható elemek)
+  const poolTitle = twoPerm.makeText('Kiválasztásra váró elemek:', 20, 25);
+  poolTitle.alignment = 'left';
+  poolTitle.fill = 'var(--muted)';
+  poolTitle.size = 13;
+  poolTitle.weight = 600;
+
+  for (let i = 0; i < permN; i++) {
+    const x = (i + 1) * gap;
+    const y = 65;
+    const isPlaced = (permStep > 0 && permOrder.slice(0, permStep).includes(i));
+
+    if (!isPlaced) {
+      const circle = twoPerm.makeCircle(x, y, 22);
+      circle.fill = PALETTE[i];
+      circle.stroke = '#ffffff';
+      circle.linewidth = 2;
+
+      const txt = twoPerm.makeText(LETTERS[i], x, y + 1);
+      txt.fill = '#ffffff';
+      txt.size = 15;
+      txt.weight = 700;
+    } else {
+      const circle = twoPerm.makeCircle(x, y, 22);
+      circle.fill = 'var(--panel)';
+      circle.stroke = 'var(--line)';
+      circle.linewidth = 1.5;
+      circle.dashes = [4, 4];
+    }
+  }
+
+  // Alsó rekeszek (1..n. helyek)
+  const slotTitle = twoPerm.makeText('Sorrend a pozíciókon (szorzási elv):', 20, 140);
+  slotTitle.alignment = 'left';
+  slotTitle.fill = 'var(--muted)';
+  slotTitle.size = 13;
+  slotTitle.weight = 600;
+
+  for (let pos = 0; pos < permN; pos++) {
+    const x = (pos + 1) * gap;
+    const y = 195;
+
+    const slot = twoPerm.makeRoundedRectangle(x, y, 54, 54, 8);
+    slot.fill = 'var(--panel)';
+    slot.stroke = (pos === permStep) ? 'var(--accent)' : 'var(--line)';
+    slot.linewidth = (pos === permStep) ? 2.5 : 1.5;
+
+    const posLabel = twoPerm.makeText((pos + 1) + '. hely', x, y + 42);
+    posLabel.fill = 'var(--muted)';
+    posLabel.size = 11;
+    posLabel.weight = 600;
+
+    // Választási lehetőségek száma felirat
+    const choicesLeft = permN - pos;
+    const choicesLabel = twoPerm.makeText(choicesLeft + ' választás', x, y - 40);
+    choicesLabel.fill = (pos === permStep) ? 'var(--accent)' : 'var(--muted)';
+    choicesLabel.size = 11;
+    choicesLabel.weight = 700;
+
+    // Ha már be van helyezve elem
+    if (pos < permStep || permStep === 0) {
+      const itemIdx = permOrder[pos];
+      const circle = twoPerm.makeCircle(x, y, 20);
+      circle.fill = PALETTE[itemIdx];
+      circle.stroke = '#ffffff';
+      circle.linewidth = 2;
+
+      const txt = twoPerm.makeText(LETTERS[itemIdx], x, y + 1);
+      txt.fill = '#ffffff';
+      txt.size = 14;
+      txt.weight = 700;
+    }
+  }
+
+  twoPerm.update();
+}
+
+function initPermEvents() {
+  const nSlider = document.getElementById('perm-n');
+  nSlider.addEventListener('input', function() {
+    permN = parseInt(this.value, 10);
+    permStep = 0;
+    permOrder = Array.from({ length: permN }, (_, i) => i);
+    updatePermUI();
+  });
+
+  document.getElementById('perm-shuffle-btn').addEventListener('click', function() {
+    permStep = 0;
+    for (let i = permOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [permOrder[i], permOrder[j]] = [permOrder[j], permOrder[i]];
+    }
+    document.getElementById('perm-step-info').textContent = 'Új véletlen sorrend beállítva';
+    drawPerm();
+  });
+
+  document.getElementById('perm-step-btn').addEventListener('click', function() {
+    permStep = (permStep + 1) % (permN + 1);
+    if (permStep === 0) {
+      document.getElementById('perm-step-info').textContent = 'Kezdés: minden elem a választóban';
+    } else {
+      document.getElementById('perm-step-info').textContent = 
+        `${permStep}. pozíció kitöltve (még ${permN - permStep + 1} lehetőség közül választottunk)`;
+    }
+    drawPerm();
+  });
+}
+
+// ================= 2. CIKLIKUS PERMUTÁCIÓ =================
+let cyclicN = 5;
+let cyclicFlip = false;
+let cyclicOrder = [0, 1, 2, 3, 4];
+let cyclicRotation = 0;
+let twoCyclic = null;
+
+function updateCyclicUI() {
+  document.getElementById('cyclic-n-val').textContent = cyclicN;
+  const baseTotal = fact(cyclicN - 1);
+  const total = cyclicFlip ? Math.round(baseTotal / 2) : baseTotal;
+  document.getElementById('cyclic-list-count').textContent = total;
+
+  if (cyclicFlip) {
+    document.getElementById('cyclic-formula').innerHTML = 
+      'P<sub>nyaklánc</sub> = ' +
+      '<span class="frac"><span class="num">(n − 1)!</span><span class="den">2</span></span> = ' +
+      '<span class="frac"><span class="num">n!</span><span class="den">2n</span></span>';
+    document.getElementById('cyclic-calc').innerHTML = 
+      `P<sub>nyaklánc</sub> = <span class="frac"><span class="num">(${cyclicN} − 1)!</span><span class="den">2</span></span> = ` +
+      `<span class="frac"><span class="num">${fact(cyclicN - 1)}</span><span class="den">2</span></span> = <strong>${total}</strong>`;
+  } else {
+    document.getElementById('cyclic-formula').innerHTML = 
+      'P<sub>ciklikus</sub> = (n − 1)! = ' +
+      '<span class="frac"><span class="num">n!</span><span class="den">n</span></span>';
+    document.getElementById('cyclic-calc').innerHTML = 
+      `P<sub>ciklikus</sub> = (${cyclicN} − 1)! = ${cyclicN - 1}! = <strong>${total}</strong>`;
+  }
+
+  // Lista generálása: A rögzített elem (A) utáni permutációk
+  const remElements = LETTERS.slice(1, cyclicN);
+  const remPerms = getPermutations(remElements);
+
+  if (cyclicFlip) {
+    // Csak a nem tükrös párok felét listázzuk
+    const canonical = [];
+    const seen = new Set();
+    for (const p of remPerms) {
+      const full = ['A'].concat(p);
+      const str = full.join(' – ');
+      const rev = ['A'].concat([...p].reverse()).join(' – ');
+      if (!seen.has(str) && !seen.has(rev)) {
+        canonical.push(str);
+        seen.add(str);
+        seen.add(rev);
+      }
+    }
+    document.getElementById('cyclic-list').innerHTML = 
+      canonical.map((c, idx) => `${idx + 1}. (${c})`).join('<br>');
+  } else {
+    document.getElementById('cyclic-list').innerHTML = 
+      remPerms.map((p, idx) => `${idx + 1}. (A – ${p.join(' – ')})`).join('<br>');
+  }
+
+  drawCyclic();
+}
+
+function drawCyclic() {
+  const W = 700;
+  const H = 300;
+  if (!twoCyclic) twoCyclic = createTwo('canvas-cyclic', W, H);
+  twoCyclic.clear();
+
+  const cx = 220;
+  const cy = 150;
+  const r = 85;
+
+  // Asztal / kör
+  const table = twoCyclic.makeCircle(cx, cy, r - 25);
+  table.fill = 'var(--panel)';
+  table.stroke = 'var(--line)';
+  table.linewidth = 2;
+
+  const tLabel = twoCyclic.makeText('Kerek asztal', cx, cy - 8);
+  tLabel.fill = 'var(--muted)';
+  tLabel.size = 13;
+  tLabel.weight = 700;
+
+  const tSub = twoCyclic.makeText('zárt kör', cx, cy + 12);
+  tSub.fill = 'var(--muted)';
+  tSub.size = 11;
+
+  // Helyek rajzolása
+  for (let i = 0; i < cyclicN; i++) {
+    const angle = ((i + cyclicRotation) * 2 * Math.PI / cyclicN) - Math.PI / 2;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+
+    const elemIdx = cyclicOrder[i];
+    const isAnchor = (elemIdx === 0);
+
+    const seat = twoCyclic.makeCircle(x, y, 20);
+    seat.fill = PALETTE[elemIdx];
+    seat.stroke = isAnchor ? 'var(--accent)' : '#ffffff';
+    seat.linewidth = isAnchor ? 3.5 : 2;
+
+    const txt = twoCyclic.makeText(LETTERS[elemIdx], x, y + 1);
+    txt.fill = '#ffffff';
+    txt.size = 14;
+    txt.weight = 700;
+
+    if (isAnchor) {
+      const ax = cx + (r + 34) * Math.cos(angle);
+      const ay = cy + (r + 34) * Math.sin(angle);
+      const aTag = twoCyclic.makeText('Rögzített horgony (A)', ax, ay);
+      aTag.fill = 'var(--accent)';
+      aTag.size = 11;
+      aTag.weight = 700;
+    }
+  }
+
+  // Jobb oldal: Forgatási ekvivalencia bemutatása
+  const rightX = 520;
+  const rightY = 150;
+  const rightW = 310;
+  const rightH = 250;
+
+  const rBox = twoCyclic.makeRoundedRectangle(rightX, rightY, rightW, rightH, 12);
+  rBox.fill = 'var(--panel)';
+  rBox.stroke = 'var(--line)';
+  rBox.linewidth = 1.5;
+
+  const rTitle = twoCyclic.makeText('Azonos elforgatások (n db):', rightX, rightY - 95);
+  rTitle.fill = 'var(--fg)';
+  rTitle.size = 12;
+  rTitle.weight = 700;
+
+  // Kiírjuk a jelenlegi körsorrend n különböző elforgatását egyenes szakaszként
+  const curElements = cyclicOrder.map(i => LETTERS[i]);
+  const dispN = Math.min(cyclicN, 5);
+  for (let shift = 0; shift < dispN; shift++) {
+    const rotated = curElements.slice(shift).concat(curElements.slice(0, shift));
+    const sy = rightY - 65 + shift * 26;
+    const isCur = (shift === (cyclicRotation % cyclicN + cyclicN) % cyclicN);
+
+    const strTxt = twoCyclic.makeText(
+      `${shift + 1}. forgatás: ${rotated.join(' – ')}`,
+      rightX, sy
+    );
+    strTxt.fill = isCur ? 'var(--accent)' : 'var(--muted)';
+    strTxt.size = 12;
+    strTxt.weight = isCur ? 700 : 500;
+  }
+
+  const rFoot1 = twoCyclic.makeText(
+    `Ez a(z) ${cyclicN} egyenes sorrend a körben`,
+    rightX, rightY + 76
+  );
+  rFoot1.fill = 'var(--ok)';
+  rFoot1.size = 11;
+  rFoot1.weight = 600;
+
+  const rFoot2 = twoCyclic.makeText(
+    'egyetlen ülésrendet jelent (osztás n-nel)',
+    rightX, rightY + 94
+  );
+  rFoot2.fill = 'var(--ok)';
+  rFoot2.size = 11;
+  rFoot2.weight = 600;
+
+  twoCyclic.update();
+}
+
+function initCyclicEvents() {
+  const nSlider = document.getElementById('cyclic-n');
+  nSlider.addEventListener('input', function() {
+    cyclicN = parseInt(this.value, 10);
+    cyclicOrder = Array.from({ length: cyclicN }, (_, i) => i);
+    cyclicRotation = 0;
+    updateCyclicUI();
+  });
+
+  document.getElementById('cyclic-flip-cb').addEventListener('change', function() {
+    cyclicFlip = this.checked;
+    updateCyclicUI();
+  });
+
+  document.getElementById('cyclic-rotate-btn').addEventListener('click', function() {
+    cyclicRotation = (cyclicRotation + 1) % cyclicN;
+    document.getElementById('cyclic-info').textContent = 
+      `Elforgatva ${cyclicRotation} hellyel: a szomszédsági viszonyok változatlanok maradnak`;
+    drawCyclic();
+  });
+
+  document.getElementById('cyclic-shuffle-btn').addEventListener('click', function() {
+    // Rögzítjük az A elemet a 0. indexen, a maradék n-1 elemet keverjük
+    const rem = Array.from({ length: cyclicN - 1 }, (_, i) => i + 1);
+    for (let i = rem.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [rem[i], rem[j]] = [rem[j], rem[i]];
+    }
+    cyclicOrder = [0].concat(rem);
+    cyclicRotation = 0;
+    document.getElementById('cyclic-info').textContent = 'Új körsorrend beállítva (A horgony rögzítve)';
+    drawCyclic();
+  });
+}
+
+// ================= 3. ISMÉTLÉSES PERMUTÁCIÓ =================
+let permRepWord = 'ALMA';
+let permRepIndexed = false;
+let twoPermRep = null;
+
+function analyzeWord(word) {
+  const counts = {};
+  for (const ch of word) {
+    counts[ch] = (counts[ch] || 0) + 1;
+  }
+  return counts;
+}
+
+function getUniqueAnagrams(word) {
+  const letters = word.split('');
+  const all = getPermutations(letters).map(p => p.join(''));
+  const unique = Array.from(new Set(all));
+  unique.sort();
+  return unique;
+}
+
+function updatePermRepUI() {
+  const counts = analyzeWord(permRepWord);
+  const n = permRepWord.length;
+  const countVals = Object.values(counts);
+  const total = permRep(countVals);
+
+  document.getElementById('permrep-list-count').textContent = total;
+
+  let denomTerms = [];
+  let denomCalc = [];
+  for (const [ch, c] of Object.entries(counts)) {
+    denomTerms.push(`${c}!`);
+    denomCalc.push(fact(c));
+  }
+
+  document.getElementById('permrep-calc').innerHTML = 
+    `P<sub>${n}</sub><sup>${countVals.join(', ')}</sup> = ` +
+    `<span class="frac"><span class="num">${n}!</span><span class="den">${denomTerms.join(' · ')}</span></span> = ` +
+    `<span class="frac"><span class="num">${fact(n)}</span><span class="den">${denomCalc.join(' · ')}</span></span> = ` +
+    `<strong>${total}</strong>`;
+
+  const multDetails = Object.entries(counts)
+    .filter(([_, c]) => c > 1)
+    .map(([ch, c]) => `${c} darab '${ch}' betű belső cseréje (${c}! = ${fact(c)} lehetőség)`)
+    .join(', ');
+
+  document.getElementById('permrep-desc').textContent = 
+    `Ha az elemek mind különböznének, ${n}! = ${fact(n)} sorrend lenne. Mivel ${multDetails || 'nincs ismétlődő betű'}, az azonosak egymás közötti felcserélése nem hoz létre új szót, ezért el kell osztani a faktoriálisaikkal.`;
+
+  const anagrams = getUniqueAnagrams(permRepWord);
+  document.getElementById('permrep-list').innerHTML = 
+    anagrams.map((w, idx) => `${idx + 1}. ${w}`).join('<br>');
+
+  drawPermRep();
+}
+
+function drawPermRep() {
+  const W = 700;
+  const H = 280;
+  if (!twoPermRep) twoPermRep = createTwo('canvas-perm-rep', W, H);
+  twoPermRep.clear();
+
+  const n = permRepWord.length;
+  const gap = W / (n + 1);
+  const counts = analyzeWord(permRepWord);
+
+  // Színek kiosztása egyedi betűk szerint
+  const uniqueChars = Object.keys(counts);
+  const charColors = {};
+  uniqueChars.forEach((ch, idx) => {
+    charColors[ch] = PALETTE[idx % PALETTE.length];
+  });
+
+  const occCounts = {};
+
+  for (let i = 0; i < n; i++) {
+    const ch = permRepWord[i];
+    occCounts[ch] = (occCounts[ch] || 0) + 1;
+    const occ = occCounts[ch];
+
+    const x = (i + 1) * gap;
+    const y = 90;
+
+    const card = twoPermRep.makeRoundedRectangle(x, y, 54, 60, 8);
+    card.fill = charColors[ch];
+    card.stroke = '#ffffff';
+    card.linewidth = 2;
+
+    const displayLetter = permRepIndexed ? `${ch}₁` : ch;
+    const letterTxt = twoPermRep.makeText(permRepIndexed ? `${ch}${occ}` : ch, x, y + 2);
+    letterTxt.fill = '#ffffff';
+    letterTxt.size = 20;
+    letterTxt.weight = 700;
+
+    const posTxt = twoPermRep.makeText((i + 1) + '. pozíció', x, y + 46);
+    posTxt.fill = 'var(--muted)';
+    posTxt.size = 11;
+    posTxt.weight = 600;
+  }
+
+  // Összevonás szemléltetése
+  const noteY = 200;
+  const bgBox = twoPermRep.makeRoundedRectangle(W / 2, noteY + 10, W - 60, 70, 8);
+  bgBox.fill = 'var(--panel)';
+  bgBox.stroke = 'var(--line)';
+  bgBox.linewidth = 1.5;
+
+  let infoText = permRepIndexed ? 
+    `Indexelt betűkkel (${n}! = ${fact(n)} megkülönböztetett eset)` : 
+    `Azonos betűkkel leosztva (${Object.values(counts).map(c => c + '!').join(' · ')} azonos átrendezés)`;
+
+  const txt1 = twoPermRep.makeText(infoText, W / 2, noteY - 6);
+  txt1.fill = 'var(--fg)';
+  txt1.size = 14;
+  txt1.weight = 700;
+
+  const txt2 = twoPermRep.makeText(
+    permRepIndexed ? 
+      'Példa: A₁ L M A₂ és A₂ L M A₁ két külön eset, de a valóságban mindkettő az ALMA szót adja.' :
+      'Az azonos elemek egymás közti cseréi nem adnak új szót, ezért osztunk.',
+    W / 2, noteY + 18
+  );
+  txt2.fill = 'var(--muted)';
+  txt2.size = 12;
+
+  twoPermRep.update();
+}
+
+function initPermRepEvents() {
+  document.querySelectorAll('#perm-rep .btns button[data-word]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#perm-rep .btns button[data-word]').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      let w = this.getAttribute('data-word');
+      if (w === 'PIROS-KÉK') w = 'PPPKK';
+      permRepWord = w;
+      document.getElementById('permrep-input').value = permRepWord;
+      updatePermRepUI();
+    });
+  });
+
+  document.getElementById('permrep-set-btn').addEventListener('click', function() {
+    const val = document.getElementById('permrep-input').value.trim().toUpperCase();
+    if (val.length >= 2) {
+      permRepWord = val;
+      document.querySelectorAll('#perm-rep .btns button[data-word]').forEach(b => b.classList.remove('active'));
+      updatePermRepUI();
+    }
+  });
+
+  document.getElementById('permrep-indexed-cb').addEventListener('change', function() {
+    permRepIndexed = this.checked;
+    drawPermRep();
+  });
+
+  document.getElementById('permrep-shuffle-btn').addEventListener('click', function() {
+    const arr = permRepWord.split('');
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    permRepWord = arr.join('');
+    document.getElementById('permrep-input').value = permRepWord;
+    drawPermRep();
+  });
+}
+
+// ================= 4. ISMÉTLÉS NÉLKÜLI VARIÁCIÓ =================
+let variN = 5;
+let variK = 3;
+let variDrawn = [0, 1, 2];
+let variStep = 0;
+let twoVari = null;
+
+function getVariations(arr, k) {
+  if (k === 0) return [[]];
+  const res = [];
+  for (let i = 0; i < arr.length; i++) {
+    const cur = arr[i];
+    const rem = arr.slice(0, i).concat(arr.slice(i + 1));
+    for (const v of getVariations(rem, k - 1)) {
+      res.push([cur].concat(v));
+    }
+  }
+  return res;
+}
+
+function updateVariUI() {
+  document.getElementById('vari-n-val').textContent = variN;
+  document.getElementById('vari-k-val').textContent = variK;
+
+  const total = vari(variN, variK);
+  document.getElementById('vari-list-count').textContent = total;
+
+  let terms = [];
+  for (let i = 0; i < variK; i++) terms.push(variN - i);
+
+  document.getElementById('vari-calc').innerHTML = 
+    `V<sub>${variN}</sub><sup>${variK}</sup> = ${terms.join(' · ')} = ` +
+    `<span class="frac"><span class="num">${variN}!</span><span class="den">(${variN} − ${variK})!</span></span> = ` +
+    `<strong>${total}</strong>`;
+
+  const allVars = getVariations(LETTERS.slice(0, variN), variK);
+  document.getElementById('vari-list').innerHTML = 
+    allVars.map((v, idx) => `${idx + 1}. (${v.join(', ')})`).join('<br>');
+
+  drawVari();
+}
+
+function drawVari() {
+  const W = 700;
+  const H = 280;
+  if (!twoVari) twoVari = createTwo('canvas-vari', W, H);
+  twoVari.clear();
+
+  // Bal oldal: Urna n golyóval
+  const urnX = 140;
+  const urnY = 140;
+  const urnW = 180;
+  const urnH = 210;
+
+  const urn = twoVari.makeRoundedRectangle(urnX, urnY, urnW, urnH, 16);
+  urn.fill = 'var(--panel)';
+  urn.stroke = 'var(--line)';
+  urn.linewidth = 2;
+
+  const urnTitle = twoVari.makeText('Urna (' + variN + ' különböző golyó)', urnX, urnY - 80);
+  urnTitle.fill = 'var(--muted)';
+  urnTitle.size = 13;
+  urnTitle.weight = 700;
+
+  // Golyók az urnában
+  const activeDrawn = (variStep === 0) ? variDrawn : variDrawn.slice(0, variStep);
+
+  for (let i = 0; i < variN; i++) {
+    const col = i % 3;
+    const row = Math.floor(i / 3);
+    const gx = urnX - 45 + col * 45;
+    const gy = urnY - 30 + row * 45;
+
+    const isDrawn = activeDrawn.includes(i);
+    const ball = twoVari.makeCircle(gx, gy, 18);
+    if (!isDrawn) {
+      ball.fill = PALETTE[i];
+      ball.stroke = '#ffffff';
+      ball.linewidth = 2;
+
+      const txt = twoVari.makeText(LETTERS[i], gx, gy + 1);
+      txt.fill = '#ffffff';
+      txt.size = 13;
+      txt.weight = 700;
+    } else {
+      ball.fill = 'var(--bg)';
+      ball.stroke = 'var(--line)';
+      ball.linewidth = 1.5;
+      ball.dashes = [3, 3];
+    }
+  }
+
+  // Jobb oldal: k darab rangsorolt dobogó / helyezés
+  const podiumStartX = 300;
+  const podiumW = W - podiumStartX - 30;
+  const slotGap = podiumW / (variK);
+
+  const rightTitle = twoVari.makeText('Kiválasztott k-as (a sorrend számít):', podiumStartX + 20, 35);
+  rightTitle.alignment = 'left';
+  rightTitle.fill = 'var(--muted)';
+  rightTitle.size = 13;
+  rightTitle.weight = 700;
+
+  const podiumNames = ['1. hely (Arany)', '2. hely (Ezüst)', '3. hely (Bronz)', '4. hely', '5. hely'];
+
+  for (let pos = 0; pos < variK; pos++) {
+    const sx = podiumStartX + (pos + 0.5) * slotGap;
+    const sy = 135;
+
+    const slot = twoVari.makeRoundedRectangle(sx, sy, 62, 70, 8);
+    slot.fill = 'var(--panel)';
+    slot.stroke = (pos === variStep - 1) ? 'var(--accent)' : 'var(--line)';
+    slot.linewidth = (pos === variStep - 1) ? 2.5 : 1.5;
+
+    const label = twoVari.makeText(podiumNames[pos] || (pos + 1) + '. hely', sx, sy + 52);
+    label.fill = 'var(--muted)';
+    label.size = 11;
+    label.weight = 600;
+
+    const choicesLeft = variN - pos;
+    const cTxt = twoVari.makeText(choicesLeft + ' lehetőség', sx, sy - 50);
+    cTxt.fill = 'var(--accent)';
+    cTxt.size = 11;
+    cTxt.weight = 700;
+
+    if (pos < activeDrawn.length) {
+      const drawnIdx = activeDrawn[pos];
+      const ball = twoVari.makeCircle(sx, sy, 20);
+      ball.fill = PALETTE[drawnIdx];
+      ball.stroke = '#ffffff';
+      ball.linewidth = 2;
+
+      const txt = twoVari.makeText(LETTERS[drawnIdx], sx, sy + 1);
+      txt.fill = '#ffffff';
+      txt.size = 14;
+      txt.weight = 700;
+    }
+  }
+
+  // Alsó szorzási folyamat
+  const multY = 245;
+  let multStr = [];
+  for (let i = 0; i < variK; i++) multStr.push((variN - i));
+  const multText = twoVari.makeText(
+    `Szorzási szabály: ${multStr.join(' · ')} = ${vari(variN, variK)} különböző sorrend`,
+    W / 2, multY
+  );
+  multText.fill = 'var(--fg)';
+  multText.size = 13;
+  multText.weight = 600;
+
+  twoVari.update();
+}
+
+function initVariEvents() {
+  const nSlider = document.getElementById('vari-n');
+  const kSlider = document.getElementById('vari-k');
+
+  nSlider.addEventListener('input', function() {
+    variN = parseInt(this.value, 10);
+    if (variK > variN) {
+      variK = variN;
+      kSlider.value = variK;
+    }
+    kSlider.max = variN;
+    variStep = 0;
+    variDrawn = Array.from({ length: variK }, (_, i) => i);
+    updateVariUI();
+  });
+
+  kSlider.addEventListener('input', function() {
+    variK = parseInt(this.value, 10);
+    variStep = 0;
+    variDrawn = Array.from({ length: variK }, (_, i) => i);
+    updateVariUI();
+  });
+
+  document.getElementById('vari-shuffle-btn').addEventListener('click', function() {
+    variStep = 0;
+    const pool = Array.from({ length: variN }, (_, i) => i);
+    variDrawn = [];
+    for (let i = 0; i < variK; i++) {
+      const r = Math.floor(Math.random() * pool.length);
+      variDrawn.push(pool.splice(r, 1)[0]);
+    }
+    document.getElementById('vari-step-info').textContent = 'Új véletlen húzás történt';
+    drawVari();
+  });
+
+  document.getElementById('vari-step-btn').addEventListener('click', function() {
+    variStep = (variStep + 1) % (variK + 1);
+    if (variStep === 0) {
+      document.getElementById('vari-step-info').textContent = 'Kezdés: minden golyó az urnában';
+    } else {
+      document.getElementById('vari-step-info').textContent = 
+        `${variStep}. pozíció kihúzva (még ${variN - variStep + 1} lehetőségből)`;
+    }
+    drawVari();
+  });
+}
+
+// ================= 5. ISMÉTLÉSES VARIÁCIÓ =================
+let variRepN = 3;
+let variRepK = 3;
+let variRepCode = [0, 1, 2];
+let twoVariRep = null;
+
+const SYMBOLS_SET = ['1', '2', '3', '4', '5', '6'];
+
+function getVariationsRep(symbols, k) {
+  if (k === 0) return [[]];
+  const res = [];
+  for (let i = 0; i < symbols.length; i++) {
+    const cur = symbols[i];
+    for (const v of getVariationsRep(symbols, k - 1)) {
+      res.push([cur].concat(v));
+    }
+  }
+  return res;
+}
+
+function updateVariRepUI() {
+  document.getElementById('varirep-n-val').textContent = variRepN;
+  document.getElementById('varirep-k-val').textContent = variRepK;
+
+  const total = variRep(variRepN, variRepK);
+  document.getElementById('varirep-list-count').textContent = total;
+
+  let terms = [];
+  for (let i = 0; i < variRepK; i++) terms.push(variRepN);
+
+  document.getElementById('varirep-calc').innerHTML = 
+    `V<sub>${variRepN}</sub><sup>${variRepK},(i)</sup> = ` +
+    `${variRepN}<sup>${variRepK}</sup> = ` +
+    `${terms.join(' · ')} = <strong>${total}</strong>`;
+
+  const symbols = SYMBOLS_SET.slice(0, variRepN);
+  const allCombos = getVariationsRep(symbols, variRepK);
+  document.getElementById('varirep-list').innerHTML = 
+    allCombos.map((c, idx) => `${idx + 1}. (${c.join(' ')})`).join('<br>');
+
+  drawVariRep();
+}
+
+function drawVariRep() {
+  const W = 700;
+  const H = 280;
+  if (!twoVariRep) twoVariRep = createTwo('canvas-varirep', W, H);
+  twoVariRep.clear();
+
+  const gap = W / (variRepK + 1);
+
+  const title = twoVariRep.makeText('Független tárcsák (minden helyen újra a teljes készlet választható):', 20, 25);
+  title.alignment = 'left';
+  title.fill = 'var(--muted)';
+  title.size = 13;
+  title.weight = 700;
+
+  for (let pos = 0; pos < variRepK; pos++) {
+    const x = (pos + 1) * gap;
+    const y = 130;
+
+    // Tárcsa henger
+    const cylinder = twoVariRep.makeRoundedRectangle(x, y, 68, 140, 10);
+    cylinder.fill = 'var(--panel)';
+    cylinder.stroke = 'var(--line)';
+    cylinder.linewidth = 2;
+
+    // Pozíció számozás
+    const posLabel = twoVariRep.makeText((pos + 1) + '. tárcsa', x, y + 85);
+    posLabel.fill = 'var(--muted)';
+    posLabel.size = 11;
+    posLabel.weight = 600;
+
+    // Szorzótényező jelölő
+    const factorLabel = twoVariRep.makeText(variRepN + ' lehetőség', x, y - 85);
+    factorLabel.fill = 'var(--accent)';
+    factorLabel.size = 12;
+    factorLabel.weight = 700;
+
+    // Szimbólumok megjelenítése a hengeren
+    const activeSymIdx = variRepCode[pos] % variRepN;
+    for (let s = 0; s < variRepN; s++) {
+      const sy = y - 35 + s * 35;
+      const isActive = (s === activeSymIdx);
+
+      if (isActive) {
+        const selBox = twoVariRep.makeRoundedRectangle(x, sy, 54, 30, 6);
+        selBox.fill = PALETTE[s];
+        selBox.stroke = '#ffffff';
+        selBox.linewidth = 1.5;
+
+        const symTxt = twoVariRep.makeText(SYMBOLS_SET[s], x, sy + 1);
+        symTxt.fill = '#ffffff';
+        symTxt.size = 16;
+        symTxt.weight = 700;
+      } else {
+        const symTxt = twoVariRep.makeText(SYMBOLS_SET[s], x, sy + 1);
+        symTxt.fill = 'var(--muted)';
+        symTxt.size = 14;
+      }
+    }
+  }
+
+  // Szorzási elv felirat
+  const multY = 245;
+  let multStr = [];
+  for (let i = 0; i < variRepK; i++) multStr.push(variRepN);
+  const multText = twoVariRep.makeText(
+    `Szorzási szabály: ${multStr.join(' · ')} = ${variRep(variRepN, variRepK)} lehetséges kód`,
+    W / 2, multY
+  );
+  multText.fill = 'var(--fg)';
+  multText.size = 13;
+  multText.weight = 600;
+
+  twoVariRep.update();
+}
+
+function initVariRepEvents() {
+  document.querySelectorAll('#vari-rep .btns button[data-n]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#vari-rep .btns button[data-n]').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      variRepN = parseInt(this.getAttribute('data-n'), 10);
+      variRepK = parseInt(this.getAttribute('data-k'), 10);
+      document.getElementById('varirep-n').value = variRepN;
+      document.getElementById('varirep-k').value = variRepK;
+      variRepCode = Array.from({ length: variRepK }, () => Math.floor(Math.random() * variRepN));
+      updateVariRepUI();
+    });
+  });
+
+  const nSlider = document.getElementById('varirep-n');
+  const kSlider = document.getElementById('varirep-k');
+
+  nSlider.addEventListener('input', function() {
+    variRepN = parseInt(this.value, 10);
+    document.querySelectorAll('#vari-rep .btns button[data-n]').forEach(b => b.classList.remove('active'));
+    variRepCode = Array.from({ length: variRepK }, () => Math.floor(Math.random() * variRepN));
+    updateVariRepUI();
+  });
+
+  kSlider.addEventListener('input', function() {
+    variRepK = parseInt(this.value, 10);
+    document.querySelectorAll('#vari-rep .btns button[data-n]').forEach(b => b.classList.remove('active'));
+    variRepCode = Array.from({ length: variRepK }, () => Math.floor(Math.random() * variRepN));
+    updateVariRepUI();
+  });
+
+  document.getElementById('varirep-rand-btn').addEventListener('click', function() {
+    variRepCode = Array.from({ length: variRepK }, () => Math.floor(Math.random() * variRepN));
+    drawVariRep();
+  });
+}
+
+// ================= 6. ISMÉTLÉS NÉLKÜLI KOMBINÁCIÓ =================
+let combN = 5;
+let combK = 3;
+let combSelected = [0, 1, 2];
+let combShowOrder = true;
+let twoComb = null;
+
+function getCombinations(arr, k) {
+  if (k === 0) return [[]];
+  if (arr.length < k) return [];
+  const head = arr[0];
+  const tail = arr.slice(1);
+  const withHead = getCombinations(tail, k - 1).map(c => [head].concat(c));
+  const withoutHead = getCombinations(tail, k);
+  return withHead.concat(withoutHead);
+}
+
+function updateCombUI() {
+  document.getElementById('comb-n-val').textContent = combN;
+  document.getElementById('comb-k-val').textContent = combK;
+
+  const total = comb(combN, combK);
+  document.getElementById('comb-list-count').textContent = total;
+
+  let numTerms = [];
+  let denTerms = [];
+  for (let i = 0; i < combK; i++) {
+    numTerms.push(combN - i);
+    denTerms.push(combK - i);
+  }
+
+  document.getElementById('comb-calc').innerHTML = 
+    `C<sub>${combN}</sub><sup>${combK}</sup> = ` +
+    `<span class="binom"><span class="paren">(</span><span class="binom-stack"><span class="top">${combN}</span><span class="bot">${combK}</span></span><span class="paren">)</span></span> = ` +
+    `<span class="frac"><span class="num">${numTerms.join(' · ')}</span><span class="den">${denTerms.join(' · ')}</span></span> = ` +
+    `<strong>${total}</strong>`;
+
+  const allCombs = getCombinations(LETTERS.slice(0, combN), combK);
+  document.getElementById('comb-list').innerHTML = 
+    allCombs.map((c, idx) => `${idx + 1}. {${c.join(', ')}}`).join('<br>');
+
+  drawComb();
+}
+
+function drawComb() {
+  const W = 700;
+  const H = 300;
+  if (!twoComb) twoComb = createTwo('canvas-comb', W, H);
+  twoComb.clear();
+
+  // Felső sáv: összes n jelölt
+  const topGap = W / (combN + 1);
+  const topTitle = twoComb.makeText('Rendelkezésre álló elemek halmaza (n = ' + combN + '):', 20, 25);
+  topTitle.alignment = 'left';
+  topTitle.fill = 'var(--muted)';
+  topTitle.size = 13;
+  topTitle.weight = 700;
+
+  for (let i = 0; i < combN; i++) {
+    const x = (i + 1) * topGap;
+    const y = 60;
+    const isSel = combSelected.includes(i);
+
+    const ball = twoComb.makeCircle(x, y, 18);
+    ball.fill = PALETTE[i];
+    ball.stroke = isSel ? 'var(--accent)' : '#ffffff';
+    ball.linewidth = isSel ? 3 : 1.5;
+
+    const txt = twoComb.makeText(LETTERS[i], x, y + 1);
+    txt.fill = '#ffffff';
+    txt.size = 13;
+    txt.weight = 700;
+
+    if (isSel) {
+      const check = twoComb.makeText('✓', x, y - 26);
+      check.fill = 'var(--ok)';
+      check.size = 14;
+      check.weight = 700;
+    }
+  }
+
+  // Alsó terület: a kiválasztott halmaz
+  const setX = 200;
+  const setY = 190;
+  const setW = 280;
+  const setH = 130;
+
+  const setBox = twoComb.makeRoundedRectangle(setX, setY, setW, setH, 16);
+  setBox.fill = 'var(--panel)';
+  setBox.stroke = 'var(--accent)';
+  setBox.linewidth = 2;
+
+  const setTitle = twoComb.makeText('Egyetlen kiválasztott kombináció (halmaz):', setX, setY - 45);
+  setTitle.fill = 'var(--accent)';
+  setTitle.size = 12;
+  setTitle.weight = 700;
+
+  const selCount = combSelected.length;
+  for (let j = 0; j < selCount; j++) {
+    const idx = combSelected[j];
+    const bx = setX - 60 + j * (120 / (selCount - 1 || 1));
+    const by = setY + 5;
+
+    const b = twoComb.makeCircle(bx, by, 20);
+    b.fill = PALETTE[idx];
+    b.stroke = '#ffffff';
+    b.linewidth = 2;
+
+    const txt = twoComb.makeText(LETTERS[idx], bx, by + 1);
+    txt.fill = '#ffffff';
+    txt.size = 14;
+    txt.weight = 700;
+  }
+
+  const noOrderNote = twoComb.makeText('{ A sorrend NEM számít }', setX, setY + 45);
+  noOrderNote.fill = 'var(--muted)';
+  noOrderNote.size = 11;
+  noOrderNote.weight = 600;
+
+  // Jobb oldal: Miért osztunk k!-sal?
+  const rightX = 520;
+  const rightY = 190;
+  const rightW = 280;
+  const rightH = 130;
+
+  const rBox = twoComb.makeRoundedRectangle(rightX, rightY, rightW, rightH, 16);
+  rBox.fill = 'var(--panel)';
+  rBox.stroke = 'var(--line)';
+  rBox.linewidth = 1.5;
+
+  const rTitle = twoComb.makeText(`A kiválasztott elemek ${combK}! = ${fact(combK)} sorrendje:`, rightX, rightY - 45);
+  rTitle.fill = 'var(--fg)';
+  rTitle.size = 12;
+  rTitle.weight = 700;
+
+  const selLetters = combSelected.map(i => LETTERS[i]);
+  const perms = getPermutations(selLetters).slice(0, 6);
+  const permStr1 = perms.slice(0, 3).map(p => p.join('')).join(', ');
+  const permStr2 = perms.slice(3, 6).map(p => p.join('')).join(', ');
+
+  const pTxt1 = twoComb.makeText(permStr1, rightX, rightY - 12);
+  pTxt1.fill = 'var(--muted)';
+  pTxt1.size = 13;
+  pTxt1.weight = 600;
+
+  if (permStr2) {
+    const pTxt2 = twoComb.makeText(permStr2, rightX, rightY + 12);
+    pTxt2.fill = 'var(--muted)';
+    pTxt2.size = 13;
+    pTxt2.weight = 600;
+  }
+
+  const arrow = twoComb.makeText(`← Mind a ${fact(combK)} variáció ugyanazt az 1 kombinációt adja`, rightX, rightY + 45);
+  arrow.fill = 'var(--ok)';
+  arrow.size = 11;
+  arrow.weight = 700;
+
+  twoComb.update();
+}
+
+function initCombEvents() {
+  const nSlider = document.getElementById('comb-n');
+  const kSlider = document.getElementById('comb-k');
+
+  nSlider.addEventListener('input', function() {
+    combN = parseInt(this.value, 10);
+    if (combK >= combN) {
+      combK = combN - 1;
+      kSlider.value = combK;
+    }
+    kSlider.max = combN - 1;
+    combSelected = Array.from({ length: combK }, (_, i) => i);
+    updateCombUI();
+  });
+
+  kSlider.addEventListener('input', function() {
+    combK = parseInt(this.value, 10);
+    combSelected = Array.from({ length: combK }, (_, i) => i);
+    updateCombUI();
+  });
+
+  document.getElementById('comb-pick-btn').addEventListener('click', function() {
+    const pool = Array.from({ length: combN }, (_, i) => i);
+    combSelected = [];
+    for (let i = 0; i < combK; i++) {
+      const r = Math.floor(Math.random() * pool.length);
+      combSelected.push(pool.splice(r, 1)[0]);
+    }
+    combSelected.sort((a, b) => a - b);
+    drawComb();
+  });
+
+  document.getElementById('comb-show-order-cb').addEventListener('change', function() {
+    combShowOrder = this.checked;
+    drawComb();
+  });
+}
+
+// ================= 7. ISMÉTLÉSES KOMBINÁCIÓ =================
+let combRepN = 3;
+let combRepK = 4;
+let combRepDist = [2, 1, 1]; // scoops per flavor
+let twoCombRep = null;
+
+const FLAVORS = ['Csokoládé', 'Vanília', 'Eper', 'Pisztácia', 'Citrom'];
+
+function getCombRepList(n, k) {
+  function helper(typesLeft, itemsLeft) {
+    if (typesLeft === 1) return [[itemsLeft]];
+    const res = [];
+    for (let i = 0; i <= itemsLeft; i++) {
+      for (const sub of helper(typesLeft - 1, itemsLeft - i)) {
+        res.push([i].concat(sub));
+      }
+    }
+    return res;
+  }
+  return helper(n, k);
+}
+
+function updateCombRepUI() {
+  document.getElementById('combrep-n-val').textContent = combRepN;
+  document.getElementById('combrep-k-val').textContent = combRepK;
+
+  const total = combRep(combRepN, combRepK);
+  document.getElementById('combrep-list-count').textContent = total;
+
+  const nPlusKMinus1 = combRepN + combRepK - 1;
+
+  document.getElementById('combrep-calc').innerHTML = 
+    `C<sub>${combRepN}</sub><sup>${combRepK},(i)</sup> = ` +
+    `<span class="binom"><span class="paren">(</span><span class="binom-stack"><span class="top">${combRepN} + ${combRepK} − 1</span><span class="bot">${combRepK}</span></span><span class="paren">)</span></span> = ` +
+    `<span class="binom"><span class="paren">(</span><span class="binom-stack"><span class="top">${nPlusKMinus1}</span><span class="bot">${combRepK}</span></span><span class="paren">)</span></span> = ` +
+    `<strong>${total}</strong>`;
+
+  const allDists = getCombRepList(combRepN, combRepK);
+  document.getElementById('combrep-list').innerHTML = 
+    allDists.map((d, idx) => {
+      const parts = d.map((cnt, fIdx) => `${cnt} ${FLAVORS[fIdx]}`).join(', ');
+      return `${idx + 1}. [${parts}]`;
+    }).join('<br>');
+
+  drawCombRep();
+}
+
+function drawCombRep() {
+  const W = 700;
+  const H = 300;
+  if (!twoCombRep) twoCombRep = createTwo('canvas-combrep', W, H);
+  twoCombRep.clear();
+
+  // Felső szint: fagylaltos rekeszek
+  const topY = 70;
+  const boxGap = (W - 40) / combRepN;
+
+  const topTitle = twoCombRep.makeText('Fagylaltpult rekeszei (n = ' + combRepN + ' fajta):', 20, 20);
+  topTitle.alignment = 'left';
+  topTitle.fill = 'var(--muted)';
+  topTitle.size = 13;
+  topTitle.weight = 700;
+
+  for (let f = 0; f < combRepN; f++) {
+    const bx = 20 + f * boxGap + boxGap / 2;
+    const box = twoCombRep.makeRoundedRectangle(bx, topY + 15, boxGap - 12, 70, 8);
+    box.fill = 'var(--panel)';
+    box.stroke = PALETTE[f];
+    box.linewidth = 2;
+
+    const fName = twoCombRep.makeText(FLAVORS[f], bx, topY - 5);
+    fName.fill = PALETTE[f];
+    fName.size = 12;
+    fName.weight = 700;
+
+    const count = combRepDist[f] || 0;
+    const countTxt = twoCombRep.makeText(count + ' gombóc', bx, topY + 30);
+    countTxt.fill = 'var(--fg)';
+    countTxt.size = 13;
+    countTxt.weight = 600;
+
+    // Golyók rajzolása a dobozban
+    for (let s = 0; s < count; s++) {
+      const gx = bx - 20 + s * 14;
+      const gy = topY + 12;
+      const scoop = twoCombRep.makeCircle(gx, gy, 6);
+      scoop.fill = PALETTE[f];
+    }
+  }
+
+  // Alsó szint: Golyók és Falak (stars and bars) modell
+  const barY = 210;
+  const totalSlots = combRepN + combRepK - 1;
+  const slotW = (W - 80) / totalSlots;
+
+  const barTitle = twoCombRep.makeText(
+    `Golyók és falak kódja: ${combRepK} gombóc (●) és ${combRepN - 1} elválasztófal (|) = összesen ${totalSlots} pozíció:`,
+    20, 160
+  );
+  barTitle.alignment = 'left';
+  barTitle.fill = 'var(--muted)';
+  barTitle.size = 13;
+  barTitle.weight = 700;
+
+  // Létrehozzuk az elemek sorát: golyók + falak
+  const sequence = [];
+  for (let f = 0; f < combRepN; f++) {
+    const scoops = combRepDist[f] || 0;
+    for (let s = 0; s < scoops; s++) {
+      sequence.push({ type: 'ball', flavor: f });
+    }
+    if (f < combRepN - 1) {
+      sequence.push({ type: 'wall' });
+    }
+  }
+
+  for (let i = 0; i < sequence.length; i++) {
+    const sx = 40 + i * slotW + slotW / 2;
+    const item = sequence[i];
+
+    if (item.type === 'ball') {
+      const ball = twoCombRep.makeCircle(sx, barY, 14);
+      ball.fill = PALETTE[item.flavor];
+      ball.stroke = '#ffffff';
+      ball.linewidth = 1.5;
+
+      const txt = twoCombRep.makeText('●', sx, barY + 1);
+      txt.fill = '#ffffff';
+      txt.size = 10;
+    } else {
+      const wall = twoCombRep.makeRectangle(sx, barY, 8, 48);
+      wall.fill = 'var(--fg)';
+      wall.stroke = 'var(--bg)';
+      wall.linewidth = 1;
+
+      const wLabel = twoCombRep.makeText('fal', sx, barY + 36);
+      wLabel.fill = 'var(--muted)';
+      wLabel.size = 10;
+    }
+
+    const posNum = twoCombRep.makeText((i + 1) + '', sx, barY - 26);
+    posNum.fill = 'var(--muted)';
+    posNum.size = 10;
+  }
+
+  const explNote = twoCombRep.makeText(
+    `A ${totalSlots} pozícióból a ${combRepK} golyó kiválasztása: (${totalSlots} alatt a ${combRepK}) = ${combRep(combRepN, combRepK)}`,
+    W / 2, 275
+  );
+  explNote.fill = 'var(--accent)';
+  explNote.size = 13;
+  explNote.weight = 700;
+
+  twoCombRep.update();
+}
+
+function initCombRepEvents() {
+  const nSlider = document.getElementById('combrep-n');
+  const kSlider = document.getElementById('combrep-k');
+
+  nSlider.addEventListener('input', function() {
+    combRepN = parseInt(this.value, 10);
+    randomizeCombRepDist();
+    updateCombRepUI();
+  });
+
+  kSlider.addEventListener('input', function() {
+    combRepK = parseInt(this.value, 10);
+    randomizeCombRepDist();
+    updateCombRepUI();
+  });
+
+  document.getElementById('combrep-rand-btn').addEventListener('click', function() {
+    randomizeCombRepDist();
+    drawCombRep();
+  });
+}
+
+function randomizeCombRepDist() {
+  combRepDist = Array(combRepN).fill(0);
+  for (let i = 0; i < combRepK; i++) {
+    const r = Math.floor(Math.random() * combRepN);
+    combRepDist[r]++;
+  }
+}
+
+// ================= 8. FELADATFELISMERŐ GYAKORLÁS =================
+const QUIZ_QUESTIONS = [
+  {
+    q: '6 barát leül egy kerek asztal köré vacsorázni. Hány különböző ülésrend alakulhat ki, ha az elforgatással egymásba vihető ültetéseket azonosnak tekintjük?',
+    order: 'yes',
+    all: 'yes',
+    rep: 'no',
+    method: 'perm_cyclic',
+    n: 6, k: 6,
+    calc: 'P_ciklikus = (6 − 1)! = 5! = 120',
+    desc: 'Körbe rendezés esetén nincs kitüntetett első hely. Egy embert leültetve rögzítünk, a maradék 5 embert a megmaradt 5 helyre 5! = 120-féleképpen ültethetjük le (OH-MAT912AE emelt szintű tankönyv, 87. oldal).'
+  },
+  {
+    q: 'Hányféle különböző nyaklánc készíthető 7 különböző színű gyöngy felfűzésével, ha a nyaklánc a térben átfordítható?',
+    order: 'yes',
+    all: 'yes',
+    rep: 'no',
+    method: 'perm_cyclic',
+    n: 7, k: 7,
+    calc: '(7 − 1)! / 2 = 6! / 2 = 720 / 2 = 360',
+    desc: 'A gyöngyök zárt kört alkotnak ((7 − 1)! = 6! = 720). Mivel a nyaklánc a térben megfordítható (tükrözhető), az óramutató járásával egyező és ellentétes körüljárási irány ugyanazt a nyakláncot adja, így 2-vel osztunk (OH-MAT1112BE emelt szintű gyűjtemény).'
+  },
+  {
+    q: 'Egy 30 fős osztályban elnököt, titkárt és jegyzőt választanak. Hányféle kimenetel lehetséges?',
+    order: 'yes',
+    all: 'no',
+    rep: 'no',
+    method: 'vari_norep',
+    n: 30, k: 3,
+    calc: 'V₃₀³ = 30 · 29 · 28 = 24 360',
+    desc: 'A tisztségek különbözőek, így a sorrend számít. Senki sem kaphat több tisztséget, így nincs visszatevés, és csak 3 embert választunk a 30-ból.'
+  },
+  {
+    q: 'Egy 30 fős osztályból 4 tagú küldöttséget választanak a diákönkormányzatba. Hányféleképpen állítható össze a küldöttség?',
+    order: 'no',
+    all: 'no',
+    rep: 'no',
+    method: 'comb_norep',
+    n: 30, k: 4,
+    calc: 'C₃₀⁴ = (30 alatt a 4) = (30 · 29 · 28 · 27) / (4 · 3 · 2 · 1) = 27 405',
+    desc: 'A küldöttségben a tagok egyenrangúak, a kiválasztás sorrendje nem számít. Nincs visszatevés.'
+  },
+  {
+    q: '5 különböző könyvet hányféleképpen tehetünk egymás mellé a könyvespolcon?',
+    order: 'yes',
+    all: 'yes',
+    rep: 'no',
+    method: 'perm_norep',
+    n: 5, k: 5,
+    calc: 'P₅ = 5! = 5 · 4 · 3 · 2 · 1 = 120',
+    desc: 'Minden könyvet felhasználunk (k = n), a könyvek különbözőek (nincs ismétlődés), és a polcon lévő sorrend számít.'
+  },
+  {
+    q: 'Hányféle 4 jegyű PIN kód készíthető a 0, 1, …, 9 számjegyekből, ha a számjegyek ismétlődhetnek, és 0-val is kezdődhet?',
+    order: 'yes',
+    all: 'no',
+    rep: 'yes',
+    method: 'vari_rep',
+    n: 10, k: 4,
+    calc: 'V₁₀⁴,⁽ⁱ⁾ = 10⁴ = 10 000',
+    desc: 'A számjegyek sorrendje számít (más az 1234 és a 4321), és a számjegyek ismétlődhetnek.'
+  },
+  {
+    q: 'Az ANANÁSZ szó betűit összekeverve hányféle 7 betűs értelmes vagy értelmetlen szó készíthető?',
+    order: 'yes',
+    all: 'yes',
+    rep: 'yes',
+    method: 'perm_rep',
+    n: 7, k: 7,
+    calc: 'P₇³,²,¹,¹ = 7! / (3! · 2! · 1! · 1!) = 5040 / (6 · 2) = 420',
+    desc: 'Az összes (7) betűt sorba rendezzük, de vannak azonosak: 3 darab A, 2 darab N, 1 Á és 1 SZ. Az azonos betűk belső cseréi nem adnak új szót.'
+  },
+  {
+    q: 'A cukrászdában 6 féle fagylalt kapható. Hányféleképpen választhatunk 3 gombócot, ha egyféléből többet is kérhetünk, és a gombócok sorrendje nem számít?',
+    order: 'no',
+    all: 'no',
+    rep: 'yes',
+    method: 'comb_rep',
+    n: 6, k: 3,
+    calc: 'C₆³,⁽ⁱ⁾ = (6 + 3 − 1 alatt a 3) = (8 alatt a 3) = (8 · 7 · 6) / (3 · 2 · 1) = 56',
+    desc: 'A gombócok sorrendje nem számít a tölcsérben, de egy ízből többet is választhatunk (ismétléses kombináció).'
+  },
+  {
+    q: 'Az Ötöslottón a 90 számból 5 nyerőszámot sorsolnak ki visszatevés nélkül. Hányféle különböző kitöltés lehetséges?',
+    order: 'no',
+    all: 'no',
+    rep: 'no',
+    method: 'comb_norep',
+    n: 90, k: 5,
+    calc: 'C₉₀⁵ = (90 alatt az 5) = 43 949 268',
+    desc: 'A lottószelvényen beikszelt számok sorrendje közömbös, és egy számot csak egyszer lehet bejelölni.'
+  },
+  {
+    q: 'Egy 8 fős futóverseny döntőjében hányféleképpen alakulhat a dobogósok (arany, ezüst, bronz) sorrendje?',
+    order: 'yes',
+    all: 'no',
+    rep: 'no',
+    method: 'vari_norep',
+    n: 8, k: 3,
+    calc: 'V₈³ = 8 · 7 · 6 = 336',
+    desc: 'A dobogós helyek nem egyenrangúak (számít a sorrend), és 8 versenyzőből 3-at választunk ki ismétlődés nélkül.'
+  },
+  {
+    q: 'Egy totószelvényen 13 mérkőzés mindegyikére háromféle tippet (1, 2, X) tehetünk. Hányféleképpen tölthető ki a szelvény?',
+    order: 'yes',
+    all: 'no',
+    rep: 'yes',
+    method: 'vari_rep',
+    n: 3, k: 13,
+    calc: 'V₃¹³,⁽ⁱ⁾ = 3¹³ = 1 594 323',
+    desc: 'Minden mérkőzés helye rögzített (sorrend számít), és mindegyikre függetlenül 3 jel közül választhatunk.'
+  },
+  {
+    q: 'Egy 12 fős társaságban mindenki mindenkivel egyszer koccint egy pohár üdítővel. Hány koccintás történik összesen?',
+    order: 'no',
+    all: 'no',
+    rep: 'no',
+    method: 'comb_norep',
+    n: 12, k: 2,
+    calc: 'C₁₂² = (12 alatt a 2) = (12 · 11) / 2 = 66',
+    desc: 'Minden koccintást egy 2 fős pár alkot. Nem számít, ki kivel koccint (A és B koccintása ugyanaz, mint B és A koccintása).'
+  }
+];
+
+let currentQuizIdx = 0;
+
+function loadQuizQuestion(idx) {
+  currentQuizIdx = idx;
+  const item = QUIZ_QUESTIONS[idx];
+
+  document.getElementById('quiz-num').textContent = `${idx + 1} / ${QUIZ_QUESTIONS.length}. feladat`;
+  document.getElementById('quiz-question').textContent = item.q;
+
+  // Választók törlése
+  document.querySelectorAll('input[name="q_order"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="q_all"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="q_rep"]').forEach(r => r.checked = false);
+  document.getElementById('quiz-method-select').value = '';
+
+  const fb = document.getElementById('quiz-feedback');
+  fb.style.display = 'none';
+  fb.className = 'feedback-box';
+}
+
+function checkQuiz() {
+  const item = QUIZ_QUESTIONS[currentQuizIdx];
+
+  const userOrder = document.querySelector('input[name="q_order"]:checked')?.value;
+  const userAll = document.querySelector('input[name="q_all"]:checked')?.value;
+  const userRep = document.querySelector('input[name="q_rep"]:checked')?.value;
+  const userMethod = document.getElementById('quiz-method-select').value;
+
+  if (!userOrder || !userAll || !userRep || !userMethod) {
+    alert('Kérlek válaszolj mind a 3 kérdésre és válaszd ki a módszert.');
+    return;
+  }
+
+  const isCorrect = (
+    userOrder === item.order &&
+    userAll === item.all &&
+    userRep === item.rep &&
+    userMethod === item.method
+  );
+
+  const fb = document.getElementById('quiz-feedback');
+  const title = document.getElementById('quiz-feedback-title');
+  const body = document.getElementById('quiz-feedback-body');
+
+  fb.style.display = 'block';
+
+  if (isCorrect) {
+    fb.className = 'feedback-box feedback-ok';
+    title.textContent = 'Helyes válasz';
+    body.innerHTML = `
+      <strong>Képlet és eredmény:</strong> ${item.calc}<br>
+      <strong>Indoklás:</strong> ${item.desc}
+    `;
+  } else {
+    fb.className = 'feedback-box feedback-bad';
+    title.textContent = 'Nem teljesen pontos';
+    body.innerHTML = `
+      <strong>Helyes beállítások:</strong><br>
+      • Sorrend számít: <strong>${item.order === 'yes' ? 'Igen' : 'Nem'}</strong><br>
+      • Minden elemet felhasználunk: <strong>${item.all === 'yes' ? 'Igen (k = n)' : 'Nem'}</strong><br>
+      • Ismétlődés megengedett: <strong>${item.rep === 'yes' ? 'Igen' : 'Nem'}</strong><br>
+      • Helyes módszer: <strong>${getMethodName(item.method)}</strong><br>
+      <strong>Számítás:</strong> ${item.calc}<br>
+      <strong>Magyarázat:</strong> ${item.desc}
+    `;
+  }
+}
+
+function getMethodName(val) {
+  const map = {
+    'perm_norep': 'Ismétlés nélküli permutáció',
+    'perm_cyclic': 'Ciklikus permutáció',
+    'perm_rep': 'Ismétléses permutáció',
+    'vari_norep': 'Ismétlés nélküli variáció',
+    'vari_rep': 'Ismétléses variáció',
+    'comb_norep': 'Ismétlés nélküli kombináció',
+    'comb_rep': 'Ismétléses kombináció'
+  };
+  return map[val] || val;
+}
+
+function initQuizEvents() {
+  loadQuizQuestion(0);
+
+  document.getElementById('quiz-check-btn').addEventListener('click', checkQuiz);
+
+  document.getElementById('quiz-next-btn').addEventListener('click', function() {
+    const nextIdx = (currentQuizIdx + 1) % QUIZ_QUESTIONS.length;
+    loadQuizQuestion(nextIdx);
+  });
+}
+
+// ================= INICIALIZÁLÁS BETÖLTÉSKOR =================
+window.addEventListener('DOMContentLoaded', function() {
+  updatePermUI();
+  initPermEvents();
+
+  updateCyclicUI();
+  initCyclicEvents();
+
+  updatePermRepUI();
+  initPermRepEvents();
+
+  updateVariUI();
+  initVariEvents();
+
+  updateVariRepUI();
+  initVariRepEvents();
+
+  updateCombUI();
+  initCombEvents();
+
+  randomizeCombRepDist();
+  updateCombRepUI();
+  initCombRepEvents();
+
+  initQuizEvents();
+});
+</script>
+
+</body>
+</html>
