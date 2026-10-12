@@ -746,7 +746,7 @@ const Az = n => az(n) === 'az' ? 'Az' : 'A';
 const THEOREMS = {
   summation: {
     title: 'Összegzés tétele',
-    desc: 'Adott egy n elemű számsorozat (tömb). Feladatunk meghatározni a tömb elemeinek összegét. Az <code>osszeg</code> akkumulátorváltozót 0-ra állítjuk, majd egy számlálós ciklussal végigmegyünk a tömbön, és minden elemet hozzáadunk.',
+    desc: 'Adott egy n elemű számsorozat (tömb). Feladatunk meghatározni a tömb elemeinek összegét. Az <code>osszeg</code> gyűjtőváltozót 0-ra állítjuk, majd egy számlálós ciklussal végigmegyünk a tömbön, és minden elemet hozzáadunk.',
     code: [
       '<span class="cm">// Összegzés</span>',
       '<span class="kw">osszeg</span> = <span class="num">0</span>',
@@ -1335,7 +1335,7 @@ const THEOREMS = {
 
   partition: {
     title: 'Szétválogatás tétele',
-    desc: 'A tömb minden elemét pontosan két csoport egyikébe osztjuk egy feltétel szerint (itt: 5-nél kisebbek a <code>b</code> tömbbe, a többi a <code>c</code> tömbbe). Két független célmutatót használunk: <code>j</code> a <code>b</code>-nek, <code>k</code> a <code>c</code>-nek.',
+    desc: 'A tömb minden elemét egy feltétel szerint két csoport egyikébe soroljuk (itt: 5-nél kisebbek a <code>b</code> tömbbe, a többi a <code>c</code> tömbbe). Két független célmutatót használunk: <code>j</code> a <code>b</code>-nek, <code>k</code> a <code>c</code>-nek.',
     code: [
       '<span class="cm">// Szétválogatás két tömbbe</span>',
       '<span class="kw">j</span> = <span class="num">0</span>; <span class="kw">k</span> = <span class="num">0</span>',
@@ -1551,7 +1551,7 @@ const THEOREMS = {
           c: c.map(v => ({ v, state: 'matched' }))
         },
         pointers: {},
-        text: `Az a tömb átmásolva (${k} elem). 2. lépés: megvizsgáljuk b elemeit.`
+        text: `Az a tömböt átmásoltuk (${k} elem). 2. lépés: megvizsgáljuk b elemeit.`
       });
 
       for (let j = 0; j < b.length; j++) {
@@ -1581,7 +1581,7 @@ const THEOREMS = {
               c: c.map((v, idx) => ({ v, state: idx === k ? 'matched' : 'normal' }))
             },
             pointers: { b: { j }, c: { k } },
-            text: `c[${k}] = ${val}. Hozzáadva az unióhoz!`
+            text: `c[${k}] = ${val}. Hozzáadtuk az unióhoz.`
           });
           k++;
         }
