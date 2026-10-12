@@ -447,7 +447,7 @@ main {
   .goal-list dd { margin-bottom: 6px; }
 }
 
-/* Függőleges tömb (buborékos rendezés): a 0. index van legalul */
+/* Függőleges tömb (buborékrendezés): a 0. index van legalul */
 .vwrap {
   width: 100%;
   max-width: 520px;
@@ -645,7 +645,7 @@ main {
     <div class="toc-group">
       <div class="toc-group-title">4. Rendezés</div>
       <div class="toc-links">
-        <a href="#t-bubble">Buborékos rendezés</a>
+        <a href="#t-bubble">Buborékrendezés</a>
       </div>
     </div>
   </nav>
@@ -1602,11 +1602,11 @@ const THEOREMS = {
   },
 
   bubble: {
-    title: 'Buborékos rendezés',
+    title: 'Buborékrendezés',
     vertical: true,
-    desc: 'A tömb itt <strong>függőlegesen</strong> áll: a 0. indexű elem van legalul, az utolsó legfelül. A hat helyen 1 és 10 közötti számok állnak, és mindegyik mellett annyi buborék látszik, amennyi az értéke. A belső ciklus (<code>j</code>) alulról fölfelé halad, és mindig két szomszédot hasonlít össze: ha az alsó a nagyobb (<code>t[j] &gt; t[j + 1]</code>), megcseréli őket. A nagy számok így <strong>fölfelé szállnak, mint a buborék</strong>: egy menet végére a legnagyobb a helyére kerül (zöld), ezért a külső ciklus (<code>i</code>) a következő menetben eggyel rövidebb részt néz végig. Folyamatábrával: <a href="/app/flowchart/index.html?lang=hu&amp;example=emBubble">Folyáb – Buborékos rendezés</a>.',
+    desc: 'A tömb itt <strong>függőlegesen</strong> áll: a 0. indexű elem van legalul, az utolsó legfelül. A hat helyen 1 és 10 közötti számok állnak, és mindegyik mellett annyi buborék látszik, amennyi az értéke. A belső ciklus (<code>j</code>) alulról fölfelé halad, és mindig két szomszédot hasonlít össze: ha az alsó a nagyobb (<code>t[j] &gt; t[j + 1]</code>), megcseréli őket. A nagy számok így <strong>fölfelé szállnak, mint a buborék</strong>: egy menet végére a legnagyobb a helyére kerül (zöld), ezért a külső ciklus (<code>i</code>) a következő menetben eggyel rövidebb részt néz végig. Folyamatábrával: <a href="/app/flowchart/index.html?lang=hu&amp;example=emBubble">Folyáb – Buborékrendezés</a>.',
     code: [
-      '<span class="cm">// Buborékos rendezés (növekvő sorrend)</span>',
+      '<span class="cm">// Buborékrendezés (növekvő sorrend)</span>',
       '<span class="kw">Ciklus</span> i = <span class="num">n - 1</span>-től <span class="num">1</span>-ig, <span class="num">-1</span>-esével',
       '    <span class="kw">Ciklus</span> j = <span class="num">0</span>-tól <span class="num">i - 1</span>-ig',
       '        <span class="kw">Ha</span> t[j] &gt; t[j + <span class="num">1</span>] <span class="kw">Akkor</span>',
@@ -1794,12 +1794,12 @@ const SUMMARIES = {
     src: ['dk11c', 'okos10']
   },
   bubble: {
-    goal: 'A rendezés is sorozathoz sorozatot rendel: ugyanazokat az elemeket kapjuk vissza, növekvő sorrendben (itt új sorozat nélkül, az elemek mozgatásával). A buborékos rendezés mindig az egymás melletti elemeket hasonlítja össze, és ha rossz sorrendben állnak, megcseréli őket. A nagyobb elemek így lépésenként a sorozat vége felé vándorolnak: a belső ciklus egy lefutása után a legnagyobb a helyére kerül, mint a víz tetejére felszálló buborék, ezért a következő menetben eggyel rövidebb részt kell végignézni. Sokféle rendező algoritmus létezik, eltérő gyorsasággal; a gyakorlatban a nyelv beépített rendezését használjuk, de egyet-kettőt érdemes ismerni.',
+    goal: 'A rendezés is sorozathoz sorozatot rendel: ugyanazokat az elemeket kapjuk vissza, növekvő sorrendben (itt új sorozat nélkül, az elemek mozgatásával). A buborékrendezés mindig az egymás melletti elemeket hasonlítja össze, és ha rossz sorrendben állnak, megcseréli őket. A nagyobb elemek így lépésenként a sorozat vége felé vándorolnak: a belső ciklus egy lefutása után a legnagyobb a helyére kerül, mint a víz tetejére felszálló buborék, ezért a következő menetben eggyel rövidebb részt kell végignézni. Sokféle rendező algoritmus létezik, eltérő gyorsasággal; a gyakorlatban a nyelv beépített rendezését használjuk, de egyet-kettőt érdemes ismerni.',
     question: 'Hogyan lesz a sorozatból növekvő sorrendű sorozat?',
     result: 'ugyanazok az elemek, rendezve',
     python: '<code>sorted(lista)</code> (új lista) vagy <code>lista.sort()</code> (helyben)',
     src: ['okos10', 'dk11d'],
-    note: 'A 11. évfolyamos tankönyv példája az egyszerű cserés rendezés, a buborékos rendezés az okosgyűjteményben szerepel.'
+    note: 'A 11. évfolyamos tankönyv példája az egyszerű cserés rendezés, a buborékrendezés az okosgyűjteményben szerepel.'
   }
 };
 
@@ -2138,7 +2138,7 @@ function createViewer(key, root) {
 }
 
 // ======================= AZ OLDAL FELÉPÍTÉSE =======================
-const GROUPS = [{title:"1. Egy sorozat feldolgozása (elemi tételek)",items:[["summation","Összegzés"],["counting","Megszámolás"],["decision","Eldöntés"],["selection","Kiválasztás"],["linearSearch","Lineáris keresés"],["maximum","Maximumkiválasztás"],["minimum","Minimumkiválasztás"]]},{title:"2. Sorozatok másolása és szétválogatása",items:[["copy","Másolás"],["filter","Kiválogatás"],["partition","Szétválogatás"]]},{title:"3. Két sorozat összehasonlítása",items:[["intersection","Metszet"],["union","Unió"]]},{title:"4. Rendezés",items:[["bubble","Buborékos rendezés"]]}];
+const GROUPS = [{title:"1. Egy sorozat feldolgozása (elemi tételek)",items:[["summation","Összegzés"],["counting","Megszámolás"],["decision","Eldöntés"],["selection","Kiválasztás"],["linearSearch","Lineáris keresés"],["maximum","Maximumkiválasztás"],["minimum","Minimumkiválasztás"]]},{title:"2. Sorozatok másolása és szétválogatása",items:[["copy","Másolás"],["filter","Kiválogatás"],["partition","Szétválogatás"]]},{title:"3. Két sorozat összehasonlítása",items:[["intersection","Metszet"],["union","Unió"]]},{title:"4. Rendezés",items:[["bubble","Buborékrendezés"]]}];
 const host = $('#theorems');
 const tpl = $('#viewerTpl');
 GROUPS.forEach(g => {
