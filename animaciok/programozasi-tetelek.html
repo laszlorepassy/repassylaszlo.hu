@@ -162,6 +162,8 @@ main {
 @media (max-width: 960px) {
   .app-grid { grid-template-columns: 1fr; }
 }
+/* keskeny képernyőn a széles tartalom (tömb, kód) a saját dobozában görögjön */
+.app-grid > div { min-width: 0; }
 .card {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -413,6 +415,126 @@ main {
 .theorem-desc strong {
   color: var(--accent);
 }
+/* A tétel célja (tankönyvi összefoglaló) */
+.goal-card { margin-bottom: 16px; }
+.goal-text { font-size: 1rem; line-height: 1.6; margin: 0 0 10px; }
+.goal-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 14px;
+  margin: 0;
+  font-size: 0.93rem;
+}
+.goal-list dt { font-weight: 700; color: var(--muted); }
+.goal-list dd { margin: 0; }
+.goal-list code, .theorem-desc code, .goal-text code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9em;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+.goal-list a, .theorem-desc a { color: var(--accent); }
+@media (max-width: 600px) {
+  .goal-list { grid-template-columns: 1fr; gap: 0; }
+  .goal-list dd { margin-bottom: 6px; }
+}
+
+/* Függőleges tömb (buborékos rendezés): a 0. index van legalul */
+.vwrap {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.vcap {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 4px 0;
+}
+.vstack {
+  position: relative;
+  --vdur: 480ms;
+}
+.vidx {
+  position: absolute;
+  left: 0;
+  width: 44px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.vslot {
+  position: absolute;
+  left: 54px;
+  right: 76px;
+  height: 40px;
+  border-radius: 20px;
+  border: 1px dashed var(--line);
+}
+.vitem {
+  position: absolute;
+  left: 54px;
+  height: 40px;
+  min-width: 46px;
+  border-radius: 20px;
+  background: var(--bar-default);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 14px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  transition: top var(--vdur) ease-in-out, background 0.25s;
+}
+.vitem.checking { background: var(--bar-check); }
+.vitem.target { background: var(--bar-target); z-index: 2; }
+.vitem.matched { background: var(--bar-match); }
+.vptr {
+  position: absolute;
+  right: 0;
+  width: 68px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.vptr span {
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: #fff;
+  white-space: nowrap;
+}
+.vptr span.p-j1 { background: var(--warn); }
+.vptr span.p-i { background: var(--ok); }
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-top: 10px;
+  justify-content: center;
+}
+.legend i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  margin-right: 5px;
+  vertical-align: -1px;
+}
+
 .preset-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -445,6 +567,8 @@ main {
   <h1>Programozási tételek</h1>
   <div class="subtitle">
     Az elemi algoritmusok lépésről lépésre követhető, interaktív szemléltetése a <strong>Folyáb</strong> példatára alapján.
+    Minden tétel előtt rövid összefoglaló áll arról, mire való; ezek a Digitális kultúra 10. és 11. tankönyv
+    és a Digitális kultúra 11–12. okosgyűjtemény (emelt szint) leckéi alapján készültek.
   </div>
 
   <nav class="toc" aria-label="Tartalomjegyzék">
@@ -476,12 +600,23 @@ main {
         <a href="#t-union">Unió</a>
       </div>
     </div>
+    <div class="toc-group">
+      <div class="toc-group-title">4. Rendezés</div>
+      <div class="toc-links">
+        <a href="#t-bubble">Buborékos rendezés</a>
+      </div>
+    </div>
   </nav>
 </header>
 
 <main id="theorems"></main>
 
 <template id="viewerTpl">
+  <div class="card goal-card">
+    <h3>A tétel célja</h3>
+    <p class="goal-text" data-r="goalText"></p>
+    <dl class="goal-list" data-r="goalList"></dl>
+  </div>
   <div class="app-grid">
     <!-- Bal oldal: Vizualizáció és vezérlés -->
     <div>
@@ -512,6 +647,7 @@ main {
           <div class="speed-wrap">
             <label >Sebesség:</label>
             <select data-r="speedSelect">
+              <option value="2400">0.25×</option>
               <option value="1200">0.5×</option>
               <option value="600" selected>1×</option>
               <option value="300">2×</option>
@@ -531,7 +667,7 @@ main {
 
       <!-- Tétel elméleti leírása -->
       <div class="card">
-        <h3>A tétel feladata és lényege</h3>
+        <h3>Így működik az algoritmus</h3>
         <div class="theorem-desc" data-r="theoremDesc"></div>
       </div>
     </div>
@@ -1408,6 +1544,207 @@ const THEOREMS = {
       });
       return steps;
     }
+  },
+
+  bubble: {
+    title: 'Buborékos rendezés',
+    vertical: true,
+    desc: 'A tömb itt <strong>függőlegesen</strong> áll: a 0. indexű elem van legalul, az utolsó legfelül. A belső ciklus (<code>j</code>) alulról fölfelé halad, és mindig két szomszédot hasonlít össze: ha az alsó a nagyobb (<code>t[j] &gt; t[j + 1]</code>), megcseréli őket. A nagy számok így <strong>fölfelé szállnak, mint a buborék</strong>: egy menet végére a legnagyobb a helyére kerül (zöld), ezért a külső ciklus (<code>i</code>) a következő menetben eggyel rövidebb részt néz végig. Folyamatábrával: <a href="/app/flowchart/index.html?lang=hu&amp;example=emBubble">Folyáb – Buborékos rendezés</a>.',
+    code: [
+      '<span class="cm">// Buborékos rendezés (növekvő sorrend)</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">n - 1</span>-től <span class="num">1</span>-ig, <span class="num">-1</span>-esével',
+      '    <span class="kw">Ciklus</span> j = <span class="num">0</span>-tól <span class="num">i - 1</span>-ig',
+      '        <span class="kw">Ha</span> t[j] &gt; t[j + <span class="num">1</span>] <span class="kw">Akkor</span>',
+      '            <span class="kw">seged</span> = t[j]; <span class="kw">t[j]</span> = t[j + <span class="num">1</span>]; <span class="kw">t[j + 1]</span> = seged',
+      '        <span class="kw">Feltétel vége</span>',
+      '    <span class="kw">Ciklus vége</span>',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="fn">Kiír</span> <span class="str">"Rendezett: "</span> & t'
+    ],
+    initData: () => ({ t: [14, 27, 5, 21, 9, 18] }),
+    presets: [
+      { name: 'Vegyes számok', data: () => ({ t: [14, 27, 5, 21, 9, 18] }) },
+      { name: 'Fordított sorrend', data: () => ({ t: [30, 24, 18, 12, 6] }) },
+      { name: 'Már rendezett', data: () => ({ t: [4, 9, 15, 22, 28] }) },
+      { name: 'A legnagyobb van legalul', data: () => ({ t: [29, 3, 8, 12, 17, 23] }) }
+    ],
+    generateSteps: (data) => {
+      const steps = [];
+      const items = data.t.map((v, id) => ({ id, v }));
+      const n = items.length;
+      let done = n;       // az ennél nem kisebb indexű elemek már a helyükön vannak
+      let swaps = 0;
+      let comps = 0;
+      const snap = (a, b, st) => items.map((it, pos) => ({
+        id: it.id, v: it.v,
+        state: pos >= done ? 'matched' : ((pos === a || pos === b) ? st : 'normal')
+      }));
+
+      steps.push({
+        line: 0, vars: { n, i: '-', j: '-', 'összehasonlítás': 0, csere: 0 },
+        arrays: { t: snap(-1, -1, 'normal') },
+        pointers: { t: {} },
+        text: 'Kezdés: a tömb rendezetlen. Alul a 0. indexű elem, felül az utolsó. Növekvő sorrendet szeretnénk: a legnagyobb kerüljön legfelülre.'
+      });
+
+      for (let i = n - 1; i >= 1; i--) {
+        steps.push({
+          line: 1, vars: { n, i, j: '-', 'összehasonlítás': comps, csere: swaps },
+          arrays: { t: snap(-1, -1, 'normal') },
+          pointers: { t: { i } },
+          text: `Külső ciklus: i = ${i}. A t[0]…t[${i}] részt nézzük végig alulról fölfelé; a menet végére a legnagyobbjuk a t[${i}] helyre kerül.`
+        });
+
+        for (let j = 0; j < i; j++) {
+          const a = items[j].v, b = items[j + 1].v;
+          const need = a > b;
+          comps++;
+          steps.push({
+            line: 3, vars: { i, j, 't[j]': a, 't[j+1]': b, 't[j] > t[j+1]?': need ? 'IGEN' : 'NEM', 'összehasonlítás': comps, csere: swaps },
+            arrays: { t: snap(j, j + 1, 'checking') },
+            pointers: { t: { i, j, 'j+1': j + 1 } },
+            text: need
+              ? `Összehasonlítás: t[${j}] = ${a} és t[${j + 1}] = ${b}. Az alsó a nagyobb (${a} &gt; ${b}), rossz a sorrend: cserélni kell.`
+              : `Összehasonlítás: t[${j}] = ${a} és t[${j + 1}] = ${b}. Az alsó nem nagyobb (${a} ≤ ${b}), jó a sorrend: nem cserélünk.`
+          });
+
+          if (need) {
+            const tmp = items[j]; items[j] = items[j + 1]; items[j + 1] = tmp;
+            swaps++;
+            steps.push({
+              line: 4, vars: { i, j, 't[j]': items[j].v, 't[j+1]': items[j + 1].v, 'összehasonlítás': comps, csere: swaps },
+              arrays: { t: snap(j, j + 1, 'target') },
+              pointers: { t: { i, j, 'j+1': j + 1 } },
+              text: `Csere: a nagyobb (${a}) egy hellyel feljebb száll, a kisebb (${b}) lejjebb kerül.`
+            });
+          }
+        }
+
+        done = i;
+        steps.push({
+          line: 6, vars: { i, j: '-', 'a helyén': `t[${i}] = ${items[i].v}`, 'összehasonlítás': comps, csere: swaps },
+          arrays: { t: snap(-1, -1, 'normal') },
+          pointers: { t: { i } },
+          text: `A belső ciklus lefutott: a vizsgált rész legnagyobb eleme (${items[i].v}) fölszállt a helyére: t[${i}] = ${items[i].v}. Ehhez már nem nyúlunk.`
+        });
+      }
+
+      done = 0;
+      steps.push({
+        line: 8, vars: { n, 'összehasonlítás': comps, csere: swaps },
+        arrays: { t: snap(-1, -1, 'normal') },
+        pointers: { t: {} },
+        text: `Kész! A tömb rendezett: [${items.map(it => it.v).join(', ')}]. Összesen ${comps} összehasonlítás és ${swaps} csere kellett.`
+      });
+      return steps;
+    }
+  }
+};
+
+// ======================= A TÉTELEK CÉLJA =======================
+// Rövid összefoglalók a tankönyvek alapján (saját megfogalmazásban).
+const SRC = {
+  dk10a: 'Digitális kultúra 10: Variációk típusalgoritmusokra 1.',
+  dk10b: 'Digitális kultúra 10: Variációk típusalgoritmusokra 2.',
+  dk11a: 'Digitális kultúra 11: Vittük valamire – Típusalgoritmusok',
+  dk11b: 'Digitális kultúra 11: Másolunk, kiválogatunk és szétválogatunk típusalgoritmussal',
+  dk11c: 'Digitális kultúra 11: A metszetképzés és az egyesítés (unió) típusalgoritmusa',
+  dk11d: 'Digitális kultúra 11: A rendezés típusalgoritmusa és rendezés a napi gyakorlatban',
+  okos5: 'Okosgyűjtemény 11–12 (emelt): Egyszerű típusalgoritmusok',
+  okos10: 'Okosgyűjtemény 11–12 (emelt): Összetett típusalgoritmusok'
+};
+const SUMMARIES = {
+  summation: {
+    goal: 'A sorozatszámítás leggyakoribb esete. Egy sorozat (lista, tömb) elemeit járjuk végig egy ciklussal, és mindegyikkel ugyanazt a műveletet végezzük el, így a sok elemből egyetlen érték lesz. Összegzésnél ez a művelet az összeadás; ugyanígy készül a szorzat, az átlag vagy több szöveg összefűzése is.',
+    question: 'Mennyi az elemek összege? (Mennyi a napi bevétel? Hány napos az év a hónapok hossza alapján?)',
+    result: 'egyetlen érték (szám vagy szöveg)',
+    python: '<code>sum(lista)</code>',
+    src: ['dk10a', 'dk11a', 'okos5']
+  },
+  counting: {
+    goal: 'Arra ad választ, hány adott tulajdonságú elem van a sorozatban. A bejárás előtt egy számlálót nullára állítunk, és minden találatnál eggyel növeljük. Az eldöntés „mindent végignéző” változatára hasonlít: ott egy logikai változót állítunk át, itt egy számlálót növelünk.',
+    question: 'Hány elemre igaz a feltétel? (Hány páros szám van a listában?)',
+    result: 'egy darabszám (lehet 0 is)',
+    python: '<code>lista.count(érték)</code> egy konkrét érték előfordulásaira; ha minden elem számít: <code>len(lista)</code>',
+    src: ['dk10b', 'dk11a', 'okos5']
+  },
+  decision: {
+    goal: 'Arra a kérdésre felel, hogy van-e a sorozatban adott tulajdonságú elem. Az is lehet, hogy nincs ilyen. Nem kell mindig a sorozat végéig menni: az első találatnál megállhatunk, mert a válasz már biztos. Sok elemnél ez rengeteg fölösleges vizsgálatot takarít meg.',
+    question: 'Van-e olyan elem, amelyre igaz a feltétel? (Volt-e ma ötpiculás fuvar? Van-e 28 napos hónap?)',
+    result: 'logikai érték: igaz vagy hamis',
+    python: '<code>érték in lista</code>',
+    src: ['dk10a', 'dk11a', 'okos5']
+  },
+  selection: {
+    goal: 'Itt már tudjuk, hogy van adott tulajdonságú elem; a kérdés az, hogy melyik az, hányadik helyen áll. Addig lépkedünk az elemeken, amíg meg nem találjuk az első megfelelőt. Mivel biztosan van ilyen, a sorozat végét nem kell figyelni. Ha több megfelelő elem is van, csak egyet (az elsőt) adja meg.',
+    question: 'Hányadik az első megfelelő elem? (Hányadik fuvar volt az ötpiculás?)',
+    result: 'egy sorszám (index)',
+    python: '<code>lista.index(érték)</code>',
+    src: ['dk10a', 'dk11a', 'okos5']
+  },
+  linearSearch: {
+    goal: 'Az eldöntés és a kiválasztás egybeépítése. Nem tudjuk előre, hogy van-e megfelelő elem, de ha van, a helyét is tudni szeretnénk. Az algoritmus szinte ugyanaz, mint az eldöntésé, a válasz pedig a kiválasztáséra hasonlít. (Éppen ezért nem mindenki tekinti önálló tételnek.)',
+    question: 'Van-e megfelelő elem, és ha van, hányadik?',
+    result: 'egy logikai érték, és találat esetén egy sorszám',
+    python: 'előbb <code>érték in lista</code>, és ha igaz: <code>lista.index(érték)</code>',
+    src: ['dk10b', 'dk11a', 'okos5']
+  },
+  maximum: {
+    goal: 'A szélsőérték-kiválasztás egyik fele: megadja a sorozat legnagyobb elemének értékét, és ha kell, a helyét is. Egy változóban tartjuk az eddig látott legnagyobbat; a sorozatot végigjárva minden elemet összehasonlítunk vele, és ha nagyobbat találunk, mostantól azt tekintjük a legnagyobbnak. Legnagyobb elem biztosan van (ha a sorozat nem üres), ezért itt sem az a kérdés, hogy van-e, hanem hogy melyik.',
+    question: 'Melyik a legnagyobb elem, és hányadik? (Melyik volt a legjobb fuvar?)',
+    result: 'egy érték és a sorszáma; több egyforma legnagyobb közül az elsőé',
+    python: '<code>max(lista)</code>',
+    src: ['dk10b', 'dk11a', 'okos5']
+  },
+  minimum: {
+    goal: 'A szélsőérték-kiválasztás másik fele: a sorozat legkisebb elemének értékét és helyét adja meg. Ugyanúgy működik, mint a maximumkiválasztás, csak az összehasonlítás iránya fordul meg: akkor cseréljük le az eddigi legkisebbet, ha nála kisebbet találunk.',
+    question: 'Melyik a legkisebb elem, és hányadik? (Hány napos az év legrövidebb hónapja?)',
+    result: 'egy érték és a sorszáma',
+    python: '<code>min(lista)</code>',
+    src: ['dk10b', 'dk11a', 'okos5']
+  },
+  copy: {
+    goal: 'Az összetett tételek már nem egyetlen értéket, hanem egy új sorozatot adnak eredményül; közülük a másolás a legegyszerűbb. Bejárjuk a sorozat elemeit, mindegyiket ugyanazzal a szabállyal (hozzárendelő függvénnyel) átalakítjuk, és az átalakított elemeket új sorozatba gyűjtjük. Az új sorozatnak pontosan annyi eleme van, mint az eredetinek. Gyakori példa az áfával növelt árak kiszámítása vagy a típusátalakítás (szövegként tárolt számokból valódi számok).',
+    question: 'Mi lesz az elemekből, ha mindegyiket átalakítjuk?',
+    result: 'ugyanolyan hosszú új sorozat',
+    python: '<code>[f(x) for x in lista]</code> vagy <code>list(map(f, lista))</code>',
+    src: ['dk11b', 'okos10']
+  },
+  filter: {
+    goal: 'Majdnem olyan, mint a másolás, de az elemeket nem alakítjuk át, és nem is mindet visszük át: csak azok kerülnek az új sorozatba, amelyek megfelelnek egy feltételnek. Az eredmény hosszát előre nem tudjuk, csak azt, hogy az eredetinél hosszabb nem lehet (akár üres is maradhat).',
+    question: 'Melyek a feltételnek megfelelő elemek?',
+    result: 'új sorozat, legfeljebb akkora, mint az eredeti',
+    python: '<code>[x for x in lista if feltétel]</code>',
+    src: ['dk11b', 'okos10']
+  },
+  partition: {
+    goal: 'A kiválogatás kibővítése: nemcsak a feltételnek megfelelő elemekre van szükségünk, hanem a többire is. Az eredeti sorozat minden elemét megvizsgáljuk, és elhelyezzük valahol: az egyik új sorozatba a megfelelők kerülnek, a másikba azok, amelyek nem (akár többfelé is válogathatunk). Olyan, mintha több kiválogatást végeznénk egyszerre.',
+    question: 'Melyek a megfelelő és melyek a nem megfelelő elemek?',
+    result: 'legalább két új sorozat; együtt éppen az eredeti elemeit tartalmazzák',
+    python: 'egy ciklusban két <code>append</code>, vagy két listaértelmezés',
+    src: ['dk11b', 'okos10']
+  },
+  intersection: {
+    goal: 'Nem egy, hanem két sorozatból készít egy újat: azokat az elemeket gyűjti ki, amelyek mindkettőben szerepelnek. Ez a halmazoknál tanult metszet. Ha az adataink nem halmazban, hanem listában vagy tömbben vannak, az egyik sorozat minden eleméről megnézzük, megvan-e a másikban is: vagyis egy kiválogatáson belül sokszor végrehajtjuk az eldöntést. (A listában, a halmazzal ellentétben, egy elem többször is előfordulhat, és számít a sorrend.)',
+    question: 'Melyek a mindkét sorozatban szereplő elemek? (Melyik megállókban lehet átszállni a villamosról a buszra?)',
+    result: 'új sorozat a közös elemekkel',
+    python: '<code>set(a) &amp; set(b)</code>',
+    src: ['dk11c', 'okos10']
+  },
+  union: {
+    goal: 'Két sorozat egyesítése: az eredménybe minden olyan elem bekerül, amely legalább az egyik sorozatban szerepel, a közösek csak egyszer. Ez a halmazoknál tanult unió. Listákkal úgy készül, hogy az első sorozat elemeit átmásoljuk, majd hozzávesszük a másodikból azokat, amelyek az elsőben még nincsenek benne: vagyis egy másolás, majd egy kiválogatás, amelyben eldöntés dolgozik.',
+    question: 'Melyek a legalább az egyik sorozatban szereplő elemek?',
+    result: 'új sorozat, ismétlődés nélkül',
+    python: '<code>set(a) | set(b)</code>',
+    src: ['dk11c', 'okos10']
+  },
+  bubble: {
+    goal: 'A rendezés is sorozathoz sorozatot rendel: ugyanazokat az elemeket kapjuk vissza, növekvő sorrendben (itt új sorozat nélkül, az elemek mozgatásával). A buborékos rendezés mindig az egymás melletti elemeket hasonlítja össze, és ha rossz sorrendben állnak, megcseréli őket. A nagyobb elemek így lépésenként a sorozat vége felé vándorolnak: a belső ciklus egy lefutása után a legnagyobb a helyére kerül, mint a víz tetejére felszálló buborék, ezért a következő menetben eggyel rövidebb részt kell végignézni. Sokféle rendező algoritmus létezik, eltérő gyorsasággal; a gyakorlatban a nyelv beépített rendezését használjuk, de egyet-kettőt érdemes ismerni.',
+    question: 'Hogyan lesz a sorozatból növekvő sorrendű sorozat?',
+    result: 'ugyanazok az elemek, rendezve',
+    python: '<code>sorted(lista)</code> (új lista) vagy <code>lista.sort()</code> (helyben)',
+    src: ['okos10', 'dk11d'],
+    note: 'A 11. évfolyamos tankönyv példája az egyszerű cserés rendezés, a buborékos rendezés az okosgyűjteményben szerepel.'
   }
 };
 
@@ -1430,6 +1767,17 @@ function createViewer(key, root) {
 
     R('visTitle').textContent = 'Animáció';
     R('theoremDesc').innerHTML = currentTheorem.desc;
+
+    // A tétel célja: tankönyvi összefoglaló
+    const sum = SUMMARIES[key];
+    R('goalText').innerHTML = sum.goal;
+    const rows = [
+      ['A kérdés', sum.question],
+      ['Az eredmény', sum.result],
+      ['Pythonban röviden', sum.python],
+      ['Forrás', sum.src.map(k => SRC[k]).join('; ') + '.' + (sum.note ? ' ' + sum.note : '')]
+    ];
+    R('goalList').innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
 
     // Cél érték mező megjelenítése ha szükséges
     if (currentTheorem.hasTarget) {
@@ -1476,6 +1824,7 @@ function createViewer(key, root) {
 
   function recalc() {
     pause();
+    R('arrayContainer').innerHTML = '';
     steps = currentTheorem.generateSteps(currentData);
     currentStepIdx = 0;
     renderStep(currentStepIdx);
@@ -1511,6 +1860,10 @@ function createViewer(key, root) {
 
     // Tömbök vizualizációja
     const container = R('arrayContainer');
+    if (currentTheorem.vertical) {
+      renderVertical(s, container);
+      return;
+    }
     container.innerHTML = '';
 
     for (const [arrName, items] of Object.entries(s.arrays)) {
@@ -1560,6 +1913,83 @@ function createViewer(key, root) {
     }
   }
 
+  // Függőleges tömb: a 0. index legalul, a cserék csúszva animálódnak.
+  // Az elemek DOM-csomópontjai megmaradnak a lépések között (azonosító szerint),
+  // csak a helyük (top) és a színük változik.
+  function renderVertical(s, container) {
+    const ROW = 48;
+    const items = s.arrays.t;
+    const n = items.length;
+    let stack = container.querySelector('.vstack');
+
+    if (!stack) {
+      const wrap = document.createElement('div');
+      wrap.className = 'vwrap';
+      wrap.innerHTML =
+        '<div class="vcap">▲ a tömb vége: ide szállnak föl a nagy számok</div>' +
+        '<div class="vstack"></div>' +
+        '<div class="vcap">▼ a tömb eleje (0. index)</div>' +
+        '<div class="legend">' +
+        '<span><i style="background:var(--bar-check)"></i>összehasonlítás</span>' +
+        '<span><i style="background:var(--bar-target)"></i>csere</span>' +
+        '<span><i style="background:var(--bar-match)"></i>a helyén van</span>' +
+        '</div>';
+      container.appendChild(wrap);
+      stack = wrap.querySelector('.vstack');
+      stack.style.height = (n * ROW) + 'px';
+      const maxV = Math.max(...items.map(it => Math.abs(it.v)), 1);
+
+      for (let pos = 0; pos < n; pos++) {
+        const top = (n - 1 - pos) * ROW + 4;
+        const idx = document.createElement('div');
+        idx.className = 'vidx';
+        idx.style.top = top + 'px';
+        idx.textContent = `t[${pos}]`;
+        stack.appendChild(idx);
+
+        const slot = document.createElement('div');
+        slot.className = 'vslot';
+        slot.style.top = top + 'px';
+        stack.appendChild(slot);
+
+        const ptr = document.createElement('div');
+        ptr.className = 'vptr';
+        ptr.dataset.pos = pos;
+        ptr.style.top = top + 'px';
+        stack.appendChild(ptr);
+      }
+
+      items.forEach(it => {
+        const el = document.createElement('div');
+        el.className = 'vitem';
+        el.dataset.id = it.id;
+        el.textContent = it.v;
+        // szélesség az érték szerint: a sáv 25–100%-a
+        const share = 0.25 + 0.75 * Math.abs(it.v) / maxV;
+        el.style.width = `calc((100% - 130px) * ${share.toFixed(3)})`;
+        stack.appendChild(el);
+      });
+    }
+
+    stack.style.setProperty('--vdur', Math.min(900, Math.round(+R('speedSelect').value * 0.8)) + 'ms');
+
+    items.forEach((it, pos) => {
+      const el = stack.querySelector(`.vitem[data-id="${it.id}"]`);
+      el.style.top = ((n - 1 - pos) * ROW + 4) + 'px';
+      el.className = 'vitem ' + (it.state || 'normal');
+    });
+
+    const pointers = (s.pointers && s.pointers.t) || {};
+    const cls = { i: 'p-i', j: 'p-j', 'j+1': 'p-j1' };
+    stack.querySelectorAll('.vptr').forEach(p => {
+      const pos = +p.dataset.pos;
+      p.innerHTML = Object.entries(pointers)
+        .filter(([, idx]) => idx === pos)
+        .map(([name]) => `<span class="${cls[name] || ''}">${name}</span>`)
+        .join('');
+    });
+  }
+
   // Vezérlő események
   function pause() {
     if (playTimer) {
@@ -1596,7 +2026,11 @@ function createViewer(key, root) {
 
   R('btnRandom').addEventListener('click', () => {
     pause();
-    if (currentTheoremKey === 'intersection' || currentTheoremKey === 'union') {
+    if (currentTheorem.vertical) {
+      // rendezéshez kevesebb, csupa különböző szám
+      const pool = Array.from({ length: 30 }, (_, k) => k + 1).sort(() => Math.random() - 0.5);
+      currentData = { t: pool.slice(0, 5 + Math.floor(Math.random() * 3)) };
+    } else if (currentTheoremKey === 'intersection' || currentTheoremKey === 'union') {
       currentData = {
         a: Array.from({ length: 4 + Math.floor(Math.random() * 3) }, () => Math.floor(Math.random() * 15) + 1),
         b: Array.from({ length: 4 + Math.floor(Math.random() * 3) }, () => Math.floor(Math.random() * 15) + 1)
@@ -1633,7 +2067,7 @@ function createViewer(key, root) {
 }
 
 // ======================= AZ OLDAL FELÉPÍTÉSE =======================
-const GROUPS = [{title:"1. Egy sorozat feldolgozása (elemi tételek)",items:[["summation","Összegzés"],["counting","Megszámolás"],["decision","Eldöntés"],["selection","Kiválasztás"],["linearSearch","Lineáris keresés"],["maximum","Maximumkiválasztás"],["minimum","Minimumkiválasztás"]]},{title:"2. Sorozatok másolása és szétválogatása",items:[["copy","Másolás"],["filter","Kiválogatás"],["partition","Szétválogatás"]]},{title:"3. Két sorozat összehasonlítása",items:[["intersection","Metszet"],["union","Unió"]]}];
+const GROUPS = [{title:"1. Egy sorozat feldolgozása (elemi tételek)",items:[["summation","Összegzés"],["counting","Megszámolás"],["decision","Eldöntés"],["selection","Kiválasztás"],["linearSearch","Lineáris keresés"],["maximum","Maximumkiválasztás"],["minimum","Minimumkiválasztás"]]},{title:"2. Sorozatok másolása és szétválogatása",items:[["copy","Másolás"],["filter","Kiválogatás"],["partition","Szétválogatás"]]},{title:"3. Két sorozat összehasonlítása",items:[["intersection","Metszet"],["union","Unió"]]},{title:"4. Rendezés",items:[["bubble","Buborékos rendezés"]]}];
 const host = $('#theorems');
 const tpl = $('#viewerTpl');
 GROUPS.forEach(g => {
