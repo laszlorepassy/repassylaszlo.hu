@@ -203,14 +203,14 @@ main {
   align-items: flex-end;
   gap: 10px;
   min-height: 120px;
-  padding: 10px 4px 30px;
+  padding: 10px 4px 68px;
   position: relative;
 }
 .array-label {
   font-weight: 700;
   font-size: 1.1rem;
   min-width: 32px;
-  padding-bottom: 30px;
+  padding-bottom: 0;
   color: var(--accent);
 }
 .bar-cell {
@@ -252,8 +252,9 @@ main {
   color: #fff;
   white-space: nowrap;
 }
-.pointer-badge.j { background: var(--warn); bottom: -64px; }
-.pointer-badge.k { background: var(--ok); bottom: -82px; }
+.pointer-badge.j { background: var(--warn); }
+.pointer-badge.k { background: var(--ok); }
+.pointer-badge.maxIndex, .pointer-badge.minIndex { background: var(--bar-target); }
 
 /* Színek állapot szerint */
 .bar-box.checking {
@@ -315,6 +316,11 @@ main {
   font-size: 0.85rem;
   color: var(--muted);
   margin-left: auto;
+}
+.speed-wrap label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .speed-wrap select {
   font: inherit;
@@ -645,14 +651,15 @@ main {
           <button class="btn" data-r="btnRandom" title="Új véletlen adatok">🎲 Új adatok</button>
 
           <div class="speed-wrap">
-            <label >Sebesség:</label>
+            <label>Sebesség:
             <select data-r="speedSelect">
-              <option value="2400">0.25×</option>
-              <option value="1200">0.5×</option>
+              <option value="2400">0,25×</option>
+              <option value="1200">0,5×</option>
               <option value="600" selected>1×</option>
               <option value="300">2×</option>
               <option value="120">5×</option>
             </select>
+            </label>
           </div>
         </div>
 
@@ -695,6 +702,10 @@ main {
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
+// Határozott névelő egy szám elé (az 1., az 5., az 50–59., de a 2., a 10.)
+const az = n => (n === 1 || n === 5 || (n >= 50 && n <= 59) || (n >= 1000 && n <= 1999)) ? 'az' : 'a';
+const Az = n => az(n) === 'az' ? 'Az' : 'A';
+
 // ======================= TÉTELEK DEFINÍCIÓJA =======================
 const THEOREMS = {
   summation: {
@@ -731,7 +742,7 @@ const THEOREMS = {
           line: 2, vars: { i, 't[i]': t[i], osszeg: sum, n },
           arrays: { t: t.map((v, idx) => ({ v, state: idx < i ? 'matched' : (idx === i ? 'checking' : 'normal') })) },
           pointers: { t: { i } },
-          text: `Ciklusfej: a(z) ${i}. indexű elemnél járunk (t[${i}] = ${t[i]}).`
+          text: `Ciklusfej: ${az(i)} ${i}. indexű elemnél járunk (t[${i}] = ${t[i]}).`
         });
 
         sum += t[i];
@@ -816,7 +827,7 @@ const THEOREMS = {
 
   decision: {
     title: 'Eldöntés tétele',
-    desc: 'Azt vizsgáljuk, szerepel-e a keresett érték a tömbben. <strong>Megállunk, amint megtaláltuk</strong> (elöltesztelő ciklus). Ha a ciklus a tömb végéig ért (<code>i >= n</code>), akkor nincs benne.',
+    desc: 'Azt vizsgáljuk, szerepel-e a keresett érték a tömbben. <strong>Megállunk, amint megtaláltuk</strong> (elöltesztelő ciklus). Ha a ciklus a tömb végéig ért (<code>i ≥ n</code>), akkor nincs benne.',
     hasTarget: true,
     defaultTarget: 14,
     code: [
@@ -863,7 +874,7 @@ const THEOREMS = {
           line: 2, vars: { i, 't[i]': t[i], ker: target, 'egyezik?': 'IGEN!' },
           arrays: { t: t.map((v, idx) => ({ v, state: idx === i ? 'matched' : (idx < i ? 'dimmed' : 'normal') })) },
           pointers: { t: { i } },
-          text: `Találat! t[${i}] = ${t[i]} == ${target}. A ciklus feltétele sérül (t[i] == ker), azonnal kilépünk!`
+          text: `Találat! t[${i}] = ${t[i]}, ez a keresett érték. A ciklus feltétele már nem teljesül, azonnal kilépünk.`
         });
         steps.push({
           line: 5, vars: { i, ker: target, eredmény: 'VAN ILYEN' },
@@ -882,7 +893,7 @@ const THEOREMS = {
           line: 6, vars: { i: n, ker: target, eredmény: 'NINCS ILYEN' },
           arrays: { t: t.map(v => ({ v, state: 'dimmed' })) },
           pointers: { t: { i: null } },
-          text: `Mivel i == n (${n}), a keresett érték (${target}) NINCS a tömbben.`
+          text: `Mivel i = n (${n}), a keresett érték (${target}) NINCS a tömbben.`
         });
       }
       return steps;
@@ -913,14 +924,20 @@ const THEOREMS = {
       const steps = [];
       const t = [...data.t];
       let target = data.target;
-      if (!t.includes(target)) target = t[Math.floor(t.length / 2)];
+      let note = '';
+      if (!t.includes(target)) {
+        // a kiválasztás csak akkor használható, ha van ilyen elem
+        note = `A megadott érték (${target}) nincs a tömbben, pedig a kiválasztáshoz biztosan lennie kell: helyette egy meglévő elemet keresünk. `;
+        target = t[Math.floor(t.length / 2)];
+        data.target = target;
+      }
       let i = 0;
 
       steps.push({
         line: 1, vars: { i: 0, ker: target },
         arrays: { t: t.map(v => ({ v, state: 'normal' })) },
         pointers: { t: { i: 0 } },
-        text: `Keresett érték: ker = ${target} (garantáltan a tömbben van). Indulás: i = 0.`
+        text: `${note}Keresett érték: ker = ${target} (biztosan a tömbben van). Indulás: i = 0.`
       });
 
       while (t[i] !== target) {
@@ -937,14 +954,14 @@ const THEOREMS = {
         line: 2, vars: { i, 't[i]': t[i], ker: target, találat: 'IGEN!' },
         arrays: { t: t.map((v, idx) => ({ v, state: idx === i ? 'matched' : (idx < i ? 'dimmed' : 'normal') })) },
         pointers: { t: { i } },
-        text: `Megtaláltuk! t[${i}] = ${t[i]} == ${target}. Kilépünk a ciklusból.`
+        text: `Megtaláltuk! t[${i}] = ${t[i]}, ez a keresett érték. Kilépünk a ciklusból.`
       });
 
       steps.push({
         line: 5, vars: { i, 'sorszám': i + 1, ker: target },
         arrays: { t: t.map((v, idx) => ({ v, state: idx === i ? 'matched' : 'dimmed' })) },
         pointers: { t: { i } },
-        text: `Eredmény: a keresett elem indexe: ${i}, azaz a(z) ${i + 1}. helyen található.`
+        text: `Eredmény: a keresett elem indexe ${i}, azaz ${az(i + 1)} ${i + 1}. helyen található.`
       });
       return steps;
     }
@@ -990,14 +1007,14 @@ const THEOREMS = {
           line: 2, vars: { i, 't[i]': t[i], ker: target, egyezik: 'nem' },
           arrays: { t: t.map((v, idx) => ({ v, state: idx < i ? 'dimmed' : (idx === i ? 'checking' : 'normal') })) },
           pointers: { t: { i } },
-          text: `Ellenőrzés: t[${i}] = ${t[i]} nem egyezik ${target}-cel. Lépünk: i = ${i + 1}.`
+          text: `Ellenőrzés: t[${i}] = ${t[i]} nem egyezik a keresett értékkel (${target}). Lépünk: i = ${i + 1}.`
         });
         i++;
       }
 
       if (i < n) {
         steps.push({
-          line: 5, vars: { i, 't[i]': t[i], ker: target, van: 'IGEN' },
+          line: 2, vars: { i, 't[i]': t[i], ker: target, van: 'IGEN' },
           arrays: { t: t.map((v, idx) => ({ v, state: idx === i ? 'matched' : 'dimmed' })) },
           pointers: { t: { i } },
           text: `Találat! t[${i}] = ${t[i]} egyezik a keresett számmal. A ciklus leáll.`
@@ -1006,7 +1023,7 @@ const THEOREMS = {
           line: 6, vars: { i, index: i, sorszám: i + 1 },
           arrays: { t: t.map((v, idx) => ({ v, state: idx === i ? 'matched' : 'dimmed' })) },
           pointers: { t: { i } },
-          text: `Sikeres keresés! Az érték a(z) ${i}. indexen (a ${i + 1}. helyen) található.`
+          text: `Sikeres keresés! Az érték ${az(i)} ${i}. indexen (${az(i + 1)} ${i + 1}. helyen) található.`
         });
       } else {
         steps.push({
@@ -1022,7 +1039,7 @@ const THEOREMS = {
 
   maximum: {
     title: 'Maximumkiválasztás tétele',
-    desc: 'Meghatározza a tömb legnagyobb elemének értékét és annak helyét (indexét). A feltételezés: az első elem a legnagyobb (<code>max = t[0], maxIndex = 0</code>), majd az 1. indextől végignézzük a tömböt; ha találunk nagyobbat, frissítjük a maximumot.',
+    desc: 'Meghatározza a tömb legnagyobb elemének értékét és annak helyét (indexét). A feltételezés: az első elem a legnagyobb (<code>maxErtek = t[0], maxIndex = 0</code>), majd az 1. indextől végignézzük a tömböt; ha találunk nagyobbat, frissítjük a maximumot.',
     code: [
       '<span class="cm">// Maximumkiválasztás</span>',
       '<span class="kw">maxErtek</span> = t[<span class="num">0</span>]',
@@ -1080,7 +1097,7 @@ const THEOREMS = {
         line: 9, vars: { maxErtek: maxVal, maxIndex: maxIdx, helye: maxIdx + 1 },
         arrays: { t: t.map((v, idx) => ({ v, state: idx === maxIdx ? 'matched' : 'dimmed' })) },
         pointers: { t: { maxIndex: maxIdx } },
-        text: `Kész! A legnagyobb elem értéke: ${maxVal}, a(z) ${maxIdx}. indexen (a ${maxIdx + 1}. helyen).`
+        text: `Kész! A legnagyobb elem értéke ${maxVal}, ${az(maxIdx)} ${maxIdx}. indexen (${az(maxIdx + 1)} ${maxIdx + 1}. helyen).`
       });
       return steps;
     }
@@ -1088,7 +1105,7 @@ const THEOREMS = {
 
   minimum: {
     title: 'Minimumkiválasztás tétele',
-    desc: 'Meghatározza a tömb legkisebb elemének értékét és annak indexét. Az első elemet tekintjük a kezdeti legkisebbnek (<code>min = t[0], minIndex = 0</code>), majd sorra összevetjük a többivel.',
+    desc: 'Meghatározza a tömb legkisebb elemének értékét és annak indexét. Az első elemet tekintjük a kezdeti legkisebbnek (<code>minErtek = t[0], minIndex = 0</code>), majd sorra összevetjük a többivel.',
     code: [
       '<span class="cm">// Minimumkiválasztás</span>',
       '<span class="kw">minErtek</span> = t[<span class="num">0</span>]',
@@ -1145,7 +1162,7 @@ const THEOREMS = {
         line: 9, vars: { minErtek: minVal, minIndex: minIdx, helye: minIdx + 1 },
         arrays: { t: t.map((v, idx) => ({ v, state: idx === minIdx ? 'matched' : 'dimmed' })) },
         pointers: { t: { minIndex: minIdx } },
-        text: `Kész! A legkisebb elem: ${minVal}, a(z) ${minIdx}. indexen (a ${minIdx + 1}. helyen).`
+        text: `Kész! A legkisebb elem értéke ${minVal}, ${az(minIdx)} ${minIdx}. indexen (${az(minIdx + 1)} ${minIdx + 1}. helyen).`
       });
       return steps;
     }
@@ -1261,7 +1278,7 @@ const THEOREMS = {
               b: b.map((v, idx) => ({ v, state: idx === j ? 'matched' : 'normal' }))
             },
             pointers: { a: { i }, b: { j } },
-            text: `b[${j}] = ${a[i]}. Beírtuk a b tömb ${j}. helyére.`
+            text: `b[${j}] = ${a[i]}. Beírtuk a b tömb ${j}. indexű helyére.`
           });
           j++;
         }
@@ -1291,6 +1308,7 @@ const THEOREMS = {
       '        <span class="kw">b[j]</span> = a[i]; <span class="kw">j</span> = <span class="kw">j</span> + <span class="num">1</span>',
       '    <span class="kw">Különben</span>',
       '        <span class="kw">c[k]</span> = a[i]; <span class="kw">k</span> = <span class="kw">k</span> + <span class="num">1</span>',
+      '    <span class="kw">Feltétel vége</span>',
       '<span class="kw">Ciklus vége</span>'
     ],
     initData: () => ({ a: [3, 7, 1, 8, 4, 6] }),
@@ -1311,14 +1329,14 @@ const THEOREMS = {
       for (let i = 0; i < n; i++) {
         const isB = a[i] < 5;
         steps.push({
-          line: 3, vars: { i, 'a[i]': a[i], cél: isB ? 'b (< 5)' : 'c (>= 5)', j, k },
+          line: 3, vars: { i, 'a[i]': a[i], cél: isB ? 'b (&lt; 5)' : 'c (≥ 5)', j, k },
           arrays: {
             a: a.map((v, idx) => ({ v, state: idx === i ? 'checking' : 'normal' })),
             b: b.map(v => ({ v, state: 'normal' })),
             c: c.map(v => ({ v, state: 'normal' }))
           },
           pointers: { a: { i } },
-          text: `a[${i}] = ${a[i]}. ${isB ? '5-nél kisebb -> b tömbbe kerül!' : 'Nem kisebb 5-nél -> c tömbbe kerül!'}`
+          text: `a[${i}] = ${a[i]}. ${isB ? '5-nél kisebb → a b tömbbe kerül.' : 'Nem kisebb 5-nél → a c tömbbe kerül.'}`
         });
 
         if (isB) {
@@ -1331,7 +1349,7 @@ const THEOREMS = {
               c: c.map(v => ({ v, state: 'normal' }))
             },
             pointers: { a: { i }, b: { j } },
-            text: `b[${j}] = ${a[i]}, j nő ${j + 1}-re.`
+            text: `b[${j}] = ${a[i]}, j új értéke ${j + 1}.`
           });
           j++;
         } else {
@@ -1344,14 +1362,14 @@ const THEOREMS = {
               c: c.map((v, idx) => ({ v, state: idx === k ? 'matched' : 'normal' }))
             },
             pointers: { a: { i }, c: { k } },
-            text: `c[${k}] = ${a[i]}, k nő ${k + 1}-re.`
+            text: `c[${k}] = ${a[i]}, k új értéke ${k + 1}.`
           });
           k++;
         }
       }
 
       steps.push({
-        line: 7, vars: { j, k, összes: n },
+        line: 8, vars: { j, k, összes: n },
         arrays: {
           a: a.map(v => ({ v, state: 'matched' })),
           b: b.map(v => ({ v, state: 'matched' })),
@@ -1368,7 +1386,7 @@ const THEOREMS = {
     title: 'Metszet tétele',
     desc: 'Két halmaz (tömb) <strong>közös elemeit</strong> gyűjti össze a <code>c</code> tömbbe. Az <code>a</code> tömb minden elemére lineáris kereséssel megvizsgáljuk, hogy benne van-e <code>b</code>-ben (belső ciklus). Ha igen, átmásoljuk.',
     code: [
-      '<span class="cm">// Metszet: A és B közös elemei C-be</span>',
+      '<span class="cm">// Metszet: a és b közös elemei c-be</span>',
       '<span class="kw">k</span> = <span class="num">0</span>',
       '<span class="kw">Ciklus</span> i = <span class="num">0</span>-tól <span class="num">n - 1</span>-ig',
       '    <span class="kw">j</span> = <span class="num">0</span>',
@@ -1377,6 +1395,7 @@ const THEOREMS = {
       '    <span class="kw">Ciklus vége</span>',
       '    <span class="kw">Ha</span> j &lt; m <span class="kw">Akkor</span>',
       '        <span class="kw">c[k]</span> = a[i]; <span class="kw">k</span> = <span class="kw">k</span> + <span class="num">1</span>',
+      '    <span class="kw">Feltétel vége</span>',
       '<span class="kw">Ciklus vége</span>'
     ],
     initData: () => ({ a: [5, 3, 6, 2, 1], b: [6, 2, 7, 8, 9] }),
@@ -1415,32 +1434,32 @@ const THEOREMS = {
         if (found) {
           c.push(a[i]);
           steps.push({
-            line: 7, vars: { i, 'a[i]': a[i], 'b-ben van?': 'IGEN', k },
+            line: 8, vars: { i, 'a[i]': a[i], 'b-ben van?': 'IGEN', k },
             arrays: {
               a: a.map((v, idx) => ({ v, state: idx === i ? 'matched' : 'normal' })),
               b: b.map((v, idx) => ({ v, state: idx === j ? 'matched' : 'normal' })),
               c: c.map((v, idx) => ({ v, state: idx === k ? 'matched' : 'normal' }))
             },
             pointers: { a: { i }, b: { j }, c: { k } },
-            text: `Közös elem! ${a[i]} szerepel b-ben (index: ${j}). c[${k}] = ${a[i]}.`
+            text: `Közös elem! ${Az(a[i])} ${a[i]} szerepel b-ben (index: ${j}). c[${k}] = ${a[i]}.`
           });
           k++;
         } else {
           steps.push({
-            line: 4, vars: { i, 'a[i]': a[i], 'b-ben van?': 'NEM', k },
+            line: 7, vars: { i, 'a[i]': a[i], 'b-ben van?': 'NEM', k },
             arrays: {
               a: a.map((v, idx) => ({ v, state: idx === i ? 'dimmed' : 'normal' })),
               b: b.map(v => ({ v, state: 'normal' })),
               c: c.map(v => ({ v, state: 'normal' }))
             },
             pointers: { a: { i } },
-            text: `${a[i]} nem található a b tömbben.`
+            text: `${Az(a[i])} ${a[i]} nem található a b tömbben (j elérte m-et), nem kerül a metszetbe.`
           });
         }
       }
 
       steps.push({
-        line: 9, vars: { 'metszet mérete': k },
+        line: 10, vars: { 'metszet mérete': k },
         arrays: {
           a: a.map(v => ({ v, state: 'normal' })),
           b: b.map(v => ({ v, state: 'normal' })),
@@ -1455,13 +1474,13 @@ const THEOREMS = {
 
   union: {
     title: 'Unió tétele',
-    desc: 'Két halmaz (tömb) egyesítése. Először az <code>A</code> tömb minden elemét átmásoljuk a <code>C</code> tömbbe, majd a <code>B</code> tömb azon elemeit fűzzük hozzá, amelyek még nincsenek benne az <code>A</code>-ban.',
+    desc: 'Két halmaz (tömb) egyesítése. Először az <code>a</code> tömb minden elemét átmásoljuk a <code>c</code> tömbbe, majd a <code>b</code> tömb azon elemeit fűzzük hozzá, amelyek még nincsenek benne az <code>a</code>-ban.',
     code: [
-      '<span class="cm">// Unió: A összes eleme, majd B-ből a hiányzók</span>',
-      '<span class="cm">// 1. A másolása C-be</span>',
+      '<span class="cm">// Unió: a összes eleme, majd b-ből a hiányzók</span>',
+      '<span class="cm">// 1. a másolása c-be</span>',
       '<span class="kw">Ciklus</span> i = <span class="num">0</span>-tól <span class="num">n - 1</span>-ig: <span class="kw">c[i]</span> = a[i]',
       '<span class="kw">k</span> = n',
-      '<span class="cm">// 2. B elemeinek ellenőrzése és hozzáadása</span>',
+      '<span class="cm">// 2. b elemeinek ellenőrzése és hozzáadása</span>',
       '<span class="kw">Ciklus</span> j = <span class="num">0</span>-tól <span class="num">m - 1</span>-ig',
       '    <span class="kw">i</span> = <span class="num">0</span>',
       '    <span class="kw">Ciklus amíg</span> i &lt; n <span class="kw">és</span> b[j] &lt;&gt; a[i]: <span class="kw">i</span> = <span class="kw">i</span> + <span class="num">1</span>',
@@ -1477,10 +1496,10 @@ const THEOREMS = {
       let k = 0;
 
       steps.push({
-        line: 1, vars: { k: 0 },
+        line: 2, vars: { k: 0 },
         arrays: { a: a.map(v => ({ v, state: 'normal' })), b: b.map(v => ({ v, state: 'normal' })), c: [] },
         pointers: {},
-        text: '1. Lépés: az a tömb összes elemét átmásoljuk c-be.'
+        text: '1. lépés: az a tömb összes elemét átmásoljuk c-be.'
       });
 
       for (let i = 0; i < a.length; i++) {
@@ -1496,7 +1515,7 @@ const THEOREMS = {
           c: c.map(v => ({ v, state: 'matched' }))
         },
         pointers: {},
-        text: `a tömb átmásolva (${k} elem). Most vizsgáljuk b elemeit.`
+        text: `Az a tömb átmásolva (${k} elem). 2. lépés: megvizsgáljuk b elemeit.`
       });
 
       for (let j = 0; j < b.length; j++) {
@@ -1513,7 +1532,7 @@ const THEOREMS = {
             c: c.map(v => ({ v, state: 'normal' }))
           },
           pointers: { b: { j } },
-          text: `b[${j}] = ${val}. Szerepel az a tömbben? ${inA ? 'Igen, már benne van, nem duplázzuk.' : 'Nem, bekerül c-be!'}`
+          text: `b[${j}] = ${val}. Szerepel az a tömbben? ${inA ? 'Igen, már benne van, nem vesszük fel még egyszer.' : 'Nem, bekerül c-be!'}`
         });
 
         if (!inA) {
@@ -1540,7 +1559,7 @@ const THEOREMS = {
           c: c.map(v => ({ v, state: 'matched' }))
         },
         pointers: {},
-        text: `Unió képzés befejezve! Az unió elemei: [${c.join(', ')}].`
+        text: `Az unióképzés befejeződött! Az unió elemei: [${c.join(', ')}].`
       });
       return steps;
     }
@@ -1647,9 +1666,9 @@ const SRC = {
   dk10a: 'Digitális kultúra 10: Variációk típusalgoritmusokra 1.',
   dk10b: 'Digitális kultúra 10: Variációk típusalgoritmusokra 2.',
   dk11a: 'Digitális kultúra 11: Vittük valamire – Típusalgoritmusok',
-  dk11b: 'Digitális kultúra 11: Másolunk, kiválogatunk és szétválogatunk típusalgoritmussal',
-  dk11c: 'Digitális kultúra 11: A metszetképzés és az egyesítés (unió) típusalgoritmusa',
-  dk11d: 'Digitális kultúra 11: A rendezés típusalgoritmusa és rendezés a napi gyakorlatban',
+  dk11b: 'Digitális kultúra 11: Kópiakészítés és digitális Hamupipőke – Másolunk, kiválogatunk és szétválogatunk típusalgoritmussal',
+  dk11c: 'Digitális kultúra 11: Eggyé válás – A metszetképzés és az egyesítés (unió) típusalgoritmusa',
+  dk11d: 'Digitális kultúra 11: Rend a lelkünk – A rendezés típusalgoritmusa és rendezés a napi gyakorlatban',
   okos5: 'Okosgyűjtemény 11–12 (emelt): Egyszerű típusalgoritmusok',
   okos10: 'Okosgyűjtemény 11–12 (emelt): Összetett típusalgoritmusok'
 };
@@ -1757,6 +1776,7 @@ function createViewer(key, root) {
   let steps = [];
   let currentStepIdx = 0;
   let playTimer = null;
+  let maxAbs = 1;
   const codeLines = [];
   const R = id => root.querySelector('[data-r="' + id + '"]');
 
@@ -1826,6 +1846,11 @@ function createViewer(key, root) {
     pause();
     R('arrayContainer').innerHTML = '';
     steps = currentTheorem.generateSteps(currentData);
+    maxAbs = Math.max(1, ...steps.flatMap(st => Object.values(st.arrays).flatMap(arr => arr.map(it => Math.abs(it.v)))));
+    // ha a tétel módosította a keresett értéket (kiválasztás), a mező is kövesse
+    if (currentTheorem.hasTarget && currentData.target !== undefined) {
+      R('targetInput').value = currentData.target;
+    }
     currentStepIdx = 0;
     renderStep(currentStepIdx);
   }
@@ -1881,9 +1906,8 @@ function createViewer(key, root) {
         const cell = document.createElement('div');
         cell.className = 'bar-cell';
 
-        // Magasság az érték alapján (min 36px, max 90px)
-        const absVal = Math.abs(item.v);
-        const h = Math.max(36, Math.min(100, 34 + absVal * 3));
+        // Magasság az érték alapján, a példa legnagyobb értékéhez arányítva (36–100 px)
+        const h = Math.round(36 + 64 * Math.abs(item.v) / maxAbs);
 
         const box = document.createElement('div');
         box.className = `bar-box ${item.state || 'normal'}`;
@@ -1896,12 +1920,15 @@ function createViewer(key, root) {
         idxLabel.textContent = i;
         cell.appendChild(idxLabel);
 
-        // Mutatók
+        // Mutatók (ha több mutat ugyanarra az elemre, egymás alá kerülnek)
+        let badgeCount = 0;
         for (const [pName, pIdx] of Object.entries(pointers)) {
           if (pIdx === i) {
             const badge = document.createElement('div');
             badge.className = `pointer-badge ${pName}`;
             badge.textContent = pName;
+            badge.style.bottom = (-46 - 20 * badgeCount) + 'px';
+            badgeCount++;
             cell.appendChild(badge);
           }
         }
@@ -2031,16 +2058,18 @@ function createViewer(key, root) {
       const pool = Array.from({ length: 30 }, (_, k) => k + 1).sort(() => Math.random() - 0.5);
       currentData = { t: pool.slice(0, 5 + Math.floor(Math.random() * 3)) };
     } else if (currentTheoremKey === 'intersection' || currentTheoremKey === 'union') {
-      currentData = {
-        a: Array.from({ length: 4 + Math.floor(Math.random() * 3) }, () => Math.floor(Math.random() * 15) + 1),
-        b: Array.from({ length: 4 + Math.floor(Math.random() * 3) }, () => Math.floor(Math.random() * 15) + 1)
-      };
+      // halmazt ábrázolnak: egy tömbön belül ne ismétlődjön szám
+      const distinct = () => Array.from({ length: 12 }, (_, k) => k + 1).sort(() => Math.random() - 0.5).slice(0, 4 + Math.floor(Math.random() * 3));
+      currentData = { a: distinct(), b: distinct() };
     } else {
       const len = 6 + Math.floor(Math.random() * 4);
-      const arr = Array.from({ length: len }, () => Math.floor(Math.random() * 30) + 1);
+      // a kiválogatás és a szétválogatás feltétele „5-nél kisebb”: ott egyjegyű számok kellenek
+      const top = (currentTheoremKey === 'filter' || currentTheoremKey === 'partition') ? 9 : 30;
+      const arr = Array.from({ length: len }, () => Math.floor(Math.random() * top) + 1);
       currentData = { t: arr, a: arr };
       if (currentTheorem.hasTarget) {
-        const willContain = Math.random() > 0.3;
+        // a kiválasztásnál az elem biztosan szerepel
+        const willContain = currentTheoremKey === 'selection' || Math.random() > 0.3;
         const target = willContain ? arr[Math.floor(Math.random() * arr.length)] : 99;
         currentData.target = target;
         R('targetInput').value = target;
@@ -2053,6 +2082,10 @@ function createViewer(key, root) {
     pause();
     currentData.target = +R('targetInput').value;
     recalc();
+  });
+
+  R('targetInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') R('btnApplyTarget').click();
   });
 
   R('speedSelect').addEventListener('change', () => {
