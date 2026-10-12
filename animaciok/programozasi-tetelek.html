@@ -486,23 +486,48 @@ main {
 .vitem {
   position: absolute;
   left: 54px;
+  right: 76px;
   height: 40px;
-  min-width: 46px;
   border-radius: 20px;
-  background: var(--bar-default);
-  color: #fff;
-  font-weight: 700;
-  font-size: 1.05rem;
+  background: var(--bg);
+  border: 2px solid var(--c);
+  --c: var(--bar-default);
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding: 0 14px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-  transition: top var(--vdur) ease-in-out, background 0.25s;
+  gap: 4px;
+  padding: 0 8px;
+  transition: top var(--vdur) ease-in-out, border-color 0.25s;
 }
-.vitem.checking { background: var(--bar-check); }
-.vitem.target { background: var(--bar-target); z-index: 2; }
-.vitem.matched { background: var(--bar-match); }
+.vitem.checking { --c: var(--bar-check); }
+.vitem.target { --c: var(--bar-target); z-index: 2; box-shadow: 0 3px 8px rgba(0,0,0,0.25); }
+.vitem.matched { --c: var(--bar-match); }
+.vnum {
+  flex: 0 0 26px;
+  text-align: right;
+  margin-right: 4px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+}
+/* egy buborék: annyi van belőle, amennyi az elem értéke */
+.vbubs {
+  flex: 1 1 0;
+  min-width: 0;
+  display: grid;
+  /* mindig tíz egyforma hely, így minden sorban ugyanakkorák a buborékok */
+  grid-template-columns: repeat(10, minmax(0, 26px));
+  gap: 3px;
+  align-items: center;
+}
+.vbub {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, rgba(255,255,255,0.85) 0 12%, var(--c) 60%);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.12);
+  transition: background 0.25s;
+}
 .vptr {
   position: absolute;
   right: 0;
@@ -523,6 +548,17 @@ main {
 }
 .vptr span.p-j1 { background: var(--warn); }
 .vptr span.p-i { background: var(--ok); }
+/* keskeny képernyőn a szélső oszlopok összehúzódnak, hogy a buborékoknak több hely jusson */
+@media (max-width: 600px) {
+  .vis-area:has(.vwrap) { padding: 8px 6px; }
+  .vidx { width: 30px; font-size: 0.75rem; }
+  .vslot, .vitem { left: 36px; right: 64px; }
+  .vitem { padding: 0 4px; gap: 2px; }
+  .vnum { flex-basis: 20px; margin-right: 2px; font-size: 1rem; }
+  .vbubs { gap: 2px; }
+  .vptr { width: 60px; gap: 2px; }
+  .vptr span { font-size: 0.7rem; padding: 2px 4px; }
+}
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -1568,7 +1604,7 @@ const THEOREMS = {
   bubble: {
     title: 'Buborékos rendezés',
     vertical: true,
-    desc: 'A tömb itt <strong>függőlegesen</strong> áll: a 0. indexű elem van legalul, az utolsó legfelül. A belső ciklus (<code>j</code>) alulról fölfelé halad, és mindig két szomszédot hasonlít össze: ha az alsó a nagyobb (<code>t[j] &gt; t[j + 1]</code>), megcseréli őket. A nagy számok így <strong>fölfelé szállnak, mint a buborék</strong>: egy menet végére a legnagyobb a helyére kerül (zöld), ezért a külső ciklus (<code>i</code>) a következő menetben eggyel rövidebb részt néz végig. Folyamatábrával: <a href="/app/flowchart/index.html?lang=hu&amp;example=emBubble">Folyáb – Buborékos rendezés</a>.',
+    desc: 'A tömb itt <strong>függőlegesen</strong> áll: a 0. indexű elem van legalul, az utolsó legfelül. A hat helyen 1 és 10 közötti számok állnak, és mindegyik mellett annyi buborék látszik, amennyi az értéke. A belső ciklus (<code>j</code>) alulról fölfelé halad, és mindig két szomszédot hasonlít össze: ha az alsó a nagyobb (<code>t[j] &gt; t[j + 1]</code>), megcseréli őket. A nagy számok így <strong>fölfelé szállnak, mint a buborék</strong>: egy menet végére a legnagyobb a helyére kerül (zöld), ezért a külső ciklus (<code>i</code>) a következő menetben eggyel rövidebb részt néz végig. Folyamatábrával: <a href="/app/flowchart/index.html?lang=hu&amp;example=emBubble">Folyáb – Buborékos rendezés</a>.',
     code: [
       '<span class="cm">// Buborékos rendezés (növekvő sorrend)</span>',
       '<span class="kw">Ciklus</span> i = <span class="num">n - 1</span>-től <span class="num">1</span>-ig, <span class="num">-1</span>-esével',
@@ -1580,12 +1616,12 @@ const THEOREMS = {
       '<span class="kw">Ciklus vége</span>',
       '<span class="fn">Kiír</span> <span class="str">"Rendezett: "</span> & t'
     ],
-    initData: () => ({ t: [14, 27, 5, 21, 9, 18] }),
+    initData: () => ({ t: [6, 9, 2, 8, 4, 7] }),
     presets: [
-      { name: 'Vegyes számok', data: () => ({ t: [14, 27, 5, 21, 9, 18] }) },
-      { name: 'Fordított sorrend', data: () => ({ t: [30, 24, 18, 12, 6] }) },
-      { name: 'Már rendezett', data: () => ({ t: [4, 9, 15, 22, 28] }) },
-      { name: 'A legnagyobb van legalul', data: () => ({ t: [29, 3, 8, 12, 17, 23] }) }
+      { name: 'Vegyes számok', data: () => ({ t: [6, 9, 2, 8, 4, 7] }) },
+      { name: 'Fordított sorrend', data: () => ({ t: [10, 8, 6, 5, 3, 1] }) },
+      { name: 'Már rendezett', data: () => ({ t: [1, 3, 4, 6, 8, 10] }) },
+      { name: 'A legnagyobb van legalul', data: () => ({ t: [10, 2, 3, 5, 7, 9] }) }
     ],
     generateSteps: (data) => {
       const steps = [];
@@ -1603,7 +1639,7 @@ const THEOREMS = {
         line: 0, vars: { n, i: '-', j: '-', 'összehasonlítás': 0, csere: 0 },
         arrays: { t: snap(-1, -1, 'normal') },
         pointers: { t: {} },
-        text: 'Kezdés: a tömb rendezetlen. Alul a 0. indexű elem, felül az utolsó. Növekvő sorrendet szeretnénk: a legnagyobb kerüljön legfelülre.'
+        text: 'Kezdés: alul a 0. indexű elem, felül az utolsó; minden szám mellett annyi buborék, amennyi az értéke. Növekvő sorrendet szeretnénk: a legtöbb buborék kerüljön legfelülre.'
       });
 
       for (let i = n - 1; i >= 1; i--) {
@@ -1964,7 +2000,6 @@ function createViewer(key, root) {
       container.appendChild(wrap);
       stack = wrap.querySelector('.vstack');
       stack.style.height = (n * ROW) + 'px';
-      const maxV = Math.max(...items.map(it => Math.abs(it.v)), 1);
 
       for (let pos = 0; pos < n; pos++) {
         const top = (n - 1 - pos) * ROW + 4;
@@ -1990,10 +2025,9 @@ function createViewer(key, root) {
         const el = document.createElement('div');
         el.className = 'vitem';
         el.dataset.id = it.id;
-        el.textContent = it.v;
-        // szélesség az érték szerint: a sáv 25–100%-a
-        const share = 0.25 + 0.75 * Math.abs(it.v) / maxV;
-        el.style.width = `calc((100% - 130px) * ${share.toFixed(3)})`;
+        // a szám, utána annyi buborék, amennyi az értéke
+        el.innerHTML = `<span class="vnum">${it.v}</span><span class="vbubs">${'<span class="vbub"></span>'.repeat(it.v)}</span>`;
+        el.setAttribute('aria-label', `${it.v} buborék`);
         stack.appendChild(el);
       });
     }
@@ -2054,9 +2088,13 @@ function createViewer(key, root) {
   R('btnRandom').addEventListener('click', () => {
     pause();
     if (currentTheorem.vertical) {
-      // rendezéshez kevesebb, csupa különböző szám
-      const pool = Array.from({ length: 30 }, (_, k) => k + 1).sort(() => Math.random() - 0.5);
-      currentData = { t: pool.slice(0, 5 + Math.floor(Math.random() * 3)) };
+      // a rendezéshez hat különböző szám 1 és 10 között (ennyi buborék fér el egy sorban)
+      const pool = Array.from({ length: 10 }, (_, k) => k + 1);
+      for (let k = pool.length - 1; k > 0; k--) {
+        const r = Math.floor(Math.random() * (k + 1));
+        [pool[k], pool[r]] = [pool[r], pool[k]];
+      }
+      currentData = { t: pool.slice(0, 6) };
     } else if (currentTheoremKey === 'intersection' || currentTheoremKey === 'union') {
       // halmazt ábrázolnak: egy tömbön belül ne ismétlődjön szám
       const distinct = () => Array.from({ length: 12 }, (_, k) => k + 1).sort(() => Math.random() - 0.5).slice(0, 4 + Math.floor(Math.random() * 3));
