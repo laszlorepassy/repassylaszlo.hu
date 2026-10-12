@@ -664,7 +664,7 @@ main {
     <div>
       <div class="card">
         <h3>
-          <span data-r="visTitle">Tömb animáció</span>
+          <span data-r="visTitle">Animáció</span>
           <span data-r="stepCounter" style="font-size:0.85rem; font-weight:normal; color:var(--muted);">0. lépés</span>
         </h3>
 
@@ -746,7 +746,7 @@ const Az = n => az(n) === 'az' ? 'Az' : 'A';
 const THEOREMS = {
   summation: {
     title: 'Összegzés tétele',
-    desc: 'Adott egy n elemű számsorozat (tömb). Feladatunk meghatározni a tömb elemeinek összegét. Az <code>osszeg</code> akkumulátor változót 0-ra állítjuk, majd egy számlálós ciklussal végigmegyünk a tömbön, és minden elemet hozzáadunk.',
+    desc: 'Adott egy n elemű számsorozat (tömb). Feladatunk meghatározni a tömb elemeinek összegét. Az <code>osszeg</code> akkumulátorváltozót 0-ra állítjuk, majd egy számlálós ciklussal végigmegyünk a tömbön, és minden elemet hozzáadunk.',
     code: [
       '<span class="cm">// Összegzés</span>',
       '<span class="kw">osszeg</span> = <span class="num">0</span>',
@@ -1212,7 +1212,7 @@ const THEOREMS = {
       '<span class="kw">Ciklus</span> i = <span class="num">0</span>-tól <span class="num">n - 1</span>-ig',
       '    <span class="kw">b[i]</span> = a[i] * <span class="num">2</span>',
       '<span class="kw">Ciklus vége</span>',
-      '<span class="fn">Kiír</span> <span class="str">"Kész a másolat tömb"</span>'
+      '<span class="fn">Kiír</span> <span class="str">"Kész a másolattömb"</span>'
     ],
     initData: () => ({ a: [3, 7, 2, 8, 5] }),
     generateSteps: (data) => {
@@ -1290,7 +1290,7 @@ const THEOREMS = {
         line: 1, vars: { j: 0, i: 0, n },
         arrays: { a: a.map(v => ({ v, state: 'normal' })), b: [] },
         pointers: { a: { i: 0 }, b: { j: 0 } },
-        text: 'Kezdés: j = 0 (a cél tömb kezdetben üres).'
+        text: 'Kezdés: j = 0 (a céltömb kezdetben üres).'
       });
 
       for (let i = 0; i < n; i++) {
@@ -1446,7 +1446,7 @@ const THEOREMS = {
         line: 1, vars: { k: 0, i: 0, j: '-' },
         arrays: { a: a.map(v => ({ v, state: 'normal' })), b: b.map(v => ({ v, state: 'normal' })), c: [] },
         pointers: { a: { i: 0 } },
-        text: 'Kezdés: k = 0 (a metszet tömb mérete).'
+        text: 'Kezdés: k = 0 (a metszettömb mérete).'
       });
 
       for (let i = 0; i < a.length; i++) {
@@ -1798,8 +1798,7 @@ const SUMMARIES = {
     question: 'Hogyan lesz a sorozatból növekvő sorrendű sorozat?',
     result: 'ugyanazok az elemek, rendezve',
     python: '<code>sorted(lista)</code> (új lista) vagy <code>lista.sort()</code> (helyben)',
-    src: ['okos10', 'dk11d'],
-    note: 'A 11. évfolyamos tankönyv példája az egyszerű cserés rendezés, a buborékrendezés az okosgyűjteményben szerepel.'
+    src: ['okos10', 'dk11d']
   }
 };
 
