@@ -30,6 +30,7 @@
   --bar-match: #10b981;
   --bar-dim: #94a3b8;
   --bar-target: #8b5cf6;
+  --bar-min: #db2777;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -57,6 +58,7 @@
     --bar-match: #34d399;
     --bar-dim: #475569;
     --bar-target: #a78bfa;
+    --bar-min: #f472b6;
   }
 }
 * { box-sizing: border-box; }
@@ -255,6 +257,8 @@ main {
 .pointer-badge.j { background: var(--warn); }
 .pointer-badge.k { background: var(--ok); }
 .pointer-badge.maxIndex, .pointer-badge.minIndex { background: var(--bar-target); }
+.pointer-badge.elso { background: var(--ok); }
+.pointer-badge.utolso { background: var(--bar-target); }
 
 /* Színek állapot szerint */
 .bar-box.checking {
@@ -496,11 +500,14 @@ main {
   align-items: center;
   gap: 4px;
   padding: 0 8px;
-  transition: top var(--vdur) ease-in-out, border-color 0.25s;
+  transition: top var(--vdur) ease-in-out, transform var(--vdur) ease-in-out, border-color 0.25s;
 }
 .vitem.checking { --c: var(--bar-check); }
 .vitem.target { --c: var(--bar-target); z-index: 2; box-shadow: 0 3px 8px rgba(0,0,0,0.25); }
 .vitem.matched { --c: var(--bar-match); }
+.vitem.mincand { --c: var(--bar-min); }
+/* a beszúrásos rendezés kiemelt eleme (kulcs): kicsit kicsúszik a sorból */
+.vitem.lifted { --c: var(--bar-target); border-style: dashed; transform: translateX(8px); z-index: 3; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 .vnum {
   flex: 0 0 26px;
   text-align: right;
@@ -533,9 +540,12 @@ main {
   right: 0;
   width: 68px;
   height: 40px;
+  z-index: 4;
   display: flex;
+  flex-wrap: wrap;
+  align-content: center;
   align-items: center;
-  gap: 4px;
+  gap: 1px 4px;
 }
 .vptr span {
   font-size: 0.78rem;
@@ -548,6 +558,7 @@ main {
 }
 .vptr span.p-j1 { background: var(--warn); }
 .vptr span.p-i { background: var(--ok); }
+.vptr span.p-min { background: var(--bar-min); }
 /* keskeny képernyőn a szélső oszlopok összehúzódnak, hogy a buborékoknak több hely jusson */
 @media (max-width: 600px) {
   .vis-area:has(.vwrap) { padding: 8px 6px; }
@@ -575,6 +586,36 @@ main {
   border-radius: 6px;
   margin-right: 5px;
   vertical-align: -1px;
+}
+
+/* Két változó cseréje: egy-egy doboz változónként */
+.swapwrap { width: 100%; max-width: 520px; margin: 0 auto; }
+.sboxes { display: grid; gap: 12px; }
+.sbox {
+  --c: var(--bar-default);
+  border: 2px solid var(--c);
+  border-radius: 12px;
+  background: var(--bg);
+  padding: 8px;
+  text-align: center;
+  transition: border-color 0.25s;
+}
+.sbox.empty { --c: var(--line); border-style: dashed; }
+.sbox.checking { --c: var(--bar-check); }
+.sbox.target { --c: var(--bar-target); box-shadow: 0 3px 8px rgba(0,0,0,0.25); animation: spop 0.5s ease-out; }
+.sbox.matched { --c: var(--bar-match); }
+.sbox.lost { --c: var(--bad); }
+@keyframes spop { from { transform: scale(0.9); } to { transform: scale(1); } }
+.sname { font-family: monospace; font-weight: 800; font-size: 1.05rem; color: var(--muted); }
+.sval { font-size: 1.8rem; font-weight: 800; min-height: 1.3em; font-variant-numeric: tabular-nums; }
+.sbubs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; margin-top: 6px; }
+.sbubs .ghost { visibility: hidden; }
+.swap-op { text-align: center; font-family: monospace; font-size: 1.3rem; font-weight: 800; margin-top: 12px; min-height: 1.6em; }
+@media (max-width: 600px) {
+  .sboxes { gap: 6px; }
+  .sbox { padding: 6px 4px; }
+  .sval { font-size: 1.4rem; }
+  .sbubs { gap: 2px; }
 }
 
 .preset-buttons {
@@ -610,7 +651,7 @@ main {
   <div class="subtitle">
     Az elemi algoritmusok lépésről lépésre követhető, interaktív szemléltetése a <strong>Folyáb</strong> példatára alapján.
     Minden tétel előtt rövid összefoglaló áll arról, mire való; ezek a Digitális kultúra 10. és 11. tankönyv
-    és a Digitális kultúra 11–12. okosgyűjtemény (emelt szint) leckéi alapján készültek.
+    és a Digitális kultúra 9–12. és 11–12. (emelt szintű) okosgyűjtemény leckéi alapján készültek.
   </div>
 
   <nav class="toc" aria-label="Tartalomjegyzék">
@@ -643,9 +684,20 @@ main {
       </div>
     </div>
     <div class="toc-group">
-      <div class="toc-group-title">4. Rendezés</div>
+      <div class="toc-group-title">4. Csere és rendezés</div>
       <div class="toc-links">
+        <a href="#t-swap">Két változó cseréje</a>
+        <a href="#t-exchange">Egyszerű cserés rendezés</a>
+        <a href="#t-minSort">Minimumkiválasztásos rendezés</a>
         <a href="#t-bubble">Buborékrendezés</a>
+        <a href="#t-insertion">Beszúrásos rendezés</a>
+      </div>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-title">5. Keresés rendezett sorozatban</div>
+      <div class="toc-links">
+        <a href="#t-sortedLinear">Lineáris keresés rendezett tömbben</a>
+        <a href="#t-binary">Bináris keresés</a>
       </div>
     </div>
   </nav>
@@ -743,6 +795,41 @@ const az = n => (n === 1 || n === 5 || (n >= 50 && n <= 59) || (n >= 1000 && n <
 const Az = n => az(n) === 'az' ? 'Az' : 'A';
 
 // ======================= TÉTELEK DEFINÍCIÓJA =======================
+// A rendezések közös kész példái: ugyanazokon az adatokon összevethető, melyik mennyit dolgozik.
+const SORT_PRESETS = [
+  { name: 'Vegyes számok', data: () => ({ t: [6, 9, 2, 8, 4, 7] }) },
+  { name: 'Fordított sorrend', data: () => ({ t: [10, 8, 6, 5, 3, 1] }) },
+  { name: 'Már rendezett', data: () => ({ t: [1, 3, 4, 6, 8, 10] }) },
+  { name: 'A legnagyobb van legalul', data: () => ({ t: [10, 2, 3, 5, 7, 9] }) },
+  { name: 'A legkisebb van legfelül', data: () => ({ t: [3, 5, 7, 9, 10, 1] }) }
+];
+
+// A rendezett tömbben keresés közös adatai: ugyanazon a tömbön összevethető a két módszer.
+const SEARCH_ARRAY = [3, 8, 12, 17, 21, 26, 30, 35, 41, 45, 52];
+const SEARCH_PRESETS = [
+  { name: 'Van benne (45)', data: () => ({ t: [...SEARCH_ARRAY], target: 45 }) },
+  { name: 'Nincs benne (33)', data: () => ({ t: [...SEARCH_ARRAY], target: 33 }) },
+  { name: 'A legelső elem (3)', data: () => ({ t: [...SEARCH_ARRAY], target: 3 }) },
+  { name: 'A legutolsó elem (52)', data: () => ({ t: [...SEARCH_ARRAY], target: 52 }) },
+  { name: 'Pont középen (26)', data: () => ({ t: [...SEARCH_ARRAY], target: 26 }) }
+];
+// hány elemet vizsgál meg a két módszer (a záró szövegben vetjük össze őket)
+function linearSortedCount(t, ker) {
+  let i = 0;
+  while (i < t.length && t[i] < ker) i++;
+  return i < t.length ? i + 1 : t.length;
+}
+function binaryCount(t, ker) {
+  let lo = 0, hi = t.length - 1, c = 0;
+  while (lo <= hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    c++;
+    if (t[mid] === ker) break;
+    if (ker < t[mid]) hi = mid - 1; else lo = mid + 1;
+  }
+  return c;
+}
+
 const THEOREMS = {
   summation: {
     title: 'Összegzés tétele',
@@ -1617,12 +1704,7 @@ const THEOREMS = {
       '<span class="fn">Kiír</span> <span class="str">"Rendezett: "</span> & t'
     ],
     initData: () => ({ t: [6, 9, 2, 8, 4, 7] }),
-    presets: [
-      { name: 'Vegyes számok', data: () => ({ t: [6, 9, 2, 8, 4, 7] }) },
-      { name: 'Fordított sorrend', data: () => ({ t: [10, 8, 6, 5, 3, 1] }) },
-      { name: 'Már rendezett', data: () => ({ t: [1, 3, 4, 6, 8, 10] }) },
-      { name: 'A legnagyobb van legalul', data: () => ({ t: [10, 2, 3, 5, 7, 9] }) }
-    ],
+    presets: SORT_PRESETS,
     generateSteps: (data) => {
       const steps = [];
       const items = data.t.map((v, id) => ({ id, v }));
@@ -1693,6 +1775,627 @@ const THEOREMS = {
       });
       return steps;
     }
+  },
+
+  swap: {
+    title: 'Két változó cseréje',
+    swap: true,
+    desc: 'Két változó, <code>a</code> és <code>b</code> értékét cseréljük meg. Mindegyik egy dobozként látszik, benne annyi buborékkal, amennyi az értéke. Az értékadás (<code>a = b</code>) <strong>másol</strong>: a jobb oldal értéke bekerül a bal oldali változóba, a bal oldal régi értéke felülíródik, a jobb oldal pedig nem változik. Ezért kell egy harmadik változó (<code>seged</code>), amelybe előbb félretesszük az egyik értéket. A második kész példa megmutatja, mi történik segédváltozó nélkül, a harmadik a Python egysoros cseréjét. A rendezések ugyanezzel a három értékadással cserélik meg a tömb két elemét.',
+    code: [
+      '<span class="cm">// Két változó cseréje segédváltozóval</span>',
+      '<span class="kw">seged</span> = a',
+      '<span class="kw">a</span> = b',
+      '<span class="kw">b</span> = seged',
+      '&nbsp;',
+      '<span class="cm">// Hibás: segédváltozó nélkül</span>',
+      '<span class="kw">a</span> = b',
+      '<span class="kw">b</span> = a',
+      '&nbsp;',
+      '<span class="cm">// Pythonban egy sorban (egyszerre két értékadás)</span>',
+      '<span class="kw">a, b</span> = b, a'
+    ],
+    initData: () => ({ a: 3, b: 8, mode: 'seged' }),
+    presets: [
+      { name: 'Segédváltozóval', data: () => ({ a: 3, b: 8, mode: 'seged' }) },
+      { name: 'Segédváltozó nélkül (hibás)', data: () => ({ a: 3, b: 8, mode: 'rossz' }) },
+      { name: 'Pythonban egy sorban', data: () => ({ a: 3, b: 8, mode: 'python' }) }
+    ],
+    generateSteps: (data) => {
+      const { a, b, mode } = data;
+      const steps = [];
+      const box = (name, v, state) => ({ name, v, state });
+      const S = (line, boxes, op, vars, text) => steps.push({ line, boxes, op, vars, text, arrays: {} });
+
+      if (mode === 'seged') {
+        S(0, [box('a', a, 'normal'), box('b', b, 'normal'), box('seged', '', 'empty')], '',
+          { a, b, seged: '-' },
+          `Kezdés: a = ${a}, b = ${b}. A végén a = ${b} és b = ${a} legyen. Egy változóban egyszerre csak egy érték fér el, ezért kell a harmadik, a seged.`);
+        S(1, [box('a', a, 'checking'), box('b', b, 'normal'), box('seged', a, 'target')], 'seged ← a',
+          { a, b, seged: a },
+          `seged = a: az a értékét (${a}) félretesszük a segédváltozóba. Az értékadás másol: az a-ban is megmarad a ${a}.`);
+        S(2, [box('a', b, 'target'), box('b', b, 'checking'), box('seged', a, 'normal')], 'a ← b',
+          { a: b, b, seged: a },
+          `a = b: az a-ba átmásoljuk a b értékét (${b}). Az a régi értéke (${a}) felülíródott, de nem veszett el: a seged őrzi.`);
+        S(3, [box('a', b, 'normal'), box('b', a, 'target'), box('seged', a, 'checking')], 'b ← seged',
+          { a: b, b: a, seged: a },
+          `b = seged: a b-be visszaírjuk a félretett értéket (${a}).`);
+        S(3, [box('a', b, 'matched'), box('b', a, 'matched'), box('seged', a, 'normal')], '',
+          { a: b, b: a, seged: a },
+          `Kész! a = ${b}, b = ${a}: a két érték helyet cserélt. Három értékadás kellett. A seged-ben is ${a} maradt, de ez már nem számít.`);
+      } else if (mode === 'rossz') {
+        S(5, [box('a', a, 'normal'), box('b', b, 'normal')], '',
+          { a, b },
+          `Kezdés: a = ${a}, b = ${b}. Próbáljuk meg segédváltozó nélkül, két értékadással!`);
+        S(6, [box('a', b, 'target'), box('b', b, 'checking')], 'a ← b',
+          { a: b, b },
+          `a = b: az a-ba átmásoljuk a b értékét (${b}). Az a régi értéke (${a}) felülíródott, és sehol sincs meg!`);
+        S(7, [box('a', b, 'checking'), box('b', b, 'target')], 'b ← a',
+          { a: b, b },
+          `b = a: a b-be az a mostani értékét másoljuk, de az már ${b}. A b-ben ugyanaz marad, ami volt.`);
+        S(7, [box('a', b, 'lost'), box('b', b, 'lost')], '',
+          { a: b, b },
+          `Hibás eredmény: a = ${b}, b = ${b}. A ${a} elveszett. Ezért kell a segédváltozó (vagy Pythonban az egysoros csere).`);
+      } else {
+        S(10, [box('a', a, 'normal'), box('b', b, 'normal'), box('jobb oldal', '', 'empty')], '',
+          { a, b },
+          `Kezdés: a = ${a}, b = ${b}. Pythonban egyetlen sorral is megcserélhetjük őket: a, b = b, a.`);
+        S(10, [box('a', a, 'checking'), box('b', b, 'checking'), box('jobb oldal', `(${b}, ${a})`, 'target')], 'b, a → ' + `(${b}, ${a})`,
+          { a, b, 'jobb oldal': `(${b}, ${a})` },
+          `Először a jobb oldal értékelődik ki: a b, a pár értéke (${b}, ${a}). Ezt a Python félreteszi, mint egy rejtett segédváltozót.`);
+        S(10, [box('a', b, 'target'), box('b', a, 'target'), box('jobb oldal', `(${b}, ${a})`, 'checking')], 'a, b ← ' + `(${b}, ${a})`,
+          { a: b, b: a, 'jobb oldal': `(${b}, ${a})` },
+          `Utána a pár két eleme egyszerre kerül a bal oldal változóiba: a = ${b}, b = ${a}.`);
+        S(10, [box('a', b, 'matched'), box('b', a, 'matched'), box('jobb oldal', '', 'empty')], '',
+          { a: b, b: a },
+          `Kész! a = ${b}, b = ${a}. A háttérben itt is van segédváltozó (a pár), csak nem nekünk kell megírni.`);
+      }
+      return steps;
+    }
+  },
+
+  exchange: {
+    title: 'Egyszerű cserés rendezés',
+    vertical: true,
+    capTop: '▲ a tömb vége',
+    capBottom: '▼ a tömb eleje (0. index): itt gyűlnek sorban a legkisebbek',
+    desc: 'A tömb ugyanúgy függőlegesen áll, mint a buborékrendezésnél: a 0. indexű elem van legalul, és minden szám mellett annyi buborék látszik, amennyi az értéke. A külső ciklus (<code>i</code>) alulról indul. A <code>t[i]</code> helyen álló elemet a belső ciklus (<code>j</code>) sorban összeveti az összes fölötte állóval, és ha az alsó a nagyobb (<code>t[i] &gt; t[j]</code>), megcseréli őket. Egy menet végére a vizsgált rész legkisebb eleme áll az <code>i</code> helyen (zöld), ezért a következő menet eggyel feljebb kezdődik. Folyamatábrával: <a href="/app/flowchart/index.html?lang=hu&amp;example=dk11SortTrace">Folyáb – Cserés rendezés, lépésenként</a>.',
+    code: [
+      '<span class="cm">// Egyszerű cserés rendezés (növekvő sorrend)</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">0</span>-tól <span class="num">n - 2</span>-ig',
+      '    <span class="kw">Ciklus</span> j = <span class="num">i + 1</span>-től <span class="num">n - 1</span>-ig',
+      '        <span class="kw">Ha</span> t[i] &gt; t[j] <span class="kw">Akkor</span>',
+      '            <span class="kw">seged</span> = t[i]; <span class="kw">t[i]</span> = t[j]; <span class="kw">t[j]</span> = seged',
+      '        <span class="kw">Feltétel vége</span>',
+      '    <span class="kw">Ciklus vége</span>',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="fn">Kiír</span> <span class="str">"Rendezett: "</span> & t'
+    ],
+    initData: () => ({ t: [6, 9, 2, 8, 4, 7] }),
+    presets: SORT_PRESETS,
+    generateSteps: (data) => {
+      const steps = [];
+      const items = data.t.map((v, id) => ({ id, v }));
+      const n = items.length;
+      let done = 0;       // az ennél kisebb indexű elemek már a helyükön vannak
+      let swaps = 0;
+      let comps = 0;
+      const snap = (a, b, st) => items.map((it, pos) => ({
+        id: it.id, v: it.v,
+        state: pos < done ? 'matched' : ((pos === a || pos === b) ? st : 'normal')
+      }));
+
+      steps.push({
+        line: 0, vars: { n, i: '-', j: '-', 'összehasonlítás': 0, csere: 0 },
+        arrays: { t: snap(-1, -1, 'normal') },
+        pointers: { t: {} },
+        text: 'Kezdés: alul a 0. indexű elem, felül az utolsó. Növekvő sorrendet szeretnénk: legalulra a legkisebb, legfelülre a legnagyobb kerüljön.'
+      });
+
+      for (let i = 0; i <= n - 2; i++) {
+        steps.push({
+          line: 1, vars: { n, i, j: '-', 'összehasonlítás': comps, csere: swaps },
+          arrays: { t: snap(i, -1, 'checking') },
+          pointers: { t: { i } },
+          text: `Külső ciklus: i = ${i}. A t[${i}] helyre a t[${i}]…t[${n - 1}] rész legkisebb eleme kerül: a t[${i}]-t sorban összevetjük az összes fölötte állóval.`
+        });
+
+        for (let j = i + 1; j <= n - 1; j++) {
+          const a = items[i].v, b = items[j].v;
+          const need = a > b;
+          comps++;
+          steps.push({
+            line: 3, vars: { i, j, 't[i]': a, 't[j]': b, 't[i] > t[j]?': need ? 'IGEN' : 'NEM', 'összehasonlítás': comps, csere: swaps },
+            arrays: { t: snap(i, j, 'checking') },
+            pointers: { t: { i, j } },
+            text: need
+              ? `Összehasonlítás: t[${i}] = ${a} és t[${j}] = ${b}. Az alsó a nagyobb (${a} &gt; ${b}): cserélni kell.`
+              : `Összehasonlítás: t[${i}] = ${a} és t[${j}] = ${b}. Az alsó nem nagyobb (${a} ≤ ${b}): nem cserélünk.`
+          });
+
+          if (need) {
+            const tmp = items[i]; items[i] = items[j]; items[j] = tmp;
+            swaps++;
+            steps.push({
+              line: 4, vars: { i, j, 't[i]': items[i].v, 't[j]': items[j].v, 'összehasonlítás': comps, csere: swaps },
+              arrays: { t: snap(i, j, 'target') },
+              pointers: { t: { i, j } },
+              text: `Csere: a kisebb (${b}) lekerül a t[${i}] helyre, a nagyobb (${a}) fölmegy a t[${j}] helyre.`
+            });
+          }
+        }
+
+        done = i + 1;
+        steps.push({
+          line: 6, vars: { i, j: '-', 'a helyén': `t[${i}] = ${items[i].v}`, 'összehasonlítás': comps, csere: swaps },
+          arrays: { t: snap(-1, -1, 'normal') },
+          pointers: { t: { i } },
+          text: `A belső ciklus lefutott: a t[${i}] helyen a vizsgált rész legkisebb eleme (${items[i].v}) áll. Ehhez már nem nyúlunk.`
+        });
+      }
+
+      done = n;
+      steps.push({
+        line: 8, vars: { n, 'összehasonlítás': comps, csere: swaps },
+        arrays: { t: snap(-1, -1, 'normal') },
+        pointers: { t: {} },
+        text: `Kész! A legfelső elem magától a helyére került. A tömb rendezett: [${items.map(it => it.v).join(', ')}]. Összesen ${comps} összehasonlítás és ${swaps} csere kellett.`
+      });
+      return steps;
+    }
+  },
+
+  minSort: {
+    title: 'Minimumkiválasztásos rendezés',
+    vertical: true,
+    capTop: '▲ a tömb vége',
+    capBottom: '▼ a tömb eleje (0. index): itt gyűlnek sorban a legkisebbek',
+    legend: [['--bar-check', 'összehasonlítás (j)'], ['--bar-min', 'az eddigi legkisebb (min)'], ['--bar-target', 'csere'], ['--bar-match', 'a helyén van']],
+    desc: 'A tömb ugyanúgy függőlegesen áll, mint a buborékrendezésnél: a 0. indexű elem van legalul. A külső ciklus (<code>i</code>) minden menetében a minimumkiválasztás tételével megkeressük a <code>t[i]</code>…<code>t[n − 1]</code> rész legkisebb elemének a helyét (<code>min</code>, rózsaszín): a belső ciklus (<code>j</code>) végignézi a fölötte állókat, és ha kisebbet talál (<code>t[j] &lt; t[min]</code>), annak a helyét jegyzi meg. A menet végén egyetlen cserével a legkisebb az <code>i</code> helyre kerül (zöld). Ha a legkisebb eleve ott áll (<code>min = i</code>), önmagával cserélődik, és nem változik semmi. Folyamatábrával: <a href="/app/flowchart/index.html?lang=hu&amp;example=emMinSort">Folyáb – Minimumkiválasztásos rendezés</a>.',
+    code: [
+      '<span class="cm">// Minimumkiválasztásos rendezés (növekvő sorrend)</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">0</span>-tól <span class="num">n - 2</span>-ig',
+      '    <span class="kw">min</span> = i',
+      '    <span class="kw">Ciklus</span> j = <span class="num">i + 1</span>-től <span class="num">n - 1</span>-ig',
+      '        <span class="kw">Ha</span> t[j] &lt; t[min] <span class="kw">Akkor</span>',
+      '            <span class="kw">min</span> = j',
+      '        <span class="kw">Feltétel vége</span>',
+      '    <span class="kw">Ciklus vége</span>',
+      '    <span class="kw">seged</span> = t[i]; <span class="kw">t[i]</span> = t[min]; <span class="kw">t[min]</span> = seged',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="fn">Kiír</span> <span class="str">"Rendezett: "</span> & t'
+    ],
+    initData: () => ({ t: [6, 9, 2, 8, 4, 7] }),
+    presets: SORT_PRESETS,
+    generateSteps: (data) => {
+      const steps = [];
+      const items = data.t.map((v, id) => ({ id, v }));
+      const n = items.length;
+      let done = 0;       // az ennél kisebb indexű elemek már a helyükön vannak
+      let swaps = 0;
+      let comps = 0;
+      // j: az éppen vizsgált hely, m: az eddigi legkisebb helye, sw: a csere két helye
+      const snap = (j, m, sw) => items.map((it, pos) => ({
+        id: it.id, v: it.v,
+        state: pos < done ? 'matched'
+          : (sw && (pos === sw[0] || pos === sw[1])) ? 'target'
+          : pos === m ? 'mincand'
+          : pos === j ? 'checking' : 'normal'
+      }));
+
+      steps.push({
+        line: 0, vars: { n, i: '-', min: '-', j: '-', 'összehasonlítás': 0, csere: 0 },
+        arrays: { t: snap(-1, -1) },
+        pointers: { t: {} },
+        text: 'Kezdés: alul a 0. indexű elem, felül az utolsó. Növekvő sorrendet szeretnénk: legalulra a legkisebb, legfelülre a legnagyobb kerüljön.'
+      });
+
+      for (let i = 0; i <= n - 2; i++) {
+        steps.push({
+          line: 1, vars: { n, i, min: '-', j: '-', 'összehasonlítás': comps, csere: swaps },
+          arrays: { t: snap(-1, -1) },
+          pointers: { t: { i } },
+          text: `Külső ciklus: i = ${i}. Megkeressük a t[${i}]…t[${n - 1}] rész legkisebb elemét, és a t[${i}] helyre tesszük.`
+        });
+
+        let m = i;
+        steps.push({
+          line: 2, vars: { i, min: m, 't[min]': items[m].v, j: '-', 'összehasonlítás': comps, csere: swaps },
+          arrays: { t: snap(-1, m) },
+          pointers: { t: { i, min: m } },
+          text: `min = ${i}: amíg mást nem látunk, a t[${i}] = ${items[i].v} az eddigi legkisebb.`
+        });
+
+        for (let j = i + 1; j <= n - 1; j++) {
+          const a = items[j].v, b = items[m].v;
+          const less = a < b;
+          comps++;
+          steps.push({
+            line: 4, vars: { i, min: m, j, 't[j]': a, 't[min]': b, 't[j] < t[min]?': less ? 'IGEN' : 'NEM', 'összehasonlítás': comps, csere: swaps },
+            arrays: { t: snap(j, m) },
+            pointers: { t: { i, min: m, j } },
+            text: less
+              ? `Összehasonlítás: t[${j}] = ${a} és t[${m}] = ${b}. Találtunk kisebbet (${a} &lt; ${b}).`
+              : `Összehasonlítás: t[${j}] = ${a} és t[${m}] = ${b}. Ez nem kisebb (${a} ≥ ${b}), a min marad.`
+          });
+
+          if (less) {
+            m = j;
+            steps.push({
+              line: 5, vars: { i, min: m, j, 't[min]': items[m].v, 'összehasonlítás': comps, csere: swaps },
+              arrays: { t: snap(-1, m) },
+              pointers: { t: { i, min: m, j } },
+              text: `min = ${j}: mostantól a t[${j}] = ${items[j].v} az eddigi legkisebb. Csak a helyét jegyezzük meg, még nem cserélünk.`
+            });
+          }
+        }
+
+        const lo = items[m].v, old = items[i].v;
+        const tmp = items[i]; items[i] = items[m]; items[m] = tmp;
+        swaps++;
+        steps.push({
+          line: 8, vars: { i, min: m, 't[i]': items[i].v, 't[min]': items[m].v, 'összehasonlítás': comps, csere: swaps },
+          arrays: { t: snap(-1, -1, [i, m]) },
+          pointers: { t: { i, min: m } },
+          text: m === i
+            ? `Csere: a legkisebb (${lo}) eleve a t[${i}] helyen áll, önmagával cserélődik: nem változik semmi.`
+            : `Csere: a legkisebb (${lo}) lekerül a t[${i}] helyre, a t[${i}] régi értéke (${old}) fölmegy a t[${m}] helyre.`
+        });
+
+        done = i + 1;
+        steps.push({
+          line: 9, vars: { i, 'a helyén': `t[${i}] = ${items[i].v}`, 'összehasonlítás': comps, csere: swaps },
+          arrays: { t: snap(-1, -1) },
+          pointers: { t: { i } },
+          text: `A t[${i}] = ${items[i].v} a helyén van. Ehhez már nem nyúlunk.`
+        });
+      }
+
+      done = n;
+      steps.push({
+        line: 10, vars: { n, 'összehasonlítás': comps, csere: swaps },
+        arrays: { t: snap(-1, -1) },
+        pointers: { t: {} },
+        text: `Kész! A legfelső elem magától a helyére került. A tömb rendezett: [${items.map(it => it.v).join(', ')}]. Összesen ${comps} összehasonlítás és ${swaps} csere kellett: menetenként egy.`
+      });
+      return steps;
+    }
+  },
+
+  insertion: {
+    title: 'Beszúrásos rendezés',
+    vertical: true,
+    capTop: '▲ a tömb vége: innen hozzuk sorra az elemeket',
+    capBottom: '▼ a tömb eleje (0. index): itt nő a rendezett rész',
+    legend: [['--bar-check', 'összehasonlítás'], ['--bar-target', 'a kiemelt elem (kulcs)'], ['--bar-match', 'a rendezett rész']],
+    desc: 'A tömb ugyanúgy függőlegesen áll, mint a buborékrendezésnél: a 0. indexű elem van legalul. Az alsó rész mindig rendezett (zöld; kezdetben csak a <code>t[0]</code>). A külső ciklus (<code>i</code>) sorban kiemeli a következő elemet a <code>kulcs</code> változóba (lila, kicsit kicsúszik a sorból). A belső, feltételes ciklus a <code>j</code> mutatóval lefelé halad a rendezett részben: amíg a <code>t[j]</code> nagyobb a kulcsnál, egy hellyel feljebb lépteti, így a kulcs alatt mindig egy hely szabadul fel. Ahol a ciklus megáll, oda kerül a kulcs (<code>t[j + 1] = kulcs</code>). Ez a rendezés nem cserél, hanem léptet: egy léptetés egyetlen értékadás. Folyamatábrával: <a href="/app/flowchart/index.html?lang=hu&amp;example=insertionSort">Folyáb – Rendezés beszúrással</a>.',
+    code: [
+      '<span class="cm">// Beszúrásos rendezés (növekvő sorrend)</span>',
+      '<span class="kw">Ciklus</span> i = <span class="num">1</span>-től <span class="num">n - 1</span>-ig',
+      '    <span class="kw">kulcs</span> = t[i]',
+      '    <span class="kw">j</span> = i - <span class="num">1</span>',
+      '    <span class="kw">Ciklus amíg</span> j &gt;= <span class="num">0</span> <span class="kw">és</span> t[j] &gt; kulcs',
+      '        <span class="kw">t[j + 1]</span> = t[j]; <span class="kw">j</span> = j - <span class="num">1</span>',
+      '    <span class="kw">Ciklus vége</span>',
+      '    <span class="kw">t[j + 1]</span> = kulcs',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="fn">Kiír</span> <span class="str">"Rendezett: "</span> & t'
+    ],
+    initData: () => ({ t: [6, 9, 2, 8, 4, 7] }),
+    presets: SORT_PRESETS,
+    generateSteps: (data) => {
+      const steps = [];
+      const items = data.t.map((v, id) => ({ id, v }));
+      const n = items.length;
+      let sorted = 1;     // az ennél kisebb indexű elemek egymáshoz képest rendezettek
+      let shifts = 0;
+      let comps = 0;
+      // key: a kiemelt elem helye, c: az éppen vizsgált hely
+      const snap = (key, c) => items.map((it, pos) => ({
+        id: it.id, v: it.v,
+        state: pos === key ? 'lifted' : pos === c ? 'checking' : (pos < sorted ? 'matched' : 'normal')
+      }));
+
+      steps.push({
+        line: 0, vars: { n, i: '-', kulcs: '-', j: '-', 'összehasonlítás': 0, 'léptetés': 0 },
+        arrays: { t: snap(-1, -1) },
+        pointers: { t: {} },
+        text: 'Kezdés: alul a 0. indexű elem, felül az utolsó. A t[0] egymagában rendezett rész (zöld); a többit egyenként szúrjuk be ebbe a részbe.'
+      });
+
+      for (let i = 1; i <= n - 1; i++) {
+        steps.push({
+          line: 1, vars: { n, i, kulcs: '-', j: '-', 'összehasonlítás': comps, 'léptetés': shifts },
+          arrays: { t: snap(-1, -1) },
+          pointers: { t: { i } },
+          text: `Külső ciklus: i = ${i}. A t[0]…t[${i - 1}] rész rendezett; most a t[${i}] = ${items[i].v} kerül be a helyére.`
+        });
+
+        const key = items[i].v;
+        let k = i;          // a kulcs (és alatta a szabad hely) mostani helye
+        steps.push({
+          line: 2, vars: { i, kulcs: key, j: '-', 'összehasonlítás': comps, 'léptetés': shifts },
+          arrays: { t: snap(k, -1) },
+          pointers: { t: { i } },
+          text: `kulcs = t[${i}] = ${key}: kiemeljük az elemet, a helye most szabad.`
+        });
+
+        let j = i - 1;
+        steps.push({
+          line: 3, vars: { i, kulcs: key, j, 'összehasonlítás': comps, 'léptetés': shifts },
+          arrays: { t: snap(k, -1) },
+          pointers: { t: { i, j } },
+          text: `j = ${j}: a rendezett rész tetejétől indulunk lefelé.`
+        });
+
+        while (true) {
+          if (j < 0) {
+            steps.push({
+              line: 4, vars: { i, kulcs: key, j, 'j >= 0?': 'NEM', 'összehasonlítás': comps, 'léptetés': shifts },
+              arrays: { t: snap(k, -1) },
+              pointers: { t: { i } },
+              text: `j = −1: elértük a tömb alját, lejjebb nincs hová menni. A ciklus véget ér.`
+            });
+            break;
+          }
+          const tj = items[j].v;
+          const more = tj > key;
+          comps++;
+          steps.push({
+            line: 4, vars: { i, kulcs: key, j, 't[j]': tj, 't[j] > kulcs?': more ? 'IGEN' : 'NEM', 'összehasonlítás': comps, 'léptetés': shifts },
+            arrays: { t: snap(k, j) },
+            pointers: { t: { i, j } },
+            text: more
+              ? `Összehasonlítás: t[${j}] = ${tj} nagyobb a kulcsnál (${tj} &gt; ${key}): feljebb kell léptetni.`
+              : `Összehasonlítás: t[${j}] = ${tj} nem nagyobb a kulcsnál (${tj} ≤ ${key}): megtaláltuk a kulcs helyét, a ciklus véget ér.`
+          });
+          if (!more) break;
+
+          const tmp = items[j]; items[j] = items[j + 1]; items[j + 1] = tmp;
+          k = j;
+          shifts++;
+          j--;
+          steps.push({
+            line: 5, vars: { i, kulcs: key, j, 'összehasonlítás': comps, 'léptetés': shifts },
+            arrays: { t: snap(k, -1) },
+            pointers: { t: j >= 0 ? { i, j } : { i } },
+            text: `t[${j + 2}] = t[${j + 1}]: a ${tj} egy hellyel feljebb lép, a szabad hely lejjebb kerül (t[${j + 1}]). j = ${j}.`
+          });
+        }
+
+        sorted = i + 1;
+        steps.push({
+          line: 7, vars: { i, kulcs: key, j, 'beszúrva ide': `t[${j + 1}]`, 'összehasonlítás': comps, 'léptetés': shifts },
+          arrays: { t: snap(-1, -1) },
+          pointers: { t: j >= 0 ? { i, j } : { i } },
+          text: `t[${j + 1}] = kulcs: a ${key} beül a szabad helyre. Most a t[0]…t[${i}] rész rendezett.`
+        });
+      }
+
+      steps.push({
+        line: 9, vars: { n, 'összehasonlítás': comps, 'léptetés': shifts },
+        arrays: { t: snap(-1, -1) },
+        pointers: { t: {} },
+        text: `Kész! A tömb rendezett: [${items.map(it => it.v).join(', ')}]. Összesen ${comps} összehasonlítás és ${shifts} léptetés kellett.`
+      });
+      return steps;
+    }
+  },
+
+  sortedLinear: {
+    title: 'Lineáris keresés rendezett tömbben',
+    hasTarget: true,
+    sortedSearch: true,
+    defaultTarget: 45,
+    desc: 'A tömb növekvő sorrendű. Az elejétől haladunk, mint a lineáris keresésnél, de a ciklus nem csak a találatnál áll meg: akkor is, ha a keresett értéknél <strong>nagyobb</strong> elemhez értünk (<code>t[i] &lt; ker</code> már nem igaz). Onnan ugyanis csak még nagyobbak jönnek, tehát a keresett érték nem lehet a tömbben. A ciklus után egyetlen vizsgálat dönt: ha <code>t[i] = ker</code>, megtaláltuk. A szürke elemeken már túl vagyunk. Folyamatábrával (az alapváltozat): <a href="/app/flowchart/index.html?lang=hu&amp;example=linearSearch">Folyáb – Keresés (lineáris)</a>.',
+    code: [
+      '<span class="cm">// Lineáris keresés rendezett (növekvő) tömbben</span>',
+      '<span class="kw">i</span> = <span class="num">0</span>',
+      '<span class="kw">Ciklus amíg</span> i &lt; n <span class="kw">és</span> t[i] &lt; ker',
+      '    <span class="kw">i</span> = <span class="kw">i</span> + <span class="num">1</span>',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="kw">Ha</span> i &lt; n <span class="kw">és</span> t[i] = ker <span class="kw">Akkor</span>',
+      '    <span class="fn">Kiír</span> <span class="str">"Van ilyen, indexe: "</span> & i',
+      '<span class="kw">Különben</span>',
+      '    <span class="fn">Kiír</span> <span class="str">"Nem található a tömbben"</span>',
+      '<span class="kw">Feltétel vége</span>'
+    ],
+    initData: () => ({ t: [...SEARCH_ARRAY], target: 45 }),
+    presets: SEARCH_PRESETS,
+    generateSteps: (data) => {
+      const steps = [];
+      const t = [...data.t];
+      const target = data.target;
+      const n = t.length;
+      let i = 0;
+      let comps = 0;
+      const snap = (cur, st) => t.map((v, idx) => ({ v, state: idx === cur ? st : (idx < cur ? 'dimmed' : 'normal') }));
+
+      steps.push({
+        line: 1, vars: { ker: target, n, i: 0, 'vizsgált elem': 0 },
+        arrays: { t: snap(-1) },
+        pointers: { t: { i: 0 } },
+        text: `A tömb növekvő sorrendű. Keresett érték: ker = ${target}. Az elejéről indulunk: i = 0.`
+      });
+
+      while (i < n && t[i] < target) {
+        comps++;
+        steps.push({
+          line: 2, vars: { ker: target, i, 't[i]': t[i], 't[i] < ker?': 'IGEN', 'vizsgált elem': comps },
+          arrays: { t: snap(i, 'checking') },
+          pointers: { t: { i } },
+          text: `t[${i}] = ${t[i]} kisebb a keresett értéknél (${t[i]} &lt; ${target}): a keresett érték csak utána jöhet. Lépünk: i = ${i + 1}.`
+        });
+        i++;
+      }
+
+      if (i < n) {
+        comps++;
+        const eq = t[i] === target;
+        steps.push({
+          line: 2, vars: { ker: target, i, 't[i]': t[i], 't[i] < ker?': 'NEM', 'vizsgált elem': comps },
+          arrays: { t: snap(i, eq ? 'matched' : 'target') },
+          pointers: { t: { i } },
+          text: eq
+            ? `t[${i}] = ${t[i]} nem kisebb a keresett értéknél: a ciklus megáll.`
+            : `t[${i}] = ${t[i]} már nagyobb a keresett értéknél (${t[i]} &gt; ${target}): a ciklus megáll. Utána csak még nagyobbak jönnek, nem kell tovább menni.`
+        });
+        steps.push({
+          line: eq ? 6 : 8, vars: { ker: target, i, 't[i] = ker?': eq ? 'IGEN' : 'NEM', 'vizsgált elem': comps },
+          arrays: { t: snap(i, eq ? 'matched' : 'target') },
+          pointers: { t: { i } },
+          text: eq
+            ? `t[${i}] = ${target}: megvan, ${az(i)} ${i}. indexen. ${comps} elemet vizsgáltunk meg; bináris kereséssel ${binaryCount(t, target)} vizsgálat kellett volna.`
+            : `t[${i}] = ${t[i]}, nem ${target}: a keresett érték nincs a tömbben. Már ${az(comps)} ${comps}. elemnél kiderült, a tömb végéig sem kellett elmenni. Bináris kereséssel ${binaryCount(t, target)} vizsgálat kellett volna.`
+        });
+      } else {
+        steps.push({
+          line: 2, vars: { ker: target, i: n, 'i < n?': 'NEM', 'vizsgált elem': comps },
+          arrays: { t: snap(n) },
+          pointers: { t: {} },
+          text: `i = ${n}: végigértünk a tömbön, minden elem kisebb volt a keresett értéknél. A ciklus megáll.`
+        });
+        steps.push({
+          line: 8, vars: { ker: target, i: n, van: 'NEM', 'vizsgált elem': comps },
+          arrays: { t: snap(n) },
+          pointers: { t: {} },
+          text: `A keresett érték (${target}) nincs a tömbben: nagyobb az összes elemnél. ${comps} elemet vizsgáltunk meg; bináris kereséssel ${binaryCount(t, target)} vizsgálat kellett volna.`
+        });
+      }
+      return steps;
+    }
+  },
+
+  binary: {
+    title: 'Bináris (felezéses) keresés',
+    hasTarget: true,
+    sortedSearch: true,
+    defaultTarget: 45,
+    desc: 'A tömb növekvő sorrendű. A még szóba jövő rész a <code>t[elso]</code>…<code>t[utolso]</code> tartomány; kezdetben az egész tömb. Mindig a középső elemét nézzük meg (<code>kozepso = (elso + utolso) div 2</code>, egész osztással). Ha az a keresett érték, kész. Ha a keresett érték kisebb nála, csak a középső előtt (balra) lehet (<code>utolso = kozepso - 1</code>), ha nagyobb, csak utána (jobbra) (<code>elso = kozepso + 1</code>). A kizárt rész szürke lesz. Ha a tartomány elfogy (<code>elso &gt; utolso</code>), a keresett érték nincs a tömbben. Folyamatábrával: <a href="/app/flowchart/index.html?lang=hu&amp;example=binarySearch">Folyáb – Bináris (felezéses) keresés</a>.',
+    code: [
+      '<span class="cm">// Bináris (felezéses) keresés növekvő sorrendű tömbben</span>',
+      '<span class="kw">elso</span> = <span class="num">0</span>; <span class="kw">utolso</span> = <span class="num">n - 1</span>; <span class="kw">van</span> = <span class="kw">hamis</span>',
+      '<span class="kw">Ciklus amíg</span> elso &lt;= utolso <span class="kw">és nem</span> van',
+      '    <span class="kw">kozepso</span> = (elso + utolso) <span class="kw">div</span> <span class="num">2</span>',
+      '    <span class="kw">Ha</span> t[kozepso] = ker <span class="kw">Akkor</span>',
+      '        <span class="kw">van</span> = <span class="kw">igaz</span>; <span class="kw">hely</span> = kozepso',
+      '    <span class="kw">Különben ha</span> ker &lt; t[kozepso] <span class="kw">Akkor</span>',
+      '        <span class="kw">utolso</span> = kozepso - <span class="num">1</span>',
+      '    <span class="kw">Különben</span>',
+      '        <span class="kw">elso</span> = kozepso + <span class="num">1</span>',
+      '    <span class="kw">Feltétel vége</span>',
+      '<span class="kw">Ciklus vége</span>',
+      '<span class="kw">Ha</span> van <span class="kw">Akkor</span> <span class="fn">Kiír</span> <span class="str">"Van ilyen, indexe: "</span> & hely',
+      '<span class="kw">Különben</span> <span class="fn">Kiír</span> <span class="str">"Nem található a tömbben"</span>'
+    ],
+    initData: () => ({ t: [...SEARCH_ARRAY], target: 45 }),
+    presets: SEARCH_PRESETS,
+    generateSteps: (data) => {
+      const steps = [];
+      const t = [...data.t];
+      const target = data.target;
+      const n = t.length;
+      let lo = 0, hi = n - 1, found = false, pos = -1, comps = 0;
+      // a tartományon kívüli elemek szürkék, a középső narancs, a találat zöld
+      const snap = (mid, st) => t.map((v, idx) => ({
+        v, state: idx === mid ? st : ((idx < lo || idx > hi) ? 'dimmed' : 'normal')
+      }));
+      const ptr = (mid) => {
+        const p = {};
+        if (lo <= hi) { p.elso = lo; p.utolso = hi; }
+        if (mid !== undefined) p.kozepso = mid;
+        return p;
+      };
+
+      steps.push({
+        line: 1, vars: { ker: target, elso: lo, utolso: hi, van: 'hamis', 'vizsgált elem': 0 },
+        arrays: { t: snap(-1) },
+        pointers: { t: ptr() },
+        text: `A tömb növekvő sorrendű. Keresett érték: ker = ${target}. Kezdetben az egész tömb szóba jön: elso = 0, utolso = ${n - 1}.`
+      });
+
+      while (lo <= hi && !found) {
+        steps.push({
+          line: 2, vars: { ker: target, elso: lo, utolso: hi, van: 'hamis', 'vizsgált elem': comps },
+          arrays: { t: snap(-1) },
+          pointers: { t: ptr() },
+          text: `elso ≤ utolso (${lo} ≤ ${hi}): még ${hi - lo + 1} elem jön szóba, a t[${lo}]…t[${hi}] tartomány.`
+        });
+
+        const mid = Math.floor((lo + hi) / 2);
+        steps.push({
+          line: 3, vars: { ker: target, elso: lo, utolso: hi, kozepso: mid, 't[kozepso]': t[mid], 'vizsgált elem': comps },
+          arrays: { t: snap(mid, 'checking') },
+          pointers: { t: ptr(mid) },
+          text: `kozepso = (${lo} + ${hi}) div 2 = ${mid}: a tartomány középső eleme t[${mid}] = ${t[mid]}.`
+        });
+
+        comps++;
+        if (t[mid] === target) {
+          found = true; pos = mid;
+          steps.push({
+            line: 5, vars: { ker: target, kozepso: mid, 't[kozepso]': t[mid], van: 'igaz', hely: mid, 'vizsgált elem': comps },
+            arrays: { t: snap(mid, 'matched') },
+            pointers: { t: ptr(mid) },
+            text: `t[${mid}] = ${t[mid]} éppen a keresett érték: van = igaz, hely = ${mid}.`
+          });
+        } else if (target < t[mid]) {
+          steps.push({
+            line: 6, vars: { ker: target, kozepso: mid, 't[kozepso]': t[mid], 'ker < t[kozepso]?': 'IGEN', 'vizsgált elem': comps },
+            arrays: { t: snap(mid, 'checking') },
+            pointers: { t: ptr(mid) },
+            text: `${target} &lt; ${t[mid]}: a keresett érték csak a középső előtt (balra) lehet: a t[${mid}] és ami utána jön, kiesik.`
+          });
+          hi = mid - 1;
+          steps.push({
+            line: 7, vars: { ker: target, elso: lo, utolso: hi, 'vizsgált elem': comps },
+            arrays: { t: snap(-1) },
+            pointers: { t: ptr() },
+            text: lo <= hi
+              ? `utolso = ${mid} - 1 = ${hi}. A szóba jövő rész a felére csökkent: t[${lo}]…t[${hi}].`
+              : `utolso = ${mid} - 1 = ${hi}. Most utolso &lt; elso: nem maradt szóba jövő elem.`
+          });
+        } else {
+          steps.push({
+            line: 6, vars: { ker: target, kozepso: mid, 't[kozepso]': t[mid], 'ker < t[kozepso]?': 'NEM', 'vizsgált elem': comps },
+            arrays: { t: snap(mid, 'checking') },
+            pointers: { t: ptr(mid) },
+            text: `${target} &gt; ${t[mid]}: a keresett érték csak a középső után (jobbra) lehet: a t[${mid}] és ami előtte van, kiesik.`
+          });
+          lo = mid + 1;
+          steps.push({
+            line: 9, vars: { ker: target, elso: lo, utolso: hi, 'vizsgált elem': comps },
+            arrays: { t: snap(-1) },
+            pointers: { t: ptr() },
+            text: lo <= hi
+              ? `elso = ${mid} + 1 = ${lo}. A szóba jövő rész a felére csökkent: t[${lo}]…t[${hi}].`
+              : `elso = ${mid} + 1 = ${lo}. Most elso &gt; utolso: nem maradt szóba jövő elem.`
+          });
+        }
+      }
+
+      if (found) {
+        steps.push({
+          line: 12, vars: { ker: target, van: 'igaz', hely: pos, 'vizsgált elem': comps },
+          arrays: { t: snap(pos, 'matched') },
+          pointers: { t: { kozepso: pos } },
+          text: `Megvan, ${az(pos)} ${pos}. indexen. ${comps} elemet vizsgáltunk meg; rendezett tömbben lineáris kereséssel ${linearSortedCount(t, target)} vizsgálat kellett volna.`
+        });
+      } else {
+        steps.push({
+          line: 2, vars: { ker: target, elso: lo, utolso: hi, 'elso <= utolso?': 'NEM', 'vizsgált elem': comps },
+          arrays: { t: snap(-1) },
+          pointers: { t: {} },
+          text: `elso &gt; utolso (${lo} &gt; ${hi}): a tartomány elfogyott, a ciklus megáll.`
+        });
+        steps.push({
+          line: 13, vars: { ker: target, van: 'hamis', 'vizsgált elem': comps },
+          arrays: { t: snap(-1) },
+          pointers: { t: {} },
+          text: `A keresett érték (${target}) nincs a tömbben. ${comps} elemet vizsgáltunk meg; rendezett tömbben lineáris kereséssel ${linearSortedCount(t, target)} vizsgálat kellett volna.`
+        });
+      }
+      return steps;
+    }
   }
 };
 
@@ -1706,7 +2409,10 @@ const SRC = {
   dk11c: 'Digitális kultúra 11: Eggyé válás – A metszetképzés és az egyesítés (unió) típusalgoritmusa',
   dk11d: 'Digitális kultúra 11: Rend a lelkünk – A rendezés típusalgoritmusa és rendezés a napi gyakorlatban',
   okos5: 'Okosgyűjtemény 11–12 (emelt): Egyszerű típusalgoritmusok',
-  okos10: 'Okosgyűjtemény 11–12 (emelt): Összetett típusalgoritmusok'
+  okos10: 'Okosgyűjtemény 11–12 (emelt): Összetett típusalgoritmusok',
+  okos912: 'Okosgyűjtemény 9–12: Neves algoritmus (Csere – okosan)',
+  folyab: 'a Folyáb példatára: Rendezés beszúrással',
+  folyabBin: 'a Folyáb példatára: Bináris (felezéses) keresés'
 };
 const SUMMARIES = {
   summation: {
@@ -1799,6 +2505,49 @@ const SUMMARIES = {
     result: 'ugyanazok az elemek, rendezve',
     python: '<code>sorted(lista)</code> (új lista) vagy <code>lista.sort()</code> (helyben)',
     src: ['okos10', 'dk11d']
+  },
+  swap: {
+    goal: 'A csere sok algoritmus építőköve: a rendezések szinte mindegyike ezzel mozgatja az elemeket. Két változó értékét akarjuk felcserélni. Egy változó egyszerre csak egy értéket tárol, és az értékadás felülírja a régit, ezért két egymás utáni értékadás (a = b, majd b = a) nem elég: az első után az a régi értéke elvész. Egy harmadik, segédváltozóba előbb félretesszük az egyiket, ahogy két pohár tartalmát is csak egy harmadik, üres pohár segítségével cserélhetjük meg.',
+    question: 'Hogyan lesz a-ban a b értéke és b-ben az a értéke úgy, hogy egyik se vesszen el?',
+    result: 'ugyanaz a két érték, felcserélve (három értékadással)',
+    python: '<code>a, b = b, a</code>; egy lista két eleme: <code>t[i], t[j] = t[j], t[i]</code>',
+    src: ['okos912', 'okos10']
+  },
+  exchange: {
+    goal: 'A legegyszerűbb rendezés. Az első helyen álló elemet sorban összehasonlítjuk az összes mögötte állóval, és ha valamelyik kisebb nála, helyet cserélnek. Egy menet után így a legkisebb elem áll elöl, és ott is marad. Ugyanezt megismételjük a második helytől, a harmadiktól és így tovább, mindig eggyel rövidebb részen. Könnyű megírni, de sokat cserél: egy elem többször is előre kerülhet, mielőtt a végleges helyére érne.',
+    question: 'Hogyan lesz a sorozatból növekvő sorrendű sorozat?',
+    result: 'ugyanazok az elemek, rendezve',
+    python: '<code>sorted(lista)</code> (új lista) vagy <code>lista.sort()</code> (helyben)',
+    src: ['dk11d']
+  },
+  minSort: {
+    goal: 'A rendezetlen rész legkisebb elemét a minimumkiválasztás tételével keressük meg (csak a helyét jegyezzük meg), és egyetlen cserével a rendezetlen rész elejére tesszük. Az első menetben a legkisebb kerül az első helyre, a másodikban a második legkisebb a második helyre, és így tovább. Összehasonlításból ugyanannyi kell, mint az egyszerű cserés rendezésnél (hat elemnél 15), de menetenként csak egy csere van, összesen n − 1.',
+    question: 'Hogyan lesz a sorozatból növekvő sorrendű sorozat?',
+    result: 'ugyanazok az elemek, rendezve',
+    python: '<code>sorted(lista)</code> (új lista) vagy <code>lista.sort()</code> (helyben)',
+    src: ['okos10']
+  },
+  insertion: {
+    goal: 'Úgy rendez, ahogy a kártyalapokat rendezzük a kezünkben. A sorozat eleje már rendezett (kezdetben csak az első elem), és a következő elemet beszúrjuk ebbe a rendezett részbe a helyére: kiemeljük, a nála nagyobbakat egy hellyel hátrébb léptetjük, és a felszabadult helyre tesszük. Ha a sorozat már majdnem rendezett, nagyon gyors, mert alig kell léptetni; fordított sorrendnél a leglassabb.',
+    question: 'Hogyan lesz a sorozatból növekvő sorrendű sorozat?',
+    result: 'ugyanazok az elemek, rendezve',
+    python: '<code>sorted(lista)</code> (új lista) vagy <code>lista.sort()</code> (helyben)',
+    src: ['folyab']
+  },
+  sortedLinear: {
+    goal: 'A lineáris keresés változata rendezett (növekvő) sorozatra. Ugyanúgy az elejétől haladunk, de nem csak akkor állunk meg, ha megtaláltuk a keresett értéket, hanem akkor is, ha nála nagyobb elemhez értünk: onnan már csak még nagyobbak jönnek, tehát a keresett érték nem lehet a sorozatban. A sikertelen keresés így általában jóval hamarabb véget ér; a sikeres ugyanannyi lépés, mint rendezetlen sorozatban.',
+    question: 'Van-e ilyen érték a rendezett sorozatban, és ha van, hányadik?',
+    result: 'egy logikai érték, és találat esetén egy sorszám',
+    python: '<code>érték in lista</code> és <code>lista.index(érték)</code> (ezek nem használják ki a rendezettséget)',
+    src: ['dk10b', 'dk11a'],
+    note: 'A rendezett sorozatra írt változat a lineáris keresésből készült.'
+  },
+  binary: {
+    goal: 'Rendezett sorozatban sokkal gyorsabban kereshetünk, ahogy a szótárban is: a középső elemet nézzük meg. Ha az a keresett, kész; ha a keresett érték kisebb nála, csak az első felében lehet, ha nagyobb, csak a második felében. Így minden vizsgálat kizárja a még szóba jövő rész felét. 11 vagy 15 elemben legfeljebb 4, 1000 elemben legfeljebb 10, egymillióban legfeljebb 20 vizsgálat kell; ezért logaritmikus keresésnek is hívják. Feltétele, hogy a sorozat rendezett legyen.',
+    question: 'Van-e ilyen érték a rendezett sorozatban, és ha van, hányadik?',
+    result: 'egy logikai érték, és találat esetén egy sorszám',
+    python: '<code>i = bisect.bisect_left(lista, érték)</code> (a <code>bisect</code> modulból), utána: <code>i &lt; len(lista) and lista[i] == érték</code>',
+    src: ['folyabBin']
   }
 };
 
@@ -1914,7 +2663,8 @@ function createViewer(key, root) {
     for (const [k, v] of Object.entries(s.vars)) {
       const card = document.createElement('div');
       card.className = 'var-card';
-      card.innerHTML = `<div class="var-name">${k}</div><div class="var-val">${v}</div>`;
+      // negatív számok elé valódi mínuszjel
+      card.innerHTML = `<div class="var-name">${k}</div><div class="var-val">${String(v).replace(/^-(?=\d)/, '−')}</div>`;
       varGrid.appendChild(card);
     }
 
@@ -1922,6 +2672,10 @@ function createViewer(key, root) {
     const container = R('arrayContainer');
     if (currentTheorem.vertical) {
       renderVertical(s, container);
+      return;
+    }
+    if (currentTheorem.swap) {
+      renderSwap(s, container);
       return;
     }
     container.innerHTML = '';
@@ -1987,14 +2741,14 @@ function createViewer(key, root) {
     if (!stack) {
       const wrap = document.createElement('div');
       wrap.className = 'vwrap';
+      const legend = currentTheorem.legend ||
+        [['--bar-check', 'összehasonlítás'], ['--bar-target', 'csere'], ['--bar-match', 'a helyén van']];
       wrap.innerHTML =
-        '<div class="vcap">▲ a tömb vége: ide szállnak föl a nagy számok</div>' +
+        `<div class="vcap">${currentTheorem.capTop || '▲ a tömb vége: ide szállnak föl a nagy számok'}</div>` +
         '<div class="vstack"></div>' +
-        '<div class="vcap">▼ a tömb eleje (0. index)</div>' +
+        `<div class="vcap">${currentTheorem.capBottom || '▼ a tömb eleje (0. index)'}</div>` +
         '<div class="legend">' +
-        '<span><i style="background:var(--bar-check)"></i>összehasonlítás</span>' +
-        '<span><i style="background:var(--bar-target)"></i>csere</span>' +
-        '<span><i style="background:var(--bar-match)"></i>a helyén van</span>' +
+        legend.map(([c, label]) => `<span><i style="background:var(${c})"></i>${label}</span>`).join('') +
         '</div>';
       container.appendChild(wrap);
       stack = wrap.querySelector('.vstack');
@@ -2040,7 +2794,7 @@ function createViewer(key, root) {
     });
 
     const pointers = (s.pointers && s.pointers.t) || {};
-    const cls = { i: 'p-i', j: 'p-j', 'j+1': 'p-j1' };
+    const cls = { i: 'p-i', j: 'p-j', 'j+1': 'p-j1', min: 'p-min' };
     stack.querySelectorAll('.vptr').forEach(p => {
       const pos = +p.dataset.pos;
       p.innerHTML = Object.entries(pointers)
@@ -2048,6 +2802,27 @@ function createViewer(key, root) {
         .map(([name]) => `<span class="${cls[name] || ''}">${name}</span>`)
         .join('');
     });
+  }
+
+  // Két változó cseréje: változónként egy doboz, benne annyi buborék, amennyi az értéke
+  function renderSwap(s, container) {
+    const boxes = s.boxes.map(bx => {
+      const num = typeof bx.v === 'number';
+      const bubs = num ? '<span class="vbub"></span>'.repeat(bx.v) + '<span class="vbub ghost"></span>'.repeat(10 - bx.v)
+                       : '<span class="vbub ghost"></span>'.repeat(10);
+      return `<div class="sbox ${bx.state}"><div class="sname">${bx.name}</div>` +
+        `<div class="sval">${bx.v === '' ? '–' : bx.v}</div><div class="sbubs">${bubs}</div></div>`;
+    }).join('');
+    container.innerHTML =
+      '<div class="swapwrap">' +
+      `<div class="sboxes" style="grid-template-columns: repeat(${s.boxes.length}, minmax(0, 1fr));">${boxes}</div>` +
+      `<div class="swap-op">${s.op || '&nbsp;'}</div>` +
+      '<div class="legend">' +
+      '<span><i style="background:var(--bar-check)"></i>innen olvasunk</span>' +
+      '<span><i style="background:var(--bar-target)"></i>ide írunk</span>' +
+      '<span><i style="background:var(--bar-match)"></i>kész</span>' +
+      '<span><i style="background:var(--bad)"></i>hibás</span>' +
+      '</div></div>';
   }
 
   // Vezérlő események
@@ -2086,7 +2861,13 @@ function createViewer(key, root) {
 
   R('btnRandom').addEventListener('click', () => {
     pause();
-    if (currentTheorem.vertical) {
+    if (currentTheorem.swap) {
+      // két különböző szám 1 és 10 között, a kiválasztott változat marad
+      const a = 1 + Math.floor(Math.random() * 10);
+      let b;
+      do { b = 1 + Math.floor(Math.random() * 10); } while (b === a);
+      currentData = { a, b, mode: currentData.mode };
+    } else if (currentTheorem.vertical) {
       // a rendezéshez hat különböző szám 1 és 10 között (ennyi buborék fér el egy sorban)
       const pool = Array.from({ length: 10 }, (_, k) => k + 1);
       for (let k = pool.length - 1; k > 0; k--) {
@@ -2094,6 +2875,15 @@ function createViewer(key, root) {
         [pool[k], pool[r]] = [pool[r], pool[k]];
       }
       currentData = { t: pool.slice(0, 6) };
+    } else if (currentTheorem.sortedSearch) {
+      // növekvő sorrendű tömb, a szomszédok különbsége 2 és 6 között
+      const arr = [1 + Math.floor(Math.random() * 5)];
+      for (let k = 1; k < 11; k++) arr.push(arr[k - 1] + 2 + Math.floor(Math.random() * 5));
+      let target;
+      if (Math.random() < 0.7) target = arr[Math.floor(Math.random() * arr.length)];
+      else do { target = arr[0] + Math.floor(Math.random() * (arr[arr.length - 1] - arr[0])); } while (arr.includes(target));
+      currentData = { t: arr, target };
+      R('targetInput').value = target;
     } else if (currentTheoremKey === 'intersection' || currentTheoremKey === 'union') {
       // halmazt ábrázolnak: egy tömbön belül ne ismétlődjön szám
       const distinct = () => Array.from({ length: 12 }, (_, k) => k + 1).sort(() => Math.random() - 0.5).slice(0, 4 + Math.floor(Math.random() * 3));
@@ -2137,7 +2927,7 @@ function createViewer(key, root) {
 }
 
 // ======================= AZ OLDAL FELÉPÍTÉSE =======================
-const GROUPS = [{title:"1. Egy sorozat feldolgozása (elemi tételek)",items:[["summation","Összegzés"],["counting","Megszámolás"],["decision","Eldöntés"],["selection","Kiválasztás"],["linearSearch","Lineáris keresés"],["maximum","Maximumkiválasztás"],["minimum","Minimumkiválasztás"]]},{title:"2. Sorozatok másolása és szétválogatása",items:[["copy","Másolás"],["filter","Kiválogatás"],["partition","Szétválogatás"]]},{title:"3. Két sorozat összehasonlítása",items:[["intersection","Metszet"],["union","Unió"]]},{title:"4. Rendezés",items:[["bubble","Buborékrendezés"]]}];
+const GROUPS = [{title:"1. Egy sorozat feldolgozása (elemi tételek)",items:[["summation","Összegzés"],["counting","Megszámolás"],["decision","Eldöntés"],["selection","Kiválasztás"],["linearSearch","Lineáris keresés"],["maximum","Maximumkiválasztás"],["minimum","Minimumkiválasztás"]]},{title:"2. Sorozatok másolása és szétválogatása",items:[["copy","Másolás"],["filter","Kiválogatás"],["partition","Szétválogatás"]]},{title:"3. Két sorozat összehasonlítása",items:[["intersection","Metszet"],["union","Unió"]]},{title:"4. Csere és rendezés",items:[["swap","Két változó cseréje"],["exchange","Egyszerű cserés rendezés"],["minSort","Minimumkiválasztásos rendezés"],["bubble","Buborékrendezés"],["insertion","Beszúrásos rendezés"]]},{title:"5. Keresés rendezett sorozatban",items:[["sortedLinear","Lineáris keresés rendezett tömbben"],["binary","Bináris keresés"]]}];
 const host = $('#theorems');
 const tpl = $('#viewerTpl');
 GROUPS.forEach(g => {
