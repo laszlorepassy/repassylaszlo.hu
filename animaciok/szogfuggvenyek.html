@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Szögfüggvények – interaktív animációk</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --panel: #f5f7fa;
+  --panel-border: #d5dae0;
+  --fg: #1b1f24;
+  --muted: #59636e;
+  --line: #d5dae0;
+  --grid: #e6e9ed;
+  --axis: #64748b;
+  --accent: #2563eb;
+  --sin-col: #ef4444; /* piros */
+  --cos-col: #3b82f6; /* kék */
+  --tan-col: #8b5cf6; /* lila */
+  --hyp-col: #10b981; /* zöld (átfogó) */
+  --ok: #16a34a;
+  --warn: #d97706;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171b;
+    --panel: #1d2228;
+    --panel-border: #333b44;
+    --fg: #e8ebef;
+    --muted: #9aa4af;
+    --line: #333b44;
+    --grid: #262c33;
+    --axis: #8b95a1;
+    --accent: #6ea0ff;
+    --sin-col: #f87171;
+    --cos-col: #60a5fa;
+    --tan-col: #a78bfa;
+    --hyp-col: #34d399;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.top-nav {
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.top-nav a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.top-nav a:hover {
+  text-decoration: underline;
+}
+header {
+  padding: 18px 20px 0;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+h1 {
+  font-size: 1.6rem;
+  margin: 0 0 16px;
+}
+.section-title {
+  font-size: 1.35rem;
+  margin: 0 0 14px;
+  color: var(--accent);
+}
+main > section + section {
+  margin-top: 44px;
+  padding-top: 28px;
+  border-top: 2px solid var(--line);
+}
+main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 16px 20px 40px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.25fr) 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+}
+svg.canvas-plot {
+  width: 100%;
+  height: auto;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  user-select: none;
+  touch-action: none;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.card h2, .card h3 {
+  font-size: 1.05rem;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-weight: 700;
+}
+.sl {
+  display: grid;
+  grid-template-columns: 3.5em 1fr auto;
+  gap: 10px;
+  align-items: center;
+  margin: 8px 0;
+}
+.sl label { font-weight: 700; }
+.sl output { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--accent); min-width: 6.5em; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+.val-pill-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 12px 0;
+}
+@media (max-width: 500px) {
+  .val-pill-grid { grid-template-columns: 1fr; }
+}
+.val-pill {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+.val-pill.sin { border-left: 4px solid var(--sin-col); }
+.val-pill.cos { border-left: 4px solid var(--cos-col); }
+.val-pill.tan { border-left: 4px solid var(--tan-col); }
+.val-pill.hyp { border-left: 4px solid var(--hyp-col); }
+.vp-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); }
+.vp-val { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.vp-sub { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+.btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.btn {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  transition: all 0.15s;
+}
+.btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+.table-wrap {
+  overflow-x: auto;
+  margin-top: 10px;
+}
+table.math-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  background: var(--bg);
+  border-radius: 6px;
+  overflow: hidden;
+}
+table.math-table th, table.math-table td {
+  padding: 8px 10px;
+  text-align: center;
+  border: 1px solid var(--line);
+}
+table.math-table th {
+  background: var(--panel);
+  font-weight: 700;
+  color: var(--muted);
+}
+.hl-sin { color: var(--sin-col); font-weight: 700; }
+.hl-cos { color: var(--cos-col); font-weight: 700; }
+.hl-tan { color: var(--tan-col); font-weight: 700; }
+.hl-hyp { color: var(--hyp-col); font-weight: 700; }
+
+/* Gyökjel és vinculum stílus */
+.sqrt {
+  display: inline-flex;
+  align-items: stretch;
+  vertical-align: -0.16em;
+  margin: 0 1px;
+}
+.sqrt svg {
+  width: 9px;
+  height: 1.2em;
+  flex-shrink: 0;
+}
+.sqrt .radicand {
+  border-top: 1.6px solid currentColor;
+  padding-top: 0px;
+  padding-left: 2px;
+  padding-right: 3px;
+  line-height: 1.1;
+  display: inline-flex;
+  align-items: center;
+}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Szögfüggvények</h1>
+</header>
+
+<main>
+
+<!-- ================= FÜL 1: DERÉKSZÖGŰ HÁROMSZÖG ================= -->
+<section id="tabTriangle">
+  <h2 class="section-title">1. Derékszögű háromszög</h2>
+  <div class="layout">
+    <svg class="canvas-plot" id="svgTriangle" viewBox="0 0 540 400" role="img" aria-label="Derékszögű háromszög szögfüggvényei"></svg>
+    <div>
+      <div class="card">
+        <h3>Nevezetes hegyesszög kiválasztása</h3>
+        <div class="sl">
+          <label>α =</label>
+          <input type="range" id="triAngle" min="0" max="2" step="1" value="0">
+          <output id="triAngleOut">30° (π/6 rad)</output>
+        </div>
+        <div class="btns">
+          <button class="btn active" data-tri-idx="0">30° (π/6)</button>
+          <button class="btn" data-tri-idx="1">45° (π/4)</button>
+          <button class="btn" data-tri-idx="2">60° (π/3)</button>
+          <button class="btn" id="btnAnimTriangle">Léptetés a szögeken</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Definíciók és pontos értékek</h3>
+        <div class="val-pill-grid">
+          <div class="val-pill sin">
+            <div class="vp-title">Szinusz (sin α)</div>
+            <div class="vp-val" id="valSinT">1/2 = 0,5</div>
+            <div class="vp-sub">szemközti / átfogó = a / c</div>
+          </div>
+          <div class="val-pill cos">
+            <div class="vp-title">Koszinusz (cos α)</div>
+            <div class="vp-val" id="valCosT"><span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">3</span></span> / 2 ≈ 0,8660</div>
+            <div class="vp-sub">melletti / átfogó = b / c</div>
+          </div>
+          <div class="val-pill tan">
+            <div class="vp-title">Tangens (tg α)</div>
+            <div class="vp-val" id="valTanT"><span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">3</span></span> / 3 ≈ 0,5774</div>
+            <div class="vp-sub">szemközti / melletti = a / b</div>
+          </div>
+          <div class="val-pill hyp">
+            <div class="vp-title">Kotangens (ctg α)</div>
+            <div class="vp-val" id="valCotT"><span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">3</span></span> ≈ 1,7321</div>
+            <div class="vp-sub">melletti / szemközti = b / a</div>
+          </div>
+        </div>
+        <div style="font-size:0.9rem; color:var(--muted); line-height:1.5;">
+          • <span class="hl-hyp">Átfogó (c)</span>: a derékszöggel szemközti oldal (itt c = 1).<br>
+          • <span class="hl-sin">Szemközti befogó (a)</span>: az α szöggel szemközti oldal: a = sin α.<br>
+          • <span class="hl-cos">Melletti befogó (b)</span>: az α szög melletti befogó: b = cos α.<br>
+          • Pitagorasz-tétel: a² + b² = c²  →  sin²(α) + cos²(α) = 1.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FÜL 2: EGYSÉGKÖR ================= -->
+<section id="tabCircle">
+  <h2 class="section-title">2. Az egységkör (0°–360°)</h2>
+  <div class="layout">
+    <svg class="canvas-plot" id="svgCircle" viewBox="0 0 540 500" role="img" aria-label="Egységkör és nevezetes szögek"></svg>
+    <div>
+      <div class="card">
+        <h3>Nevezetes szögek az egységkörön (0°–360°)</h3>
+        <div class="sl">
+          <label>α =</label>
+          <input type="range" id="circAngle" min="0" max="16" step="1" value="2">
+          <output id="circAngleOut">45° (π/4 rad)</output>
+        </div>
+        <div class="btns" id="circBtns">
+          <!-- Gombok dinamikusan generálva vagy feltöltve -->
+        </div>
+        <div style="margin-top:10px;">
+          <button class="btn" id="btnAnimCircle">Forgatás a nevezetes szögeken</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Pontos értékek az egységkörön (R = 1)</h3>
+        <div class="val-pill-grid">
+          <div class="val-pill cos">
+            <div class="vp-title">x koordináta = cos α</div>
+            <div class="vp-val" id="valCosC"></div>
+            <div class="vp-sub">vízszintes vetület</div>
+          </div>
+          <div class="val-pill sin">
+            <div class="vp-title">y koordináta = sin α</div>
+            <div class="vp-val" id="valSinC"></div>
+            <div class="vp-sub">függőleges vetület</div>
+          </div>
+          <div class="val-pill tan">
+            <div class="vp-title">Tangens = y / x (tg α)</div>
+            <div class="vp-val" id="valTanC"></div>
+            <div class="vp-sub">érintő az x = 1 egyenesen</div>
+          </div>
+          <div class="val-pill hyp">
+            <div class="vp-title">Síknegyed / helyzet</div>
+            <div class="vp-val" id="valQuadrant"></div>
+            <div class="vp-sub" id="valSigns"></div>
+          </div>
+        </div>
+        <div style="font-size:0.88rem; color:var(--muted); line-height:1.5;">
+          Az egységkörben a pont koordinátái: <strong>P(cos α; sin α)</strong>. A kör pontjaira kattintva is közvetlenül kiválasztható a kívánt szög!
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FÜL 3: HULLÁMOK GENERÁLÁSA ================= -->
+<section id="tabWaves">
+  <h2 class="section-title">3. Hullám animáció (sin &amp; cos)</h2>
+  <div class="card">
+    <h3>Hullámrajzolás az egységkörből (vízszintes vetítéssel)</h3>
+    <svg class="canvas-plot" id="svgWaves" viewBox="0 0 960 420" role="img" aria-label="Szinusz és koszinusz hullámok rajzolása egységkörből"></svg>
+
+    <div class="btns" style="align-items:center; margin-top:12px;">
+      <button class="btn btn-primary" id="btnPlayWave">▶ Indítás</button>
+      <button class="btn" id="btnResetWave">↺ Újra</button>
+
+      <div style="display:flex; flex-wrap:wrap; gap:6px; margin-left:8px;">
+        <button class="btn active" id="btnModeBoth" data-wmode="both">Mindkettő (fáziskülönbség 90°)</button>
+        <button class="btn" id="btnModeSin" data-wmode="sin"><span class="hl-sin">Csak Szinusz (sin α)</span></button>
+        <button class="btn" id="btnModeCos" data-wmode="cos"><span class="hl-cos">Csak Koszinusz (cos α)</span></button>
+      </div>
+
+      <div style="margin-left:auto; display:flex; align-items:center; gap:6px; font-size:0.9rem; color:var(--muted);">
+        <label for="waveSpeed">Sebesség:</label>
+        <select id="waveSpeed" style="font:inherit; padding:4px; border-radius:4px; border:1px solid var(--line); background:var(--bg); color:var(--fg);">
+          <option value="1">1×</option>
+          <option value="2" selected>2×</option>
+          <option value="4">4×</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Szög és érték kijelző / ugrás -->
+    <div style="margin-top:14px; display:flex; flex-wrap:wrap; align-items:center; gap:16px; background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:10px 14px;">
+      <div style="font-weight:700; font-size:1.05rem;" id="waveAngleOut">α = 0° (0 rad)</div>
+      <div style="font-weight:600;"><span class="hl-sin">sin α</span> = <span id="waveSinOut">0,0000</span></div>
+      <div style="font-weight:600;"><span class="hl-cos">cos α</span> = <span id="waveCosOut">1,0000</span></div>
+      <div class="btns" style="margin-top:0; margin-left:auto;">
+        <span style="font-size:0.85rem; color:var(--muted); align-self:center;">Ugrás:</span>
+        <button class="btn" data-jump="0">0°</button>
+        <button class="btn" data-jump="30">30° (π/6)</button>
+        <button class="btn" data-jump="45">45° (π/4)</button>
+        <button class="btn" data-jump="60">60° (π/3)</button>
+        <button class="btn" data-jump="90">90° (π/2)</button>
+        <button class="btn" data-jump="180">180° (π)</button>
+        <button class="btn" data-jump="270">270° (3π/2)</button>
+        <button class="btn" data-jump="360">360° (2π)</button>
+      </div>
+    </div>
+
+    <div style="margin-top:14px; font-size:0.95rem; line-height:1.6; color:var(--fg); background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:12px 14px;">
+      <strong>Miért vízszintes a vetítővonal mindkét hullámnál?</strong><br>
+      • <span class="hl-sin">Piros vektor és hullám (szinusz):</span> Az egységkörön az α szögű pont magassága közvetlenül sin α. A piros szaggatott vonal ezt a magasságot vetíti vízszintesen a szinusz görbére.<br>
+      • <span class="hl-cos">Kék vektor és hullám (koszinusz):</span> Az egységkörön a koszinusz a pont vízszintes koordinátája (x = cos α). Mivel <b>cos α = sin(α + 90°)</b>, a 90°-kal elforgatott kék sugár magassága pontosan megegyezik a koszinusz értékével! Így a kék szaggatott vonal is <b>teljesen vízszintesen</b> vetíti át az értéket a koszinusz görbére.<br>
+      • <strong>Fáziskülönbség:</strong> A két görbe pontosan megegyezik alakban, de a koszinusz 90°-kal (π/2-vel) el van tolva a szinuszhoz képest.
+    </div>
+  </div>
+</section>
+
+<!-- ================= FÜL 4: NEVEZETES SZÖGEK ================= -->
+<section id="tabAngles">
+  <h2 class="section-title">4. Nevezetes szögek</h2>
+  <div class="card">
+    <h3>Nevezetes hegyesszögek szögfüggvényei (0°, 30°, 45°, 60°, 90°)</h3>
+    <div class="table-wrap">
+      <table class="math-table">
+        <thead>
+          <tr>
+            <th>Fok (α)</th>
+            <th>0°</th>
+            <th>30°</th>
+            <th>45°</th>
+            <th>60°</th>
+            <th>90°</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Radián</strong></td>
+            <td>0</td>
+            <td>π / 6</td>
+            <td>π / 4</td>
+            <td>π / 3</td>
+            <td>π / 2</td>
+          </tr>
+          <tr>
+            <td><strong class="hl-sin">sin α</strong></td>
+            <td>0 = <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">0</span></span> / 2</td>
+            <td>1/2 = <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">1</span></span> / 2</td>
+            <td><span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">2</span></span> / 2</td>
+            <td><span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">3</span></span> / 2</td>
+            <td>1 = <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">4</span></span> / 2</td>
+          </tr>
+          <tr>
+            <td><strong class="hl-cos">cos α</strong></td>
+            <td>1 = <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">4</span></span> / 2</td>
+            <td><span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">3</span></span> / 2</td>
+            <td><span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">2</span></span> / 2</td>
+            <td>1/2 = <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">1</span></span> / 2</td>
+            <td>0 = <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">0</span></span> / 2</td>
+          </tr>
+          <tr>
+            <td><strong class="hl-tan">tg α</strong></td>
+            <td>0</td>
+            <td><span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">3</span></span> / 3 = 1 / <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">3</span></span></td>
+            <td>1</td>
+            <td><span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">3</span></span></td>
+            <td>nem értelmezett</td>
+          </tr>
+          <tr>
+            <td><strong class="hl-hyp">ctg α</strong></td>
+            <td>nem értelmezett</td>
+            <td><span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">3</span></span></td>
+            <td>1</td>
+            <td><span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">3</span></span> / 3 = 1 / <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">3</span></span></td>
+            <td>0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:16px; font-size:0.95rem; line-height:1.6;">
+      <h3>Könnyű megjegyzési trükk a sin értékekre:</h3>
+      Sorban a gyökök számlálója 0, 1, 2, 3, 4, a nevező mindig 2:<br>
+      • sin(0°) = <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">0</span></span> / 2 = 0<br>
+      • sin(30°) = <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">1</span></span> / 2 = 1/2<br>
+      • sin(45°) = <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">2</span></span> / 2<br>
+      • sin(60°) = <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">3</span></span> / 2<br>
+      • sin(90°) = <span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">4</span></span> / 2 = 1<br>
+      A koszinusz ugyanez, csak éppen fordított sorrendben!
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const NS = 'http://www.w3.org/2000/svg';
+const MINUS = '−';
+
+function sqrtHtml(content) {
+  return '<span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">' + content + '</span></span>';
+}
+
+function fmt(n, d = 4) {
+  let r = Math.round(n * Math.pow(10, d)) / Math.pow(10, d);
+  if (Object.is(r, -0)) r = 0;
+  return String(r.toFixed(d)).replace('.', ',').replace('-', MINUS);
+}
+
+function el(name, attrs, parent) {
+  const e = document.createElementNS(NS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+// ================= FÜL 1: DERÉKSZÖGŰ HÁROMSZÖG =================
+(function() {
+  const svg = $('#svgTriangle');
+  const ox = 70, oy = 330;
+  const C_LEN = 310;
+
+  const TRI_ANGLES = [
+    {
+      deg: 30,
+      rad: 'π/6',
+      sinVal: '1/2 = 0,5',
+      cosVal: sqrtHtml('3') + ' / 2 ≈ 0,8660',
+      tanVal: sqrtHtml('3') + ' / 3 ≈ 0,5774',
+      cotVal: sqrtHtml('3') + ' ≈ 1,7321',
+      aText: 'a = 1/2 = 0,5 (szemközti)',
+      bText: 'b = ' + sqrtHtml('3') + '/2 ≈ 0,87 (melletti)'
+    },
+    {
+      deg: 45,
+      rad: 'π/4',
+      sinVal: sqrtHtml('2') + ' / 2 ≈ 0,7071',
+      cosVal: sqrtHtml('2') + ' / 2 ≈ 0,7071',
+      tanVal: '1',
+      cotVal: '1',
+      aText: 'a = ' + sqrtHtml('2') + '/2 ≈ 0,71 (szemközti)',
+      bText: 'b = ' + sqrtHtml('2') + '/2 ≈ 0,71 (melletti)'
+    },
+    {
+      deg: 60,
+      rad: 'π/3',
+      sinVal: sqrtHtml('3') + ' / 2 ≈ 0,8660',
+      cosVal: '1/2 = 0,5',
+      tanVal: sqrtHtml('3') + ' ≈ 1,7321',
+      cotVal: sqrtHtml('3') + ' / 3 ≈ 0,5774',
+      aText: 'a = ' + sqrtHtml('3') + '/2 ≈ 0,87 (szemközti)',
+      bText: 'b = 1/2 = 0,5 (melletti)'
+    }
+  ];
+
+  const gBase = el('g', {}, svg);
+  const sideB = el('line', { stroke: 'var(--cos-col)', 'stroke-width': 4, 'stroke-linecap': 'round' }, gBase);
+  const sideA = el('line', { stroke: 'var(--sin-col)', 'stroke-width': 4, 'stroke-linecap': 'round' }, gBase);
+  const sideC = el('line', { stroke: 'var(--hyp-col)', 'stroke-width': 4, 'stroke-linecap': 'round' }, gBase);
+
+  const rightAngle = el('path', { fill: 'none', stroke: 'var(--muted)', 'stroke-width': 2 }, gBase);
+  const arcAngle = el('path', { fill: 'rgba(37, 99, 235, 0.15)', stroke: 'var(--accent)', 'stroke-width': 2 }, gBase);
+  const arcText = el('text', { 'font-size': 14, 'font-weight': 700, fill: 'var(--accent)' }, gBase);
+
+  // SVG HTML címkékhez foreignObject vagy szöveges felirat
+  const labA = el('text', { 'font-size': 14, 'font-weight': 700, fill: 'var(--sin-col)', 'text-anchor': 'start' }, gBase);
+  const labB = el('text', { 'font-size': 14, 'font-weight': 700, fill: 'var(--cos-col)', 'text-anchor': 'middle' }, gBase);
+  const labC = el('text', { 'font-size': 14, 'font-weight': 700, fill: 'var(--hyp-col)', 'text-anchor': 'end' }, gBase);
+
+  let animTimer = null;
+  let currentIndex = 0;
+
+  function update(idx) {
+    currentIndex = idx;
+    const item = TRI_ANGLES[idx];
+    const deg = item.deg;
+    const rad = deg * Math.PI / 180;
+    const bLen = C_LEN * Math.cos(rad);
+    const aLen = C_LEN * Math.sin(rad);
+
+    const bx = ox + bLen;
+    const by = oy;
+    const ax = bx;
+    const ay = oy - aLen;
+
+    sideB.setAttribute('x1', ox); sideB.setAttribute('y1', oy);
+    sideB.setAttribute('x2', bx); sideB.setAttribute('y2', by);
+
+    sideA.setAttribute('x1', bx); sideA.setAttribute('y1', by);
+    sideA.setAttribute('x2', ax); sideA.setAttribute('y2', ay);
+
+    sideC.setAttribute('x1', ox); sideC.setAttribute('y1', oy);
+    sideC.setAttribute('x2', ax); sideC.setAttribute('y2', ay);
+
+    const sq = 18;
+    rightAngle.setAttribute('d', `M ${bx - sq} ${oy} L ${bx - sq} ${oy - sq} L ${bx} ${oy - sq}`);
+
+    const rArc = 52;
+    const arcX = ox + rArc * Math.cos(rad);
+    const arcY = oy - rArc * Math.sin(rad);
+    arcAngle.setAttribute('d', `M ${ox + rArc} ${oy} A ${rArc} ${rArc} 0 0 0 ${arcX} ${arcY} L ${ox} ${oy} Z`);
+    arcText.setAttribute('x', ox + rArc + 8);
+    arcText.setAttribute('y', oy - 14);
+    arcText.textContent = `α = ${deg}° (${item.rad})`;
+
+    labB.setAttribute('x', ox + bLen / 2);
+    labB.setAttribute('y', oy + 26);
+    labB.textContent = deg === 30 ? 'b = cos(30°) ≈ 0,87 (melletti)' : (deg === 45 ? 'b = cos(45°) ≈ 0,71 (melletti)' : 'b = cos(60°) = 0,5 (melletti)');
+
+    labA.setAttribute('x', bx + 12);
+    labA.setAttribute('y', oy - aLen / 2 + 5);
+    labA.textContent = deg === 30 ? 'a = sin(30°) = 0,5 (szemközti)' : (deg === 45 ? 'a = sin(45°) ≈ 0,71 (szemközti)' : 'a = sin(60°) ≈ 0,87 (szemközti)');
+
+    labC.setAttribute('x', (ox + ax) / 2 - 12);
+    labC.setAttribute('y', (oy + ay) / 2 - 12);
+    labC.textContent = 'c = 1 (átfogó)';
+
+    $('#triAngle').value = idx;
+    $('#triAngleOut').textContent = `${deg}° (${item.rad} rad)`;
+
+    $('#valSinT').innerHTML = item.sinVal;
+    $('#valCosT').innerHTML = item.cosVal;
+    $('#valTanT').innerHTML = item.tanVal;
+    $('#valCotT').innerHTML = item.cotVal;
+
+    $$('[data-tri-idx]').forEach(b => b.classList.toggle('active', +b.dataset.triIdx === idx));
+  }
+
+  $('#triAngle').addEventListener('input', e => {
+    if (animTimer) { clearInterval(animTimer); animTimer = null; }
+    update(+e.target.value);
+  });
+
+  $$('[data-tri-idx]').forEach(b => {
+    b.addEventListener('click', () => {
+      if (animTimer) { clearInterval(animTimer); animTimer = null; }
+      update(+b.dataset.triIdx);
+    });
+  });
+
+  $('#btnAnimTriangle').addEventListener('click', () => {
+    if (animTimer) {
+      clearInterval(animTimer);
+      animTimer = null;
+      $('#btnAnimTriangle').textContent = 'Léptetés a szögeken';
+      return;
+    }
+    $('#btnAnimTriangle').textContent = '⏸ Megállítás';
+    animTimer = setInterval(() => {
+      currentIndex = (currentIndex + 1) % TRI_ANGLES.length;
+      update(currentIndex);
+    }, 1800);
+  });
+
+  update(0);
+})();
+
+// ================= FÜL 2: EGYSÉGKÖR =================
+(function() {
+  const svg = $('#svgCircle');
+  const cx = 225, cy = 250, R = 165;
+
+  const NOTABLE_ANGLES = [
+    { deg: 0, rad: '0', sinExact: '0', cosExact: '1', tanExact: '0', quad: 'Tengelyen', signs: 'Kezdőpont: P(1; 0)' },
+    { deg: 30, rad: 'π/6', sinExact: '1/2 = 0,5', cosExact: sqrtHtml('3') + ' / 2 ≈ 0,8660', tanExact: sqrtHtml('3') + ' / 3 ≈ 0,5774', quad: 'I. negyed', signs: 'sin > 0, cos > 0, tg > 0' },
+    { deg: 45, rad: 'π/4', sinExact: sqrtHtml('2') + ' / 2 ≈ 0,7071', cosExact: sqrtHtml('2') + ' / 2 ≈ 0,7071', tanExact: '1', quad: 'I. negyed', signs: 'sin > 0, cos > 0, tg > 0' },
+    { deg: 60, rad: 'π/3', sinExact: sqrtHtml('3') + ' / 2 ≈ 0,8660', cosExact: '1/2 = 0,5', tanExact: sqrtHtml('3') + ' ≈ 1,7321', quad: 'I. negyed', signs: 'sin > 0, cos > 0, tg > 0' },
+    { deg: 90, rad: 'π/2', sinExact: '1', cosExact: '0', tanExact: 'nem értelmezett', quad: 'Tengelyen', signs: 'y tengely felső pont: P(0; 1)' },
+    { deg: 120, rad: '2π/3', sinExact: sqrtHtml('3') + ' / 2 ≈ 0,8660', cosExact: '−1/2 = −0,5', tanExact: '−' + sqrtHtml('3') + ' ≈ −1,7321', quad: 'II. negyed', signs: 'sin > 0, cos < 0, tg < 0' },
+    { deg: 135, rad: '3π/4', sinExact: sqrtHtml('2') + ' / 2 ≈ 0,7071', cosExact: '−' + sqrtHtml('2') + ' / 2 ≈ −0,7071', tanExact: '−1', quad: 'II. negyed', signs: 'sin > 0, cos < 0, tg < 0' },
+    { deg: 150, rad: '5π/6', sinExact: '1/2 = 0,5', cosExact: '−' + sqrtHtml('3') + ' / 2 ≈ −0,8660', tanExact: '−' + sqrtHtml('3') + ' / 3 ≈ −0,5774', quad: 'II. negyed', signs: 'sin > 0, cos < 0, tg < 0' },
+    { deg: 180, rad: 'π', sinExact: '0', cosExact: '−1', tanExact: '0', quad: 'Tengelyen', signs: 'x tengely bal pont: P(−1; 0)' },
+    { deg: 210, rad: '7π/6', sinExact: '−1/2 = −0,5', cosExact: '−' + sqrtHtml('3') + ' / 2 ≈ −0,8660', tanExact: sqrtHtml('3') + ' / 3 ≈ 0,5774', quad: 'III. negyed', signs: 'sin < 0, cos < 0, tg > 0' },
+    { deg: 225, rad: '5π/4', sinExact: '−' + sqrtHtml('2') + ' / 2 ≈ −0,7071', cosExact: '−' + sqrtHtml('2') + ' / 2 ≈ −0,7071', tanExact: '1', quad: 'III. negyed', signs: 'sin < 0, cos < 0, tg > 0' },
+    { deg: 240, rad: '4π/3', sinExact: '−' + sqrtHtml('3') + ' / 2 ≈ −0,8660', cosExact: '−1/2 = −0,5', tanExact: sqrtHtml('3') + ' ≈ 1,7321', quad: 'III. negyed', signs: 'sin < 0, cos < 0, tg > 0' },
+    { deg: 270, rad: '3π/2', sinExact: '−1', cosExact: '0', tanExact: 'nem értelmezett', quad: 'Tengelyen', signs: 'y tengely alsó pont: P(0; −1)' },
+    { deg: 300, rad: '5π/3', sinExact: '−' + sqrtHtml('3') + ' / 2 ≈ −0,8660', cosExact: '1/2 = 0,5', tanExact: '−' + sqrtHtml('3') + ' ≈ −1,7321', quad: 'IV. negyed', signs: 'sin < 0, cos > 0, tg < 0' },
+    { deg: 315, rad: '7π/4', sinExact: '−' + sqrtHtml('2') + ' / 2 ≈ −0,7071', cosExact: sqrtHtml('2') + ' / 2 ≈ 0,7071', tanExact: '−1', quad: 'IV. negyed', signs: 'sin < 0, cos > 0, tg < 0' },
+    { deg: 330, rad: '11π/6', sinExact: '−1/2 = −0,5', cosExact: sqrtHtml('3') + ' / 2 ≈ 0,8660', tanExact: '−' + sqrtHtml('3') + ' / 3 ≈ −0,5774', quad: 'IV. negyed', signs: 'sin < 0, cos > 0, tg < 0' },
+    { deg: 360, rad: '2π', sinExact: '0', cosExact: '1', tanExact: '0', quad: 'Tengelyen', signs: 'Teljes fordulat (360° = 2π): P(1; 0)' }
+  ];
+
+  // Gombok feltöltése
+  const btnContainer = $('#circBtns');
+  NOTABLE_ANGLES.forEach((it, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.dataset.circIdx = idx;
+    btn.textContent = `${it.deg}° (${it.rad})`;
+    btn.style.fontSize = '0.82rem';
+    btn.style.padding = '4px 8px';
+    btnContainer.appendChild(btn);
+  });
+
+  // Tengelyek és kör
+  el('circle', { cx, cy, r: R, fill: 'none', stroke: 'var(--line)', 'stroke-width': 2 }, svg);
+  el('line', { x1: 20, y1: cy, x2: 520, y2: cy, stroke: 'var(--axis)', 'stroke-width': 2 }, svg);
+  el('line', { x1: cx, y1: 20, x2: cx, y2: 480, stroke: 'var(--axis)', 'stroke-width': 2 }, svg);
+
+  // x = 1 tangens tengely
+  el('line', { x1: cx + R, y1: 20, x2: cx + R, y2: 480, stroke: 'var(--tan-col)', 'stroke-width': 1.5, 'stroke-dasharray': '5 4' }, svg);
+  el('text', { x: cx + R + 6, y: 35, font: '13px sans-serif', fill: 'var(--tan-col)', 'font-weight': 700 }, svg).textContent = 'tg tengely (x = 1)';
+
+  el('text', { x: 510, y: cy - 8, font: '14px sans-serif', fill: 'var(--muted)', 'font-weight': 700 }, svg).textContent = 'x';
+  el('text', { x: cx + 10, y: 34, font: '14px sans-serif', fill: 'var(--muted)', 'font-weight': 700 }, svg).textContent = 'y';
+
+  // Nevezetes pontok jelölői a körön
+  const tickGroup = el('g', {}, svg);
+  NOTABLE_ANGLES.slice(0, 16).forEach((it, idx) => {
+    const r = it.deg * Math.PI / 180;
+    const x = cx + R * Math.cos(r);
+    const y = cy - R * Math.sin(r);
+    const pt = el('circle', { cx: x, cy: y, r: 4, fill: 'var(--muted)', cursor: 'pointer' }, tickGroup);
+    pt.addEventListener('click', () => {
+      if (animTimer) { clearInterval(animTimer); animTimer = null; }
+      update(idx);
+    });
+
+    // Feliratok a kör körül
+    const lr = R + 22;
+    const lx = cx + lr * Math.cos(r);
+    const ly = cy - lr * Math.sin(r);
+    const lbl = el('text', {
+      x: lx,
+      y: ly + 4,
+      font: '11px sans-serif',
+      fill: 'var(--muted)',
+      'text-anchor': Math.abs(Math.cos(r)) < 0.2 ? 'middle' : (Math.cos(r) > 0 ? 'start' : 'end'),
+      cursor: 'pointer'
+    }, tickGroup);
+    lbl.textContent = it.rad;
+    lbl.addEventListener('click', () => {
+      if (animTimer) { clearInterval(animTimer); animTimer = null; }
+      update(idx);
+    });
+  });
+
+  // Dinamikus alakzatok
+  const ray = el('line', { x1: cx, y1: cy, stroke: 'var(--fg)', 'stroke-width': 2 }, svg);
+  const cosProj = el('line', { stroke: 'var(--cos-col)', 'stroke-width': 4, 'stroke-linecap': 'round' }, svg);
+  const sinProj = el('line', { stroke: 'var(--sin-col)', 'stroke-width': 4, 'stroke-linecap': 'round' }, svg);
+  const tanSeg = el('line', { stroke: 'var(--tan-col)', 'stroke-width': 4, 'stroke-linecap': 'round' }, svg);
+  const dotP = el('circle', { r: 7, fill: 'var(--accent)', stroke: 'var(--bg)', 'stroke-width': 2 }, svg);
+  const labelP = el('text', { 'font-size': 13, 'font-weight': 700, fill: 'var(--accent)' }, svg);
+
+  let animTimer = null;
+  let currentIndex = 2; // 45°
+
+  function update(idx) {
+    currentIndex = idx;
+    const item = NOTABLE_ANGLES[idx];
+    const deg = item.deg;
+    const rad = deg * Math.PI / 180;
+    const cosV = Math.cos(rad);
+    const sinV = Math.sin(rad);
+    const tanV = Math.tan(rad);
+
+    const px = cx + R * cosV;
+    const py = cy - R * sinV;
+
+    ray.setAttribute('x2', px);
+    ray.setAttribute('y2', py);
+
+    cosProj.setAttribute('x1', cx); cosProj.setAttribute('y1', cy);
+    cosProj.setAttribute('x2', px); cosProj.setAttribute('y2', cy);
+
+    sinProj.setAttribute('x1', px); sinProj.setAttribute('y1', cy);
+    sinProj.setAttribute('x2', px); sinProj.setAttribute('y2', py);
+
+    if (Math.abs(cosV) > 0.05 && Math.abs(tanV) < 4) {
+      tanSeg.style.display = '';
+      tanSeg.setAttribute('x1', cx + R); tanSeg.setAttribute('y1', cy);
+      tanSeg.setAttribute('x2', cx + R); tanSeg.setAttribute('y2', cy - R * tanV);
+    } else {
+      tanSeg.style.display = 'none';
+    }
+
+    dotP.setAttribute('cx', px);
+    dotP.setAttribute('cy', py);
+
+    labelP.setAttribute('x', px + (cosV > 0.3 ? -105 : (cosV < -0.3 ? 12 : -45)));
+    labelP.setAttribute('y', py + (sinV >= 0 ? -14 : 22));
+    labelP.textContent = `P(${fmt(cosV, 2)}; ${fmt(sinV, 2)})`;
+
+    $('#circAngle').value = idx;
+    $('#circAngleOut').textContent = `${deg}° (${item.rad} rad)`;
+
+    $('#valCosC').innerHTML = item.cosExact;
+    $('#valSinC').innerHTML = item.sinExact;
+    $('#valTanC').innerHTML = item.tanExact;
+    $('#valQuadrant').textContent = item.quad;
+    $('#valSigns').textContent = item.signs;
+
+    $$('[data-circ-idx]').forEach(b => b.classList.toggle('active', +b.dataset.circIdx === idx));
+  }
+
+  $('#circAngle').addEventListener('input', e => {
+    if (animTimer) { clearInterval(animTimer); animTimer = null; }
+    update(+e.target.value);
+  });
+
+  $$('[data-circ-idx]').forEach(b => {
+    b.addEventListener('click', () => {
+      if (animTimer) { clearInterval(animTimer); animTimer = null; }
+      update(+b.dataset.circIdx);
+    });
+  });
+
+  $('#btnAnimCircle').addEventListener('click', () => {
+    if (animTimer) {
+      clearInterval(animTimer);
+      animTimer = null;
+      $('#btnAnimCircle').textContent = 'Forgatás a nevezetes szögeken';
+      return;
+    }
+    $('#btnAnimCircle').textContent = '⏸ Megállítás';
+    animTimer = setInterval(() => {
+      currentIndex = (currentIndex + 1) % NOTABLE_ANGLES.length;
+      update(currentIndex);
+    }, 1200);
+  });
+
+  update(2);
+})();
+
+// ================= FÜL 3: HULLÁMOK GENERÁLÁSA =================
+(function() {
+  const svg = $('#svgWaves');
+  const cx = 130, cy = 210, R = 90;
+  const startX = 270;
+  const W = 960;
+  const waveLength = 480; // 360° = 480px, így 720° = 960px
+
+  // Kör elemek
+  el('circle', { cx, cy, r: R, fill: 'none', stroke: 'var(--line)', 'stroke-width': 2 }, svg);
+  el('line', { x1: 20, y1: cy, x2: 240, y2: cy, stroke: 'var(--axis)', 'stroke-width': 1.5 }, svg);
+  el('line', { x1: cx, y1: 80, x2: cx, y2: 340, stroke: 'var(--axis)', 'stroke-width': 1.5 }, svg);
+
+  // Hullám tengely
+  el('line', { x1: startX, y1: cy, x2: W - 20, y2: cy, stroke: 'var(--axis)', 'stroke-width': 2 }, svg);
+
+  // Hullám rács és címkék
+  [
+    { f: 0.25, l: 'π/2' },
+    { f: 0.5, l: 'π' },
+    { f: 0.75, l: '3π/2' },
+    { f: 1, l: '2π' },
+    { f: 1.25, l: '5π/2' },
+    { f: 1.5, l: '3π' }
+  ].forEach(g => {
+    const x = startX + g.f * waveLength;
+    if (x <= W - 20) {
+      el('line', { x1: x, y1: 80, x2: x, y2: 340, stroke: 'var(--grid)', 'stroke-width': 1 }, svg);
+      const lbl = el('text', { x, y: cy + 18, font: '13px sans-serif', fill: 'var(--muted)', 'text-anchor': 'middle' }, svg);
+      lbl.textContent = g.l;
+    }
+  });
+
+  // Vonalak a hullámhoz
+  const sinPath = el('path', { fill: 'none', stroke: 'var(--sin-col)', 'stroke-width': 3 }, svg);
+  const cosPath = el('path', { fill: 'none', stroke: 'var(--cos-col)', 'stroke-width': 3 }, svg);
+
+  // Piros vektor: alfa szög (sin)
+  const sinRadius = el('line', { x1: cx, y1: cy, stroke: 'var(--sin-col)', 'stroke-width': 2.5 }, svg);
+  const sinDot = el('circle', { r: 5, fill: 'var(--sin-col)' }, svg);
+
+  // Kék vektor: alfa + 90° (cos)
+  const cosRadius = el('line', { x1: cx, y1: cy, stroke: 'var(--cos-col)', 'stroke-width': 2.5 }, svg);
+  const cosDot = el('circle', { r: 5, fill: 'var(--cos-col)' }, svg);
+
+  // Derékszög sarok a két vektor között az origónál
+  const rightAngleMark = el('path', { fill: 'none', stroke: 'var(--tan-col)', 'stroke-width': 1.8 }, svg);
+
+  // Piros vízszintes lézer (sin vetítés)
+  const sinLaser = el('line', { stroke: 'var(--sin-col)', 'stroke-width': 1.5, 'stroke-dasharray': '5 4' }, svg);
+  const sinWaveDot = el('circle', { r: 5, fill: 'var(--sin-col)' }, svg);
+
+  // Kék vízszintes lézer (cos vetítés a 90°-kal elforgatott vektorból)
+  const cosLaser = el('line', { stroke: 'var(--cos-col)', 'stroke-width': 1.5, 'stroke-dasharray': '5 4' }, svg);
+  const cosWaveDot = el('circle', { r: 5, fill: 'var(--cos-col)' }, svg);
+
+  let currentAngle = 0;
+  let waveTimer = null;
+  let waveMode = 'both'; // 'both', 'sin', 'cos'
+
+  const RAD_MAP = {
+    0: '0', 30: 'π/6', 45: 'π/4', 60: 'π/3', 90: 'π/2',
+    120: '2π/3', 135: '3π/4', 150: '5π/6', 180: 'π',
+    210: '7π/6', 225: '5π/4', 240: '4π/3', 270: '3π/2',
+    300: '5π/3', 315: '7π/4', 330: '11π/6', 360: '2π',
+    450: '5π/2', 540: '3π', 630: '7π/2', 720: '4π'
+  };
+
+  function renderWave() {
+    const rad = currentAngle * Math.PI / 180;
+    const radCos = rad + Math.PI / 2;
+
+    // Piros pont (sin): szög = currentAngle
+    const pxSin = cx + R * Math.cos(rad);
+    const pySin = cy - R * Math.sin(rad);
+
+    // Kék pont (cos): szög = currentAngle + 90°
+    const pxCos = cx + R * Math.cos(radCos);
+    const pyCos = cy - R * Math.sin(radCos); // pontosan cy - R * cos(rad)
+
+    const showSin = waveMode === 'both' || waveMode === 'sin';
+    const showCos = waveMode === 'both' || waveMode === 'cos';
+
+    // Piros vektor
+    if (showSin) {
+      sinRadius.style.display = '';
+      sinDot.style.display = '';
+      sinRadius.setAttribute('x2', pxSin); sinRadius.setAttribute('y2', pySin);
+      sinDot.setAttribute('cx', pxSin); sinDot.setAttribute('cy', pySin);
+    } else {
+      sinRadius.style.display = 'none';
+      sinDot.style.display = 'none';
+    }
+
+    // Kék vektor
+    if (showCos) {
+      cosRadius.style.display = '';
+      cosDot.style.display = '';
+      cosRadius.setAttribute('x2', pxCos); cosRadius.setAttribute('y2', pyCos);
+      cosDot.setAttribute('cx', pxCos); cosDot.setAttribute('cy', pyCos);
+    } else {
+      cosRadius.style.display = 'none';
+      cosDot.style.display = 'none';
+    }
+
+    // Derékszög jelölés
+    if (showSin && showCos) {
+      rightAngleMark.style.display = '';
+      const sq = 14;
+      const v1x = Math.cos(rad) * sq, v1y = -Math.sin(rad) * sq;
+      const v2x = Math.cos(radCos) * sq, v2y = -Math.sin(radCos) * sq;
+      rightAngleMark.setAttribute('d', `M ${cx + v1x} ${cy + v1y} L ${cx + v1x + v2x} ${cy + v1y + v2y} L ${cx + v2x} ${cy + v2y}`);
+    } else {
+      rightAngleMark.style.display = 'none';
+    }
+
+    const waveX = startX + (currentAngle / 360) * waveLength;
+
+    // Szinusz hullám kirajzolása
+    if (showSin) {
+      let dSin = `M ${startX} ${cy}`;
+      for (let a = 0; a <= currentAngle; a += 2) {
+        const r = a * Math.PI / 180;
+        const x = startX + (a / 360) * waveLength;
+        const y = cy - R * Math.sin(r);
+        dSin += ` L ${x} ${y}`;
+      }
+      sinPath.setAttribute('d', dSin);
+      sinPath.style.display = '';
+
+      // Piros lézer: teljesen VÍZSZINTES (y1 == y2 == pySin)
+      sinLaser.style.display = '';
+      sinWaveDot.style.display = '';
+      sinLaser.setAttribute('x1', pxSin); sinLaser.setAttribute('y1', pySin);
+      sinLaser.setAttribute('x2', waveX); sinLaser.setAttribute('y2', pySin);
+      sinWaveDot.setAttribute('cx', waveX); sinWaveDot.setAttribute('cy', pySin);
+    } else {
+      sinPath.style.display = 'none';
+      sinLaser.style.display = 'none';
+      sinWaveDot.style.display = 'none';
+    }
+
+    // Koszinusz hullám kirajzolása
+    if (showCos) {
+      let dCos = `M ${startX} ${cy - R}`;
+      for (let a = 0; a <= currentAngle; a += 2) {
+        const r = a * Math.PI / 180;
+        const x = startX + (a / 360) * waveLength;
+        const y = cy - R * Math.cos(r);
+        dCos += ` L ${x} ${y}`;
+      }
+      cosPath.setAttribute('d', dCos);
+      cosPath.style.display = '';
+
+      // Kék lézer: teljesen VÍZSZINTES (y1 == y2 == pyCos)
+      cosLaser.style.display = '';
+      cosWaveDot.style.display = '';
+      cosLaser.setAttribute('x1', pxCos); cosLaser.setAttribute('y1', pyCos);
+      cosLaser.setAttribute('x2', waveX); cosLaser.setAttribute('y2', pyCos);
+      cosWaveDot.setAttribute('cx', waveX); cosWaveDot.setAttribute('cy', pyCos);
+    } else {
+      cosPath.style.display = 'none';
+      cosLaser.style.display = 'none';
+      cosWaveDot.style.display = 'none';
+    }
+
+    // Kijelzők frissítése
+    const degNorm = currentAngle % 360;
+    const radStr = RAD_MAP[degNorm] ? ` (${RAD_MAP[degNorm]} rad)` : '';
+    $('#waveAngleOut').textContent = `α = ${currentAngle}°${radStr}`;
+    $('#waveSinOut').textContent = fmt(Math.sin(rad));
+    $('#waveCosOut').textContent = fmt(Math.cos(rad));
+  }
+
+  function play() {
+    if (waveTimer) {
+      clearInterval(waveTimer);
+      waveTimer = null;
+      $('#btnPlayWave').textContent = '▶ Indítás';
+      return;
+    }
+    $('#btnPlayWave').textContent = '⏸ Szünet';
+    const spd = +$('#waveSpeed').value;
+    waveTimer = setInterval(() => {
+      currentAngle += spd * 1.5;
+      if (currentAngle > 720) currentAngle = 0;
+      renderWave();
+    }, 25);
+  }
+
+  $('#btnPlayWave').addEventListener('click', play);
+  $('#btnResetWave').addEventListener('click', () => {
+    if (waveTimer) { clearInterval(waveTimer); waveTimer = null; $('#btnPlayWave').textContent = '▶ Indítás'; }
+    currentAngle = 0;
+    renderWave();
+  });
+
+  $$('[data-wmode]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('[data-wmode]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      waveMode = btn.dataset.wmode;
+      renderWave();
+    });
+  });
+
+  $$('[data-jump]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (waveTimer) { clearInterval(waveTimer); waveTimer = null; $('#btnPlayWave').textContent = '▶ Indítás'; }
+      currentAngle = +btn.dataset.jump;
+      renderWave();
+    });
+  });
+
+  renderWave();
+})();
+
+</script>
+</body>
+</html>

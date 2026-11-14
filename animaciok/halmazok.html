@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Halmazok – animációk</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --panel: #f5f7fa;
+  --fg: #1b1f24;
+  --muted: #59636e;
+  --line: #d5dae0;
+  --accent: #2563eb;
+  --soft: #e8f0fe;
+  --ca: #2563eb;
+  --cb: #ea580c;
+  --cc: #15803d;
+  --hl: #fde047;
+  --mix: #7c3aed;
+  --ok: #2b8a3e;
+  --warn: #b45309;
+  --bad: #c92a2a;
+  --n: #93c5fd;
+  --z: #86efac;
+  --q: #fdba74;
+  --r: #d8b4fe;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171b;
+    --panel: #1d2228;
+    --fg: #e8ebef;
+    --muted: #9aa4af;
+    --line: #333b44;
+    --accent: #6ea0ff;
+    --soft: #1c2a47;
+    --ca: #6ea0ff;
+    --cb: #ff9a57;
+    --cc: #5fce83;
+    --hl: #b7791f;
+    --mix: #b794f6;
+    --ok: #63c47a;
+    --warn: #f0b04a;
+    --bad: #ff7b7b;
+    --n: #1e4b8f;
+    --z: #1f6b3a;
+    --q: #8a4a14;
+    --r: #5b3a8c;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 18px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
+}
+.top-nav { padding: 10px 20px; background: var(--panel); border-bottom: 1px solid var(--line); font-size: 0.95rem; }
+.top-nav a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.top-nav a:hover { text-decoration: underline; }
+header { padding: 14px 16px 0; max-width: 1180px; margin: 0 auto; }
+h1 { font-size: 1.5rem; margin: 0 0 10px; }
+.lead { color: var(--muted); margin: 0 0 12px; max-width: 60em; }
+.toc { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 14px; border-bottom: 2px solid var(--line); }
+.toc a {
+  font-weight: 600; text-decoration: none; padding: 6px 14px; border-radius: 999px;
+  border: 2px solid var(--line); background: var(--panel); color: var(--accent);
+}
+.toc a:hover { border-color: var(--accent); }
+main { max-width: 1180px; margin: 0 auto; padding: 14px 16px 40px; }
+main > section { margin: 0 0 56px; scroll-margin-top: 10px; }
+main > section > h2 { font-size: 1.35rem; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--line); }
+.figcap { margin-top: 8px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 1.25rem; min-height: 3.2em; }
+.figcap .sw { display: inline-block; width: 1em; height: 1em; margin-right: 8px; vertical-align: -0.12em; border: 2px solid var(--fg); border-radius: 4px; background: var(--hl); }
+.layout { display: grid; grid-template-columns: minmax(300px, 580px) 1fr; gap: 20px; align-items: start; }
+@media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+svg.venn { width: 100%; height: auto; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+.panel h2 { font-size: 1rem; margin: 0 0 6px; color: var(--muted); font-weight: 600; }
+.sl { display: grid; grid-template-columns: 7.2em 1fr 2.4em; gap: 8px; align-items: center; margin: 4px 0; }
+.sl label { font-weight: 700; }
+.sl output { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; }
+.btns button {
+  font: inherit; cursor: pointer; padding: 6px 12px; border-radius: 8px;
+  border: 2px solid var(--accent); background: transparent; color: var(--accent); font-weight: 600;
+}
+.btns button:hover, .btns button.act { background: var(--accent); color: var(--bg); }
+.par3 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+.par3 .sl { grid-template-columns: 6.4em 1fr 1.6em; }
+@media (max-width: 1000px) { .par3 { grid-template-columns: 1fr; } }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: 700; color: #fff; background: var(--ok); }
+.badge.warn { background: var(--warn); }
+.badge.bad { background: var(--bad); }
+.note { color: var(--muted); }
+.steps { list-style: none; margin: 0; padding: 0; }
+.steps li { padding: 6px 10px; border-left: 4px solid transparent; opacity: .45; transition: opacity 2s, border-color 2s; }
+.steps li.cur { opacity: 1; border-color: var(--accent); background: var(--bg); font-weight: 600; }
+.steps li.done { opacity: .8; }
+.steps li.later { display: none; }
+.dots { display: flex; gap: 6px; margin: 8px 0 0; }
+.dots i { width: 12px; height: 12px; border-radius: 50%; background: var(--line); }
+.dots i.on { background: var(--accent); }
+.caption { min-height: 4.6em; }
+.pager {
+  position: sticky; top: 8px; z-index: 5;
+  display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+  width: fit-content; margin: 0 0 12px auto; padding: 6px 10px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.14);
+}
+.pager button {
+  font: inherit; font-weight: 700; cursor: pointer; min-width: 44px; height: 44px; padding: 0 12px;
+  border-radius: 999px; border: 2px solid var(--accent); background: transparent; color: var(--accent);
+}
+.pager button.wide { min-width: 0; padding: 0 16px; }
+.pager button:hover:not(:disabled) { background: var(--accent); color: var(--bg); }
+.pager button:disabled { opacity: .35; cursor: default; }
+.pager .dots { margin: 0 6px 0 4px; }
+
+.reg { transition: fill-opacity 2s ease, fill 2s ease; }
+.fade { transition: opacity 2s ease; }
+.out { fill: none; stroke-width: 4; }
+.slab { font-size: 30px; font-weight: 700; }
+.cnt { font-size: 30px; font-weight: 700; fill: var(--fg); text-anchor: middle; dominant-baseline: central; stroke: var(--bg); stroke-width: 5px; paint-order: stroke; }
+.mul { font-size: 30px; font-weight: 700; text-anchor: middle; dominant-baseline: central; stroke: var(--bg); stroke-width: 5px; paint-order: stroke; }
+.chip { transition: transform 2s ease, opacity 2s ease; }
+.chip.dim { opacity: .35; }
+.chip circle { fill: var(--bg); stroke: var(--fg); stroke-width: 2; transition: fill 2s ease, stroke-width 2s ease; }
+.chip.on circle { fill: var(--hl); stroke-width: 3.5; }
+.chip text { font-size: 17px; font-weight: 700; fill: var(--fg); text-anchor: middle; dominant-baseline: central; }
+.tog { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin: 6px 0; }
+.tog b { width: 1.5em; font-size: 1.15rem; }
+.tog button {
+  font: inherit; font-weight: 700; width: 2.1em; height: 2.1em; padding: 0; border-radius: 50%;
+  border: 2px solid var(--line); background: var(--bg); color: var(--muted); cursor: pointer;
+}
+.tog.a b { color: var(--ca); }
+.tog.b b { color: var(--cb); }
+.tog.a button[aria-pressed="true"] { background: var(--ca); border-color: var(--ca); color: var(--bg); }
+.tog.b button[aria-pressed="true"] { background: var(--cb); border-color: var(--cb); color: var(--bg); }
+.ov { text-decoration: overline; }
+.res { font-size: 1.35rem; font-weight: 700; margin: 6px 0; }
+.formula {
+  font-size: 1.25rem; font-weight: 700; padding: 8px 12px; margin: 8px 0 0;
+  border-left: 4px solid var(--accent); background: var(--bg); border-radius: 6px;
+}
+.subs h3 { font-size: 1rem; margin: 10px 0 6px; color: var(--muted); }
+.subs h3:first-child { margin-top: 0; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.2em, 1fr)); gap: 6px; }
+.card {
+  padding: 4px 2px; border: 2px solid var(--line); border-radius: 8px; background: var(--bg);
+  text-align: center; font-weight: 600; font-size: 17px; white-space: nowrap;
+}
+.card.new { border-color: var(--accent); background: var(--soft); animation: fadein 2s ease both; }
+@keyframes fadein { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+.subsbox { border: 1px solid var(--line); border-radius: 8px; padding: 12px; min-height: 300px; }
+.nums { display: flex; flex-wrap: wrap; gap: 6px; }
+.nums button {
+  font: inherit; font-weight: 700; cursor: pointer; min-width: 2.6em; padding: 4px 10px; border-radius: 8px;
+  border: 2px solid var(--line); background: var(--bg); color: var(--fg);
+}
+.nums button.act { border-color: var(--accent); background: var(--soft); }
+.numchip { cursor: pointer; }
+.numchip text { font-size: 22px; font-weight: 700; fill: var(--fg); text-anchor: middle; dominant-baseline: central; }
+.numchip rect { fill: var(--bg); stroke: var(--fg); stroke-width: 1.5; transition: fill 2s ease, stroke-width 2s ease; }
+.numchip.on rect { fill: var(--hl); stroke-width: 3.5; }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Halmazok</h1>
+  <p class="lead">Hat fejezet a részhalmazoktól a szitaformuláig. Minden fejezet lépésenként halad: a jobb felső lapozóval vagy a billentyűkkel (nyilak, szóköz, PageUp, PageDown) lehet előre- és visszalépni, a Lejátszás gomb magától végigmegy a lépéseken.</p>
+  <nav class="toc" aria-label="Tartalomjegyzék">
+    <a href="#reszhalmazok">1. Részhalmazok száma</a>
+    <a href="#muveletek">2. Halmazműveletek</a>
+    <a href="#szamhalmazok">3. Számhalmazok</a>
+    <a href="#szita-ket-halmazra">4. Szitaformula két halmazra</a>
+    <a href="#harom-halmaz-abraja">5. Három halmaz ábrája</a>
+    <a href="#szita-harom-halmazra">6. Szitaformula három halmazra</a>
+  </nav>
+</header>
+<main>
+
+<section id="reszhalmazok">
+  <h2>1. Részhalmazok száma: egy n elemű halmaznak 2ⁿ részhalmaza van</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div class="subsbox"><div class="subs" id="subs"></div></div>
+    <div>
+      <div class="panel">
+        <h2>Hány elemű a halmaz?</h2>
+        <div class="sl"><label>n</label><input type="range" id="nSub" min="1" max="5" step="1" value="4"><output id="nSubO"></output></div>
+        <div class="res" id="setSub"></div>
+      </div>
+      <div class="panel">
+        <div class="caption" id="capSub"></div>
+        <ul class="steps" id="algSub"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="muveletek">
+  <h2>2. Halmazműveletek: metszet, unió, különbség, kiegészítő halmaz</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="venn" id="vOps" viewBox="0 0 640 440" role="img" aria-label="Két halmaz Venn-diagramja az elemekkel"></svg>
+      <div class="figcap" id="figOps" aria-live="polite"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h2>Művelet</h2>
+        <div class="btns" id="opsBtns" style="margin-top:0"></div>
+        <div class="res" id="titOps"></div>
+        <div id="defOps"></div>
+        <div class="formula" id="resOps"></div>
+        <div class="note" id="noteOps" style="margin-top:8px"></div>
+      </div>
+      <div class="panel">
+        <h2>A halmazok elemei (kattintással változtatható)</h2>
+        <div class="tog a" id="togA"><b>A</b></div>
+        <div class="tog b" id="togB"><b>B</b></div>
+        <div id="setsOps"></div>
+        <div class="btns" id="preOps">
+          <button data-a="1,3,5,7,9" data-b="1,2,3,4">Tankönyvi példa</button>
+          <button data-a="1,3,5" data-b="2,4,6">Diszjunkt halmazok</button>
+          <button data-a="1,2,3,4,5,6" data-b="2,4">Részhalmaz</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="szamhalmazok">
+  <h2>3. Számhalmazok: természetes, egész, racionális, irracionális és valós számok</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <svg class="venn" id="vNum" viewBox="0 0 640 440" role="img" aria-label="A számhalmazok egymásba ágyazva"></svg>
+    <div>
+      <div class="panel">
+        <div class="caption" id="capNum"></div>
+        <ul class="steps" id="algNum"></ul>
+      </div>
+      <div class="panel">
+        <h2>Melyik halmaznak eleme? (kattints egy számra)</h2>
+        <div class="nums" id="numBtns"></div>
+        <div id="numInfo" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="szita-ket-halmazra">
+  <h2>4. Szitaformula két halmazra</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <svg class="venn" id="vS2" viewBox="0 0 640 440" role="img" aria-label="Két halmaz elemszáma Venn-diagramon"></svg>
+    <div>
+      <div class="panel">
+        <div class="caption" id="capS2"></div>
+        <ul class="steps" id="algS2"></ul>
+      </div>
+      <div class="panel">
+        <h2>Az adatok</h2>
+        <div id="parS2"></div>
+        <div class="btns" id="preS2">
+          <button data-p="24,30,12">Hibakeresés: 24, 30, közös 12</button>
+          <button data-p="6,6,1">Két kocka, legalább egy hatos</button>
+          <button data-p="14,9,0">Diszjunkt halmazok</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="harom-halmaz-abraja">
+  <h2>5. Három halmaz ábrája: kitöltés belülről kifelé</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <svg class="venn" id="vV3" viewBox="0 0 640 480" role="img" aria-label="Három halmaz Venn-diagramja"></svg>
+    <div>
+      <div class="panel">
+        <div class="caption" id="capV3"></div>
+        <ul class="steps" id="algV3"></ul>
+      </div>
+      <div class="panel">
+        <h2>Az adatok</h2>
+        <div class="par3"></div>
+        <div class="btns pre3"></div>
+        <div class="warn3" style="margin-top:6px"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="szita-harom-halmazra">
+  <h2>6. Szitaformula három halmazra</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <svg class="venn" id="vS3" viewBox="0 0 640 480" role="img" aria-label="Hányszor számoltuk az egyes tartományokat"></svg>
+    <div>
+      <div class="panel">
+        <div class="caption" id="capS3"></div>
+        <ul class="steps" id="algS3"></ul>
+      </div>
+      <div class="panel">
+        <h2>Az adatok</h2>
+        <div class="par3"></div>
+        <div class="btns pre3"></div>
+        <div class="warn3" style="margin-top:6px"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const NS = 'http://www.w3.org/2000/svg';
+const MINUS = '−';
+const SUP = ['⁰', '¹', '²', '³', '⁴', '⁵'];
+const STEP_MS = 5500;
+
+function el(name, attrs, parent, text) {
+  const e = document.createElementNS(NS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function fmtSet(a) { return a.length ? '{' + a.join('; ') + '}' : '∅'; }
+function num(n) { return n < 0 ? MINUS + Math.abs(n) : String(n); }
+
+/* lépéses fejezetek közös vezérlője: a lapozó sáv gombjai, pöttyök, automatikus lejátszás */
+const steppers = {};
+function stepper(tab, n, onStep) {
+  const host = $('#' + tab + ' .pager');
+  host.innerHTML = '<div class="dots"></div>' +
+    '<button data-r="reset" title="Újra" aria-label="Újra">↺</button>' +
+    '<button data-r="prev" title="Előző" aria-label="Előző">◀</button>' +
+    '<button data-r="play" class="wide">Lejátszás</button>' +
+    '<button data-r="next" title="Következő" aria-label="Következő">▶</button>';
+  const dots = $('.dots', host);
+  const b = r => $('[data-r="' + r + '"]', host);
+  let cur = 0, timer = null;
+  function buildDots() {
+    dots.innerHTML = '';
+    for (let i = 0; i <= n; i++) dots.appendChild(document.createElement('i'));
+  }
+  function show() {
+    $$('i', dots).forEach((d, i) => d.classList.toggle('on', i <= cur));
+    b('prev').disabled = cur === 0;
+    b('next').disabled = cur === n;
+    onStep(cur);
+  }
+  function pause() { if (timer) { clearInterval(timer); timer = null; b('play').textContent = 'Lejátszás'; } }
+  const api = {
+    next() { if (cur < n) { cur++; show(); } if (cur === n) pause(); },
+    prev() { pause(); if (cur > 0) { cur--; show(); } },
+    reset() { pause(); cur = 0; show(); },
+    go(i) { pause(); cur = Math.max(0, Math.min(n, i)); show(); },
+    setN(m) { pause(); n = m; if (cur > n) cur = n; buildDots(); show(); },
+    refresh: show,
+    pause,
+    get step() { return cur; }
+  };
+  b('next').addEventListener('click', () => { pause(); api.next(); });
+  b('prev').addEventListener('click', api.prev);
+  b('reset').addEventListener('click', api.reset);
+  b('play').addEventListener('click', () => {
+    if (timer) { pause(); return; }
+    for (const k in steppers) steppers[k].pause();
+    if (cur === n) cur = 0;
+    show();
+    b('play').textContent = 'Szünet';
+    timer = setInterval(api.next, STEP_MS);
+  });
+  buildDots();
+  steppers[tab] = api;
+  return api;
+}
+function stepList(ul, lines, step) {
+  ul.innerHTML = '';
+  lines.forEach((t, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = t;
+    li.className = i === step ? 'cur' : (i < step ? 'done' : 'later');
+    ul.appendChild(li);
+  });
+}
+function slider(host, label, min, max, value, onInput) {
+  const row = document.createElement('div');
+  row.className = 'sl';
+  const lab = document.createElement('label');
+  lab.innerHTML = label;
+  const inp = document.createElement('input');
+  inp.type = 'range'; inp.min = min; inp.max = max; inp.step = 1; inp.value = value;
+  const out = document.createElement('output');
+  out.textContent = value;
+  inp.addEventListener('input', () => onInput(+inp.value));
+  row.append(lab, inp, out);
+  host.appendChild(row);
+  return { set(v) { inp.value = v; out.textContent = v; }, label(t) { lab.innerHTML = t; }, max(m) { inp.max = m; } };
+}
+
+/* Venn-diagram tartományai: minden tartomány külön kitölthető (kulcs: bitmaszk, i. bit = az i. körön belül) */
+function vennRegions(svg, circles, box) {
+  const id = svg.id, defs = el('defs', {}, svg), reg = {};
+  circles.forEach((c, i) => {
+    const cp = el('clipPath', { id: id + '-c' + i }, defs);
+    el('circle', { cx: c.cx, cy: c.cy, r: c.r }, cp);
+  });
+  for (let key = 0; key < (1 << circles.length); key++) {
+    const m = el('mask', { id: id + '-m' + key, maskUnits: 'userSpaceOnUse', x: 0, y: 0, width: 640, height: 480 }, defs);
+    el('rect', { x: 0, y: 0, width: 640, height: 480, fill: '#fff' }, m);
+    circles.forEach((c, i) => { if (!(key >> i & 1)) el('circle', { cx: c.cx, cy: c.cy, r: c.r, fill: '#000' }, m); });
+    let parent = svg;
+    circles.forEach((c, i) => { if (key >> i & 1) parent = el('g', { 'clip-path': 'url(#' + id + '-c' + i + ')' }, parent); });
+    reg[key] = el('rect', { ...box, mask: 'url(#' + id + '-m' + key + ')', class: 'reg', 'fill-opacity': 0 }, parent);
+  }
+  return reg;
+}
+function paint(r, color, op) { r.style.fill = color; r.style.fillOpacity = op; }
+
+/* 1. fejezet: részhalmazok száma, 2ⁿ */
+(function () {
+  const EL = ['a', 'b', 'c', 'd', 'e'];
+  let n = 4;
+  const host = $('#subs');
+  const sub = (mask, k) => fmtSet(EL.slice(0, k).filter((_, j) => mask >> j & 1));
+  const pop = m => { let c = 0; while (m) { c += m & 1; m >>= 1; } return c; };
+  function group(title, masks, k, isNew) {
+    if (title) { const h = document.createElement('h3'); h.textContent = title; host.appendChild(h); }
+    const g = document.createElement('div');
+    g.className = 'cards';
+    masks.forEach(m => {
+      const d = document.createElement('div');
+      d.className = 'card' + (isNew ? ' new' : '');
+      d.textContent = sub(m, k);
+      g.appendChild(d);
+    });
+    host.appendChild(g);
+  }
+  const range = (a, b) => Array.from({ length: b - a }, (_, i) => a + i);
+  function render(step) {
+    const k = Math.min(step, n), all = 1 << n;
+    $('#nSubO').textContent = n;
+    $('#setSub').textContent = 'H = ' + fmtSet(EL.slice(0, n));
+    host.innerHTML = '';
+    const sizes = range(0, n + 1).map(s => range(0, all).filter(m => pop(m) === s).length);
+    if (step === n + 3) {
+      range(0, n + 1).forEach(s => group(s + ' elemű részhalmaz: ' + sizes[s], range(0, all).filter(m => pop(m) === s), n, false));
+    } else if (k === 0) {
+      group('Egy elemről sem döntöttünk', [0], 0, false);
+    } else {
+      const half = 1 << (k - 1);
+      group('Az „' + EL[k - 1] + '” kimarad: az eddigi ' + half, range(0, half), k, false);
+      group('Az „' + EL[k - 1] + '” bekerül: ' + half + ' új', range(half, 2 * half), k, step <= n);
+    }
+    const lines = ['Kezdés: 1 részhalmaz van, az üres halmaz (∅).'];
+    for (let i = 1; i <= n; i++) lines.push('Az „' + EL[i - 1] + '”: kimarad vagy bekerül: ' + (1 << (i - 1)) + ' · 2 = <b>' + (1 << i) + '</b> részhalmaz');
+    lines.push('Általánosan: egy n elemű halmaznak <b>2ⁿ</b> részhalmaza van.');
+    lines.push('Most n = ' + n + ': ' + Array(n).fill('2').join(' · ') + ' = 2' + SUP[n] + ' = <b>' + all + '</b>');
+    lines.push('Ellenőrzés elemszám szerint: ' + sizes.join(' + ') + ' = <b>' + all + '</b> ✓');
+    stepList($('#algSub'), lines, step);
+    let cap;
+    if (step === 0) cap = 'Sorra vesszük az elemeket, és mindegyikről eldöntjük, hogy bekerül-e a részhalmazba. Amíg egyikről sem döntöttünk, egyetlen részhalmaz van: az üres halmaz.';
+    else if (step <= n) cap = 'Minden eddigi részhalmazból kettő lesz: az egyikből az „' + EL[step - 1] + '” kimarad, a másikba bekerül. Ezért a részhalmazok száma megduplázódik.';
+    else if (step === n + 1) cap = 'Minden elemnél 2 lehetőség van (kimarad vagy bekerül), és a döntések függetlenek, ezért a lehetőségek számát összeszorozzuk: n darab kettes szorzata, vagyis 2ⁿ.';
+    else if (step === n + 2) cap = 'Behelyettesítünk: az n helyére az elemek száma kerül. Az üres halmazt és magát a H halmazt is beleszámoltuk.';
+    else cap = 'Ugyanazok a részhalmazok elemszám szerint csoportosítva. A csoportok elemszámának összege ugyanannyi, mint amit a képlet ad.';
+    $('#capSub').textContent = cap;
+  }
+  const S = stepper('reszhalmazok', n + 3, render);
+  $('#nSub').addEventListener('input', e => { n = +e.target.value; S.setN(n + 3); });
+  S.refresh();
+})();
+
+/* 2. fejezet: halmazműveletek két halmazon */
+(function () {
+  const svg = $('#vOps');
+  const C = [{ cx: 240, cy: 215, r: 150 }, { cx: 400, cy: 215, r: 150 }];
+  const box = { x: 10, y: 10, width: 620, height: 420, rx: 18 };
+  el('rect', { ...box, fill: 'var(--bg)' }, svg);
+  const reg = vennRegions(svg, C, box);
+  el('rect', { ...box, fill: 'none', stroke: 'var(--fg)', 'stroke-width': 3 }, svg);
+  el('circle', { cx: C[0].cx, cy: C[0].cy, r: C[0].r, class: 'out', stroke: 'var(--ca)' }, svg);
+  el('circle', { cx: C[1].cx, cy: C[1].cy, r: C[1].r, class: 'out', stroke: 'var(--cb)' }, svg);
+  el('text', { x: 110, y: 72, class: 'slab', fill: 'var(--ca)', 'text-anchor': 'middle' }, svg, 'A');
+  el('text', { x: 530, y: 72, class: 'slab', fill: 'var(--cb)', 'text-anchor': 'middle' }, svg, 'B');
+  el('text', { x: 36, y: 50, class: 'slab', fill: 'var(--fg)', 'text-anchor': 'middle' }, svg, 'H');
+
+  /* az elemek helyei tartományonként, belülről kifelé */
+  const SL = {
+    1: [[172, 215], [172, 171], [172, 259], [128, 193], [128, 237], [214, 193], [214, 237], [172, 127], [172, 303], [128, 281]],
+    3: [[302, 215], [338, 215], [302, 171], [338, 171], [302, 259], [338, 259], [302, 127], [338, 127], [302, 303], [338, 303]],
+    0: [[48, 215], [592, 215], [48, 165], [592, 165], [48, 265], [592, 265], [48, 115], [592, 115], [48, 315], [592, 315]]
+  };
+  SL[2] = SL[1].map(([x, y]) => [640 - x, y]);
+  const N = 10, chips = {};
+  for (let i = 1; i <= N; i++) {
+    const g = el('g', { class: 'chip' }, svg);
+    el('circle', { r: 16 }, g);
+    el('text', {}, g, String(i));
+    chips[i] = g;
+  }
+  let A = new Set([1, 3, 5, 7, 9]), B = new Set([1, 2, 3, 4]);
+  const key = i => (A.has(i) ? 1 : 0) | (B.has(i) ? 2 : 0);
+  const OV = s => '<span class="ov">' + s + '</span>';
+  const OPS = [
+    { btn: 'A és B', sym: '', keys: [], title: 'Két halmaz egy alaphalmazban',
+      def: 'A H alaphalmaz minden eleme a négy tartomány egyikébe kerül: csak A-nak eleme, csak B-nek eleme, mindkettőnek, vagy egyiknek sem.',
+      note: 'Az A és a B sorban a számokra kattintva az elemek áthelyezhetők.' },
+    { btn: 'A ∩ B', sym: 'A ∩ B', keys: [3], title: 'Metszet',
+      def: 'Azok az elemek, amelyek A-nak <b>és</b> B-nek is elemei.',
+      note: 'Felcserélhető: A ∩ B = B ∩ A. Ha a metszet üres, a két halmaz diszjunkt.' },
+    { btn: 'A ∪ B', sym: 'A ∪ B', keys: [1, 2, 3], title: 'Unió',
+      def: 'Azok az elemek, amelyek A és B közül <b>legalább az egyiknek</b> elemei.',
+      note: 'A „vagy” megengedő: a közös elemek is benne vannak, de mindegyiket csak egyszer írjuk fel. Felcserélhető: A ∪ B = B ∪ A.' },
+    { btn: 'A \\ B', sym: 'A \\ B', keys: [1], title: 'Különbség',
+      def: 'A-nak azok az elemei, amelyek B-nek <b>nem</b> elemei.',
+      note: 'A-ból elhagyjuk a közös elemeket.' },
+    { btn: 'B \\ A', sym: 'B \\ A', keys: [2], title: 'Különbség, fordított sorrendben',
+      def: 'B-nek azok az elemei, amelyek A-nak <b>nem</b> elemei.',
+      note: 'A különbség nem felcserélhető: A \\ B ≠ B \\ A, ahogy a kivonásnál 5 − 3 ≠ 3 − 5.' },
+    { btn: OV('A'), sym: OV('A'), keys: [0, 2], title: 'Kiegészítő halmaz (komplementer)',
+      def: 'A H alaphalmaznak azok az elemei, amelyek A-nak <b>nem</b> elemei: ' + OV('A') + ' = H \\ A.',
+      note: 'Alaphalmaz nélkül a kiegészítő halmaznak nincs értelme: más alaphalmazra nézve más a kiegészítő.' },
+    { btn: OV('A ∪ B'), sym: OV('A ∪ B'), keys: [0], title: 'Az unió kiegészítő halmaza',
+      def: 'Azok az elemek, amelyek <b>se</b> A-nak, <b>se</b> B-nek nem elemei.',
+      note: 'Ugyanez a halmaz másképp felírva: ' + OV('A') + ' ∩ ' + OV('B') + ' (ami A-n is, B-n is kívül van).' }
+  ];
+  const togs = { A: {}, B: {} };
+  [['A', '#togA'], ['B', '#togB']].forEach(([name, sel]) => {
+    for (let i = 1; i <= N; i++) {
+      const bt = document.createElement('button');
+      bt.textContent = i;
+      bt.title = i + (name === 'A' ? ' az A halmazban' : ' a B halmazban');
+      bt.addEventListener('click', () => {
+        const s = name === 'A' ? A : B;
+        if (s.has(i)) s.delete(i); else s.add(i);
+        S.refresh();
+      });
+      $(sel).appendChild(bt);
+      togs[name][i] = bt;
+    }
+  });
+  OPS.forEach((o, i) => {
+    const bt = document.createElement('button');
+    bt.innerHTML = o.btn;
+    bt.addEventListener('click', () => S.go(i));
+    $('#opsBtns').appendChild(bt);
+  });
+  $$('#preOps button').forEach(bt => bt.addEventListener('click', () => {
+    A = new Set(bt.dataset.a.split(',').map(Number));
+    B = new Set(bt.dataset.b.split(',').map(Number));
+    S.refresh();
+  }));
+  function render(step) {
+    const o = OPS[step], cnt = { 0: 0, 1: 0, 2: 0, 3: 0 }, all = [];
+    for (let i = 1; i <= N; i++) all.push(i);
+    all.forEach(i => {
+      const k = key(i), [x, y] = SL[k][cnt[k]++];
+      chips[i].style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      chips[i].classList.toggle('on', o.keys.includes(k));
+      chips[i].classList.toggle('dim', step > 0 && !o.keys.includes(k));
+      togs.A[i].setAttribute('aria-pressed', A.has(i));
+      togs.B[i].setAttribute('aria-pressed', B.has(i));
+    });
+    /* kiinduláskor a két halmaz a saját színével látszik, műveletnél az eredmény sárga */
+    const base = ['var(--bg)', 'var(--ca)', 'var(--cb)', 'var(--mix)'];
+    for (let k = 0; k < 4; k++) {
+      if (step === 0) paint(reg[k], base[k], k === 0 ? 0 : (k === 3 ? .3 : .2));
+      else paint(reg[k], 'var(--hl)', o.keys.includes(k) ? .7 : 0);
+    }
+    $$('#opsBtns button').forEach((bt, i) => bt.classList.toggle('act', i === step));
+    const a = all.filter(i => A.has(i)), b = all.filter(i => B.has(i));
+    const common = a.filter(i => B.has(i));
+    let rel = '';
+    if (a.length && b.length) {
+      if (a.length === b.length && common.length === a.length) rel = '<span class="badge">A = B</span>';
+      else if (!common.length) rel = '<span class="badge warn">diszjunktak: A ∩ B = ∅</span>';
+      else if (common.length === b.length) rel = '<span class="badge">B ⊂ A (valódi részhalmaz)</span>';
+      else if (common.length === a.length) rel = '<span class="badge">A ⊂ B (valódi részhalmaz)</span>';
+    }
+    $('#setsOps').innerHTML = 'H = {1; 2; 3; …; 10}<br><b style="color:var(--ca)">A</b> = ' + fmtSet(a) + ', |A| = ' + a.length +
+      '<br><b style="color:var(--cb)">B</b> = ' + fmtSet(b) + ', |B| = ' + b.length + (rel ? '<br>' + rel : '');
+    $('#titOps').innerHTML = o.title;
+    $('#defOps').innerHTML = o.def;
+    const res = all.filter(i => o.keys.includes(key(i)));
+    $('#resOps').style.display = o.sym ? '' : 'none';
+    $('#resOps').innerHTML = o.sym + ' = ' + fmtSet(res) + ', az elemszáma ' + res.length;
+    $('#figOps').innerHTML = step === 0
+      ? 'A <b style="color:var(--ca)">kék</b> kör az A, a <b style="color:var(--cb)">narancs</b> a B halmaz; a közös részben azok az elemek állnak, amelyek mindkettőnek elemei.'
+      : '<span class="sw"></span><b>' + o.title + ':</b> ' + o.sym + ' = ' + fmtSet(res) + '<br><span class="note">A sárga tartomány és a sárga elemek adják az eredményt.</span>';
+    $('#noteOps').innerHTML = o.note;
+  }
+  const S = stepper('muveletek', OPS.length - 1, render);
+  S.refresh();
+})();
+
+/* 3. fejezet: számhalmazok */
+(function () {
+  const svg = $('#vNum');
+  const sh = {
+    R: el('rect', { x: 10, y: 10, width: 620, height: 420, rx: 24, fill: 'var(--r)', stroke: 'var(--fg)', 'stroke-width': 3, class: 'fade' }, svg),
+    Q: el('ellipse', { cx: 250, cy: 235, rx: 225, ry: 175, fill: 'var(--q)', stroke: 'var(--fg)', 'stroke-width': 3, class: 'fade' }, svg),
+    Z: el('ellipse', { cx: 215, cy: 250, rx: 160, ry: 120, fill: 'var(--z)', stroke: 'var(--fg)', 'stroke-width': 3, class: 'fade' }, svg),
+    N: el('ellipse', { cx: 190, cy: 262, rx: 95, ry: 68, fill: 'var(--n)', stroke: 'var(--fg)', 'stroke-width': 3, class: 'fade' }, svg)
+  };
+  const lab = {
+    R: el('text', { x: 40, y: 50, class: 'slab fade', fill: 'var(--fg)', 'text-anchor': 'middle' }, svg, 'R'),
+    I: el('text', { x: 548, y: 84, class: 'slab fade', fill: 'var(--fg)', 'text-anchor': 'middle' }, svg, 'Q*'),
+    Q: el('text', { x: 255, y: 100, class: 'slab fade', fill: 'var(--fg)', 'text-anchor': 'middle' }, svg, 'Q'),
+    Z: el('text', { x: 215, y: 166, class: 'slab fade', fill: 'var(--fg)', 'text-anchor': 'middle' }, svg, 'Z'),
+    N: el('text', { x: 190, y: 228, class: 'slab fade', fill: 'var(--fg)', 'text-anchor': 'middle' }, svg, 'N')
+  };
+  /* lvl: 0 természetes, 1 egész, 2 racionális, 3 irracionális */
+  const NUMS = [
+    { t: '0', lvl: 0, x: 140, y: 268, why: 'A 0 is természetes szám.' },
+    { t: '5', lvl: 0, x: 190, y: 290, why: 'Az 5 természetes szám, ezért egész, racionális és valós is.' },
+    { t: '12', lvl: 0, x: 242, y: 266, why: 'A 12 természetes szám; törtként is felírható: 12 = 12/1.' },
+    { t: '−3', lvl: 1, x: 322, y: 226, why: 'A −3 a 3 ellentettje: egész szám, de nem természetes.' },
+    { t: '−1', lvl: 1, x: 300, y: 300, why: 'A −1 egész szám, de nem természetes.' },
+    { t: '−3/4', lvl: 2, x: 418, y: 196, why: 'Két egész szám hányadosa: −3/4 = −0,75. Racionális, de nem egész.' },
+    { t: '0,5', lvl: 2, x: 400, y: 304, why: 'Törtként: 0,5 = 1/2. Racionális, de nem egész.' },
+    { t: '1/3', lvl: 2, x: 130, y: 112, why: 'Tizedes tört alakja végtelen, de szakaszos: 1/3 = 0,333… Racionális.' },
+    { t: '√2', lvl: 3, x: 552, y: 160, why: 'Nem írható fel két egész szám hányadosaként: √2 = 1,41421356…, a tizedes tört nem ér véget és nem ismétlődik.' },
+    { t: 'π', lvl: 3, x: 548, y: 262, why: 'π = 3,14159265…, végtelen, nem szakaszos tizedes tört: irracionális.' },
+    { t: '−√5', lvl: 3, x: 552, y: 356, why: 'Negatív irracionális szám: −√5 = −2,2360679…' }
+  ];
+  let sel = null;
+  NUMS.forEach((d, i) => {
+    const g = el('g', { class: 'numchip fade', transform: 'translate(' + d.x + ',' + d.y + ')' }, svg);
+    const w = 20 + d.t.length * 13;
+    el('rect', { x: -w / 2, y: -18, width: w, height: 36, rx: 10 }, g);
+    el('text', {}, g, d.t);
+    d.g = g;
+    const bt = document.createElement('button');
+    bt.textContent = d.t;
+    $('#numBtns').appendChild(bt);
+    d.bt = bt;
+    const pick = () => { sel = i; S.go(Math.max(S.step, d.lvl)); };
+    g.addEventListener('click', pick);
+    bt.addEventListener('click', pick);
+  });
+  const lines = [
+    '<b>N</b>: természetes számok: 0; 1; 2; 3; …',
+    '<b>Z</b>: egész számok: …; −2; −1; 0; 1; 2; … &nbsp; N ⊂ Z',
+    '<b>Q</b>: racionális számok: két egész szám hányadosai &nbsp; Z ⊂ Q',
+    '<b>Q*</b>: irracionális számok: nem írhatók fel így',
+    '<b>R</b>: valós számok: Q ∪ Q* = R, Q ∩ Q* = ∅ &nbsp; N ⊂ Z ⊂ Q ⊂ R'
+  ];
+  const caps = [
+    'A természetes számok halmaza: a 0 és a pozitív egész számok. Ezekkel számlálunk össze.',
+    'Hozzávesszük a természetes számok ellentettjeit: ez az egész számok halmaza. Minden természetes szám egész is, ezért N részhalmaza Z-nek.',
+    'A racionális számok felírhatók két egész szám hányadosaként (a nevező nem 0). Tizedes tört alakjuk véges vagy végtelen szakaszos. Minden egész szám racionális is, például −3 = −3/1.',
+    'Vannak számok, amelyek nem írhatók fel két egész szám hányadosaként: ezek az irracionális számok. Tizedes tört alakjuk végtelen és nem szakaszos.',
+    'A racionális és az irracionális számok együtt adják a valós számok halmazát. A két halmaz diszjunkt: Q* = R \\ Q. Mind az öt halmaz végtelen.'
+  ];
+  function render(step) {
+    sh.N.style.opacity = 1;
+    sh.Z.style.opacity = step >= 1 ? 1 : 0;
+    sh.Q.style.opacity = step >= 2 ? 1 : 0;
+    sh.R.style.opacity = step >= 3 ? 1 : 0;
+    lab.N.style.opacity = 1;
+    lab.Z.style.opacity = step >= 1 ? 1 : 0;
+    lab.Q.style.opacity = step >= 2 ? 1 : 0;
+    lab.I.style.opacity = step >= 3 ? 1 : 0;
+    lab.R.style.opacity = step >= 4 ? 1 : 0;
+    NUMS.forEach((d, i) => {
+      const vis = d.lvl <= step;
+      d.g.style.opacity = vis ? 1 : 0;
+      d.g.style.pointerEvents = vis ? '' : 'none';
+      d.g.classList.toggle('on', i === sel && vis);
+      d.bt.classList.toggle('act', i === sel);
+    });
+    stepList($('#algNum'), lines, step);
+    $('#capNum').textContent = caps[step];
+    const info = $('#numInfo');
+    if (sel === null) { info.innerHTML = '<span class="note">Az ábrán vagy itt a gombok között.</span>'; return; }
+    const d = NUMS[sel];
+    const inSet = { N: d.lvl === 0, Z: d.lvl <= 1, Q: d.lvl <= 2, 'Q*': d.lvl === 3, R: true };
+    info.innerHTML = Object.keys(inSet).map(s => '<b style="color:var(--' + (inSet[s] ? 'ok' : 'bad') + ')">' + d.t + (inSet[s] ? ' ∈ ' : ' ∉ ') + s + '</b>').join(', &nbsp;') +
+      '<br>' + d.why;
+  }
+  const S = stepper('szamhalmazok', 4, render);
+  S.refresh();
+})();
+
+/* 4. fejezet: szitaformula két halmazra */
+(function () {
+  const svg = $('#vS2');
+  const C = [{ cx: 240, cy: 215, r: 150 }, { cx: 400, cy: 215, r: 150 }];
+  const box = { x: 10, y: 10, width: 620, height: 420, rx: 18 };
+  el('rect', { ...box, fill: 'var(--bg)' }, svg);
+  const reg = vennRegions(svg, C, box);
+  el('rect', { ...box, fill: 'none', stroke: 'var(--fg)', 'stroke-width': 3 }, svg);
+  el('circle', { cx: C[0].cx, cy: C[0].cy, r: C[0].r, class: 'out', stroke: 'var(--ca)' }, svg);
+  el('circle', { cx: C[1].cx, cy: C[1].cy, r: C[1].r, class: 'out', stroke: 'var(--cb)' }, svg);
+  const labA = el('text', { x: 28, y: 52, class: 'slab', fill: 'var(--ca)' }, svg);
+  const labB = el('text', { x: 612, y: 52, class: 'slab', fill: 'var(--cb)', 'text-anchor': 'end' }, svg);
+  const P = { 1: [162, 215], 3: [320, 215], 2: [478, 215] };
+  const cnt = {}, mul = {};
+  for (const k in P) {
+    cnt[k] = el('text', { x: P[k][0], y: P[k][1] - 16, class: 'cnt fade' }, svg);
+    mul[k] = el('text', { x: P[k][0], y: P[k][1] + 22, class: 'mul fade' }, svg);
+  }
+  const St = { a: 24, b: 30, m: 12 };
+  const host = $('#parS2');
+  const sA = slider(host, '|A|', 1, 40, St.a, v => { St.a = v; fix(); });
+  const sB = slider(host, '|B|', 1, 40, St.b, v => { St.b = v; fix(); });
+  const sM = slider(host, '|A ∩ B|', 0, 40, St.m, v => { St.m = v; fix(); });
+  function fix() {
+    St.m = Math.min(St.m, St.a, St.b);
+    sA.set(St.a); sB.set(St.b); sM.max(Math.min(St.a, St.b)); sM.set(St.m);
+    S.refresh();
+  }
+  $$('#preS2 button').forEach(bt => bt.addEventListener('click', () => {
+    [St.a, St.b, St.m] = bt.dataset.p.split(',').map(Number);
+    sM.max(40); fix();
+  }));
+  function setMul(k, n, on) {
+    mul[k].textContent = n + '×';
+    mul[k].style.fill = n === 1 ? 'var(--ok)' : 'var(--bad)';
+    mul[k].style.opacity = on ? 1 : 0;
+  }
+  function render(step) {
+    const { a, b, m } = St, u = a + b - m;
+    labA.textContent = '|A| = ' + a;
+    labB.textContent = '|B| = ' + b;
+    paint(reg[0], 'var(--bg)', 0);
+    paint(reg[1], 'var(--ca)', step >= 1 ? .3 : 0);
+    paint(reg[2], 'var(--cb)', step >= 2 ? .3 : 0);
+    paint(reg[3], step === 2 ? 'var(--bad)' : (step >= 3 ? 'var(--mix)' : 'var(--ca)'), step === 2 ? .6 : (step >= 1 ? .3 : 0));
+    cnt[1].textContent = a - m; cnt[3].textContent = m; cnt[2].textContent = b - m;
+    cnt[1].style.opacity = step === 6 ? 1 : 0;
+    cnt[2].style.opacity = step === 6 ? 1 : 0;
+    cnt[3].style.opacity = 1;
+    setMul(1, 1, step >= 1 && step < 6);
+    setMul(2, 1, step >= 2 && step < 6);
+    setMul(3, step === 2 ? 2 : 1, step >= 1 && step < 6);
+    const lines = [
+      '|A| = ' + a + ', |B| = ' + b + ', |A ∩ B| = ' + m + '. Kérdés: |A ∪ B| = ?',
+      '|A|',
+      '|A| + |B|',
+      '|A| + |B| − |A ∩ B|',
+      'A szitaformula: <b>|A ∪ B| = |A| + |B| − |A ∩ B|</b>',
+      'Behelyettesítve: |A ∪ B| = ' + a + ' + ' + b + ' − ' + m + ' = <b>' + u + '</b>',
+      'Ellenőrzés a három résszel: ' + (a - m) + ' + ' + m + ' + ' + (b - m) + ' = <b>' + u + '</b> ✓'
+    ];
+    stepList($('#algS2'), lines, step);
+    const dis = m === 0;
+    const caps = [
+      'Két halmaz elemszámát és a közös elemek számát ismerjük. Hány elem van a két halmazban együtt, ha mindegyiket csak egyszer számoljuk?',
+      'Először megszámoljuk A elemeit: ' + a + ' elem. Ebben a közös rész is benne van.',
+      'Hozzáadjuk B elemeit: ' + a + ' + ' + b + ' = ' + (a + b) + '.' + (dis ? ' A két halmaz diszjunkt, nincs közös elem, így semmit sem számoltunk kétszer.' : ' Ez túl sok: a közös ' + m + ' elemet kétszer számoltuk, egyszer A-nál, egyszer B-nél.'),
+      dis ? 'Mivel a metszet üres, nincs mit kivonni: diszjunkt halmazoknál elég az összeadás.' : 'A kétszer számolt közös részt egyszer kivonjuk: így már minden elem pontosan egyszer szerepel.',
+      'Ugyanez betűkkel, bármely két véges halmazra: a két elemszám összegéből kivonjuk a metszet elemszámát.',
+      'A képletbe beírjuk az adatokat.',
+      'Másik út: a három tartomány elemszámát külön kiszámoljuk (csak A: ' + a + ' − ' + m + ', közös: ' + m + ', csak B: ' + b + ' − ' + m + '), és összeadjuk. Ugyanazt kapjuk.'
+    ];
+    $('#capS2').textContent = caps[step];
+  }
+  const S = stepper('szita-ket-halmazra', 6, render);
+  S.refresh();
+})();
+
+/* 5–6. fejezet: három halmaz, közös adatokkal */
+(function () {
+  const C = [{ cx: 250, cy: 190, r: 130 }, { cx: 390, cy: 190, r: 130 }, { cx: 320, cy: 310, r: 130 }];
+  const COL = ['var(--ca)', 'var(--cb)', 'var(--cc)'];
+  const box = { x: 10, y: 10, width: 620, height: 460, rx: 18 };
+  const POS = { 1: [192, 150], 2: [448, 150], 4: [320, 376], 3: [320, 124], 5: [250, 268], 6: [390, 268], 7: [320, 214], 0: [66, 436] };
+  const PRE = [
+    { name: 'Filmek (tankönyv, 28. o.)', L: ['S', 'M', 'D'], v: [9, 7, 7, 5, 4, 2, 2, 15], who: 'S: Star Wars, M: Marvel-filmek, D: Disney-rajzfilmek' },
+    { name: 'Nyelvtanulók', L: ['A', 'B', 'C'], v: [12, 8, 6, 4, 3, 2, 1, 20], who: 'A: angol, B: német, C: francia' },
+    { name: 'Páronként diszjunkt', L: ['A', 'B', 'C'], v: [5, 4, 3, 0, 0, 0, 0, 12], who: 'egyik elem sincs benne két halmazban' }
+  ];
+  /* v: |A|, |B|, |C|, |A∩B|, |A∩C|, |B∩C|, |A∩B∩C|, az alaphalmaz elemszáma */
+  const St = { L: PRE[0].L.slice(), v: PRE[0].v.slice(), who: PRE[0].who };
+  const names = () => {
+    const [a, b, c] = St.L;
+    return ['|' + a + '|', '|' + b + '|', '|' + c + '|', '|' + a + ' ∩ ' + b + '|', '|' + a + ' ∩ ' + c + '|', '|' + b + ' ∩ ' + c + '|', '|' + a + ' ∩ ' + b + ' ∩ ' + c + '|', '|H|'];
+  };
+  function cells() {
+    const [a, b, c, ab, ac, bc, abc, tot] = St.v, r = {};
+    r[7] = abc; r[3] = ab - abc; r[5] = ac - abc; r[6] = bc - abc;
+    r[1] = a - r[3] - r[5] - abc; r[2] = b - r[3] - r[6] - abc; r[4] = c - r[5] - r[6] - abc;
+    r.u = r[1] + r[2] + r[3] + r[4] + r[5] + r[6] + r[7];
+    r[0] = tot - r.u;
+    r.ok = [0, 1, 2, 3, 4, 5, 6, 7].every(k => r[k] >= 0);
+    return r;
+  }
+  function makeVenn(svg) {
+    el('rect', { ...box, fill: 'var(--bg)' }, svg);
+    const reg = vennRegions(svg, C, box);
+    el('rect', { ...box, fill: 'none', stroke: 'var(--fg)', 'stroke-width': 3 }, svg);
+    C.forEach((c, i) => el('circle', { cx: c.cx, cy: c.cy, r: c.r, class: 'out', stroke: COL[i] }, svg));
+    const lab = [
+      el('text', { x: 118, y: 72, class: 'slab', fill: COL[0], 'text-anchor': 'middle' }, svg),
+      el('text', { x: 522, y: 72, class: 'slab', fill: COL[1], 'text-anchor': 'middle' }, svg),
+      el('text', { x: 462, y: 430, class: 'slab', fill: COL[2], 'text-anchor': 'middle' }, svg)
+    ];
+    const cnt = {}, mul = {};
+    for (const k in POS) {
+      cnt[k] = el('text', { x: POS[k][0], y: POS[k][1], class: 'cnt fade' }, svg);
+      mul[k] = el('text', { x: POS[k][0], y: POS[k][1], class: 'mul fade' }, svg);
+    }
+    return { reg, lab, cnt, mul };
+  }
+  const tabs = [];
+  /* a két fejezet paraméterpanelje ugyanazt az állapotot mutatja */
+  const panels = $$('.par3').map(host => {
+    const sl = names().map((nm, i) => slider(host, nm, i === 7 ? 1 : 0, i === 7 ? 40 : 20, St.v[i], v => { St.v[i] = v; sync(); }));
+    const sec = host.closest('section');
+    PRE.forEach(p => {
+      const bt = document.createElement('button');
+      bt.textContent = p.name;
+      bt.addEventListener('click', () => { St.L = p.L.slice(); St.v = p.v.slice(); St.who = p.who; sync(); });
+      $('.pre3', sec).appendChild(bt);
+    });
+    return { sl, warn: $('.warn3', sec) };
+  });
+  function sync() {
+    const nm = names(), r = cells();
+    panels.forEach(p => {
+      p.sl.forEach((s, i) => { s.set(St.v[i]); s.label(nm[i]); });
+      p.warn.innerHTML = r.ok ? '<span class="note">' + St.who + '</span>'
+        : '<span class="badge bad">Ilyen halmazok nincsenek</span> <span class="note">Valamelyik tartományba negatív elemszám jutna: egy metszet nem lehet nagyobb a halmazánál, és az alaphalmaz sem lehet kisebb az uniónál.</span>';
+    });
+    tabs.forEach(t => t.refresh());
+  }
+  function common(V) {
+    St.L.forEach((t, i) => { V.lab[i].textContent = t; });
+  }
+  const cellTxt = (r, k) => r[k] < 0 ? num(r[k]) : String(r[k]);
+
+  /* 5. fejezet: az ábra kitöltése belülről kifelé */
+  (function () {
+    const V = makeVenn($('#vV3'));
+    function render(step) {
+      common(V);
+      const r = cells(), nm = names(), [a, b, c, ab, ac, bc, abc, tot] = St.v, [A, B, Cc] = St.L;
+      const shown = { 7: step >= 1, 3: step >= 2, 5: step >= 2, 6: step >= 2, 1: step >= 3, 2: step >= 3, 4: step >= 3, 0: step >= 5 };
+      const hot = { 1: [7], 2: [3, 5, 6], 3: [1, 2, 4], 4: [1, 2, 3, 4, 5, 6, 7], 5: [0] }[step] || [];
+      for (let k = 0; k < 8; k++) {
+        paint(V.reg[k], 'var(--hl)', hot.includes(k) ? .55 : 0);
+        V.cnt[k].textContent = cellTxt(r, k);
+        V.cnt[k].style.fill = r[k] < 0 ? 'var(--bad)' : 'var(--fg)';
+        V.cnt[k].style.opacity = shown[k] ? 1 : 0;
+        V.mul[k].style.opacity = 0;
+      }
+      const lines = [
+        nm.slice(0, 3).map((n, i) => n + ' = ' + St.v[i]).join(', ') + '; ' + nm.slice(3, 6).map((n, i) => n + ' = ' + St.v[i + 3]).join(', ') + '; ' + nm[6] + ' = ' + abc + '; ' + nm[7] + ' = ' + tot,
+        'Mindhárom halmazban: ' + nm[6] + ' = <b>' + abc + '</b>',
+        'Pontosan két halmazban: ' + ab + ' − ' + abc + ' = <b>' + num(r[3]) + '</b>, ' + ac + ' − ' + abc + ' = <b>' + num(r[5]) + '</b>, ' + bc + ' − ' + abc + ' = <b>' + num(r[6]) + '</b>',
+        'Csak ' + A + ': ' + a + ' − ' + (a - r[1]) + ' = <b>' + num(r[1]) + '</b>, csak ' + B + ': ' + b + ' − ' + (b - r[2]) + ' = <b>' + num(r[2]) + '</b>, csak ' + Cc + ': ' + c + ' − ' + (c - r[4]) + ' = <b>' + num(r[4]) + '</b>',
+        'A hét tartomány együtt: ' + [1, 2, 4, 3, 5, 6, 7].map(k => num(r[k])).join(' + ') + ' = <b>' + r.u + '</b> = |' + A + ' ∪ ' + B + ' ∪ ' + Cc + '|',
+        'Egyik halmazban sincs: ' + tot + ' − ' + r.u + ' = <b>' + num(r[0]) + '</b>'
+      ];
+      stepList($('#algV3'), lines, step);
+      const caps = [
+        'A három kör az alaphalmazt nyolc tartományra osztja. Nem az elemeket, hanem az elemek számát írjuk a tartományokba. Belülről kifelé haladunk.',
+        'A közepével kezdünk: ez a három halmaz közös része, az elemszámát a feladat megadja.',
+        'A két halmaz metszetében a hármas metszet elemei is benne vannak. Ezért a kettős metszet elemszámából kivonjuk a már beírt középső számot: a maradék kerül a metszet másik részébe.',
+        'Egy halmaz elemszámából kivonjuk azt, amit a halmaz három másik tartományába már beírtunk: ami marad, az csak ehhez az egy halmazhoz tartozik.',
+        'A hét tartomány diszjunkt, ezért az elemszámukat egyszerűen összeadhatjuk: ez a három halmaz uniójának elemszáma.',
+        'Az alaphalmaz elemszámából kivonjuk az unió elemszámát: ennyi elem nincs benne egyik halmazban sem (az unió kiegészítő halmaza).'
+      ];
+      $('#capV3').textContent = caps[step];
+    }
+    const S = stepper('harom-halmaz-abraja', 5, render);
+    tabs.push(S);
+  })();
+
+  /* 6. fejezet: szitaformula három halmazra, a tartományokban az, hogy hányszor számoltuk őket */
+  (function () {
+    const V = makeVenn($('#vS3'));
+    const bits = k => (k & 1) + (k >> 1 & 1) + (k >> 2 & 1);
+    function render(step) {
+      common(V);
+      const r = cells(), nm = names(), v = St.v, [A, B, Cc] = St.L;
+      const U = '|' + A + ' ∪ ' + B + ' ∪ ' + Cc + '|';
+      for (let k = 1; k < 8; k++) {
+        const nb = bits(k);
+        let m = 0;
+        if (step >= 1) m = nb;
+        if (step >= 2) m = nb === 3 ? 0 : 1;
+        if (step >= 3) m = 1;
+        const showMul = step >= 1 && step <= 4;
+        V.mul[k].textContent = m + '×';
+        V.mul[k].style.fill = m === 1 ? 'var(--ok)' : 'var(--bad)';
+        V.mul[k].style.opacity = showMul ? 1 : 0;
+        V.cnt[k].textContent = cellTxt(r, k);
+        V.cnt[k].style.fill = r[k] < 0 ? 'var(--bad)' : 'var(--fg)';
+        V.cnt[k].style.opacity = step === 5 ? 1 : 0;
+        if (step === 0) paint(V.reg[k], 'var(--accent)', 0);
+        else if (m === 0) paint(V.reg[k], 'var(--bad)', .3);
+        else paint(V.reg[k], 'var(--accent)', Math.min(.2 * m, .6));
+      }
+      paint(V.reg[0], 'var(--bg)', 0);
+      V.cnt[0].style.opacity = 0; V.mul[0].style.opacity = 0;
+      const sum1 = v[0] + v[1] + v[2], sum2 = v[3] + v[4] + v[5], u = sum1 - sum2 + v[6];
+      const lines = [
+        nm.slice(0, 3).map((n, i) => n + ' = ' + v[i]).join(', ') + '; ' + nm.slice(3, 6).map((n, i) => n + ' = ' + v[i + 3]).join(', ') + '; ' + nm[6] + ' = ' + v[6] + '. Kérdés: ' + U + ' = ?',
+        nm[0] + ' + ' + nm[1] + ' + ' + nm[2],
+        '… − ' + nm[3] + ' − ' + nm[4] + ' − ' + nm[5],
+        '… + ' + nm[6],
+        'A szitaformula: <b>' + U + ' = ' + nm[0] + ' + ' + nm[1] + ' + ' + nm[2] + ' − ' + nm[3] + ' − ' + nm[4] + ' − ' + nm[5] + ' + ' + nm[6] + '</b>',
+        'Behelyettesítve: ' + v[0] + ' + ' + v[1] + ' + ' + v[2] + ' − ' + v[3] + ' − ' + v[4] + ' − ' + v[5] + ' + ' + v[6] + ' = <b>' + u + '</b>; ellenőrzés a tartományokkal: ' + [1, 2, 4, 3, 5, 6, 7].map(k => num(r[k])).join(' + ') + ' = <b>' + r.u + '</b> ✓'
+      ];
+      stepList($('#algS3'), lines, step);
+      const caps = [
+        'Az ábra kitöltése nélkül is megkaphatjuk az unió elemszámát. A tartományokba most azt írjuk, hogy eddig hányszor számoltuk az ott lévő elemeket: a cél, hogy mindenhol 1× álljon.',
+        'Összeadjuk a három halmaz elemszámát: ' + v[0] + ' + ' + v[1] + ' + ' + v[2] + ' = ' + sum1 + '. Ami két halmazban is benne van, azt kétszer, ami mindháromban, azt háromszor számoltuk.',
+        'Kivonjuk a három kettős metszet elemszámát: ' + sum1 + ' − ' + sum2 + ' = ' + (sum1 - sum2) + '. A kétszer számolt részek rendben vannak, de a közepét háromszor adtuk hozzá és háromszor vontuk ki: most egyszer sincs megszámolva.',
+        'Ezért a hármas metszet elemszámát visszaadjuk: ' + (sum1 - sum2) + ' + ' + v[6] + ' = ' + u + '. Most már minden tartomány pontosan egyszer szerepel.',
+        'Ugyanez betűkkel, bármely három véges halmazra: összeadjuk a halmazok elemszámát, kivonjuk a kettős metszetekét, és hozzáadjuk a hármas metszetét.',
+        'A képletbe beírjuk az adatokat. Az eredmény megegyezik azzal, amit az ábra hét tartományának összeadásával kapunk.'
+      ];
+      $('#capS3').textContent = caps[step];
+    }
+    const S = stepper('szita-harom-halmazra', 5, render);
+    tabs.push(S);
+  })();
+  sync();
+})();
+
+/* billentyűk: mindig az a fejezet lép, amelyik éppen a képernyő felső részén látszik */
+(function () {
+  function current() {
+    const y = Math.min(window.innerHeight * 0.4, 320);
+    let best = null, bestD = Infinity;
+    $$('main > section').forEach(sec => {
+      const r = sec.getBoundingClientRect();
+      const d = r.top <= y && r.bottom >= y ? 0 : Math.min(Math.abs(r.top - y), Math.abs(r.bottom - y));
+      if (d < bestD) { bestD = d; best = sec; }
+    });
+    return best.id;
+  }
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.ctrlKey || e.altKey || e.metaKey) return;
+    const next = ['ArrowRight', 'PageDown', ' '].includes(e.key), prev = ['ArrowLeft', 'PageUp'].includes(e.key);
+    if (!next && !prev) return;
+    e.preventDefault();
+    if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
+    $('#' + current() + ' .pager [data-r="' + (next ? 'next' : 'prev') + '"]').click();
+  });
+})();
+</script>
+</body>
+</html>

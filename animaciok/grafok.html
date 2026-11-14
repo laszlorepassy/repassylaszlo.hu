@@ -1,0 +1,1514 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Gráfok – animációk</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --panel: #f5f7fa;
+  --fg: #1b1f24;
+  --muted: #59636e;
+  --line: #d5dae0;
+  --accent: #2563eb;
+  --soft: #e8f0fe;
+  --ca: #2563eb;
+  --cb: #ea580c;
+  --cc: #15803d;
+  --cd: #7c3aed;
+  --hl: #fde047;
+  --ok: #2b8a3e;
+  --warn: #b45309;
+  --bad: #c92a2a;
+  --n1: #bfdbfe;
+  --n2: #fed7aa;
+  --n3: #bbf7d0;
+  --n4: #ddd6fe;
+  --n5: #fecdd3;
+  --red: #dc2626;
+  --blue: #2563eb;
+  --river: #93c5fd;
+  --land: #f3ead7;
+  --bridge: #8b5e34;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171b;
+    --panel: #1d2228;
+    --fg: #e8ebef;
+    --muted: #9aa4af;
+    --line: #333b44;
+    --accent: #6ea0ff;
+    --soft: #1c2a47;
+    --ca: #6ea0ff;
+    --cb: #ff9a57;
+    --cc: #5fce83;
+    --cd: #b794f6;
+    --hl: #b7791f;
+    --ok: #63c47a;
+    --warn: #f0b04a;
+    --bad: #ff7b7b;
+    --n1: #1e4b8f;
+    --n2: #8a4a14;
+    --n3: #1f6b3a;
+    --n4: #5b3a8c;
+    --n5: #8a2c3c;
+    --red: #ff6b6b;
+    --blue: #6ea0ff;
+    --river: #1e4b8f;
+    --land: #2a2620;
+    --bridge: #c08a55;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14171b; --panel: #1d2228; --fg: #e8ebef; --muted: #9aa4af; --line: #333b44;
+  --accent: #6ea0ff; --soft: #1c2a47; --ca: #6ea0ff; --cb: #ff9a57; --cc: #5fce83; --cd: #b794f6;
+  --hl: #b7791f; --ok: #63c47a; --warn: #f0b04a; --bad: #ff7b7b;
+  --n1: #1e4b8f; --n2: #8a4a14; --n3: #1f6b3a; --n4: #5b3a8c; --n5: #8a2c3c;
+  --red: #ff6b6b; --blue: #6ea0ff; --river: #1e4b8f; --land: #2a2620; --bridge: #c08a55;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 18px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
+}
+.top-nav { padding: 10px 20px; background: var(--panel); border-bottom: 1px solid var(--line); font-size: 0.95rem; }
+.top-nav a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.top-nav a:hover { text-decoration: underline; }
+header { padding: 14px 16px 0; max-width: 1180px; margin: 0 auto; }
+h1 { font-size: 1.5rem; margin: 0 0 10px; }
+.lead { color: var(--muted); margin: 0 0 12px; max-width: 60em; }
+.toc { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 14px; border-bottom: 2px solid var(--line); }
+.toc a {
+  font-weight: 600; text-decoration: none; padding: 6px 14px; border-radius: 999px;
+  border: 2px solid var(--line); background: var(--panel); color: var(--accent);
+}
+.toc a:hover { border-color: var(--accent); }
+main { max-width: 1180px; margin: 0 auto; padding: 14px 16px 40px; }
+main > section { margin: 0 0 56px; scroll-margin-top: 10px; }
+main > section > h2 { font-size: 1.35rem; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--line); }
+.figcap { margin-top: 8px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 1.2rem; min-height: 3.2em; }
+.layout { display: grid; grid-template-columns: minmax(300px, 640px) 1fr; gap: 20px; align-items: start; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+svg.gr { width: 100%; height: auto; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; touch-action: none; user-select: none; -webkit-user-select: none; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+.panel h3 { font-size: 1rem; margin: 0 0 6px; color: var(--muted); font-weight: 600; }
+.def { margin: 0 0 8px; }
+.def:last-child { margin-bottom: 0; }
+.def b.t { color: var(--accent); }
+.sl { display: grid; grid-template-columns: 7.2em 1fr 2.4em; gap: 8px; align-items: center; margin: 4px 0; }
+.sl label { font-weight: 700; }
+.sl output { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; }
+.btns button {
+  font: inherit; cursor: pointer; padding: 6px 12px; border-radius: 8px;
+  border: 2px solid var(--accent); background: transparent; color: var(--accent); font-weight: 600;
+}
+.btns button:hover, .btns button.act { background: var(--accent); color: var(--bg); }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: 700; color: #fff; background: var(--ok); }
+.badge.bad { background: var(--bad); }
+.badge.warn { background: var(--warn); }
+.note { color: var(--muted); }
+.steps { list-style: none; margin: 0; padding: 0; }
+.steps li { padding: 6px 10px; border-left: 4px solid transparent; opacity: .45; transition: opacity 2s, border-color 2s; }
+.steps li.cur { opacity: 1; border-color: var(--accent); background: var(--bg); font-weight: 600; }
+.steps li.done { opacity: .8; }
+.steps li.later { display: none; }
+.dots { display: flex; gap: 6px; flex-wrap: wrap; max-width: 260px; }
+.dots i { width: 12px; height: 12px; border-radius: 50%; background: var(--line); }
+.dots i.on { background: var(--accent); }
+.pager {
+  position: sticky; top: 8px; z-index: 5;
+  display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+  width: fit-content; max-width: 100%; margin: 0 0 12px auto; padding: 6px 10px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.14);
+}
+.pager button {
+  font: inherit; font-weight: 700; cursor: pointer; min-width: 44px; height: 44px; padding: 0 12px;
+  border-radius: 999px; border: 2px solid var(--accent); background: transparent; color: var(--accent);
+}
+.pager button.wide { min-width: 0; padding: 0 16px; }
+.pager button:hover:not(:disabled) { background: var(--accent); color: var(--bg); }
+.pager button:disabled { opacity: .35; cursor: default; }
+.pager .dots { margin: 0 6px 0 4px; }
+.formula {
+  font-size: 1.25rem; font-weight: 700; padding: 8px 12px; margin: 8px 0 0;
+  border-left: 4px solid var(--accent); background: var(--bg); border-radius: 6px;
+}
+.bin { display: inline-flex; flex-direction: column; vertical-align: middle; line-height: 1; text-align: center; font-size: .8em; padding: 1px .35em; margin: 0 .1em; border-left: 2px solid currentColor; border-right: 2px solid currentColor; border-radius: .7em; }
+.res { font-size: 1.2rem; font-weight: 700; margin: 6px 0; }
+.try { margin-top: 18px; }
+.try > h3 { font-size: 1.1rem; margin: 0 0 8px; }
+.trylay { display: grid; grid-template-columns: minmax(280px, 520px) 1fr; gap: 20px; align-items: start; }
+@media (max-width: 900px) { .trylay { grid-template-columns: 1fr; } }
+table.adj { border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+table.adj th, table.adj td { border: 1px solid var(--line); width: 1.7em; height: 1.7em; text-align: center; padding: 0; }
+table.adj th { background: var(--bg); color: var(--muted); }
+table.adj td.one { font-weight: 700; color: var(--accent); }
+table.adj td.on { background: var(--hl); }
+.minis { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; margin-top: 10px; }
+.minis figure { margin: 0; text-align: center; font-size: 14px; color: var(--muted); }
+.minis svg { width: 100%; height: auto; border: 2px solid var(--line); border-radius: 8px; background: var(--bg); cursor: pointer; }
+.minis figure.on svg { border-color: var(--accent); }
+.minis h4 { grid-column: 1 / -1; margin: 6px 0 0; font-size: 1rem; color: var(--muted); }
+.minis .new { animation: fadein 1.5s ease both; }
+@keyframes fadein { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+/* gráfrajz */
+.v { cursor: grab; transition: opacity 1.2s ease; }
+.v rect { fill: var(--bg); stroke: var(--fg); stroke-width: 3; transition: fill 1.5s ease, stroke 1.5s ease, stroke-width 1.5s ease; }
+.v text { font-weight: 700; fill: var(--fg); text-anchor: middle; dominant-baseline: central; pointer-events: none; stroke: var(--bg); stroke-width: 4px; paint-order: stroke; }
+.v.hl rect { fill: var(--hl); stroke-width: 4; }
+.v.c1 rect { fill: var(--n1); } .v.c2 rect { fill: var(--n2); } .v.c3 rect { fill: var(--n3); }
+.v.c4 rect { fill: var(--n4); } .v.c5 rect { fill: var(--n5); }
+.v.bad rect { stroke: var(--bad); stroke-width: 5; }
+.v.ok rect { stroke: var(--ok); stroke-width: 5; }
+.v.sel rect { stroke: var(--accent); stroke-width: 6; }
+.v.dim { opacity: .3; }
+.v .bdg { transition: opacity 1.2s ease; }
+.v .bdg circle { fill: var(--panel); stroke: var(--accent); stroke-width: 2.5; }
+.v .bdg text { font-size: 16px; fill: var(--accent); stroke: none; }
+.v.bad .bdg circle { stroke: var(--bad); } .v.bad .bdg text { fill: var(--bad); }
+.e { fill: none; stroke: var(--fg); stroke-width: 3.5; stroke-linecap: round; transition: stroke 1.5s ease, stroke-width 1.5s ease, opacity 1.2s ease; }
+.e.hl { stroke: var(--accent); stroke-width: 7; }
+.e.c1 { stroke: var(--ca); stroke-width: 5; } .e.c2 { stroke: var(--cb); stroke-width: 5; }
+.e.c3 { stroke: var(--cc); stroke-width: 5; } .e.c4 { stroke: var(--cd); stroke-width: 5; }
+.e.bad { stroke: var(--bad); stroke-width: 6; stroke-dasharray: 10 8; }
+.e.ghost { stroke: var(--muted); stroke-width: 2; stroke-dasharray: 5 7; opacity: .55; }
+.e.dim { opacity: .15; }
+.e.red { stroke: var(--red); stroke-width: 5; }
+.e.blue { stroke: var(--blue); stroke-width: 4; stroke-dasharray: 9 7; }
+.e.thick { stroke-width: 9; }
+.hit { fill: none; stroke: transparent; stroke-width: 22; cursor: pointer; }
+.elab { font-size: 17px; font-weight: 700; fill: var(--fg); text-anchor: middle; dominant-baseline: central; stroke: var(--bg); stroke-width: 6px; paint-order: stroke; pointer-events: none; transition: opacity 1.2s ease; }
+.elab.hl { fill: var(--accent); }
+.elab.bad { fill: var(--bad); }
+.end { transition: transform 1.8s ease, opacity 1.2s ease; }
+.maptxt { font-size: 15px; font-weight: 600; fill: var(--muted); text-anchor: middle; }
+.bigtxt { font-size: 22px; font-weight: 700; fill: var(--fg); text-anchor: middle; dominant-baseline: central; stroke: var(--bg); stroke-width: 6px; paint-order: stroke; }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Gráfok</h1>
+  <p class="lead">Tizenhárom fejezet a gráf fogalmától a königsbergi hidakig, a tankönyvek szövegével (Matematika 9., 2. lecke; Gyűjtemény a matematika emelt szintű oktatásához 9–12., 31–33. lecke; 11–12., 50. lecke). Minden fejezet lépésenként halad: a jobb felső lapozóval vagy a billentyűkkel (nyilak, szóköz, PageUp, PageDown) lehet előre- és visszalépni, a Lejátszás gomb magától végigmegy a lépéseken. A gráfok pontjai egérrel húzhatók.</p>
+  <nav class="toc" aria-label="Tartalomjegyzék">
+    <a href="#mi-a-graf">1. Mi a gráf?</a>
+    <a href="#hurokel">2. Hurokél, többszörös él</a>
+    <a href="#fokszamtetel">3. Fokszámtétel</a>
+    <a href="#teljes-graf">4. Teljes gráf</a>
+    <a href="#komplementer">5. Komplementer gráf</a>
+    <a href="#izomorf">6. Izomorf gráfok</a>
+    <a href="#fokszamsorozat">7. Van-e ilyen gráf?</a>
+    <a href="#ut-kor">8. Út, kör, összefüggő gráf</a>
+    <a href="#fak">9. Fák</a>
+    <a href="#korok">10. Körök a teljes gráfban</a>
+    <a href="#konigsberg">11. A königsbergi hidak</a>
+    <a href="#halozat">12. A legkisebb költségű hálózat</a>
+    <a href="#hat-ember">13. Hat ember</a>
+  </nav>
+</header>
+<main>
+
+<section id="mi-a-graf">
+  <h2>1. Mi a gráf? Pontok, élek, fokszám</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="A ház helyiségeinek vázlata, majd gráfja"></svg>
+      <div class="figcap" aria-live="polite"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Kidolgozott feladat (Kompetenciamérés feladata nyomán, 2017)</h3>
+        <p class="def">Egy házaspár új házat tervez. „Úgy szeretném – mondja a feleség –, hogy az előszobából az étkezőbe lehessen belépni, onnan nyíljon egyik irányba a konyha, másik irányba a nappali.” Végül a beszélgetésük nyomán a férj egy vázlatot készített arról, hogyan nyíljanak egymásból a helyiségek.</p>
+        <p class="def">a) Hány helyiséget szeretnének a két terasszal együtt? b) A bejárati ajtón kívül hány ajtó lesz a házban? c) Melyik helyiségből nyílik a legtöbb ajtó?</p>
+      </div>
+      <div class="panel"><ul class="steps"></ul></div>
+      <div class="panel">
+        <h3>Elmélet</h3>
+        <p class="def"><b class="t">Gráfokkal</b> szoktunk ábrázolni elemeket, ha azt is szeretnénk az ábrában megjeleníteni, hogy mely elemek között van kapcsolat. A gráf <b>pontjai</b> (vagy más szóval <b>csúcsai</b>) jelölik a különböző elemeket, és a pontokat összekötő vonalak (vagy más szóval <b>élek</b>) jelölik a kapcsolatot. Az ábrában nem számít az összekötő vonalak hossza, és nem számít, hogy egyenes vonalakat rajzolunk vagy görbéket.</p>
+        <p class="def">A gráf pontjainak fontos jellemzője a pont <b class="t">foka</b> vagy <b class="t">fokszáma</b>, ez a pontból kiinduló élek száma.</p>
+        <p class="def">Vannak olyan gráfok, amelyekben az elemek közötti kapcsolatok iránya is fontos, ilyenkor az összekötő vonalakat nyilakkal egészítjük ki (<b>irányított gráf</b>).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="hurokel">
+  <h2>2. Hurokél, többszörös él, egyszerű gráf</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="Betonúthálózat és az osztók gráfja"></svg>
+      <div class="figcap" aria-live="polite"></div>
+    </div>
+    <div>
+      <div class="panel"><ul class="steps"></ul></div>
+      <div class="panel">
+        <h3>Definíció</h3>
+        <p class="def">A <b class="t">hurokél</b> kezdő és végpontja megegyezik; <b class="t">többszörös él</b> esetén pedig a gráf két pontját egynél több él köti össze.</p>
+        <p class="def">Az olyan gráfot, amelyben sem hurokél, sem többszörös él nincs, <b class="t">egyszerű gráf</b>nak nevezzük.</p>
+        <p class="def note">A hurokél is lehet többszörös él. (A hurokélnek két „vége” van, ezért 2-vel növeli a fokszámot.)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="fokszamtetel">
+  <h2>3. Fokszámtétel: a fokszámok összege az élek számának kétszerese</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="Az élvégek a csúcsokba csúsznak"></svg>
+      <div class="figcap" aria-live="polite"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>3. példa</h3>
+        <p class="def">Bizonyítsuk be a <b class="t">fokszámtételt</b>, mely szerint bármely gráfban a fokszámok összege megegyezik az élek számának a kétszeresével.</p>
+        <div class="formula">fokszámok összege = 2 · élek száma</div>
+      </div>
+      <div class="panel"><ul class="steps"></ul></div>
+    </div>
+  </div>
+  <div class="try">
+    <h3>Próbáld ki: kattints két pontra, és él kerül közéjük (vagy eltűnik)</h3>
+    <div class="trylay">
+      <svg class="gr" id="degEd" viewBox="0 0 520 400" role="img" aria-label="Gráfszerkesztő"></svg>
+      <div>
+        <div class="panel" id="degInfo"></div>
+        <div class="btns"><button id="degRnd">Véletlen gráf</button><button id="degClr">Minden él törlése</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="teljes-graf">
+  <h2>4. Teljes gráf: hány éle van?</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="n pontú teljes gráf"></svg>
+      <div class="figcap" aria-live="polite"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>2. példa a)</h3>
+        <p class="def">Megrajzoltuk egy szabályos n-szög oldalait és átlóit. Hány szakaszt húztunk be?</p>
+        <div class="sl"><label>n</label><input type="range" id="nK" min="3" max="10" step="1" value="6"><output id="nKo">6</output></div>
+      </div>
+      <div class="panel"><ul class="steps"></ul></div>
+      <div class="panel">
+        <h3>Definíció</h3>
+        <p class="def">Ha egy gráf bármely pontjából bármely pontjába pontosan egy él vezet, akkor <b class="t">teljes gráf</b>nak nevezzük. Másképpen: a teljes gráf olyan egyszerű gráf, amelynek bármely két pontja között van él.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="komplementer">
+  <h2>5. Komplementer gráf</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="Egy gráf és a komplementere"></svg>
+      <div class="figcap" aria-live="polite"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>2. példa b), c)</h3>
+        <p class="def">b) Hány 5 pontú, 3 élű egyszerű gráf van, ha a gráf pontjait megkülönböztetjük?<br>c) Az 5 pontú, megkülönböztetett csúcsú gráfok közül melyikből van több: amelyiknek 3 éle van, vagy amelyiknek 7?</p>
+        <div class="res" id="cmpInfo"></div>
+        <p class="note">Kattints az élekre (a szaggatottakra is): így G élei változnak, a komplementer magától követi.</p>
+        <div class="btns"><button id="cmpRnd">Véletlen 3 élű G</button></div>
+      </div>
+      <div class="panel"><ul class="steps"></ul></div>
+      <div class="panel">
+        <h3>Definíció</h3>
+        <p class="def">Egy G egyszerű gráf <span style="text-decoration: overline">G</span> <b class="t">komplementer gráf</b>ját kapjuk, ha<br>– a két gráf pontjai ugyanazok;<br>– és G bármely két pontja között pontosan akkor van él, ha <span style="text-decoration: overline">G</span>-ben nincs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="izomorf">
+  <h2>6. Izomorf gráfok: mikor tekintünk azonosnak két gráfot?</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="Ugyanaz a gráf többféle rajzon"></svg>
+      <div class="figcap" aria-live="polite"></div>
+    </div>
+    <div>
+      <div class="panel" id="izoFeladat">
+        <h3>Bevezető (emelt szintű érettségi, 2020)</h3>
+        <p class="def">Adott négy, a valós számok halmazán értelmezett függvény: f(x) = (x + 4)(2 − x); g(x) = x + 4; h(x) = x² − 4; i(x) = |x| − 4. Egy négypontú gráf csúcsait megfeleltetjük e négy függvénynek. Két csúcsot pontosan akkor kötünk össze éllel, ha a két megfelelő függvénynek van közös zérushelye.</p>
+      </div>
+      <div class="panel"><ul class="steps"></ul></div>
+      <div class="panel">
+        <h3>Definíció</h3>
+        <p class="def">Két gráfot <b class="t">izomorf</b>nak nevezünk, ha pontjaik és éleik kölcsönösen egyértelműen megfeleltethetők egymásnak úgy, hogy az egyik gráf bármely két kiválasztott pontja között akkor és csak akkor van él, ha a másik gráf két megfelelő pontját is összekötöttük.</p>
+        <p class="def note">Sokszor nem egyszerű feladat két gráfról eldönteni, hogy izomorfak-e. (Ennek vizsgálatát érdemes az élek számának és a csúcsok fokszámának meghatározásával kezdeni, és azt követően vizsgálni a csúcsok egymásnak való megfelelését.)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="fokszamsorozat">
+  <h2>7. Van-e ilyen gráf? Két azonos fokszámú pont</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="Gráf építése adott fokszámokból"></svg>
+      <div class="figcap" aria-live="polite"></div>
+      <div class="btns" id="fsBtns" hidden><button id="fsRnd">Új véletlen társaság</button></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>4. példa</h3>
+        <p class="def">a) Van-e olyan 10 pontú egyszerű gráf, amelyben az egyes pontok fokszáma 9, 8, 6, 5, 5, 4, 4, 3, 2, 0?<br>b) Hány olyan 10 pontú egyszerű gráf van, amelyben az egyes pontok fokszáma 8, 3, 3, 3, 3, 3, 3, 1, 1, 0? (Az izomorf gráfokat nem tekintjük különbözőknek.)<br>c) Van-e olyan 10 pontú egyszerű gráf, amelyben minden pont foka különböző?</p>
+      </div>
+      <div class="panel"><ul class="steps"></ul></div>
+      <div class="panel">
+        <h3>Tétel</h3>
+        <p class="def">Bármely egyszerű, legalább kétpontú gráfban létezik két azonos fokszámú pont.</p>
+        <p class="def note">A tételt „társaságokra” is megfogalmazhatjuk: bármely legalább kétfős társaságban van két olyan személy, akinek a társaságban ugyanannyi ismerőse van. (Az ismeretség kölcsönös.)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ut-kor">
+  <h2>8. Út, séta, kör, összefüggő gráf, komponensek</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="Az 1. példa gráfja"></svg>
+      <div class="figcap" aria-live="polite"></div>
+      <p class="note">Kattints két pontra: megmutatja a köztük vezető utat, vagy azt, hogy nincs út.</p>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>1. példa</h3>
+        <p class="def">A G gráf csúcsainak halmaza {A, B, C, D, E, F, G, H, I, J, K}. A gráf éleit felsorolással adjuk meg: {A, B}, {A, C}, {B, C}, {E, F}, {F, G}, {F, H}, {F, I}, {I, J}, {I, K}. a) Szemléltessük más módokon a gráfot! b) Jellemezzük a gráfot!</p>
+        <div id="adjBox"></div>
+      </div>
+      <div class="panel"><ul class="steps"></ul></div>
+      <div class="panel">
+        <h3>Definíció</h3>
+        <p class="def"><b class="t">Útnak</b> nevezzük egymáshoz csatlakozó élek olyan sorozatát, amelyek egyetlen ponton sem mennek át egynél többször.</p>
+        <p class="def">A <b class="t">séta</b> a gráf egymáshoz csatlakozó éleinek egy sorozata; a <b class="t">körséta</b> pedig olyan séta, amelynek a kezdőpontja és a végpontja megegyezik.</p>
+        <p class="def">Egy gráf <b class="t">összefüggő</b>, ha bármely pontjából bármely pontjába eljuthatunk valamilyen úton. Ha egy gráf nem összefüggő, akkor a maximális összefüggő részeit <b class="t">komponensek</b>nek nevezzük.</p>
+        <p class="def"><b class="t">Körnek</b> nevezzük a kezdőpontjába visszavezető utat. (A hurokél is kör.)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="fak">
+  <h2>9. Fák: az n pontú fa éleinek száma n − 1</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="Fa felépítése élenként"></svg>
+      <div class="figcap" aria-live="polite"></div>
+      <div class="btns"><button id="treeNew">Másik fa</button></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>5. példa</h3>
+        <p class="def">Mit állíthatunk egy n pontú fa éleinek a számáról?</p>
+        <div class="sl"><label>n</label><input type="range" id="nT" min="3" max="12" step="1" value="8"><output id="nTo">8</output></div>
+      </div>
+      <div class="panel"><ul class="steps"></ul></div>
+      <div class="panel">
+        <h3>Definíció és tétel</h3>
+        <p class="def">A <b class="t">fa</b> (fagráf) olyan összefüggő gráf, amelyik nem tartalmaz kört.</p>
+        <p class="def">Tétel: Az n pontú fa éleinek száma n − 1. (Az egyetlen pontból álló gráf is fa.)</p>
+      </div>
+      <div class="panel">
+        <h3>6. példa</h3>
+        <p class="def">1. Egy fa bármely két pontját pontosan egy út köti össze.<br>2. Ha egy fa valamely élét elhagyjuk, akkor a kapott gráf nem lesz összefüggő.<br>3. Ha egy fa legalább kétpontú, akkor van elsőfokú pontja.<br>4. Ha egy n pontú összefüggő gráfban n-nél kevesebb él van, akkor a gráf tartalmaz elsőfokú pontot.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="korok">
+  <h2>10. Hány kört határoznak meg az 5 pontú teljes gráf élei?</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="Az 5 pontú teljes gráf egy körrel"></svg>
+      <div class="figcap" aria-live="polite"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>8. példa</h3>
+        <p class="def">Hány különböző kört határoznak meg az 5 pontú teljes gráf élei?</p>
+        <div class="res" id="korSum"></div>
+      </div>
+      <div class="panel"><ul class="steps"></ul></div>
+    </div>
+  </div>
+  <div class="minis" id="minis"></div>
+</section>
+
+<section id="konigsberg">
+  <h2>11. A königsbergi hidak: gráfok bejárása</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="Königsberg térképe és gráfja"></svg>
+      <div class="figcap" aria-live="polite"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>A probléma (1735)</h3>
+        <p class="def">A várost (ma: Kalinyingrád) a Pregel folyó négy részre osztotta, a városrészeket hét híd kötötte össze. A lakók tették fel a kérdést: lehet-e olyan sétát tenni a városban, amelynek során mindegyik hídon pontosan egyszer kelnek át, majd visszatérnek a kiindulási helyzetükbe?</p>
+      </div>
+      <div class="panel"><ul class="steps"></ul></div>
+    </div>
+  </div>
+  <div class="try">
+    <h3>Próbáld ki: rajzold le egy vonallal! Kattints a kezdőpontra, utána sorban az élekre.</h3>
+    <div class="trylay">
+      <svg class="gr" id="eulEd" viewBox="0 0 520 440" role="img" aria-label="Egy vonallal rajzolós játék"></svg>
+      <div>
+        <div class="btns" id="eulPick" style="margin-top:0"></div>
+        <div class="panel" id="eulInfo" style="margin-top:12px"></div>
+        <div class="btns"><button id="eulUndo">Visszalépés</button><button id="eulReset">Újra</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="halozat">
+  <h2>12. A legkisebb költségű vezetékhálózat</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="Költséges élek törlése a teljes gráfból"></svg>
+      <div class="figcap" aria-live="polite"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Emelt szintű érettségi, 2019 (Gyűjtemény 9–12., 32. lecke, 4. feladat)</h3>
+        <p class="def">Több település közötti legkisebb költségű vezetékhálózat tervezésekor először egy teljes gráfot készítettek. Ebben a gráfban minden települést a gráf egy csúcsával, minden vezetékes kapcsolatot a gráf egy-egy élével jelöltek, majd a gráf minden élére ráírták, hogy mennyibe kerülne az adott kapcsolat kiépítése. Ezután egyesével kitörölték a „költséges éleket” úgy, hogy a törlés után megmaradó gráf összefüggő maradjon. A teljes gráf élei kétharmadának törlése után végül egy (a legkisebb költségű hálózatot megadó) fagráfot kaptak. Hány település szerepelt a tervben?</p>
+        <div class="res" id="netInfo"></div>
+      </div>
+      <div class="panel"><ul class="steps"></ul></div>
+    </div>
+  </div>
+</section>
+
+<section id="hat-ember">
+  <h2>13. Hat ember: mindig van három, akik mind kezet fogtak, vagy egyikük sem</h2>
+  <div class="pager" role="group" aria-label="Lapozás"></div>
+  <div class="layout">
+    <div>
+      <svg class="gr" viewBox="0 0 640 460" role="img" aria-label="A hatpontú teljes gráf éleinek két színnel színezése"></svg>
+      <div class="figcap" aria-live="polite"></div>
+      <div class="btns" id="ramBtns" hidden><button id="ramRnd">Véletlen színezés</button><button id="ramClr">Törlés</button></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>5. feladat</h3>
+        <p class="def">Hat ember találkozott egy összejövetelen, többen kezet fogtak egymással. Bizonyítsuk be, hogy kiválasztható közülük három ember úgy, hogy vagy mindannyian kezet fogtak egymással, vagy egyikük sem fogott kezet a másik két emberrel!</p>
+        <p class="def note">(A feladat gráfelméleti átfogalmazása: Bizonyítsuk be, hogy bármely 6 pontú, egyszerű gráfban kiválasztható három csúcs úgy, hogy közülük vagy mindegyik pont össze van kötve a másik kettővel, vagy semelyik két pont között nincs él!)</p>
+        <p class="def"><span style="color:var(--red);font-weight:700">━ piros</span>: kezet fogtak &nbsp; <span style="color:var(--blue);font-weight:700">╍ kék, szaggatott</span>: nem fogtak kezet</p>
+      </div>
+      <div class="panel"><ul class="steps"></ul></div>
+    </div>
+  </div>
+</section>
+
+<p class="note">Forrás: Matematika 9. (OH-MAT09TA), 2. lecke; Gyűjtemény a matematika emelt szintű oktatásához 9–12. (OH-MAT912AE), 31–33. lecke; Gyűjtemény a matematika emelt szintű oktatásához 11–12. (OH-MAT1112BE), 50. lecke. A „Próbáld ki” részek és a 12. fejezet költségei saját példák.</p>
+</main>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const NS = 'http://www.w3.org/2000/svg';
+const MINUS = '−';
+const STEP_MS = 5500;
+const TWEEN_MS = 1900;
+const LET = 'ABCDEFGHIJKLMNOP'.split('');
+
+function el(name, attrs, parent, text) {
+  const e = document.createElementNS(NS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const lerp = (a, b, t) => a + (b - a) * t;
+function rng(seed) {
+  let s = seed >>> 0 || 1;
+  return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; };
+}
+let rand = rng(Date.now() % 100000 + 7);
+function shuffle(a, r = rand) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function binom(n, k) { if (k < 0 || k > n) return 0; let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i; return Math.round(r); }
+
+/* gráfépítő segédek: N({A:[x,y]}, fn) csúcsok; E(['A-B', 'A-A#2'], fn) élek ("#" után a többszörös él sorszáma) */
+function N(pos, f) {
+  const o = {};
+  for (const id in pos) o[id] = Object.assign({ x: pos[id][0], y: pos[id][1] }, f ? f(id) : {});
+  return o;
+}
+function E(list, f) {
+  return list.map((s, i) => {
+    const [a, b] = s.split('#')[0].split('-');
+    return Object.assign({ id: s, a, b }, f ? f(s, i) : {});
+  });
+}
+function circlePos(ids, cx = 320, cy = 230, r = 170, start = -90) {
+  const o = {};
+  ids.forEach((id, i) => {
+    const t = (start + 360 * i / ids.length) * Math.PI / 180;
+    o[id] = [Math.round(cx + r * Math.cos(t)), Math.round(cy + r * Math.sin(t))];
+  });
+  return o;
+}
+function degrees(nodes, edges) {
+  const d = {};
+  for (const id in nodes) d[id] = 0;
+  edges.forEach(e => { if (e.cls && /\b(ghost|gone)\b/.test(e.cls)) return; d[e.a] += 1; d[e.b] += 1; });
+  return d;
+}
+function adjOf(nodes, edges) {
+  const g = {};
+  for (const id in nodes) g[id] = [];
+  edges.forEach(e => { if (e.cls && /\b(ghost|gone)\b/.test(e.cls)) return; if (e.a !== e.b) { g[e.a].push(e.b); g[e.b].push(e.a); } });
+  return g;
+}
+function bfsPath(adj, s, t) {
+  const prev = { [s]: null }, q = [s];
+  while (q.length) {
+    const u = q.shift();
+    if (u === t) break;
+    for (const w of adj[u]) if (!(w in prev)) { prev[w] = u; q.push(w); }
+  }
+  if (!(t in prev)) return null;
+  const p = [];
+  for (let u = t; u !== null; u = prev[u]) p.unshift(u);
+  return p;
+}
+function components(adj) {
+  const comp = {}, list = [];
+  for (const s in adj) {
+    if (s in comp) continue;
+    const c = [s]; comp[s] = list.length;
+    for (let i = 0; i < c.length; i++) for (const w of adj[c[i]]) if (!(w in comp)) { comp[w] = list.length; c.push(w); }
+    list.push(c);
+  }
+  return { comp, list };
+}
+const ekey = (a, b) => a < b ? a + '-' + b : b + '-' + a;
+
+/*
+  Graph(svg, opt): animált gráfrajz.
+  set(state): state = { nodes: {id: {x, y, label, cls, box, w, h, fs, ly, badge}}, edges: [{id, a, b, bend, via, ang, size, cls, label, lt, color}], deg: true }
+  A csúcsok új helyükre úsznak, az új elemek beúsznak, a régiek elhalványulnak.
+*/
+function Graph(svg, opt = {}) {
+  const gBg = el('g', {}, svg), gE = el('g', {}, svg), gL = el('g', {}, svg), gV = el('g', {}, svg), gTop = el('g', {}, svg);
+  const V = {}, Ed = {};
+  let st = { nodes: {}, edges: [] }, raf = 0, t0 = 0, drag = null;
+
+  function geom(n) {
+    const box = !!n.box;
+    const w = n.w ?? (box ? 116 : 40), h = n.h ?? (box ? 38 : 40);
+    return { x: n.x, y: n.y, w, h, rx: n.rx ?? (box ? 7 : Math.min(w, h) / 2), fs: n.fs ?? (box ? 16 : 20), ly: n.ly ?? 0 };
+  }
+  function egeom(e, P) {
+    if (e.a === e.b) return { loop: 1, ang: (e.ang ?? -90) * Math.PI / 180, size: e.size ?? 1, ox: 0, oy: 0 };
+    const a = P[e.a], b = P[e.b];
+    if (!a || !b) return { ox: 0, oy: 0 };
+    if (e.via) return { ox: 2 * (e.via[0] - (a.x + b.x) / 2), oy: 2 * (e.via[1] - (a.y + b.y) / 2) };
+    if (e.bend) {
+      const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy) || 1;
+      return { ox: -dy / L * e.bend * 2, oy: dx / L * e.bend * 2 };
+    }
+    return { ox: 0, oy: 0 };
+  }
+  function makeNode(id) {
+    const g = el('g', { class: 'v', 'data-id': id }, gV);
+    const rect = el('rect', {}, g), text = el('text', {}, g);
+    const bdg = el('g', { class: 'bdg' }, g);
+    el('circle', { r: 14 }, bdg);
+    const btxt = el('text', {}, bdg);
+    g.addEventListener('pointerdown', ev => {
+      ev.preventDefault();
+      const p = toSvg(ev);
+      drag = { id, sx: p.x, sy: p.y, ox: V[id].cur.x, oy: V[id].cur.y, moved: false };
+      try { svg.setPointerCapture(ev.pointerId); } catch (err) { /* szintetikus esemény */ }
+    });
+    return { g, rect, text, bdg, btxt };
+  }
+  function makeEdge(id) {
+    const hit = el('path', { class: 'hit', 'data-id': id }, gE);
+    const path = el('path', { class: 'e' }, gE);
+    const lab = el('text', { class: 'elab' }, gL);
+    hit.addEventListener('click', () => { if (opt.onEdge) opt.onEdge(id); });
+    if (!opt.onEdge) hit.style.pointerEvents = 'none';
+    return { hit, path, lab };
+  }
+  function toSvg(ev) {
+    const pt = svg.createSVGPoint();
+    pt.x = ev.clientX; pt.y = ev.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  }
+  svg.addEventListener('pointermove', ev => {
+    if (!drag) return;
+    const p = toSvg(ev), dx = p.x - drag.sx, dy = p.y - drag.sy;
+    if (Math.hypot(dx, dy) > 5) drag.moved = true;
+    if (!drag.moved) return;
+    const v = V[drag.id];
+    if (!v) return;
+    const vb = svg.viewBox.baseVal;
+    v.cur.x = v.to.x = Math.max(20, Math.min(vb.width - 20, drag.ox + dx));
+    v.cur.y = v.to.y = Math.max(20, Math.min(vb.height - 20, drag.oy + dy));
+    if (st.nodes[drag.id]) { st.nodes[drag.id].x = v.cur.x; st.nodes[drag.id].y = v.cur.y; }
+    for (const id in Ed) Ed[id].from = null;
+    draw(1);
+  });
+  const endDrag = () => {
+    if (!drag) return;
+    const d = drag; drag = null;
+    if (!d.moved && opt.onNode) opt.onNode(d.id);
+  };
+  svg.addEventListener('pointerup', endDrag);
+  svg.addEventListener('pointercancel', () => { drag = null; });
+
+  function fadeIn(g) { g.style.opacity = 0; g.getBoundingClientRect(); requestAnimationFrame(() => { g.style.opacity = ''; }); }
+  function kill(...els) { els.forEach(x => { x.style.opacity = 0; x.style.pointerEvents = 'none'; setTimeout(() => x.remove(), 1300); }); }
+
+  function set(s, instant) {
+    st = s;
+    const P = {};
+    for (const id in s.nodes) P[id] = geom(s.nodes[id]);
+    for (const id in V) if (!(id in s.nodes)) { kill(V[id].g); delete V[id]; }
+    const deg = s.deg ? degrees(s.nodes, s.edges) : null;
+    for (const id in s.nodes) {
+      const n = s.nodes[id];
+      let v = V[id];
+      if (!v) { v = V[id] = makeNode(id); v.cur = Object.assign({}, P[id]); fadeIn(v.g); }
+      v.from = Object.assign({}, v.cur);
+      v.to = P[id];
+      v.g.setAttribute('class', 'v ' + (n.cls || ''));
+      v.rect.style.fill = n.fill || '';
+      v.text.textContent = n.label ?? id;
+      const b = n.badge ?? (deg ? deg[id] : null);
+      v.bdg.style.opacity = b === null || b === undefined || b === '' ? 0 : 1;
+      if (b !== null && b !== undefined) v.btxt.textContent = b;
+    }
+    const seen = {};
+    s.edges.forEach(e => {
+      seen[e.id] = 1;
+      let d = Ed[e.id];
+      const fresh = !d;
+      if (fresh) { d = Ed[e.id] = makeEdge(e.id); fadeIn(d.path); fadeIn(d.lab); }
+      d.spec = e;
+      d.from = fresh ? null : d.cur;
+      d.to = egeom(e, P);
+      if (fresh) d.cur = d.to;
+      d.path.setAttribute('class', 'e ' + (e.cls || ''));
+      d.path.style.stroke = e.color || '';
+      d.lab.textContent = e.label ?? '';
+      d.lab.setAttribute('class', 'elab ' + (e.lcls || ''));
+    });
+    for (const id in Ed) if (!seen[id]) { kill(Ed[id].path, Ed[id].hit, Ed[id].lab); delete Ed[id]; }
+    if (s.bg !== undefined) gBg.style.opacity = s.bg;
+    cancelAnimationFrame(raf);
+    if (instant) { draw(1); return; }
+    t0 = performance.now();
+    const tick = now => {
+      const t = Math.min(1, (now - t0) / TWEEN_MS);
+      draw(ease(t));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+  }
+  function draw(t) {
+    const C = {};
+    for (const id in V) {
+      const v = V[id], c = {};
+      for (const k in v.to) c[k] = lerp(v.from[k], v.to[k], t);
+      v.cur = c; C[id] = c;
+      v.g.setAttribute('transform', 'translate(' + c.x.toFixed(1) + ',' + c.y.toFixed(1) + ')');
+      v.rect.setAttribute('x', -c.w / 2); v.rect.setAttribute('y', -c.h / 2);
+      v.rect.setAttribute('width', c.w); v.rect.setAttribute('height', c.h); v.rect.setAttribute('rx', c.rx);
+      v.text.setAttribute('y', c.ly); v.text.style.fontSize = c.fs + 'px';
+      v.bdg.setAttribute('transform', 'translate(' + (c.w / 2 + 6) + ',' + (-c.h / 2 - 6) + ')');
+    }
+    for (const id in Ed) {
+      const d = Ed[id], e = d.spec, a = C[e.a], b = C[e.b];
+      if (!a || !b) continue;
+      const to = d.from ? d.to : egeom(e, C);
+      const g = d.from ? {
+        loop: to.loop, ang: lerp(d.from.ang ?? to.ang ?? 0, to.ang ?? 0, t), size: lerp(d.from.size ?? to.size ?? 1, to.size ?? 1, t),
+        ox: lerp(d.from.ox, to.ox, t), oy: lerp(d.from.oy, to.oy, t)
+      } : to;
+      d.cur = g;
+      let path, lx, ly;
+      if (g.loop) {
+        const R = 62 * g.size + a.w / 2, w = 0.55;
+        const c1x = a.x + R * Math.cos(g.ang - w), c1y = a.y + R * Math.sin(g.ang - w);
+        const c2x = a.x + R * Math.cos(g.ang + w), c2y = a.y + R * Math.sin(g.ang + w);
+        path = 'M' + a.x + ',' + a.y + ' C' + c1x + ',' + c1y + ' ' + c2x + ',' + c2y + ' ' + a.x + ',' + a.y;
+        lx = a.x + R * 0.8 * Math.cos(g.ang); ly = a.y + R * 0.8 * Math.sin(g.ang);
+      } else {
+        const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+        if (Math.abs(g.ox) < .01 && Math.abs(g.oy) < .01) {
+          path = 'M' + a.x + ',' + a.y + ' L' + b.x + ',' + b.y;
+          const lt = e.lt ?? .5;
+          lx = lerp(a.x, b.x, lt); ly = lerp(a.y, b.y, lt);
+        } else {
+          const qx = mx + g.ox, qy = my + g.oy;
+          path = 'M' + a.x + ',' + a.y + ' Q' + qx + ',' + qy + ' ' + b.x + ',' + b.y;
+          const lt = e.lt ?? .5, u = 1 - lt;
+          lx = u * u * a.x + 2 * u * lt * qx + lt * lt * b.x; ly = u * u * a.y + 2 * u * lt * qy + lt * lt * b.y;
+        }
+      }
+      d.path.setAttribute('d', path); d.hit.setAttribute('d', path);
+      d.lab.setAttribute('x', lx + (e.ldx || 0)); d.lab.setAttribute('y', ly + (e.ldy || 0));
+    }
+    if (opt.onDraw) opt.onDraw(C);
+  }
+  return { set, bg: gBg, top: gTop, svg, get state() { return st; }, pos(id) { return V[id] && V[id].cur; } };
+}
+
+/* lépéses fejezetek közös vezérlője: a lapozó sáv gombjai, pöttyök, automatikus lejátszás */
+const steppers = {};
+function stepper(sec, n, onStep) {
+  const host = $('#' + sec + ' .pager');
+  host.innerHTML = '<div class="dots"></div>' +
+    '<button data-r="reset" title="Újra" aria-label="Újra">↺</button>' +
+    '<button data-r="prev" title="Előző" aria-label="Előző">◀</button>' +
+    '<button data-r="play" class="wide">Lejátszás</button>' +
+    '<button data-r="next" title="Következő" aria-label="Következő">▶</button>';
+  const dots = $('.dots', host);
+  const b = r => $('[data-r="' + r + '"]', host);
+  let cur = 0, timer = null;
+  function buildDots() {
+    dots.innerHTML = '';
+    for (let i = 0; i <= n; i++) dots.appendChild(document.createElement('i'));
+  }
+  function show() {
+    $$('i', dots).forEach((d, i) => d.classList.toggle('on', i <= cur));
+    b('prev').disabled = cur === 0;
+    b('next').disabled = cur === n;
+    onStep(cur);
+  }
+  function pause() { if (timer) { clearInterval(timer); timer = null; b('play').textContent = 'Lejátszás'; } }
+  const api = {
+    next() { if (cur < n) { cur++; show(); } if (cur === n) pause(); },
+    prev() { pause(); if (cur > 0) { cur--; show(); } },
+    reset() { pause(); cur = 0; show(); },
+    go(i) { pause(); cur = Math.max(0, Math.min(n, i)); show(); },
+    setN(m) { pause(); n = m; if (cur > n) cur = n; buildDots(); show(); },
+    refresh: show,
+    pause,
+    get step() { return cur; }
+  };
+  b('next').addEventListener('click', () => { pause(); api.next(); });
+  b('prev').addEventListener('click', api.prev);
+  b('reset').addEventListener('click', api.reset);
+  b('play').addEventListener('click', () => {
+    if (timer) { pause(); return; }
+    for (const k in steppers) steppers[k].pause();
+    if (cur === n) cur = 0;
+    show();
+    b('play').textContent = 'Szünet';
+    timer = setInterval(api.next, STEP_MS);
+  });
+  buildDots();
+  steppers[sec] = api;
+  return api;
+}
+function stepList(ul, lines, step) {
+  ul.innerHTML = '';
+  lines.forEach((t, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = t;
+    li.className = i === step ? 'cur' : (i < step ? 'done' : 'later');
+    ul.appendChild(li);
+  });
+}
+/* egy fejezet: lépések listája ({line, cap, st}), a gráf és a felirat frissítése */
+function chapter(sec, G, getSteps, after) {
+  const root = $('#' + sec);
+  let steps = getSteps();
+  const S = stepper(sec, steps.length - 1, i => {
+    const s = steps[i];
+    G.set(typeof s.st === 'function' ? s.st() : s.st);
+    $('.figcap', root).innerHTML = typeof s.cap === 'function' ? s.cap() : s.cap;
+    stepList($('.steps', root), steps.map(x => x.line), i);
+    if (after) after(i, s);
+  });
+  S.rebuild = () => { steps = getSteps(); S.setN(steps.length - 1); };
+  S.refresh();
+  return S;
+}
+const figOf = sec => $('#' + sec + ' svg.gr');
+</script>
+<script>
+const BIN = (n, k) => '<span class="bin"><span>' + n + '</span><span>' + k + '</span></span>';
+const HUE = (i, n) => 'hsl(' + Math.round(i * 330 / Math.max(1, n)) + ' 75% 45%)';
+
+/* 1. fejezet: a ház vázlatából gráf */
+(function () {
+  const sec = 'mi-a-graf', G = Graph(figOf(sec));
+  const L = { ter1: 'terasz', elo: 'előszoba', kam: 'kamra', nap: 'nappali', etk: 'étkező', kon: 'konyha', hal1: 'hálószoba', fur1: 'fürdőszoba', fol: 'folyosó', hal3: 'hálószoba', hal2: 'hálószoba', fur2: 'fürdőszoba', ter2: 'terasz' };
+  const P1 = { ter1: [200, 48], elo: [340, 48], kam: [480, 48], nap: [200, 138], etk: [340, 138], kon: [480, 138], hal1: [74, 190], fur1: [200, 242], fol: [340, 242], hal3: [480, 242], hal2: [270, 334], fur2: [410, 334], ter2: [270, 418] };
+  const ED = ['ter1-nap', 'elo-etk', 'kam-kon', 'nap-etk', 'etk-kon', 'hal1-nap', 'hal1-fur1', 'fur1-fol', 'etk-fol', 'fol-hal3', 'fol-hal2', 'fol-fur2', 'hal2-ter2', 'ter2-hal3'];
+  const ORDER = ['elo', 'etk', 'kon', 'kam', 'fol', 'fur2', 'ter2', 'hal3', 'hal2', 'fur1', 'hal1', 'ter1', 'nap'];
+  const P2 = circlePos(ORDER, 320, 220, 178);
+  const BENT = { 'hal1-fur1': 40, 'etk-fol': -50, 'fol-hal2': 35 };
+  const box = (cls) => N(P1, id => ({ box: true, label: L[id], cls: cls ? cls(id) : '' }));
+  const dot = (P, cls) => N(P, id => ({ w: 28, h: 28, fs: 15, ly: 30, label: L[id], cls: cls ? cls(id) : '' }));
+  const e1 = cls => E(ED, s => ({ via: s === 'ter2-hal3' ? [470, 405] : null, cls: cls ? cls(s) : '' }));
+  const e2 = () => E(ED, s => ({ bend: BENT[s] || 0 }));
+  const isFol = s => s.split('-').includes('fol');
+  const steps = () => [
+    { line: 'Kiindulás: a férj vázlata', cap: 'A férj vázlata arról, hogyan nyíljanak egymásból a helyiségek: a téglalapok a helyiségek, a vonalak a helyiségeket összekötő ajtók.', st: () => ({ nodes: box(), edges: e1() }) },
+    { line: 'a) Helyiségek: <b>13</b>', cap: 'a) Az ábrán a kis téglalapok felelnek meg a helyiségeknek, összesen <b>13</b> van belőlük.', st: () => ({ nodes: box(() => 'hl'), edges: e1() }) },
+    { line: 'b) Ajtók: <b>14</b>', cap: 'b) A téglalapokat összekötő szakaszok jelentik az ajtókat, ezekből <b>14</b> van.', st: () => ({ nodes: box(), edges: e1(() => 'hl') }) },
+    { line: 'c) A folyosóról <b>5</b> ajtó nyílik', cap: 'c) A legtöbb összekötő szakasz a folyosóról indul, ott lesz a legtöbb ajtó, összesen <b>5</b>.', st: () => ({ nodes: box(id => id === 'fol' ? 'hl' : ''), edges: e1(s => isFol(s) ? 'hl' : 'dim') }) },
+    { line: 'Pontok (csúcsok) és élek: gráf', cap: 'A gráf <b>pontjai</b> (vagy más szóval <b>csúcsai</b>) jelölik a különböző elemeket, és a pontokat összekötő vonalak (vagy más szóval <b>élek</b>) jelölik a kapcsolatot.', st: () => ({ nodes: dot(P1), edges: e1() }) },
+    { line: 'Másképp lerajzolva: ugyanaz a gráf', cap: 'Az ábrában nem számít az összekötő vonalak hossza, és nem számít, hogy egyenes vonalakat rajzolunk vagy görbéket. A gráffal a kapcsolatok hálózatát szeretnénk szemléltetni.', st: () => ({ nodes: dot(P2), edges: e2() }) },
+    { line: 'Fokszám: a pontból kiinduló élek száma', cap: 'A gráf pontjainak fontos jellemzője a pont <b>foka</b> vagy <b>fokszáma</b>, ez a pontból kiinduló élek száma. A folyosó foka 5. A fokszámok összege 28 = 2 · 14 (l. a 3. fejezetet).', st: () => ({ nodes: dot(P2, id => id === 'fol' ? 'hl' : ''), edges: e2(), deg: true }) }
+  ];
+  chapter(sec, G, steps);
+})();
+
+/* 2. fejezet: hurokél, többszörös él, egyszerű gráf; az osztók gráfja */
+(function () {
+  const sec = 'hurokel', G = Graph(figOf(sec));
+  const P = { E: [230, 95], D: [430, 80], F: [100, 205], C: [495, 205], A: [215, 345], B: [455, 378] };
+  const LOOPS = ['A-A#1', 'A-A#2', 'C-C'], MULTI = ['E-F#1', 'E-F#2'];
+  const ALL = ['A-A#1', 'A-A#2', 'C-C', 'E-F#1', 'E-F#2', 'E-D', 'F-D', 'F-C', 'A-C', 'A-B'];
+  const GEO = { 'A-A#1': { ang: 140, size: 1 }, 'A-A#2': { ang: 140, size: 1.8 }, 'C-C': { ang: 10, size: 1.3 }, 'E-F#1': { bend: 26 }, 'E-F#2': { bend: -26 } };
+  const g1 = (cls, list = ALL) => E(list, s => Object.assign({ cls: cls ? cls(s) : '' }, GEO[s] || {}));
+  const nodes1 = cls => N(P, id => ({ cls: cls ? cls(id) : '' }));
+  const PD = { 22: [320, 48], 9: [470, 58], 12: [168, 104], 8: [520, 112], 15: [110, 215], 7: [568, 222], 21: [150, 332], 5: [522, 332], 2: [300, 412], 4: [442, 398] };
+  const ED = ['2-4', '2-8', '2-12', '2-22', '4-8', '4-12', '5-15', '7-21'];
+  const steps = () => [
+    { line: 'Betonúthálózat hat település között', cap: 'Az első ábrán az A, B, C, D, E, F települések közötti betonúthálózatot szemléltetjük.', st: () => ({ nodes: nodes1(), edges: g1() }) },
+    { line: '<b>Hurokél</b>: kezdő- és végpontja ugyanaz', cap: 'Az első gráfban C-ből olyan él is kiindul, aminek a végpontja is C (hasonló a helyzet A-val is). A <b>hurokél</b> kezdő és végpontja megegyezik.', st: () => ({ nodes: nodes1(id => id === 'A' || id === 'C' ? 'hl' : ''), edges: g1(s => LOOPS.includes(s) ? 'hl' : 'dim') }) },
+    { line: '<b>Többszörös él</b>: két pont között több él', cap: 'Az E és F helységek között pedig két aszfaltutat is megépítettek: <b>többszörös él</b> esetén a gráf két pontját egynél több él köti össze. A hurokél is lehet többszörös él. (Erre példa A, amelynek két hurokéle van.)', st: () => ({ nodes: nodes1(id => 'AEF'.includes(id) ? 'hl' : ''), edges: g1(s => MULTI.includes(s) ? 'hl' : (s.startsWith('A-A') ? 'c2' : 'dim')) }) },
+    { line: 'Fokszámok: 6, 1, 4, 2, 3, 4', cap: 'A pontok fokszámai rendre 6, 1, 4, 2, 3, 4. (A hurokélnek két „vége” van, ezért 2-vel növeli a fokszámot.) Az A foka: 2 + 2 + 1 + 1 = 6.', st: () => ({ nodes: nodes1(id => id === 'A' ? 'hl' : ''), edges: g1(s => s.includes('A') ? 'c1' : ''), deg: true }) },
+    { line: 'Ez a gráf nem <b>egyszerű</b>', cap: 'Az olyan gráfot, amelyben sem hurokél, sem többszörös él nincs, <b>egyszerű gráf</b>nak nevezzük. Az A, B, C, D, E, F pontokkal megadott gráf nem egyszerű gráf. Ha elhagyjuk a hurokéleket és a második E–F élt, egyszerű gráfot kapunk.', st: () => ({ nodes: nodes1(), edges: g1(null, ALL.filter(s => !LOOPS.includes(s) && s !== 'E-F#2')), deg: true }) },
+    { line: 'Az osztók gráfja: egyszerű gráf', cap: 'A második ábrán a számokat reprezentáló két pontot akkor kötöttük össze egy éllel, ha az egyik szám a másiknak valódi osztója. Az előző ábrán a másik gráf egyszerű.', st: () => ({ nodes: N(PD), edges: E(ED) }) },
+    { line: 'f(2) = 4, f(4) = 3, f(9) = 0: <b>izolált pont</b>', cap: 'Ha adott pont fokszámát f-fel jelöljük, akkor f(2) = 4, f(4) = 3 stb. Egy érdekesség: f(9) = 0, a nulladfokú pontot másképpen <b>izolált pont</b>nak is nevezzük.', st: () => ({ nodes: N(PD, id => ({ cls: id === '9' ? 'hl' : '' })), edges: E(ED), deg: true }) }
+  ];
+  chapter(sec, G, steps);
+})();
+
+/* 3. fejezet: fokszámtétel, élvégek */
+(function () {
+  const sec = 'fokszamtetel', G = Graph(figOf(sec));
+  const P = { P: [150, 110], Q: [340, 78], R: [235, 262], S: [130, 392], T: [470, 312], U: [565, 140] };
+  const ED = ['P-Q', 'P-R', 'Q-R', 'R-S', 'S-T', 'T-U', 'Q-T'];
+  const svg = figOf(sec), ends = [];
+  ED.forEach((s, i) => {
+    for (let k = 0; k < 2; k++) {
+      const c = el('circle', { r: 9, class: 'end', cx: 0, cy: 0 }, G.top);
+      c.style.fill = HUE(i, ED.length);
+      c.style.stroke = 'var(--bg)'; c.style.strokeWidth = 2;
+      c.style.opacity = 0;
+      ends.push({ c, e: s, k });
+    }
+  });
+  function placeEnds(mode) {
+    const ring = {};
+    ends.forEach(o => {
+      const [a, b] = o.e.split('-'), me = o.k ? b : a, other = o.k ? a : b;
+      const pa = G.pos(me) || { x: P[me][0], y: P[me][1] }, pb = G.pos(other) || { x: P[other][0], y: P[other][1] };
+      let x, y;
+      if (mode === 'edge') { x = lerp(pa.x, pb.x, .24); y = lerp(pa.y, pb.y, .24); }
+      else {
+        ring[me] = (ring[me] || 0) + 1;
+        const deg = ED.filter(s => s.split('-').includes(me)).length;
+        const t = -Math.PI / 2 + 2 * Math.PI * (ring[me] - 1) / deg;
+        x = pa.x + 34 * Math.cos(t); y = pa.y + 34 * Math.sin(t);
+      }
+      o.c.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      o.c.style.opacity = mode === 'hide' || mode === 'off' ? 0 : 1;
+    });
+  }
+  const odd = id => ['Q', 'R', 'T', 'U'].includes(id);
+  const steps = () => [
+    { line: 'Egy gráf: 6 pont, 7 él', cap: 'Egy gráf 6 ponttal és 7 éllel.', st: { nodes: N(P), edges: E(ED) }, ends: 'off' },
+    { line: 'Minden élnek két vége van: 14 élvég', cap: 'Minden élnek két vége van: 7 élnek 2 · 7 = 14 vége.', st: { nodes: N(P), edges: E(ED, (s, i) => ({ color: HUE(i, ED.length) })) }, ends: 'edge' },
+    { line: 'Minden élvég egy ponthoz tartozik', cap: 'Minden élvég egy pontba fut be: egy pont fokszáma éppen a hozzá tartozó élvégek száma.', st: { nodes: N(P), edges: E(ED, (s, i) => ({ color: HUE(i, ED.length), cls: 'dim' })) }, ends: 'ring' },
+    { line: 'Összeg: 2 + 3 + 3 + 2 + 3 + 1 = 14 = 2 · 7', cap: 'Mivel minden élnek két vége van, a fokszámok összegzésekor az élek számának a kétszeresét kapjuk: 2 + 3 + 3 + 2 + 3 + 1 = <b>14 = 2 · 7</b>.', st: { nodes: N(P), edges: E(ED), deg: true }, ends: 'hide' },
+    { line: 'A páratlan fokú pontok száma páros', cap: 'A tételből következik, hogy bármely gráfban a fokszámok összege páros, illetve hogy bármely gráfban a páratlan fokú pontok száma is páros. Itt Q, R, T, U: <b>4</b> darab.', st: { nodes: N(P, id => ({ cls: odd(id) ? 'hl' : '' })), edges: E(ED), deg: true }, ends: 'hide' },
+    { line: 'Hurokéllel, többszörös éllel is igaz', cap: 'Ez az észrevétel hurokélek és többszörös élek esetén is érvényes, így a fokszámtétel minden gráfra igaz. Új hurokél S-nél, második él P és Q között: 2 + 3 + … = <b>18 = 2 · 9</b>.', st: { nodes: N(P, id => ({ cls: id === 'S' || id === 'P' || id === 'Q' ? 'hl' : '' })), edges: E(ED.concat(['S-S', 'P-Q#2']), s => s === 'S-S' ? { ang: 160, size: .9, cls: 'c2' } : s === 'P-Q#2' ? { bend: 30, cls: 'c2' } : {}), deg: true }, ends: 'hide' }
+  ];
+  let list = steps();
+  chapter(sec, G, () => list, i => { placeEnds(list[i].ends); });
+
+  /* gráfszerkesztő */
+  const ed = $('#degEd'), ids = LET.slice(0, 6), PE = circlePos(ids, 260, 200, 150);
+  let set = new Set(['A-B', 'B-C', 'C-D', 'A-D', 'D-E']), sel = null;
+  const GE = Graph(ed, { onNode: id => {
+    if (sel === null) sel = id;
+    else if (sel === id) sel = null;
+    else { const k = ekey(sel, id); set.has(k) ? set.delete(k) : set.add(k); sel = null; }
+    render();
+  } });
+  function render() {
+    const nodes = N(PE, id => ({ cls: id === sel ? 'sel' : '' })), edges = E([...set]);
+    const d = degrees(nodes, edges), od = ids.filter(id => d[id] % 2);
+    ids.forEach(id => { if (id !== sel && d[id] % 2) nodes[id].cls = 'hl'; });
+    GE.set({ nodes, edges, deg: true }, true);
+    const sum = ids.reduce((s, id) => s + d[id], 0);
+    $('#degInfo').innerHTML = '<div class="res">' + ids.map(id => d[id]).join(' + ') + ' = ' + sum + '</div>' +
+      '<div class="res">2 · élek száma = 2 · ' + set.size + ' = ' + (2 * set.size) + ' ✓</div>' +
+      '<p class="def">Páratlan fokú pontok (sárgák): ' + (od.length ? od.join(', ') : 'nincs') + ' → <b>' + od.length + '</b> darab, páros.</p>' +
+      '<p class="note">' + (sel ? 'Kiválasztva: ' + sel + '. Kattints egy másik pontra!' : 'Kattints egy pontra, utána egy másikra.') + '</p>';
+  }
+  $('#degRnd').addEventListener('click', () => { set = new Set(); ids.forEach((a, i) => ids.slice(i + 1).forEach(b => { if (rand() < .4) set.add(a + '-' + b); })); sel = null; render(); });
+  $('#degClr').addEventListener('click', () => { set = new Set(); sel = null; render(); });
+  render();
+})();
+
+/* 4. fejezet: teljes gráf */
+(function () {
+  const sec = 'teljes-graf', G = Graph(figOf(sec));
+  let n = 6;
+  const ids = () => LET.slice(0, n);
+  const all = () => { const r = []; ids().forEach((a, i) => ids().slice(i + 1).forEach(b => r.push(a + '-' + b))); return r; };
+  const nodes = (cls) => N(circlePos(ids()), id => ({ cls: cls ? cls(id) : '' }));
+  const side = s => { const [a, b] = s.split('-').map(x => LET.indexOf(x)); return b - a === 1 || b - a === n - 1; };
+  const steps = () => {
+    const m = n * (n - 1) / 2, gauss = Array.from({ length: n - 1 }, (_, i) => n - 1 - i).join(' + ');
+    return [
+      { line: n + ' pont', cap: 'Megrajzoltuk egy szabályos ' + n + '-szög csúcsait. A kapott alakzatot tekinthetjük egy n pontú egyszerű gráfnak is, amelyben minden pontot minden ponttal összekötöttünk, és az élek száma a kérdés.', st: () => ({ nodes: nodes(), edges: [] }) },
+      { line: 'Minden pontból n − 1 = ' + (n - 1) + ' él', cap: 'Első megoldás: A gráf bármely két pontját pontosan egy él köti össze. Minden pontból (n − 1) számú él húzható: A-ból ' + (n - 1) + '.', st: () => ({ nodes: nodes(id => id === 'A' ? 'hl' : ''), edges: E(all().filter(s => s.startsWith('A-')), () => ({ cls: 'c1' })) }) },
+      { line: 'n(n − 1) = ' + n + ' · ' + (n - 1) + ' = ' + n * (n - 1) + ' – kétszer számolva', cap: 'Ez n(n − 1) = ' + n + ' · ' + (n - 1) + ' = ' + n * (n - 1) + ' élt jelent. De ekkor minden élt kétszer számoltunk, a két végpontjánál;', st: () => ({ nodes: nodes(), edges: E(all()), deg: true }) },
+      { line: 'Élek száma: n(n − 1)/2 = <b>' + m + '</b>', cap: 'ezért az összes él száma n(n − 1)/2 = ' + n * (n - 1) + '/2 = <b>' + m + '</b>.', st: () => ({ nodes: nodes(), edges: E(all(), () => ({ cls: 'hl' })) }) },
+      { line: 'Gauss-módszer: ' + gauss + ' = ' + m, cap: 'További megoldások is adhatók a Gauss-módszerrel (az egyes csúcsokból kiinduló, egyszeresen számolt szakaszok számának összege (n − 1) + (n − 2) + … + 2 + 1): ' + gauss + ' = <b>' + m + '</b>.', st: () => ({ nodes: nodes(), edges: E(all(), s => ({ color: HUE(LET.indexOf(s[0]), n - 1), cls: 'c1' })) }) },
+      { line: 'Pontpárok: ' + BIN(n, 2) + ' = ' + m, cap: 'Második megoldás: Mindegyik élt egyértelműen megadhatjuk a két végpontjával. Annyi éle van tehát a gráfnak, ahányféleképpen ki tudunk választani az n pontjából 2-t: ' + BIN('n', 2) + ' = n(n − 1)/2 = ' + BIN(n, 2) + ' = <b>' + m + '</b>.', st: () => ({ nodes: nodes(), edges: E(all()) }) },
+      { line: 'Oldalak és átlók: ' + n + ' + ' + n * (n - 3) / 2 + ' = ' + m, cap: 'Például teljes gráfot kapunk, ha a gráfmodellt alkalmazzuk egy olyan társaságra, amelyben mindenki mindenkit ismer. (Azaz egy szabályos sokszög oldalait és átlóit behúzzuk.) Kékkel a ' + n + ' oldal, narancssárgával a ' + n * (n - 3) / 2 + ' átló.', st: () => ({ nodes: nodes(), edges: E(all(), s => ({ cls: side(s) ? 'c1' : 'c2' })) }) }
+    ];
+  };
+  const S = chapter(sec, G, steps);
+  $('#nK').addEventListener('input', e => { n = +e.target.value; $('#nKo').textContent = n; const k = S.step; S.rebuild(); S.go(k); });
+})();
+
+/* 5. fejezet: komplementer gráf */
+(function () {
+  const sec = 'komplementer';
+  const ids = LET.slice(0, 5), P = circlePos(ids, 320, 235, 180);
+  const ALL = []; ids.forEach((a, i) => ids.slice(i + 1).forEach(b => ALL.push(a + '-' + b)));
+  let g = new Set(['A-B', 'B-D', 'C-E']);
+  let S;
+  const G = Graph(figOf(sec), { onEdge: id => { g.has(id) ? g.delete(id) : g.add(id); S.refresh(); } });
+  const k = () => g.size;
+  const info = () => { $('#cmpInfo').innerHTML = 'G: ' + k() + ' él, <span style="text-decoration:overline">G</span>: ' + (10 - k()) + ' él<br>' + BIN(10, k()) + ' = ' + BIN(10, 10 - k()) + ' = ' + binom(10, k()); };
+  const steps = () => [
+    { line: 'G: 5 pontú, ' + k() + ' élű gráf', cap: 'G: egy 5 pontú, ' + k() + ' élű egyszerű gráf (kékkel).', st: () => ({ nodes: N(P), edges: E([...g], () => ({ cls: 'c1' })) }) },
+    { line: 'A teljes gráf 10 éléből ' + k() + ' kiválasztva', cap: 'b) Az 5 pontú teljes gráf éleinek száma 5 · 4/2 = 10, ezekből kell ' + k() + '-at kiválasztanunk. Mivel a gráf pontjait megkülönböztetjük, az élek is különböznek, így a lehetőségek száma ' + BIN(10, k()) + ' = ' + binom(10, k()) + '.', st: () => ({ nodes: N(P), edges: E(ALL, s => ({ cls: g.has(s) ? 'c1' : 'ghost' })) }) },
+    { line: 'A hiányzó élek: a komplementer', cap: 'Egy G egyszerű gráf <span style="text-decoration:overline">G</span> komplementer gráfját kapjuk, ha a két gráf pontjai ugyanazok, és G bármely két pontja között pontosan akkor van él, ha <span style="text-decoration:overline">G</span>-ben nincs (narancssárgával).', st: () => ({ nodes: N(P), edges: E(ALL, s => ({ cls: g.has(s) ? 'c1' : 'c2' })) }) },
+    { line: '<span style="text-decoration:overline">G</span>: ' + (10 - k()) + ' él', cap: 'Az ábrán egy gráf komplementer gráfja látható: ' + (10 - k()) + ' éle van. G és <span style="text-decoration:overline">G</span> élei együtt a teljes gráfot adják.', st: () => ({ nodes: N(P), edges: E(ALL, s => ({ cls: g.has(s) ? 'ghost' : 'c2' })) }) },
+    { line: 'c) ' + BIN(10, k()) + ' = ' + BIN(10, 10 - k()) + ' = ' + binom(10, k()), cap: 'c) A vizsgált 5 pontú, ' + k() + ' élű gráfokat párosíthatjuk a ' + (10 - k()) + ' élű komplementer gráfjaikkal. A párosítás kölcsönösen egyértelmű, ezért a két fajta gráfból ugyanannyi van. (A gondolatmenetünk általános érvényű.)', st: () => ({ nodes: N(P), edges: E(ALL, s => ({ cls: g.has(s) ? 'c1' : 'c2' })) }) }
+  ];
+  S = chapter(sec, G, steps, () => info());
+  S.refresh = () => { const i = S.step; S.rebuild(); S.go(i); };
+  $('#cmpRnd').addEventListener('click', () => { g = new Set(shuffle(ALL.slice()).slice(0, 3)); S.refresh(); });
+})();
+</script>
+<script>
+/* 6. fejezet: izomorf gráfok */
+(function () {
+  const sec = 'izomorf', G = Graph(figOf(sec));
+  const FE = ['f-g', 'f-h', 'f-i', 'g-i'], ZERO = { 'f-g': MINUS + '4', 'f-h': '2', 'f-i': MINUS + '4', 'g-i': MINUS + '4' };
+  const Z = { f: [180, 120], g: [460, 120], i: [460, 340], h: [180, 340] };
+  const T = { f: [320, 100], g: [510, 380], i: [130, 380], h: [320, 255] };
+  const fe = () => E(FE, s => ({ label: ZERO[s] }));
+  const BE = ['A-B', 'A-D', 'A-E', 'B-C'];
+  const D1 = { A: [320, 170], D: [180, 80], E: [460, 80], B: [320, 300], C: [320, 415] };
+  const D2 = { A: [170, 210], B: [470, 130], C: [210, 400], D: [470, 350], E: [270, 70] };
+  const D3 = { A: [470, 230], B: [250, 120], C: [110, 310], D: [320, 405], E: [570, 410] };
+  const BEND3 = { 'A-B': 70, 'A-D': -60, 'B-C': 45, 'A-E': 30 };
+  const anon = P => N(P, () => ({ label: '' }));
+  const tri = (cx, k) => ({ ['A' + k]: [cx, 140], ['B' + k]: [cx - 80, 300], ['C' + k]: [cx + 80, 300] });
+  const P3 = Object.assign(tri(110, 1), tri(320, 2), tri(530, 3));
+  const hex = circlePos(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'], 170, 235, 115);
+  const t1 = circlePos(['t1', 't2', 't3'], 480, 145, 80), t2 = circlePos(['t4', 't5', 't6'], 480, 335, 80);
+  const P6 = Object.assign({}, hex, t1, t2);
+  const E6 = ['h1-h2', 'h2-h3', 'h3-h4', 'h4-h5', 'h5-h6', 'h1-h6', 't1-t2', 't2-t3', 't1-t3', 't4-t5', 't5-t6', 't4-t6'];
+  const steps = () => [
+    { line: 'Zsuzsi rajza', cap: 'Mivel az f függvény zérushelyei −4 és 2, a g függvény zérushelye −4, a h függvény zérushelyei 2 és −2, az i függvény zérushelyei 4 és −4, meghatározhatjuk, hogy melyik csúcsot melyik csúccsal kell összekötni (az éleken a közös zérushely). Ez Zsuzsi rajza.', st: () => ({ nodes: N(Z), edges: fe() }) },
+    { line: 'Tamás rajza: ugyanaz a gráf', cap: 'Bár első ránézésre Zsuzsi és Tamás rajza elég különböző, mindketten helyesen oldották meg a feladatot. Rajzaik ugyanazt a gráfot ábrázolják.', st: () => ({ nodes: N(T), edges: fe() }) },
+    { line: 'Egy 5 pontú gráf', cap: 'A gráfokkal elsősorban adott objektumok közötti kapcsolatokat szemléltetünk. A gráfmodellben ennek megfelelően általában azt vizsgáljuk, hogy adott gráf mely pontjait kötöttük össze éllel (azaz mely pontok között van kapcsolat).', st: () => ({ nodes: anon(D1), edges: E(BE) }) },
+    { line: 'Metsző élekkel', cap: 'Az sem számít, hogy az élek metszik egymást, ha a metszéspontjukat nem tekintjük a gráf pontjának.', st: () => ({ nodes: anon(D2), edges: E(BE) }) },
+    { line: 'Görbe vonalakkal', cap: 'Két pontot szakasz helyett görbe vonallal is összeköthetünk, ez nem jelent elvi különbséget (a kapcsolat így is, úgy is kapcsolat marad).', st: () => ({ nodes: anon(D3), edges: E(BE, s => ({ bend: BEND3[s] || 0 })) }) },
+    { line: 'Megbetűzve: a gráfok <b>izomorfak</b>', cap: 'Mindegyik gráf pontjait megbetűzhetjük A, B, C, D, E-vel úgy, hogy pl. A legyen a harmadfokú pont, B a másodfokú, és C legyen még B-vel összekötve. (A maradék két D és E pont szerepe szimmetrikus.) Ekkor pedig mindegyik gráfban pontosan ugyanazokat a pontokat kötöttük össze éllel. A fenti gráfok tehát <b>izomorfak</b>.', st: () => ({ nodes: N(D3, id => ({ cls: id === 'A' ? 'hl' : id === 'B' ? 'c1' : '' })), edges: E(BE, s => ({ bend: BEND3[s] || 0 })), deg: true }) },
+    { line: 'Megkülönböztetett pontok: 3 különböző gráf', cap: 'Más a helyzet akkor, ha a gráf pontjait megkülönböztetjük. Ha például tudjuk, hogy három személy (A, B, C) között összesen egy ismeretség van, akkor nem mindegy, hogy a három személy közül melyik kettő ismeri egymást. Így az ismeretségi gráf háromféle lehet, és ezek különböznek egymástól.', st: () => ({ nodes: N(P3, id => ({ label: id[0] })), edges: E(['A1-B1', 'A2-C2', 'B3-C3'], () => ({ cls: 'c1' })) }) },
+    { line: 'Azonos fokszámok, mégsem izomorfak', cap: 'Sokszor nem egyszerű feladat két gráfról eldönteni, hogy izomorfak-e. Itt mindkét gráfnak 6 pontja és 6 éle van, és minden pont foka 2, mégsem izomorfak: a bal oldali összefüggő, a jobb oldali nem.', st: () => ({ nodes: N(P6, () => ({ label: '' })), edges: E(E6, s => ({ cls: s[0] === 'h' ? 'c1' : 'c2' })), deg: true }) }
+  ];
+  chapter(sec, G, steps);
+})();
+
+/* 7. fejezet: adott fokszámokkal van-e gráf? */
+(function () {
+  const sec = 'fokszamsorozat', G = Graph(figOf(sec));
+  const A = [9, 8, 6, 5, 5, 4, 4, 3, 2, 0], B = [8, 3, 3, 3, 3, 3, 3, 1, 1, 0], Cn = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+  const ids = A.map((_, i) => 'n' + i), PC = circlePos(ids, 320, 230, 180);
+  const lab = (arr, cls) => N(PC, id => ({ label: String(arr[+id.slice(1)]), cls: cls ? cls(+id.slice(1)) : '' }));
+  const PB = Object.assign({ n0: [320, 235] }, circlePos(['n1', 'n2', 'n3', 'n4', 'n5', 'n6'], 320, 235, 150), { n7: [65, 235], n8: [575, 235], n9: [575, 55] });
+  const labB = cls => N(PB, id => ({ label: String(B[+id.slice(1)]), cls: cls ? cls(+id.slice(1)) : '' }));
+  const center = ['n0-n1', 'n0-n2', 'n0-n3', 'n0-n4', 'n0-n5', 'n0-n6', 'n0-n7', 'n0-n8'];
+  const TRI = ['n1-n3', 'n3-n5', 'n1-n5', 'n2-n4', 'n4-n6', 'n2-n6'], HEX = ['n1-n2', 'n2-n3', 'n3-n4', 'n4-n5', 'n5-n6', 'n1-n6'];
+  let rnd = null;
+  function randomGraph() {
+    const m = 8, rid = LET.slice(0, m), P = circlePos(rid, 320, 230, 175), set = [];
+    rid.forEach((a, i) => rid.slice(i + 1).forEach(b => { if (rand() < .42) set.push(a + '-' + b); }));
+    const nodes = N(P), edges = E(set), d = degrees(nodes, edges);
+    let pair = null;
+    for (let i = 0; i < m && !pair; i++) for (let j = i + 1; j < m && !pair; j++) if (d[rid[i]] === d[rid[j]]) pair = [rid[i], rid[j]];
+    pair.forEach(id => { nodes[id].cls = 'hl'; });
+    rnd = { nodes, edges, deg: true, pair, k: d[pair[0]] };
+  }
+  randomGraph();
+  const steps = () => [
+    { line: 'a) Összeg 46: páros', cap: 'a) 9, 8, 6, 5, 5, 4, 4, 3, 2, 0: a fokszámtétel teljesül (a fokszámok összege páros: 46), de nincs ilyen gráf.', st: () => ({ nodes: lab(A), edges: [] }) },
+    { line: 'a) A 9-es a 0-st is elérné: <b>nincs ilyen gráf</b>', cap: 'Ugyanis a kilencedfokú pontot az összes többi ponttal össze kell kötnünk – emiatt a gráfban nem lehet nulladfokú (izolált) pont.', st: () => ({ nodes: lab(A, i => i === 0 ? 'hl' : i === 9 ? 'bad' : ''), edges: E(ids.slice(1).map(b => 'n0-' + b), s => ({ cls: s === 'n0-n9' ? 'bad' : 'c1' })) }) },
+    { line: 'b) Összeg 28: 14 él', cap: 'b) 8, 3, 3, 3, 3, 3, 3, 1, 1, 0: a fokszámok összege 28, a gráfban – ha létezik – 14 él van.', st: () => ({ nodes: labB(), edges: [] }) },
+    { line: 'b) A 8-as mindenkivel, a 0-s kivételével', cap: 'A nyolcadfokú pontot az izolált pont kivételével az összes többivel összekötjük, így a két elsőfokú pontból további él nem indul ki.', st: () => ({ nodes: labB(i => i === 0 ? 'hl' : ''), edges: E(center, () => ({ cls: 'c1' })) }) },
+    { line: 'b) Maradt 6 pont, 6 él: mindenkinek még 2', cap: 'Hagyjuk el ezt a négy pontot és a belőlük kiinduló éleket a gráfból! Ekkor 6 pontú, 14 − 8 = 6 élű gráfot kapunk, elegendő ezt vizsgálni a továbbiakban: mindegyik pontból még 2 él indul.', st: () => ({ nodes: N(PB, id => { const i = +id.slice(1); return i >= 1 && i <= 6 ? { label: '3', badge: 2 } : { label: String(B[i]), cls: 'dim' }; }), edges: E(center, () => ({ cls: 'dim' })) }) },
+    { line: 'b) 1. lehetőség: két háromszög', cap: 'Ha összekötünk két pontot, akkor a gráf felépítését kétféleképpen folytathatjuk. Az egyik lehetőség, hogy mindkét pontot egy harmadikkal kötjük össze. Ekkor a befejezés egyértelmű: két (gráfelméleti) háromszöget kapunk.', st: () => ({ nodes: labB(), edges: E(center.concat(TRI), s => ({ cls: TRI.includes(s) ? 'c2' : '' })), deg: true }) },
+    { line: 'b) 2. lehetőség: hatszög; <b>két gráf</b> van', cap: 'A másik lehetőség, hogy a két pontot egy-egy további ponttal kötjük össze. Ezekből 1-1 él indul még ki, de nem köthetjük össze őket, mert akkor két darab másodfokú pont maradna. Ugyanazzal az ötödik ponttal sem köthetők össze, így a befejezés innen egyértelmű. Eredmény: két megfelelő gráf van.', st: () => ({ nodes: labB(), edges: E(center.concat(HEX), s => ({ cls: HEX.includes(s) ? 'c3' : '' })), deg: true }) },
+    { line: 'c) Tízféle fokszám: 9, 8, …, 0', cap: 'c) Tízféle lehetséges fokszám van: 9, 8, 7, … , 0.', st: () => ({ nodes: lab(Cn), edges: [] }) },
+    { line: 'c) 9 és 0 együtt nem lehet: skatulyaelv', cap: 'De – mint fentebb láttuk – nulladfokú és kilencedfokú pont egyszerre nem lehet a gráfban. A fokszámok lehetséges értékeire így csak 9 lehetőség marad, tehát a skatulyaelv miatt nem lehet mindegyik fokszám különböző.', st: () => ({ nodes: lab(Cn, i => i === 0 || i === 9 ? 'bad' : ''), edges: E(['n0-n9'], () => ({ cls: 'bad' })) }) },
+    { line: 'Tétel: van két azonos fokszámú pont', cap: () => 'Bármely egyszerű, legalább kétpontú gráfban létezik két azonos fokszámú pont. Ebben a véletlen társaságban ' + rnd.pair[0] + ' és ' + rnd.pair[1] + ' is ' + rnd.k + ' embert ismer.', st: () => rnd }
+  ];
+  const S = chapter(sec, G, steps, i => { $('#fsBtns').hidden = i !== 9; });
+  $('#fsRnd').addEventListener('click', () => { randomGraph(); S.refresh(); });
+})();
+
+/* 8. fejezet: út, séta, kör, komponensek */
+(function () {
+  const sec = 'ut-kor';
+  const P = { C: [130, 185], A: [70, 320], B: [200, 320], D: [290, 250], F: [475, 105], E: [365, 245], G: [440, 245], H: [515, 245], I: [585, 215], J: [545, 340], K: [612, 340] };
+  const ED = ['A-B', 'A-C', 'B-C', 'E-F', 'F-G', 'F-H', 'F-I', 'I-J', 'I-K'];
+  const PD = { 22: [320, 48], 9: [470, 58], 12: [168, 104], 8: [520, 112], 15: [110, 215], 7: [568, 222], 21: [150, 332], 5: [522, 332], 2: [300, 412], 4: [442, 398] };
+  const EDD = ['2-4', '2-8', '2-12', '2-22', '4-8', '4-12', '5-15', '7-21'];
+  const COMP = { A: 'c1', B: 'c1', C: 'c1', D: 'c2', E: 'c3', F: 'c3', G: 'c3', H: 'c3', I: 'c3', J: 'c3', K: 'c3' };
+  const COMPD = { 2: 'c1', 4: 'c1', 8: 'c1', 12: 'c1', 22: 'c1', 5: 'c2', 15: 'c2', 7: 'c3', 21: 'c3', 9: 'c4' };
+  let picks = [], S;
+  const G = Graph(figOf(sec), { onNode: id => {
+    picks.push(id);
+    const st = G.state;
+    if (picks.length === 1) {
+      const nodes = {}; for (const k in st.nodes) nodes[k] = Object.assign({}, st.nodes[k], { cls: k === id ? 'sel' : '' });
+      G.set({ nodes, edges: st.edges.map(e => Object.assign({}, e, { cls: '', label: '' })), bg: 0 }, true);
+      $('#' + sec + ' .figcap').innerHTML = 'Kiválasztva: <b>' + id + '</b>. Kattints egy másik pontra!';
+      return;
+    }
+    const [s, t] = picks; picks = [];
+    const p = bfsPath(adjOf(st.nodes, st.edges), s, t), on = new Set();
+    if (p) for (let i = 1; i < p.length; i++) on.add(ekey(p[i - 1], p[i]));
+    const nodes = {}; for (const k in st.nodes) nodes[k] = Object.assign({}, st.nodes[k], { cls: p && p.includes(k) ? 'hl' : (k === s || k === t ? 'bad' : '') });
+    G.set({ nodes, edges: st.edges.map(e => Object.assign({}, e, { cls: on.has(ekey(e.a, e.b)) ? 'hl' : '', label: '' })), bg: 0 }, true);
+    $('#' + sec + ' .figcap').innerHTML = p ? (s === t ? 'Ugyanaz a pont.' : 'Út ' + s + ' és ' + t + ' között: <b>' + p.join('–') + '</b>.')
+      : 'Nincs út ' + s + ' és ' + t + ' között: különböző komponensekhez tartoznak.';
+    adj(new Set(on));
+  } });
+  const bg = G.bg;
+  [['G₁', 135, 385], ['G₂', 290, 315], ['G₃', 490, 400]].forEach(([t, x, y]) => el('text', { x, y, class: 'bigtxt' }, bg, t));
+  function adj(hl) {
+    const ids = Object.keys(P).sort(), set = new Set(ED.map(s => ekey(...s.split('-'))));
+    let h = '<table class="adj"><tr><th></th>' + ids.map(i => '<th>' + i + '</th>').join('') + '</tr>';
+    ids.forEach(r => {
+      h += '<tr><th>' + r + '</th>' + ids.map(c => {
+        const k = ekey(r, c), one = set.has(k);
+        return '<td class="' + (one ? 'one' : '') + (hl && hl.has(k) ? ' on' : '') + '">' + (one ? 1 : '') + '</td>';
+      }).join('') + '</tr>';
+    });
+    $('#adjBox').innerHTML = h + '</table>';
+  }
+  const g1 = (ncls, ecls, lab) => ({ nodes: N(P, id => ({ cls: ncls ? ncls(id) : '' })), edges: E(ED, s => ({ cls: ecls ? ecls(s) : '', label: lab ? lab[s] || '' : '' })), bg: 0 });
+  const inP = (path) => { const s = new Set(); for (let i = 1; i < path.length; i++) s.add(ekey(path[i - 1], path[i])); return s; };
+  const pathSt = (path, cls = 'hl') => { const on = inP(path); return g1(id => path.includes(id) ? 'hl' : '', s => on.has(s) ? cls : ''); };
+  const steps = () => [
+    { line: 'a) Rajz és táblázat', cap: 'a) Az egyik leggyakoribb szemléltetési lehetőség az ábrán látható „rajzos” megadás. Egy másik módszer a táblázattal történő megadás: az A sora és B oszlopa találkozásához 1-et írunk, ha a két pont össze van kötve éllel.', st: () => g1(), hl: null },
+    { line: 'b) 11 pont, 9 él, egyszerű gráf', cap: 'b) A gráfnak 11 pontja és 9 éle van. Az egyes csúcsok fokszámai rendre 2, 2, 2, 0, 1, 4, 1, 1, 3, 1, 1. A gráf egyszerű, mert sem hurokél, sem többszörös él nem szerepel benne.', st: () => Object.assign(g1(), { deg: true }), hl: null },
+    { line: '<b>Út</b> A és B között: A–C–B', cap: 'A G₁ komponensben egy A és B közötti út például A–C–B vagy maga az A–B él is.', st: () => pathSt(['A', 'C', 'B']), hl: inP(['A', 'C', 'B']) },
+    { line: '<b>Séta</b>: G–F–H–F–I–J', cap: 'A (gráfelméleti) út speciális séta, hiszen a sétában többször szerepelhet ugyanaz a pont vagy él is. G–F–H–F–I–J séta (az élek sorszámával), de nem út: F-en kétszer megy át.', st: () => g1(id => 'GFHIJ'.includes(id) ? 'hl' : '', s => ['F-G', 'F-H', 'F-I', 'I-J'].includes(s) ? 'hl' : '', { 'F-G': '1', 'F-H': '2, 3', 'F-I': '4', 'I-J': '5' }), hl: inP(['G', 'F', 'H', 'F', 'I', 'J']) },
+    { line: '<b>Kör</b>: A–B–C–A', cap: 'Körnek nevezzük a kezdőpontjába visszavezető utat. A G₁ komponens három élből álló kör: A–B–C–A.', st: () => pathSt(['A', 'B', 'C', 'A'], 'c2'), hl: inP(['A', 'B', 'C', 'A']) },
+    { line: 'Nem összefüggő: <b>3 komponens</b>', cap: 'Az adott G gráf nem összefüggő, hiszen például A és D vagy A és E között nincs út. Három komponensből áll, ezeket a részgráfokat G₁, G₂, G₃-mal jelöltük. A G₂ komponens egy izolált pontból áll.', st: () => Object.assign(g1(id => COMP[id]), { bg: 1 }), hl: null },
+    { line: 'G₃: egyetlen út, fa', cap: 'A G₃ komponens is összefüggő (a komponens definíciója ezt megköveteli), de itt bármely két pont között csak egyetlen út van. Például G és K között G–F–I–K. A G₃ komponens hat élű fa.', st: () => Object.assign(pathSt(['G', 'F', 'I', 'K']), { bg: 1 }), hl: inP(['G', 'F', 'I', 'K']) },
+    { line: 'Az osztók gráfja: <b>4 komponens</b>', cap: 'A második gráf nem összefüggő, négy komponensből áll: {2, 4, 8, 12, 22}, {5, 15}, {7, 21}, {9}. (Az izolált pontot is komponensnek tekintjük.)', st: () => ({ nodes: N(PD, id => ({ cls: COMPD[id] })), edges: E(EDD), bg: 0 }), hl: null },
+    { line: 'Kör: 2–4–8–2', cap: 'A második gráfban kör például 2 – 4 – 8 – 2', st: () => ({ nodes: N(PD, id => ({ cls: ['2', '4', '8'].includes(id) ? 'hl' : '' })), edges: E(EDD, s => ({ cls: ['2-4', '4-8', '2-8'].includes(s) ? 'c2' : '' })), bg: 0 }), hl: null },
+    { line: 'Kör: 2–8–4–12–2', cap: 'vagy 2 – 8 – 4 – 12 – 2.', st: () => ({ nodes: N(PD, id => ({ cls: ['2', '4', '8', '12'].includes(id) ? 'hl' : '' })), edges: E(EDD, s => ({ cls: ['2-8', '4-8', '4-12', '2-12'].includes(s) ? 'c2' : '' })), bg: 0 }), hl: null }
+  ];
+  const list = steps();
+  S = chapter(sec, G, () => list, i => { picks = []; adj(list[i].hl); });
+})();
+
+/* 9. fejezet: fák */
+(function () {
+  const sec = 'fak';
+  let n = 8, tree = null, mode = null, S;
+  function newTree() {
+    const par = [-1], depth = [0];
+    for (let k = 1; k < n; k++) { let p = Math.floor(rand() * k); if (depth[p] >= 3) p = Math.floor(rand() * Math.min(k, 3)); par.push(p); depth.push(depth[p] + 1); }
+    const ids = LET.slice(0, n), maxD = Math.max(...depth), levels = [];
+    for (let k = 0; k < n; k++) (levels[depth[k]] = levels[depth[k]] || []).push(k);
+    const P = {}, xs = [];
+    levels.forEach((lv, d) => {
+      lv.sort((a, b) => (xs[par[a]] ?? 0) - (xs[par[b]] ?? 0) || a - b);
+      lv.forEach((k, j) => { xs[k] = Math.round(60 + (520 * (j + 1)) / (lv.length + 1)); P[ids[k]] = [xs[k], Math.round(55 + d * Math.min(110, 350 / Math.max(1, maxD)))]; });
+    });
+    const edges = [];
+    for (let k = 1; k < n; k++) edges.push(ekey(ids[par[k]], ids[k]));
+    tree = { ids, P, edges };
+    mode = null;
+  }
+  const COLORS = ['var(--n1)', 'var(--n2)', 'var(--n3)', 'var(--n4)', 'var(--n5)', '#99f6e4', '#fef08a', '#e9d5ff', '#fecaca', '#bae6fd', '#d9f99d', '#fbcfe8'];
+  function colorBy(nodes, edges) {
+    const { comp } = components(adjOf(nodes, edges));
+    for (const id in nodes) nodes[id].fill = COLORS[comp[id] % COLORS.length];
+    return nodes;
+  }
+  function interactive() {
+    const nodes = N(tree.P), base = E(tree.edges);
+    if (!mode) return { nodes: N(tree.P), edges: base, deg: true };
+    if (mode.cut) {
+      const edges = base.map(e => e.id === mode.cut ? Object.assign({}, e, { cls: 'ghost' }) : e);
+      return { nodes: colorBy(nodes, edges), edges };
+    }
+    const p = bfsPath(adjOf(nodes, base), mode.add[0], mode.add[1]), on = new Set();
+    for (let i = 1; i < p.length; i++) on.add(ekey(p[i - 1], p[i]));
+    const edges = base.map(e => Object.assign({}, e, { cls: on.has(e.id) ? 'c2' : '' }));
+    edges.push({ id: 'uj', a: mode.add[0], b: mode.add[1], cls: 'c2 thick' });
+    for (const id of p) nodes[id].cls = 'hl';
+    return { nodes, edges };
+  }
+  let pick = null;
+  const G = Graph(figOf(sec), {
+    onEdge: id => { if (S.step !== n || id === 'uj') return; mode = mode && mode.cut === id ? null : { cut: id }; pick = null; S.refresh(); },
+    onNode: id => {
+      if (S.step !== n) return;
+      if (!pick) { pick = id; mode = null; S.refresh(); return; }
+      const a = pick; pick = null;
+      if (a !== id && !tree.edges.includes(ekey(a, id))) mode = { add: [a, id] };
+      S.refresh();
+    }
+  });
+  const steps = () => {
+    const out = [{ line: n + ' pont, 0 él: ' + n + ' komponens', cap: 'Ha egy n pontú gráfban egyetlen él sincs, akkor n számú komponensből áll. Hány él behúzásával tudjuk összefüggővé tenni a gráfot? (Most n = ' + n + '; minden komponens más színű.)', st: () => ({ nodes: colorBy(N(tree.P), []), edges: [] }) }];
+    for (let k = 1; k < n; k++) {
+      const cap = k === 1 ? 'Ha most egy éllel két pontot összekötünk, akkor a komponensek számát 1-gyel csökkentjük, azaz (n − 1) = ' + (n - 1) + ' komponens keletkezik.'
+        : k < n - 1 ? 'Minden lépésben egy-egy komponenst kötünk össze egy újabb éllel, s így a komponensek darabszáma minden lépésben 1-gyel csökken: ' + k + ' él, ' + (n - k) + ' komponens.'
+        : 'Kezdetben n komponensből állt a gráf, míg az összefüggő gráf egyetlen komponensből áll; ezért (n − 1) = ' + (n - 1) + ' lépésre biztosan szükségünk van.';
+      out.push({ line: k + '. él: ' + (n - k) + ' komponens', cap, st: () => { const edges = E(tree.edges.slice(0, k), (s, i) => ({ cls: i === k - 1 ? 'hl' : '' })); return { nodes: colorBy(N(tree.P), edges), edges }; } });
+    }
+    out.push({ line: '<b>Fa</b>: ' + n + ' pont, ' + (n - 1) + ' él', cap: () => {
+      if (!mode) return pick ? 'Kiválasztva: <b>' + pick + '</b>. Kattints egy vele éllel nem összekötött pontra!' : 'Az n pontú fa éleinek száma n − 1. Bármely két pontja között egyetlen út vezet, ezért nincs benne kör. Próbáld ki: kattints egy élre (elhagyjuk), vagy két, éllel nem összekötött pontra (behúzzuk az élt).';
+      if (mode.cut) return '2. Ha egy fa valamely élét elhagyjuk, akkor a kapott gráf nem lesz összefüggő: ' + mode.cut.replace('-', ' és ') + ' különböző komponensekhez tartozik. (Nincs közöttük út.)';
+      return '3. Ha egy fa valamely két pontja között nincs él, akkor ezt az élt behúzva a gráfban kör keletkezik: ' + mode.add.join('–') + ' él.';
+    }, st: () => { const s = interactive(); if (pick && s.nodes[pick]) s.nodes[pick].cls = 'sel'; return s; } });
+    out.push({ line: 'Elsőfokú pontok: legalább kettő', cap: () => { const d = degrees(N(tree.P), E(tree.edges)); const L = tree.ids.filter(id => d[id] === 1); return 'Ha egy fa legalább kétpontú, akkor van elsőfokú pontja. (Azaz a fának legalább két elsőfokú pontja is van.) Itt ' + L.length + ' darab: ' + L.join(', ') + '. Indoklás a fokszámtétellel: az (n − 1) élnek 2(n − 1) vége van; ha minden pont foka legalább 2 lenne, az összeg legalább 2n lenne.'; },
+      st: () => { const nodes = N(tree.P), edges = E(tree.edges), d = degrees(nodes, edges); for (const id in nodes) if (d[id] === 1) nodes[id].cls = 'hl'; return { nodes, edges, deg: true }; } });
+    return out;
+  };
+  newTree();
+  S = chapter(sec, G, steps);
+  const refresh0 = S.refresh;
+  $('#nT').addEventListener('input', e => { n = +e.target.value; $('#nTo').textContent = n; newTree(); S.rebuild(); S.go(0); });
+  $('#treeNew').addEventListener('click', () => { newTree(); const k = S.step; S.rebuild(); S.go(k); });
+})();
+</script>
+<script>
+/* 10. fejezet: körök az 5 pontú teljes gráfban */
+(function () {
+  const sec = 'korok', G = Graph(figOf(sec));
+  const ids = LET.slice(0, 5), P = circlePos(ids, 320, 235, 185);
+  const ALL = []; ids.forEach((a, i) => ids.slice(i + 1).forEach(b => ALL.push(a + '-' + b)));
+  const C3 = [], C4 = [], C5 = [];
+  for (let a = 0; a < 5; a++) for (let b = a + 1; b < 5; b++) for (let c = b + 1; c < 5; c++) C3.push([a, b, c].map(i => ids[i]));
+  for (let skip = 4; skip >= 0; skip--) {
+    const [a, b, c, d] = ids.filter((_, i) => i !== skip);
+    C4.push([a, b, c, d], [a, b, d, c], [a, c, b, d]);
+  }
+  (function perm(rest, cur) {
+    if (!rest.length) { if (cur[0] < cur[3]) C5.push(['A'].concat(cur)); return; }
+    rest.forEach((x, i) => perm(rest.filter((_, j) => j !== i), cur.concat(x)));
+  })(['B', 'C', 'D', 'E'], []);
+  const cyc = c => { const s = new Set(); c.forEach((x, i) => s.add(ekey(x, c[(i + 1) % c.length]))); return s; };
+  let shown = null;
+  function main(c) {
+    shown = c;
+    const on = c ? cyc(c) : new Set();
+    G.set({ nodes: N(P, id => ({ cls: c && c.includes(id) ? 'hl' : '' })), edges: E(ALL, s => ({ cls: on.has(s) ? 'c1 thick' : (c ? 'ghost' : '') })) });
+    if (c) $('#' + sec + ' .figcap').dataset.cyc = c.join('–') + '–' + c[0];
+  }
+  function mini(c, isNew) {
+    const f = document.createElement('figure');
+    if (isNew) f.className = 'new';
+    const s = el('svg', { viewBox: '0 0 100 100', role: 'img', 'aria-label': c.join('–') });
+    const pp = circlePos(ids, 50, 52, 38), on = cyc(c);
+    ALL.forEach(k => { const [a, b] = k.split('-'); el('line', { x1: pp[a][0], y1: pp[a][1], x2: pp[b][0], y2: pp[b][1], stroke: on.has(k) ? 'var(--accent)' : 'var(--line)', 'stroke-width': on.has(k) ? 5 : 1.5, 'stroke-linecap': 'round' }, s); });
+    ids.forEach(id => el('circle', { cx: pp[id][0], cy: pp[id][1], r: 6, fill: c.includes(id) ? 'var(--hl)' : 'var(--bg)', stroke: 'var(--fg)', 'stroke-width': 1.5 }, s));
+    f.appendChild(s);
+    const cap = document.createElement('figcaption');
+    cap.textContent = c.join('') + c[0];
+    f.appendChild(cap);
+    const act = () => { $$('#minis figure').forEach(x => x.classList.remove('on')); f.classList.add('on'); main(c); };
+    f.addEventListener('mouseenter', act);
+    f.addEventListener('click', act);
+    return f;
+  }
+  function minis(groups, fresh) {
+    const box = $('#minis');
+    box.innerHTML = '';
+    groups.forEach(([title, list]) => {
+      const h = document.createElement('h4'); h.textContent = title; box.appendChild(h);
+      list.forEach(c => box.appendChild(mini(c, fresh)));
+    });
+  }
+  const G3 = ['3 hosszú körök: 10', C3], G4 = ['4 hosszú körök: 15', C4], G5 = ['5 hosszú körök: 12', C5];
+  const steps = [
+    { line: 'A köröket hosszuk szerint számoljuk', cap: 'A köröket a hosszuk, azaz a bennük szereplő élek száma alapján számoljuk össze.', g: [], sum: '' },
+    { line: '1 és 2 hosszú kör nincs', cap: '1 és 2 hosszú kör nincs a gráfban. (Ezek lennének a hurokélek, illetve a többszörös élek.)', g: [], sum: '' },
+    { line: '3 hosszú: ' + BIN(5, 3) + ' = 10', cap: 'A 3 hosszú körök száma ' + BIN(5, 3) + ' = 10, mert bármely három pont pontosan egy kört határoz meg. (Mutass a kis ábrákra!)', g: [G3], sum: '10', first: C3[0] },
+    { line: '4 hosszú: ' + BIN(5, 4) + ' · 3 = 15', cap: 'A gráfban 4 pontot ' + BIN(5, 4) + '-féleképpen választhatunk ki. Az A–B–C–D / A–D–C–B körök megegyeznek, de A–C–B–D és A–C–D–B különbözők, és egymástól is különböznek. A 4 hosszú körök száma ' + BIN(5, 4) + ' · 3 = 15.', g: [G4], sum: '10 + 15', first: C4[0] },
+    { line: '5 hosszú: 4!/2 = 12', cap: 'Az A, B, C, D, E csúcsokat 5!-féleképpen rendezhetjük sorba. A ciklikus szimmetria miatt egy-egy kört 5 sorrend is meghatároz. Rögzítsük tehát az A csúcsot; hozzá képest a B, C, D, E pontok már csak 4!-féle sorrendet adnak. A kétféle körüljárási irány miatt még most is kétszer számoltunk minden kört: A–B–C–D–E / A–E–D–C–B. Az 5 hosszú körök száma tehát 4!/2 = 12.', g: [G5], sum: '10 + 15 + 12', first: C5[0] },
+    { line: 'Összesen: 10 + 15 + 12 = <b>37</b>', cap: 'Eredmény: a körök száma 10 + 15 + 12 = <b>37</b>.', g: [G3, G4, G5], sum: '10 + 15 + 12 = 37', first: null }
+  ];
+  stepper(sec, steps.length - 1, i => {
+    const s = steps[i];
+    main(s.first || null);
+    $('#' + sec + ' .figcap').innerHTML = s.cap;
+    stepList($('#' + sec + ' .steps'), steps.map(x => x.line), i);
+    minis(s.g, i < 5);
+    $('#korSum').textContent = s.sum;
+  }).refresh();
+})();
+
+/* 11. fejezet: königsbergi hidak, Euler-séta */
+(function () {
+  const sec = 'konigsberg', G = Graph(figOf(sec));
+  const bg = G.bg;
+  el('rect', { x: 0, y: 0, width: 640, height: 460, fill: 'var(--land)' }, bg);
+  ['M0,230 C70,230 70,155 150,155 L640,155', 'M0,230 C70,230 70,305 150,305 L640,305', 'M450,155 L450,305'].forEach(d =>
+    el('path', { d, fill: 'none', stroke: 'var(--river)', 'stroke-width': 44 }, bg));
+  [[170, 155, 0], [330, 155, 0], [170, 305, 0], [330, 305, 0], [560, 155, 0], [560, 305, 0], [450, 230, 1]].forEach(([x, y, h]) => {
+    const w = h ? 66 : 22, hh = h ? 22 : 66;
+    el('rect', { x: x - w / 2, y: y - hh / 2, width: w, height: hh, rx: 3, fill: 'var(--bridge)' }, bg);
+  });
+  el('text', { x: 250, y: 272, class: 'maptxt' }, bg, 'Kneiphof');
+  el('text', { x: 395, y: 160, class: 'maptxt' }, bg, 'Pregel');
+  const PM = { A: [300, 70], B: [250, 225], C: [300, 390], D: [565, 230] };
+  const PG = { A: [320, 70], B: [200, 230], C: [320, 390], D: [520, 230] };
+  const VIA = { 'A-B#1': [170, 155], 'A-B#2': [330, 155], 'B-C#1': [170, 305], 'B-C#2': [330, 305], 'A-D': [560, 155], 'C-D': [560, 305], 'B-D': [450, 230] };
+  const BEND = { 'A-B#1': 40, 'A-B#2': -40, 'B-C#1': 40, 'B-C#2': -40 };
+  const SEVEN = ['A-B#1', 'A-B#2', 'B-C#1', 'B-C#2', 'A-D', 'C-D', 'B-D'];
+  const EIGHT = SEVEN.concat(['A-B#3']);
+  const NUM = { 'C-D': 1, 'A-D': 2, 'A-B#1': 3, 'A-B#3': 4, 'A-B#2': 5, 'B-C#1': 6, 'B-C#2': 7, 'B-D': 8 };
+  const WALK = ['C', 'D', 'A', 'B', 'A', 'B', 'C', 'B', 'D'];
+  const ORDER = Object.keys(NUM).sort((a, b) => NUM[a] - NUM[b]);
+  const eg = (list, f) => E(list, s => Object.assign({ bend: BEND[s] || 0 }, f ? f(s) : {}));
+  const steps = [
+    { line: 'Königsberg: 4 városrész, 7 híd', cap: 'Lehet-e olyan sétát tenni a városban, amelynek során mindegyik hídon pontosan egyszer kelnek át, majd visszatérnek a kiindulási helyzetükbe?', st: () => ({ nodes: {}, edges: [], bg: 1 }) },
+    { line: 'Városrész → pont, híd → él', cap: 'A feladat gráfelméleti jellegű. A gráfmodellben a pontoknak az egyes városrészeket, az éleknek pedig az őket összekötő hidakat feleltetjük meg.', st: () => ({ nodes: N(PM), edges: E(SEVEN, s => ({ via: VIA[s] })), bg: 1 }) },
+    { line: 'A gráf: van-e minden élen egyszer áthaladó körséta?', cap: 'Az új fogalmakkal a königsbergi hidak problémája a matematika nyelvén a következő: létezik-e olyan körséta a gráfban, amely minden élen pontosan egyszer halad át?', st: () => ({ nodes: N(PG), edges: eg(SEVEN), bg: 0 }) },
+    { line: 'Fokszámok: 3, 5, 3, 3', cap: 'A gráf A, B, C, D pontjainak fokszáma rendre 3, 5, 3, 3: mind páratlan.', st: () => ({ nodes: N(PG, () => ({ cls: 'bad' })), edges: eg(SEVEN), deg: true, bg: 0 }) },
+    { line: 'Euler: be kell menni és ki kell jönni', cap: '1735-ben Euler megmutatta, hogy a kívánt séta lehetetlen. Ugyanis ha a gráf bejárása során valamelyik élen át egy közbülső pontba érkezünk, akkor egy másik élen keresztül el is kell hagynunk azt a pontot. Ha a bejárás lehetséges, akkor emiatt minden pont fokszáma páros kell, hogy legyen. (Ez igaz a kiindulási pontra is, mert azt elhagyjuk, majd oda vissza is kell térnünk.) B-nél az 5 él közül egy pár nélkül marad.', st: () => ({ nodes: N(PG, id => ({ cls: id === 'B' ? 'hl' : 'dim' })), edges: eg(SEVEN, s => ({ cls: s.endsWith('#1') ? 'c1' : s.endsWith('#2') ? 'c3' : s === 'B-D' ? 'bad' : 'dim' })), deg: true, bg: 0 }) },
+    { line: 'Négy páratlan fokú pont: <b>nem járható be</b>', cap: 'A város gráfjában négy páratlan fokú pont is van, ezért a hidak nem járhatók be a kívánt módon. A fenti, fokszámokra vonatkozó szükséges feltétel igaz nem egyszerű gráfokra is. Az is igazolható, hogy összefüggő gráfokra a feltétel elégséges is.', st: () => ({ nodes: N(PG, () => ({ cls: 'bad' })), edges: eg(SEVEN), deg: true, bg: 0 }) },
+    { line: '9. példa: még egy él A és B között', cap: '9. példa: Ha egy élt (nem hurokélt) behúzunk, akkor a gráfban két páros és két páratlan fokszámú pont lesz. Példaképpen az A és B pontok között húzunk be egy további élt. Ekkor C és D páratlan fokú pont marad; az egyik lesz a kezdőpontja, a másik pedig a végpontja a sétának.', st: () => ({ nodes: N(PG, id => ({ cls: id === 'C' || id === 'D' ? 'hl' : '' })), edges: eg(EIGHT, s => ({ cls: s === 'A-B#3' ? 'c2 thick' : '' })), deg: true, bg: 0 }) }
+  ];
+  for (let k = 1; k <= 8; k++) {
+    const used = ORDER.slice(0, k);
+    steps.push({
+      line: k + '. él: ' + WALK[k - 1] + ' → ' + WALK[k],
+      cap: k < 8 ? 'A séta ' + k + '. éle: ' + WALK[k - 1] + ' → ' + WALK[k] + '. Eddig: ' + WALK.slice(0, k + 1).join('–') + '.' : 'Az ábrán megadtunk egy lehetséges sétát: ' + WALK.join('–') + '. Minden élen pontosan egyszer haladt át, C-ből indult, D-be érkezett.',
+      st: () => ({ nodes: N(PG, id => ({ cls: id === WALK[k] ? 'sel' : (id === 'C' ? 'ok' : '') })), edges: eg(EIGHT, s => ({ cls: used.includes(s) ? (s === used[k - 1] ? 'hl thick' : 'hl') : '', label: used.includes(s) ? String(NUM[s]) : '', lcls: 'hl' })), bg: 0 })
+    });
+  }
+  steps.push({
+    line: 'Vigyázat: zsákutca', cap: 'A fokszámokra vonatkozó bejárási feltétel elégséges, de nem automatikus, a bejáráskor vigyáznunk kell. Ha például az 1, 2, 3, 4, 5 élek után a 8-at választjuk, akkor zsákutcába jutunk, nem tudjuk folytatni a bejárást (a 6-os és a 7-es él kimarad).',
+    st: () => ({ nodes: N(PG, id => ({ cls: id === 'D' ? 'bad' : '' })), edges: eg(EIGHT, s => ({ cls: NUM[s] === 6 || NUM[s] === 7 ? 'bad' : 'hl', label: String(NUM[s]), lcls: NUM[s] === 6 || NUM[s] === 7 ? 'bad' : 'hl' })), bg: 0 })
+  });
+  chapter(sec, G, () => steps);
+
+  /* egy vonallal rajzolós játék */
+  const PUZ = {
+    'Házikó': { P: { A: [140, 400], B: [380, 400], C: [380, 220], D: [140, 220], E: [260, 70] }, E: ['A-B', 'B-C', 'C-D', 'A-D', 'A-C', 'B-D', 'D-E', 'C-E'] },
+    'Königsberg + 1 híd': { P: { A: [270, 60], B: [150, 220], C: [270, 380], D: [430, 220] }, E: EIGHT, bend: BEND },
+    'Königsberg': { P: { A: [270, 60], B: [150, 220], C: [270, 380], D: [430, 220] }, E: SEVEN, bend: BEND },
+    'Ötágú csillag': { P: circlePos(LET.slice(0, 5), 260, 225, 175), E: ['A-B', 'B-C', 'C-D', 'D-E', 'A-E', 'A-C', 'A-D', 'B-D', 'B-E', 'C-E'] }
+  };
+  let pz = 'Házikó', path = [], used = [];
+  const GE = Graph($('#eulEd'), {
+    onNode: id => { if (!path.length) { path = [id]; render(); } },
+    onEdge: id => {
+      if (!path.length || used.includes(id)) return;
+      const e = PUZ[pz].E.includes(id) && id.split('#')[0].split('-'), cur = path[path.length - 1];
+      if (!e || !e.includes(cur)) return;
+      used.push(id); path.push(e[0] === cur ? e[1] : e[0]); render();
+    }
+  });
+  function render() {
+    const z = PUZ[pz], nodes = N(z.P), edges = E(z.E, s => ({ bend: (z.bend || {})[s] || 0 }));
+    const d = degrees(nodes, edges), odd = Object.keys(d).filter(id => d[id] % 2);
+    const cur = path[path.length - 1];
+    for (const id in nodes) nodes[id].cls = id === cur ? 'sel' : (id === path[0] ? 'ok' : '');
+    edges.forEach(e => { const i = used.indexOf(e.id); if (i >= 0) { e.cls = 'hl'; e.label = String(i + 1); e.lcls = 'hl'; } });
+    GE.set({ nodes, edges, deg: true }, true);
+    let msg = odd.length === 0 ? 'Minden pont foka páros: körséta bármelyik pontból indulhat.' : odd.length === 2 ? 'Két páratlan fokú pont van (' + odd.join(', ') + '): az egyikből kell indulni, a másikba érkezünk.' : odd.length + ' páratlan fokú pont van (' + odd.join(', ') + '): egy vonallal nem rajzolható le.';
+    let st;
+    if (!path.length) st = 'Kattints a kezdőpontra!';
+    else if (used.length === z.E.length) st = '<span class="badge">Kész!</span> Minden élen pontosan egyszer haladtál át: ' + path.join('–') + '.';
+    else {
+      const left = z.E.filter(s => !used.includes(s) && s.split('#')[0].split('-').includes(cur));
+      st = left.length ? 'Itt tartasz: ' + cur + '. Kattints a következő élre! (' + used.length + ' / ' + z.E.length + ' él)' : '<span class="badge bad">Elakadtál</span> ' + cur + '-ből nem indul több használatlan él. Visszalépés vagy újra.';
+    }
+    $('#eulInfo').innerHTML = '<p class="def">' + msg + '</p><p class="def">' + st + '</p>';
+    $$('#eulPick button').forEach(b => b.classList.toggle('act', b.textContent === pz));
+  }
+  Object.keys(PUZ).forEach(k => {
+    const b = document.createElement('button');
+    b.textContent = k;
+    b.addEventListener('click', () => { pz = k; path = []; used = []; render(); });
+    $('#eulPick').appendChild(b);
+  });
+  $('#eulUndo').addEventListener('click', () => { if (used.length) { used.pop(); path.pop(); } else path = []; render(); });
+  $('#eulReset').addEventListener('click', () => { path = []; used = []; render(); });
+  render();
+})();
+
+/* 12. fejezet: legkisebb költségű hálózat (költséges élek törlése) */
+(function () {
+  const sec = 'halozat', G = Graph(figOf(sec));
+  const ids = LET.slice(0, 6), P = circlePos(ids, 320, 232, 185, -120);
+  const W = { 'A-B': 10, 'B-C': 6, 'C-D': 3, 'D-E': 7, 'E-F': 5, 'A-F': 12, 'A-C': 9, 'B-D': 11, 'C-E': 4, 'D-F': 8, 'A-E': 13, 'B-F': 14, 'A-D': 15, 'B-E': 2, 'C-F': 1 };
+  const LONG = { 'A-D': .3, 'B-E': .72, 'C-F': .3 };
+  const order = Object.keys(W).sort((a, b) => W[b] - W[a]);
+  const steps = [];
+  const removed = new Set(), kept = new Set();
+  const conn = rem => { const nodes = N(P), edges = E(Object.keys(W).filter(s => !rem.has(s))); return components(adjOf(nodes, edges)).list.length === 1; };
+  const snap = (cur, how) => {
+    const rem = new Set(removed), kp = new Set(kept);
+    return () => ({ nodes: N(P), edges: E(Object.keys(W), s => ({
+      cls: s === cur ? (how === 'del' ? 'bad' : 'c3 thick') : rem.has(s) ? 'ghost' : kp.has(s) ? 'c3' : '',
+      label: rem.has(s) && s !== cur ? '' : String(W[s]), lt: LONG[s] ?? .5, lcls: s === cur ? (how === 'del' ? 'bad' : 'hl') : ''
+    })) });
+  };
+  const sum = () => Object.keys(W).filter(s => !removed.has(s)).reduce((t, s) => t + W[s], 0);
+  steps.push({ line: 'Teljes gráf: 6 pont, 15 él', cap: 'Először egy teljes gráfot készítettek, és a gráf minden élére ráírták, hogy mennyibe kerülne az adott kapcsolat kiépítése (saját példa: 6 település).', st: snap(null), info: 'Élek: 15, költség: ' + sum() });
+  for (const s of order) {
+    if (removed.size === 10) break;
+    const test = new Set(removed); test.add(s);
+    const nm = s.replace('-', '–');
+    if (conn(test)) {
+      steps.push({ line: W[s] + ' (' + nm + '): törölve', cap: 'A legdrágább még meglévő él a ' + nm + ' (' + W[s] + '). Törlés után a gráf összefüggő marad, ezért kitöröljük.', st: snap(s, 'del') });
+      removed.add(s);
+    } else {
+      steps.push({ line: W[s] + ' (' + nm + '): <b>marad</b>', cap: 'A ' + nm + ' él (' + W[s] + ') törlése után a megmaradó gráf nem lenne összefüggő (A elszigetelődne), ezért ez az él marad.', st: snap(s, 'keep') });
+      kept.add(s);
+    }
+    steps[steps.length - 1].info = 'Törölve: ' + removed.size + ' él, maradt: ' + (15 - removed.size) + ', költség: ' + sum();
+  }
+  const fin = Object.keys(W).filter(s => !removed.has(s)).sort((a, b) => W[a] - W[b]);
+  steps.push({ line: 'Fagráf: 5 él', cap: 'A teljes gráf élei kétharmadának (15-ből 10-nek) törlése után végül egy (a legkisebb költségű hálózatot megadó) fagráfot kaptak: 5 él, költsége ' + fin.map(s => W[s]).join(' + ') + ' = ' + sum() + '.', st: () => ({ nodes: N(P, () => ({ cls: 'hl' })), edges: E(fin, s => ({ cls: 'c3', label: String(W[s]), lt: LONG[s] ?? .5 })) }), info: 'Maradt: 5 él, költség: ' + sum() });
+  steps.push({ line: 'n(n − 1)/2 · 1/3 = n − 1 → <b>n = 6</b>', cap: 'Ha n település szerepelt, a teljes gráfnak n(n − 1)/2 éle van, a fagráfnak n − 1. Kétharmad törlése után az élek harmada maradt: n(n − 1)/2 · 1/3 = n − 1, azaz n(n − 1) = 6(n − 1), és mivel n > 1, <b>n = 6</b>. 6 település szerepelt a tervben.', st: () => ({ nodes: N(P, () => ({ cls: 'hl' })), edges: E(fin, s => ({ cls: 'c3', label: String(W[s]), lt: LONG[s] ?? .5 })) }), info: '15 · 1/3 = 5 = 6 − 1 ✓' });
+  chapter(sec, G, () => steps, (i, s) => { $('#netInfo').textContent = s.info || ''; });
+})();
+
+/* 13. fejezet: hat ember, egyszínű háromszög */
+(function () {
+  const sec = 'hat-ember';
+  const ids = LET.slice(0, 6), P = circlePos(ids, 320, 232, 185);
+  const ALL = []; ids.forEach((a, i) => ids.slice(i + 1).forEach(b => ALL.push(a + '-' + b)));
+  let sample = {}, user = {}, S;
+  function makeSample() { sample = {}; ALL.forEach(s => { sample[s] = rand() < .5 ? 'red' : 'blue'; }); }
+  makeSample();
+  const HU = { red: 'piros', blue: 'kék' };
+  function analyse() {
+    const fromA = ALL.filter(s => s.startsWith('A-'));
+    const red = fromA.filter(s => sample[s] === 'red'), col = red.length >= 3 ? 'red' : 'blue';
+    const three = fromA.filter(s => sample[s] === col).slice(0, 3), [X, Y, Z] = three.map(s => s.split('-')[1]);
+    const inner = [ekey(X, Y), ekey(Y, Z), ekey(X, Z)], same = inner.find(s => sample[s] === col);
+    const tri = same ? ['A'].concat(same.split('-')) : [X, Y, Z];
+    return { col, X, Y, Z, three, inner, same, tri, tcol: same ? col : (col === 'red' ? 'blue' : 'red') };
+  }
+  function findMono(colors) {
+    for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) for (let k = j + 1; k < 6; k++) {
+      const [a, b, c] = [ids[i], ids[j], ids[k]], e = [ekey(a, b), ekey(b, c), ekey(a, c)];
+      if (colors[e[0]] && colors[e[0]] === colors[e[1]] && colors[e[1]] === colors[e[2]]) return { tri: [a, b, c], col: colors[e[0]], e };
+    }
+    return null;
+  }
+  const G = Graph(figOf(sec), { onEdge: id => {
+    if (S.step !== 7) return;
+    user[id] = !user[id] ? 'red' : user[id] === 'red' ? 'blue' : undefined;
+    if (!user[id]) delete user[id];
+    S.refresh();
+  } });
+  const colored = (map, f) => E(ALL, s => ({ cls: (map[s] || 'ghost') + (f ? f(s) : '') }));
+  const steps = () => {
+    const a = analyse(), tri = new Set([ekey(a.tri[0], a.tri[1]), ekey(a.tri[1], a.tri[2]), ekey(a.tri[0], a.tri[2])]);
+    const triTxt = a.tri.join('–');
+    return [
+      { line: '6 pont: a 6 ember', cap: 'A gráfelméleti átfogalmazás szerint a pontok az emberek. Két pont között piros él van, ha kezet fogtak, és kék (szaggatott), ha nem fogtak kezet.', st: () => ({ nodes: N(P), edges: colored({}) }) },
+      { line: 'Egy lehetséges összejövetel', cap: 'Egy lehetséges összejövetel: a teljes gráf mind a 15 éle piros vagy kék.', st: () => ({ nodes: N(P), edges: colored(sample) }) },
+      { line: 'Az A pont 5 éle', cap: 'Nézzük az A pontot: 5 él indul belőle, mindegyik piros vagy kék.', st: () => ({ nodes: N(P, id => ({ cls: id === 'A' ? 'hl' : '' })), edges: colored(sample, s => s.startsWith('A-') ? '' : ' dim') }) },
+      { line: 'Skatulyaelv: legalább 3 egyszínű', cap: '5 él és 2 szín: a skatulyaelv miatt legalább 3 él azonos színű. Itt A–' + a.X + ', A–' + a.Y + ', A–' + a.Z + ' ' + HU[a.col] + '.', st: () => ({ nodes: N(P, id => ({ cls: id === 'A' ? 'hl' : [a.X, a.Y, a.Z].includes(id) ? 'sel' : '' })), edges: colored(sample, s => a.three.includes(s) ? ' thick' : ' dim') }) },
+      { line: a.X + ', ' + a.Y + ', ' + a.Z + ' között', cap: 'Ha ' + a.X + ', ' + a.Y + ', ' + a.Z + ' között van egy ' + HU[a.col] + ' él, az A-val együtt ' + HU[a.col] + ' háromszöget ad. Ha nincs, akkor mindhárom él ' + HU[a.col === 'red' ? 'blue' : 'red'] + ', és ' + a.X + ', ' + a.Y + ', ' + a.Z + ' háromszöge egyszínű. ' + (a.same ? 'Itt ' + a.same.replace('-', '–') + ' ' + HU[a.col] + '.' : 'Itt egyik sem ' + HU[a.col] + '.'), st: () => ({ nodes: N(P, id => ({ cls: [a.X, a.Y, a.Z].includes(id) ? 'sel' : '' })), edges: colored(sample, s => a.three.includes(s) || a.inner.includes(s) ? ' thick' : ' dim') }) },
+      { line: 'Egyszínű háromszög: ' + triTxt, cap: (a.tcol === 'red' ? triTxt + ': mindannyian kezet fogtak egymással.' : triTxt + ': egyikük sem fogott kezet a másik kettővel.') + ' A gondolatmenet bármely színezésre működik, ezért mindig kiválasztható ilyen három ember.', st: () => ({ nodes: N(P, id => ({ cls: a.tri.includes(id) ? 'hl' : '' })), edges: colored(sample, s => tri.has(s) ? ' thick' : ' dim') }) },
+      { line: '5 embernél nem igaz', cap: '5 embernél az állítás nem igaz: ha az ötszög oldalai pirosak, az átlói (az ötágú csillag) kékek, akkor nincs egyszínű háromszög.', st: () => { const p5 = circlePos(LET.slice(0, 5), 320, 235, 185), L5 = LET.slice(0, 5), ed = []; L5.forEach((x, i) => L5.slice(i + 1).forEach(y => ed.push(x + '-' + y))); return { nodes: N(p5), edges: E(ed, s => { const d = Math.abs(LET.indexOf(s[0]) - LET.indexOf(s[2])); return { cls: d === 1 || d === 4 ? 'red' : 'blue' }; }) }; } },
+      { line: 'Próbáld ki!', cap: () => { const m = findMono(user), n = Object.keys(user).length; return m ? 'Egyszínű háromszög: <b>' + m.tri.join('–') + '</b> (' + HU[m.col] + ').' + (n < 15 ? ' Színezd tovább, vagy próbáld elkerülni!' : '') : n === 15 ? 'Ez nem lehet: 15 színes élnél mindig van egyszínű háromszög.' : 'Kattints az élekre: szürke → piros → kék. Próbáld úgy színezni mind a 15 élt, hogy ne legyen egyszínű háromszög! (' + n + ' / 15)'; },
+        st: () => { const m = findMono(user); return { nodes: N(P, id => ({ cls: m && m.tri.includes(id) ? 'hl' : '' })), edges: colored(user, s => m && m.e.includes(s) ? ' thick' : '') }; } }
+    ];
+  };
+  S = chapter(sec, G, steps, i => { $('#ramBtns').hidden = i !== 7; });
+  S.refresh = (() => { const r = S.refresh; return () => { const i = S.step; S.rebuild(); S.go(i); }; })();
+  $('#ramRnd').addEventListener('click', () => { user = {}; ALL.forEach(s => { user[s] = rand() < .5 ? 'red' : 'blue'; }); S.refresh(); });
+  $('#ramClr').addEventListener('click', () => { user = {}; S.refresh(); });
+})();
+
+/* billentyűk: mindig az a fejezet lép, amelyik éppen a képernyő felső részén látszik */
+(function () {
+  function current() {
+    const y = Math.min(window.innerHeight * 0.4, 320);
+    let best = null, bestD = Infinity;
+    $$('main > section').forEach(sec => {
+      const r = sec.getBoundingClientRect();
+      const d = r.top <= y && r.bottom >= y ? 0 : Math.min(Math.abs(r.top - y), Math.abs(r.bottom - y));
+      if (d < bestD) { bestD = d; best = sec; }
+    });
+    return best.id;
+  }
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.ctrlKey || e.altKey || e.metaKey) return;
+    const next = ['ArrowRight', 'PageDown', ' '].includes(e.key), prev = ['ArrowLeft', 'PageUp'].includes(e.key);
+    if (!next && !prev) return;
+    e.preventDefault();
+    if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
+    $('#' + current() + ' .pager [data-r="' + (next ? 'next' : 'prev') + '"]').click();
+  });
+})();
+</script>
+</body>
+</html>

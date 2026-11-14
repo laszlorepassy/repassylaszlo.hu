@@ -1,0 +1,1231 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Másodfokú egyenletek – animációk és levezetések</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --panel: #f5f7fa;
+  --fg: #1b1f24;
+  --muted: #59636e;
+  --line: #d5dae0;
+  --grid: #e6e9ed;
+  --axis: #6b7280;
+  --curve: #2563eb;
+  --sq: #3b82f6;
+  --rect: #ea580c;
+  --corner: #eab308;
+  --root: #ef4444;
+  --accent: #2563eb;
+  --ok: #16a34a;
+  --warn: #d97706;
+  --bad: #dc2626;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171b;
+    --panel: #1d2228;
+    --fg: #e8ebef;
+    --muted: #9aa4af;
+    --line: #333b44;
+    --grid: #262c33;
+    --axis: #8b95a1;
+    --curve: #6ea0ff;
+    --sq: #3b82f6;
+    --rect: #f97316;
+    --corner: #facc15;
+    --root: #f87171;
+    --accent: #6ea0ff;
+    --ok: #22c55e;
+    --warn: #f59e0b;
+    --bad: #ef4444;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.top-nav {
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.top-nav a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.top-nav a:hover {
+  text-decoration: underline;
+}
+header {
+  padding: 24px 24px 12px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+h1 {
+  font-size: 1.85rem;
+  margin: 0 0 16px;
+}
+main {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+.anim-section {
+  margin-bottom: 50px;
+  scroll-margin-top: 20px;
+}
+.anim-section h2 {
+  font-size: 1.35rem;
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--line);
+  color: var(--fg);
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(360px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+.plot-container, .geo-container {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.panel h3 {
+  font-size: 1.05rem;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-weight: 700;
+}
+.eq {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.sl {
+  display: grid;
+  grid-template-columns: 2.2em 1fr 3.8em;
+  gap: 10px;
+  align-items: center;
+  margin: 8px 0;
+}
+.sl label {
+  font-weight: 700;
+  font-style: italic;
+}
+.sl output {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--accent);
+}
+input[type=range] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.btns button, .calc button, .trainer-input button {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  transition: all 0.15s;
+}
+.btns button:hover, .calc button:hover, .trainer-input button:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.btns button.active {
+  background: var(--accent);
+  color: #fff;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.88em;
+}
+.badge.two { background: var(--ok); }
+.badge.one { background: var(--warn); }
+.badge.none { background: var(--bad); }
+.note { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin-top: 6px; }
+.steps { list-style: none; margin: 0; padding: 0; }
+.steps li {
+  padding: 8px 12px;
+  border-left: 4px solid transparent;
+  opacity: .5;
+  transition: opacity .3s, border-color .3s;
+  font-size: 0.98rem;
+}
+.steps li.cur { opacity: 1; border-color: var(--accent); background: var(--bg); border-radius: 0 4px 4px 0; }
+.steps li.done { opacity: .85; }
+.dots { display: flex; gap: 6px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.dots i.on { background: var(--accent); }
+.calc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.calc input {
+  font: inherit; width: 5em; padding: 4px 6px; border: 1px solid var(--line);
+  border-radius: 6px; background: var(--bg); color: var(--fg);
+}
+.caption { min-height: 2.8em; font-size: 0.95rem; line-height: 1.5; }
+.pager {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
+}
+.pager button {
+  font: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer; padding: 5px 12px;
+  border-radius: 6px; border: 1px solid var(--accent); background: transparent; color: var(--accent);
+}
+.pager button.wide { padding: 5px 16px; }
+.pager button:hover:not(:disabled) { background: var(--accent); color: #fff; }
+.pager button:disabled { opacity: .35; cursor: default; }
+
+/* Viète-kiegészítések */
+.viete-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 10px 0;
+}
+@media (max-width: 500px) {
+  .viete-cards { grid-template-columns: 1fr; }
+}
+.v-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+.v-card.sum { border-left: 4px solid var(--accent); }
+.v-card.prod { border-left: 4px solid var(--ok); }
+.v-title { font-size: 0.8rem; color: var(--muted); font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+.v-val { font-size: 1.25rem; font-weight: 700; }
+.v-box {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-top: 8px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.trainer-input {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.trainer-input input {
+  font: inherit;
+  width: 4.5em;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+}
+.hl-sum { color: var(--accent); font-weight: 700; }
+.hl-prod { color: var(--ok); font-weight: 700; }
+.hl-root { color: var(--root); font-weight: 700; }
+
+/* Gyökjel és vinculum */
+.sqrt {
+  display: inline-flex;
+  align-items: stretch;
+  vertical-align: -0.16em;
+  margin: 0 1px;
+}
+.sqrt svg {
+  width: 9px;
+  height: 1.2em;
+  flex-shrink: 0;
+}
+.sqrt .radicand {
+  border-top: 1.6px solid currentColor;
+  padding-top: 0px;
+  padding-left: 2px;
+  padding-right: 3px;
+  line-height: 1.1;
+  display: inline-flex;
+  align-items: center;
+}
+</style>
+<script src="two.min.js?v=0.8.14"></script>
+<script>
+if (typeof Two === 'undefined') {
+  document.write('<script src="https://cdn.jsdelivr.net/npm/two.js@0.8.14/build/two.min.js"><\/script>');
+}
+</script>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Másodfokú egyenletek megoldása</h1>
+</header>
+
+<main>
+
+<!-- ================= 1. RÉSZ: GRAFIKUS MEGOLDÁS ================= -->
+<section id="secGraph" class="anim-section">
+  <h2>1. Grafikus megoldás: a parabola és a valós gyökök</h2>
+  <div class="layout">
+    <div class="plot-container" id="plot1Container"></div>
+
+    <div>
+      <div class="panel">
+        <h3>Az egyenlet</h3>
+        <div class="eq" id="eq1"></div>
+        <div class="sl"><label>a</label><input type="range" id="a1" min="-3" max="3" step="0.5" value="1"><output id="a1o"></output></div>
+        <div class="sl"><label>b</label><input type="range" id="b1" min="-8" max="8" step="0.5" value="-2"><output id="b1o"></output></div>
+        <div class="sl"><label>c</label><input type="range" id="c1" min="-8" max="8" step="0.5" value="-3"><output id="c1o"></output></div>
+        <div class="btns">
+          <button class="btn" data-p="1,-2,-3">D &gt; 0 (2 gyök)</button>
+          <button class="btn" data-p="1,-4,4">D = 0 (1 gyök)</button>
+          <button class="btn" data-p="1,2,3">D &lt; 0 (nincs gyök)</button>
+          <button class="btn btn-primary" id="play1">Animáció: c változik</button>
+        </div>
+        <div style="margin-top:10px;">
+          <label class="note"><input type="checkbox" id="vt1" checked> csúcs és szimmetriatengely megjelenítése</label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Diszkrimináns és gyökök</h3>
+        <div id="d1"></div>
+        <div id="res1" style="margin-top:8px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2. RÉSZ: AL-HVÁRIZMI ================= -->
+<section id="secGeo" class="anim-section">
+  <h2>2. Geometrikus megoldás: teljes négyzetté alakítás (Al-Hvárizmi)</h2>
+  <div class="pager" role="group" aria-label="Lapozás">
+    <div class="dots" id="dots2"></div>
+    <button id="reset2" title="Újra" aria-label="Újra">↺</button>
+    <button id="prev2" title="Előző" aria-label="Előző">◀</button>
+    <button id="play2" class="wide">Lejátszás</button>
+    <button id="next2" title="Következő" aria-label="Következő">▶</button>
+  </div>
+
+  <div class="layout">
+    <div class="geo-container" id="geo2Container"></div>
+
+    <div>
+      <div class="panel">
+        <h3>Az egyenlet: x² + bx = k</h3>
+        <div class="sl"><label>b</label><input type="range" id="b2" min="2" max="12" step="2" value="6"><output id="b2o"></output></div>
+        <div class="sl"><label>k</label><input type="range" id="k2" min="1" max="40" step="1" value="7"><output id="k2o"></output></div>
+        <div class="note">Az ábrán az x szakasz a pozitív megoldás valós hossza, így a területek méretarányosan pontosak.</div>
+      </div>
+
+      <div class="panel">
+        <div class="caption" id="cap2"></div>
+        <ul class="steps" id="alg2"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. RÉSZ: MEGOLDÓKÉPLET ================= -->
+<section id="secFormula" class="anim-section">
+  <h2>3. A másodfokú megoldóképlet algebrai levezetése</h2>
+  <div class="pager" role="group" aria-label="Lapozás">
+    <div class="dots" id="dots3"></div>
+    <button id="reset3" title="Újra" aria-label="Újra">↺</button>
+    <button id="prev3" title="Előző" aria-label="Előző">◀</button>
+    <button id="play3" class="wide">Lejátszás</button>
+    <button id="next3" title="Következő" aria-label="Következő">▶</button>
+  </div>
+
+  <div class="layout">
+    <div class="panel">
+      <h3>Algebrai levezetés lépésről lépésre</h3>
+      <ul class="steps" id="alg3"></ul>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3>Magyarázat</h3>
+        <div class="caption" id="cap3"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Kipróbálom számokkal</h3>
+        <div class="calc">
+          <label>a = <input type="number" id="a3" value="2" step="any"></label>
+          <label>b = <input type="number" id="b3" value="-3" step="any"></label>
+          <label>c = <input type="number" id="c3" value="-5" step="any"></label>
+        </div>
+        <div id="calc3" style="margin-top:10px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4. RÉSZ: VIÈTE ================= -->
+<section id="secViete" class="anim-section">
+  <h2>4. Gyöktényezős alak és Viète-formulák</h2>
+  <div class="layout">
+    <div class="plot-container" id="plot4Container"></div>
+
+    <div>
+      <div class="panel">
+        <h3>Gyöktényezős szorzat</h3>
+        <div class="eq" id="fac4"></div>
+        <div class="sl"><label>a</label><input type="range" id="a4" min="-2" max="2" step="0.5" value="1"><output id="a4o"></output></div>
+        <div class="sl"><label>x₁</label><input type="range" id="x14" min="-6" max="6" step="0.5" value="-1"><output id="x14o"></output></div>
+        <div class="sl"><label>x₂</label><input type="range" id="x24" min="-6" max="6" step="0.5" value="3"><output id="x24o"></output></div>
+        <div class="btns">
+          <button class="btn" id="play4">Animáció: gyökök egymás felé (D → 0)</button>
+          <button class="btn" id="play4shift">Animáció: tolás fix távolsággal</button>
+        </div>
+        <div class="btns" style="margin-top:8px;">
+          <button class="btn" data-v="1,2,4">Két pozitív gyök</button>
+          <button class="btn" data-v="1,-2,3">Ellentétes előjelű</button>
+          <button class="btn" data-v="1,-3,3">Szimmetrikus (b = 0)</button>
+          <button class="btn" data-v="1,2,2">Érintő (kettős gyök)</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Viète-formulák összefüggései</h3>
+        <div class="viete-cards">
+          <div class="v-card sum">
+            <div class="v-title">Gyökök összege (x₁ + x₂)</div>
+            <div class="v-val" id="vSumVal"></div>
+            <div style="font-size:0.85rem; color:var(--muted); margin-top:4px;" id="vSumFormula"></div>
+          </div>
+          <div class="v-card prod">
+            <div class="v-title">Gyökök szorzata (x₁ · x₂)</div>
+            <div class="v-val" id="vProdVal"></div>
+            <div style="font-size:0.85rem; color:var(--muted); margin-top:4px;" id="vProdFormula"></div>
+          </div>
+        </div>
+        <div id="exp4"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Miért igaz? – A szorzás kifejtése</h3>
+        <div class="v-box" id="vieteProof"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Fejszámolás Viète-formulákkal</h3>
+        <div style="font-size:0.95rem; margin-bottom:8px;">
+          Kitalálod a gyököket fejben a szorzat és az összeg alapján?
+        </div>
+        <div id="trainerEq" style="font-size:1.2rem; font-weight:700; margin-bottom:6px;"></div>
+        <div id="trainerClues" style="font-size:0.9rem; color:var(--muted); margin-bottom:8px;"></div>
+        <div class="trainer-input">
+          <label>x₁ = <input type="number" id="trX1" placeholder="?"></label>
+          <label>x₂ = <input type="number" id="trX2" placeholder="?"></label>
+          <button id="trCheck">Ellenőrzés</button>
+          <button id="trShow">Megoldás</button>
+          <button id="trNew">Új feladvány</button>
+        </div>
+        <div id="trFeedback" style="margin-top:8px; font-weight:600;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const MINUS = '−';
+
+function fmt(n) {
+  let r = Math.round(n * 100) / 100;
+  if (Object.is(r, -0)) r = 0;
+  return String(r).replace('.', ',').replace('-', MINUS);
+}
+
+function sqrtHtml(content) {
+  return '<span class="sqrt"><svg viewBox="0 0 10 24" preserveAspectRatio="none"><path d="M1 13 L3.5 11 L6.5 22 L9.5 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="radicand">' + content + '</span></span>';
+}
+
+function par(n) { return n < 0 ? '(' + fmt(n) + ')' : fmt(n); }
+
+function term(coef, sym, first) {
+  if (Math.abs(coef) < 1e-9) return '';
+  const abs = Math.abs(coef);
+  const body = (Math.abs(abs - 1) < 1e-9 && sym) ? sym : fmt(abs) + sym;
+  if (first) return (coef < 0 ? MINUS : '') + body;
+  return (coef < 0 ? ' ' + MINUS + ' ' : ' + ') + body;
+}
+
+function eqStr(a, b, c) {
+  let s = term(a, 'x²', true);
+  s += term(b, 'x', s === '');
+  if (s === '') s = fmt(c);
+  else if (Math.abs(c) >= 1e-9) s += (c < 0 ? ' ' + MINUS + ' ' : ' + ') + fmt(Math.abs(c));
+  return s + ' = 0';
+}
+
+function tween(ms, onProgress, onDone) {
+  const t0 = performance.now();
+  let stop = false;
+  (function frame(now) {
+    if (stop) return;
+    const t = Math.min((now - t0) / ms, 1);
+    onProgress(t);
+    if (t < 1) requestAnimationFrame(frame); else if (onDone) onDone();
+  })(t0);
+  return () => { stop = true; };
+}
+
+// Koordináta-rendszer állandók Two.js-hez
+const SC = 32, OX = 280, OY = 256, W = 560, H = 512;
+const px = x => OX + x * SC;
+const py = y => OY - y * SC;
+
+/* Two.js koordinátarendszer létrehozó segédfüggvény */
+function makeTwoPlot(containerId) {
+  const elem = document.getElementById(containerId);
+  const two = new Two({ width: W, height: H, type: Two.Types.svg }).appendTo(elem);
+  two.renderer.domElement.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  two.renderer.domElement.style.width = '100%';
+  two.renderer.domElement.style.height = 'auto';
+  two.renderer.domElement.style.display = 'block';
+
+  // Rácsvonalak
+  for (let x = Math.ceil(-OX / SC); x <= Math.floor((W - OX) / SC); x++) {
+    const l = two.makeLine(px(x), 0, px(x), H);
+    l.stroke = 'var(--grid)'; l.linewidth = 1;
+  }
+  for (let y = Math.ceil(-(H - OY) / SC); y <= Math.floor(OY / SC); y++) {
+    const l = two.makeLine(0, py(y), W, py(y));
+    l.stroke = 'var(--grid)'; l.linewidth = 1;
+  }
+
+  // Tengelyek
+  const axX = two.makeLine(0, OY, W, OY);
+  axX.stroke = 'var(--axis)'; axX.linewidth = 2;
+  const axY = two.makeLine(OX, 0, OX, H);
+  axY.stroke = 'var(--axis)'; axY.linewidth = 2;
+
+  // Tengelyosztások
+  for (let x = -8; x <= 8; x += 2) {
+    if (x === 0) continue;
+    const txt = two.makeText(x < 0 ? MINUS + Math.abs(x) : String(x), px(x), OY + 16);
+    txt.fill = 'var(--muted)'; txt.size = 12;
+  }
+  for (let y = -6; y <= 6; y += 2) {
+    if (y === 0) continue;
+    const txt = two.makeText(y < 0 ? MINUS + Math.abs(y) : String(y), OX - 12, py(y) + 4);
+    txt.fill = 'var(--muted)'; txt.size = 12;
+  }
+  const labX = two.makeText('x', W - 12, OY - 10);
+  labX.fill = 'var(--muted)'; labX.size = 15; labX.style = 'italic';
+  const labY = two.makeText('y', OX + 12, 16);
+  labY.fill = 'var(--muted)'; labY.size = 15; labY.style = 'italic';
+
+  // Viète elemek (ha kérik)
+  const vDistLine = two.makeLine(0, OY, 0, OY);
+  vDistLine.stroke = 'var(--accent)'; vDistLine.linewidth = 3.5;
+  const vDistText = two.makeText('', 0, 0);
+  vDistText.fill = 'var(--accent)'; vDistText.size = 13; vDistText.weight = 'bold';
+
+  const vYIntercept = two.makeCircle(OX, 0, 5);
+  vYIntercept.fill = 'var(--ok)'; vYIntercept.noStroke();
+  const vYIntText = two.makeText('', 0, 0);
+  vYIntText.fill = 'var(--ok)'; vYIntText.size = 13; vYIntText.weight = 'bold';
+
+  // Szimmetriatengely
+  const axisLine = two.makeLine(0, 0, 0, H);
+  axisLine.stroke = 'var(--muted)'; axisLine.linewidth = 2; axisLine.dashes = [6, 5];
+
+  // Parabola görbe
+  const N_PTS = 65;
+  const points = [];
+  for (let i = 0; i <= N_PTS; i++) {
+    points.push(new Two.Anchor(0, 0));
+  }
+  const curve = two.makeCurve(points, true);
+  curve.stroke = 'var(--curve)'; curve.linewidth = 3.5; curve.noFill();
+
+  // Csúcs pont és felirat
+  const vertex = two.makeCircle(0, 0, 6);
+  vertex.fill = 'var(--curve)'; vertex.noStroke();
+  const vLabel = two.makeText('', 0, 0);
+  vLabel.fill = 'var(--curve)'; vLabel.size = 13; vLabel.weight = 'bold';
+
+  // Gyökök
+  const roots = [0, 1].map(() => {
+    const c = two.makeCircle(0, OY, 7);
+    c.fill = 'var(--root)'; c.stroke = 'var(--bg)'; c.linewidth = 2;
+    const t = two.makeText('', 0, 0);
+    t.fill = 'var(--root)'; t.size = 14; t.weight = 'bold';
+    return { c, t };
+  });
+
+  two.update();
+
+  return {
+    two, curve, points, N_PTS, axisLine, vertex, vLabel, roots,
+    vDistLine, vDistText, vYIntercept, vYIntText
+  };
+}
+
+function updateTwoPlot(p, a, b, c, opts) {
+  // Parabola pontjainak frissítése
+  const minX = -OX / SC;
+  const maxX = (W - OX) / SC;
+  const dx = (maxX - minX) / p.N_PTS;
+
+  for (let i = 0; i <= p.N_PTS; i++) {
+    const xVal = minX + i * dx;
+    const yVal = a * xVal * xVal + b * xVal + c;
+    p.points[i].set(px(xVal), py(yVal));
+  }
+
+  const xv = -b / (2 * a);
+  const yv = c - (b * b) / (4 * a);
+  const showV = opts.vertex;
+
+  p.vertex.visible = showV;
+  p.axisLine.visible = showV;
+  p.vLabel.visible = showV;
+
+  if (showV) {
+    p.vertex.translation.set(px(xv), py(yv));
+    p.axisLine.translation.set(px(xv), H / 2);
+    p.axisLine.vertices[0].set(0, -H / 2);
+    p.axisLine.vertices[1].set(0, H / 2);
+
+    p.vLabel.value = 'csúcs (' + fmt(xv) + '; ' + fmt(yv) + ')';
+    const lx = Math.min(Math.max(px(xv) + 12, 60), W - 70);
+    const ly = Math.min(Math.max(py(yv) + (a > 0 ? 20 : -14), 20), H - 12);
+    p.vLabel.translation.set(lx, ly);
+  }
+
+  // Zérushelyek számítása
+  const D = b * b - 4 * a * c;
+  let rVals = [];
+  if (Math.abs(D) < 1e-9) {
+    rVals = [-b / (2 * a)];
+  } else if (D > 0) {
+    rVals = [(-b - Math.sqrt(D)) / (2 * a), (-b + Math.sqrt(D)) / (2 * a)].sort((u, v) => u - v);
+  }
+
+  p.roots.forEach((m, i) => {
+    const r = rVals[i];
+    const on = r !== undefined && Math.abs(r) <= 9;
+    m.c.visible = on;
+    m.t.visible = on;
+    if (on) {
+      m.c.translation.set(px(r), OY);
+      m.t.translation.set(px(r), OY - 16);
+      const name = rVals.length === 1 ? 'x' : (i === 0 ? 'x₁' : 'x₂');
+      m.t.value = name + ' = ' + fmt(r);
+    }
+  });
+
+  // Viète extra elemek frissítése
+  if (opts.viete) {
+    if (rVals.length === 2) {
+      p.vDistLine.visible = true;
+      p.vDistText.visible = true;
+      const x1p = px(rVals[0]), x2p = px(rVals[1]);
+      p.vDistLine.translation.set((x1p + x2p) / 2, OY + 14);
+      p.vDistLine.vertices[0].set(-(x2p - x1p) / 2, 0);
+      p.vDistLine.vertices[1].set((x2p - x1p) / 2, 0);
+
+      p.vDistText.value = 'távolság: ' + fmt(Math.abs(rVals[1] - rVals[0]));
+      p.vDistText.translation.set((x1p + x2p) / 2, OY + 30);
+    } else {
+      p.vDistLine.visible = false;
+      p.vDistText.visible = false;
+    }
+
+    if (Math.abs(c) <= 8) {
+      p.vYIntercept.visible = true;
+      p.vYIntText.visible = true;
+      p.vYIntercept.translation.set(OX, py(c));
+      p.vYIntText.value = '(0; ' + fmt(c) + ')';
+      p.vYIntText.translation.set(OX + 34, py(c));
+    } else {
+      p.vYIntercept.visible = false;
+      p.vYIntText.visible = false;
+    }
+  } else {
+    p.vDistLine.visible = false;
+    p.vDistText.visible = false;
+    p.vYIntercept.visible = false;
+    p.vYIntText.visible = false;
+  }
+
+  p.two.update();
+}
+
+// ================= 1. RÉSZ: GRAFIKUS MEGOLDÁS =================
+(function() {
+  const plot = makeTwoPlot('plot1Container');
+  const S = { a: 1, b: -2, c: -3 };
+  let stopAnim = null;
+
+  function sync() {
+    $('#a1').value = S.a; $('#b1').value = S.b; $('#c1').value = S.c;
+    $('#a1o').textContent = fmt(S.a); $('#b1o').textContent = fmt(S.b); $('#c1o').textContent = fmt(S.c);
+  }
+
+  function render() {
+    const a = Math.abs(S.a) < 0.1 ? (S.a < 0 ? -0.1 : 0.1) : S.a;
+    $('#eq1').textContent = eqStr(a, S.b, S.c);
+
+    const D = S.b * S.b - 4 * a * S.c;
+    const Dstr = par(S.b) + '² ' + MINUS + ' 4·' + par(a) + '·' + par(S.c) + ' = ' + fmt(D);
+
+    let dHtml = 'D = b² ' + MINUS + ' 4ac = <b>' + Dstr + '</b> ';
+    let resHtml = '';
+
+    if (D > 0) {
+      const x1 = (-S.b - Math.sqrt(D)) / (2 * a);
+      const x2 = (-S.b + Math.sqrt(D)) / (2 * a);
+      dHtml += '<span class="badge two">D &gt; 0</span>';
+      resHtml = 'Két különböző valós gyök van (a parabola két pontban metszi az x tengelyt):<br>' +
+        '<b>x₁ = ' + fmt(Math.min(x1, x2)) + '</b>,  <b>x₂ = ' + fmt(Math.max(x1, x2)) + '</b>';
+    } else if (Math.abs(D) < 1e-9) {
+      const x = -S.b / (2 * a);
+      dHtml += '<span class="badge one">D = 0</span>';
+      resHtml = 'Egybeeső (kétszeres) valós gyök van (a parabola érinti az x tengelyt):<br>' +
+        '<b>x = ' + fmt(x) + '</b>';
+    } else {
+      dHtml += '<span class="badge none">D &lt; 0</span>';
+      resHtml = 'Nincs valós gyök (a parabola nem metszi az x tengelyt).';
+    }
+
+    $('#d1').innerHTML = dHtml;
+    $('#res1').innerHTML = resHtml;
+
+    updateTwoPlot(plot, a, S.b, S.c, { vertex: $('#vt1').checked, viete: false });
+  }
+
+  ['a1', 'b1', 'c1'].forEach(id => {
+    $('#' + id).addEventListener('input', e => {
+      if (stopAnim) { stopAnim(); stopAnim = null; $('#play1').textContent = 'Animáció: c változik'; }
+      S[id[0]] = +e.target.value;
+      sync();
+      render();
+    });
+  });
+
+  $('#vt1').addEventListener('change', render);
+
+  $$('[data-p]').forEach(b => {
+    b.addEventListener('click', () => {
+      if (stopAnim) { stopAnim(); stopAnim = null; $('#play1').textContent = 'Animáció: c változik'; }
+      const [a, b_, c] = b.dataset.p.split(',').map(Number);
+      S.a = a; S.b = b_; S.c = c;
+      sync();
+      render();
+    });
+  });
+
+  $('#play1').addEventListener('click', () => {
+    if (stopAnim) { stopAnim(); stopAnim = null; $('#play1').textContent = 'Animáció: c változik'; return; }
+    $('#play1').textContent = '⏸ Szünet';
+    const from = 5, to = -5;
+    stopAnim = tween(12000, t => {
+      S.c = from + (to - from) * t;
+      sync();
+      render();
+    }, () => {
+      stopAnim = null;
+      $('#play1').textContent = 'Animáció: c változik';
+    });
+  });
+
+  sync();
+  render();
+})();
+
+/* Lapozó vezérlő segédfüggvény */
+function stepper(n, ids, onStep, autoMs) {
+  let cur = 0, timer = null;
+  const dots = $('#' + ids.dots);
+  dots.innerHTML = '';
+  for (let i = 0; i <= n; i++) dots.appendChild(document.createElement('i'));
+
+  function show() {
+    $$('i', dots).forEach((d, i) => d.classList.toggle('on', i <= cur));
+    $('#' + ids.prev).disabled = cur === 0;
+    $('#' + ids.next).disabled = cur === n;
+    onStep(cur);
+  }
+
+  function pause() {
+    if (timer) { clearInterval(timer); timer = null; $('#' + ids.play).textContent = 'Lejátszás'; }
+  }
+
+  const api = {
+    next() { if (cur < n) { cur++; show(); } else pause(); },
+    prev() { pause(); if (cur > 0) { cur--; show(); } },
+    reset() { pause(); cur = 0; show(); },
+    refresh() { show(); },
+    get step() { return cur; }
+  };
+
+  $('#' + ids.next).addEventListener('click', () => { pause(); api.next(); });
+  $('#' + ids.prev).addEventListener('click', api.prev);
+  $('#' + ids.reset).addEventListener('click', api.reset);
+  $('#' + ids.play).addEventListener('click', () => {
+    if (timer) { pause(); return; }
+    if (cur === n) cur = 0;
+    show();
+    $('#' + ids.play).textContent = 'Szünet';
+    timer = setInterval(api.next, autoMs);
+  });
+
+  show();
+  return api;
+}
+
+// ================= 2. RÉSZ: AL-HVÁRIZMI GEOMETRIAI MEGOLDÁS TWO.JS-BEN =================
+const geoStep = (function() {
+  const container = document.getElementById('geo2Container');
+  const GW = 460, GH = 380;
+  const two = new Two({ width: GW, height: GH, type: Two.Types.svg }).appendTo(container);
+  two.renderer.domElement.setAttribute('viewBox', `0 0 ${GW} ${GH}`);
+  two.renderer.domElement.style.width = '100%';
+  two.renderer.domElement.style.height = 'auto';
+  two.renderer.domElement.style.display = 'block';
+
+  // Alakzatok létrehozása Two.js-ben
+  // sq: x^2 négyzet
+  const sq = two.makeRectangle(0, 0, 10, 10);
+  sq.fill = '#2563eb'; sq.stroke = '#1b1f24'; sq.linewidth = 2;
+  const tSq = two.makeText('x²', 0, 0);
+  tSq.fill = '#fff'; tSq.size = 20; tSq.weight = 'bold';
+
+  // r1: téglalap sáv (jobb oldali függőleges sáv)
+  const r1 = two.makeRectangle(0, 0, 10, 10);
+  r1.fill = '#ea580c'; r1.stroke = '#1b1f24'; r1.linewidth = 2;
+  const tR1 = two.makeText('', 0, 0);
+  tR1.fill = '#fff'; tR1.size = 16; tR1.weight = 'bold';
+
+  // r2: téglalap sáv (alsó vízszintes sáv)
+  const r2 = two.makeRectangle(0, 0, 10, 10);
+  r2.fill = '#ea580c'; r2.stroke = '#1b1f24'; r2.linewidth = 2;
+  const tR2 = two.makeText('', 0, 0);
+  tR2.fill = '#fff'; tR2.size = 16; tR2.weight = 'bold';
+
+  // co: hiányzó saroknégyzet (b/2)^2
+  const co = two.makeRectangle(0, 0, 10, 10);
+  co.fill = '#eab308'; co.stroke = '#1b1f24'; co.linewidth = 2; co.dashes = [6, 4];
+  const tCo = two.makeText('', 0, 0);
+  tCo.fill = '#1b1f24'; tCo.size = 14; tCo.weight = 'bold';
+
+  // Méretfeliratok
+  const dims = {
+    topX: two.makeText('x', 0, 0),
+    topB: two.makeText('', 0, 0),
+    leftX: two.makeText('x', 0, 0),
+    leftB: two.makeText('', 0, 0),
+    rightS: two.makeText('', 0, 0),
+    bottomS: two.makeText('', 0, 0)
+  };
+  for (const k in dims) {
+    dims[k].fill = '#64748b'; dims[k].size = 14; dims[k].style = 'italic';
+  }
+
+  const M = 40;
+
+  function apply(step, b, k) {
+    const h = b / 2;
+    const x = -h + Math.sqrt(k + h * h);
+    const u = Math.min(270 / (x + h), 290 / (x + b));
+    const X = x * u, B = h * u;
+
+    // x^2 négyzet
+    sq.translation.set(M + X / 2, M + X / 2);
+    sq.width = X; sq.height = X;
+    tSq.translation.set(M + X / 2, M + X / 2);
+
+    if (step === 0) {
+      // Egyben a bx téglalap
+      r1.visible = true;
+      r1.translation.set(M + X + 15 + B, M + X / 2);
+      r1.width = 2 * B; r1.height = X;
+      tR1.value = 'bx';
+      tR1.translation.set(M + X + 15 + B, M + X / 2);
+
+      r2.visible = false;
+      tR2.value = '';
+      co.visible = false;
+      tCo.value = '';
+    } else if (step === 1) {
+      // Két b/2 téglalapra vágva
+      r1.visible = true;
+      r1.translation.set(M + X + 15 + B / 2, M + X / 2);
+      r1.width = B; r1.height = X;
+      tR1.value = fmt(h) + 'x';
+      tR1.translation.set(M + X + 15 + B / 2, M + X / 2);
+
+      r2.visible = true;
+      r2.translation.set(M + X + 15 + B + 12 + B / 2, M + X / 2);
+      r2.width = B; r2.height = X;
+      tR2.value = fmt(h) + 'x';
+      tR2.translation.set(M + X + 15 + B + 12 + B / 2, M + X / 2);
+
+      co.visible = false;
+      tCo.value = '';
+    } else {
+      // Oldalakra illesztve
+      r1.visible = true;
+      r1.translation.set(M + X + B / 2, M + X / 2);
+      r1.width = B; r1.height = X;
+      tR1.value = fmt(h) + 'x';
+      tR1.translation.set(M + X + B / 2, M + X / 2);
+
+      r2.visible = true;
+      r2.translation.set(M + X / 2, M + X + B / 2);
+      r2.width = X; r2.height = B;
+      tR2.value = fmt(h) + 'x';
+      tR2.translation.set(M + X / 2, M + X + B / 2);
+
+      co.visible = true;
+      co.translation.set(M + X + B / 2, M + X + B / 2);
+      co.width = B; co.height = B;
+      co.opacity = step === 2 ? 0.35 : 1;
+      tCo.value = step === 2 ? '?' : (fmt(h) + '² = ' + fmt(h * h));
+      tCo.translation.set(M + X + B / 2, M + X + B / 2);
+    }
+
+    // Méretvonalak
+    const dimVis = step >= 2;
+    dims.topX.visible = dimVis;
+    dims.topX.translation.set(M + X / 2, M - 14);
+
+    dims.topB.visible = dimVis;
+    dims.topB.value = fmt(h);
+    dims.topB.translation.set(M + X + B / 2, M - 14);
+
+    dims.leftX.visible = dimVis;
+    dims.leftX.translation.set(M - 14, M + X / 2);
+
+    dims.leftB.visible = dimVis;
+    dims.leftB.value = fmt(h);
+    dims.leftB.translation.set(M - 14, M + X + B / 2);
+
+    const step4 = step >= 4;
+    dims.rightS.visible = step4;
+    dims.rightS.value = 'x + ' + fmt(h);
+    dims.rightS.translation.set(M + X + B + 32, M + (X + B) / 2);
+
+    dims.bottomS.visible = step4;
+    dims.bottomS.value = 'x + ' + fmt(h);
+    dims.bottomS.translation.set(M + (X + B) / 2, M + X + B + 18);
+
+    two.update();
+  }
+
+  return apply;
+})();
+
+const alg2 = (function() {
+  const ul = $('#alg2');
+  const S = stepper(5, { dots: 'dots2', prev: 'prev2', next: 'next2', play: 'play2', reset: 'reset2' }, step => update(step), 5000);
+
+  function update(step) {
+    const b = +$('#b2').value, k = +$('#k2').value, h = b / 2;
+    $('#b2o').textContent = b; $('#k2o').textContent = k;
+    const val = k + h * h, sq = Math.sqrt(val);
+    const x1 = -h + sq, x2 = -h - sq;
+    const rt = Number.isInteger(sq) ? String(sq) : sqrtHtml(fmt(val));
+
+    const lines = [
+      'x² + ' + b + 'x = ' + k,
+      'x² + ' + fmt(h) + 'x + ' + fmt(h) + 'x = ' + k,
+      'A hiányzó sarok területe: ' + fmt(h) + '·' + fmt(h) + ' = ' + fmt(h * h),
+      'x² + ' + b + 'x + ' + fmt(h * h) + ' = ' + k + ' + ' + fmt(h * h),
+      '(x + ' + fmt(h) + ')² = ' + fmt(val),
+      'x + ' + fmt(h) + ' = ±' + rt + ',  x₁ = ' + fmt(x1) + ',  x₂ = ' + fmt(x2)
+    ];
+
+    const caps = [
+      'Az x² területű négyzethez hozzávesszük a bx területű téglalapot: együtt k területű az alakzat.',
+      'A bx téglalapot két darab b/2 széles téglalapra vágjuk szét.',
+      'A két téglalapot a négyzet két oldalára illesztjük. Egy b/2 oldalú sarok hiányzik a teljes négyzethez.',
+      'A hiányzó sarkot pótoljuk. Ugyanannyit az egyenlet másik oldalához is hozzá kell adni.',
+      'Most egy (x + b/2) oldalú teljes négyzetünk van, területe k + (b/2)².',
+      'Négyzetgyökvonással kapjuk a megoldást. A ± jel adja a két algebrai gyököt.'
+    ];
+
+    $('#cap2').textContent = caps[step];
+    ul.innerHTML = '';
+    lines.forEach((t, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = t;
+      li.className = i === step ? 'cur' : (i < step ? 'done' : '');
+      ul.appendChild(li);
+    });
+
+    geoStep(step, b, k);
+  }
+
+  ['b2', 'k2'].forEach(id => $('#' + id).addEventListener('input', () => update(S.step)));
+  return S;
+})();
+
+// ================= 3. RÉSZ: MEGOLDÓKÉPLET LEVEZETÉSE =================
+(function() {
+  const mi = t => '<mi>' + t + '</mi>', mn = t => '<mn>' + t + '</mn>', mo = t => '<mo>' + t + '</mo>';
+  const row = (...p) => '<mrow>' + p.join('') + '</mrow>';
+  const frac = (n, d) => '<mfrac>' + row(n) + row(d) + '</mfrac>';
+  const sup = (b, e) => '<msup>' + b + e + '</msup>';
+  const M = s => '<math display="inline">' + s + '</math>';
+  const a = mi('a'), b = mi('b'), c = mi('c'), x = mi('x');
+  const x2 = sup(x, mn(2));
+  const half = frac(b, row(mn(2), a));
+  const disc = row(sup(b, mn(2)), mo('−'), mn(4), a, c);
+
+  const eqs = [
+    M(row(a, x2, mo('+'), b, x, mo('+'), c, mo('='), mn(0))),
+    M(row(x2, mo('+'), frac(b, a), x, mo('+'), frac(c, a), mo('='), mn(0))),
+    M(row(x2, mo('+'), frac(b, a), x, mo('='), mo('−'), frac(c, a))),
+    M(row(x2, mo('+'), frac(b, a), x, mo('+'), sup(row(mo('('), half, mo(')')), mn(2)), mo('='), sup(row(mo('('), half, mo(')')), mn(2)), mo('−'), frac(c, a))),
+    M(row(sup(row(mo('('), x, mo('+'), half, mo(')')), mn(2)), mo('='), frac(disc, row(mn(4), x2.replace('<mi>x</mi>', a))))),
+    M(row(x, mo('+'), half, mo('='), mo('±'), frac(row('<msqrt>' + disc + '</msqrt>'), row(mn(2), a)))),
+    M(row(x, mo('='), frac(row(mo('−'), b, mo('±'), '<msqrt>' + disc + '</msqrt>'), row(mn(2), a))))
+  ];
+
+  const caps = [
+    'Kiindulás: az általános másodfokú egyenlet normálalakja, a ≠ 0.',
+    'Osztunk a-val, hogy az x² együtthatója 1 legyen.',
+    'A konstans tagot átvisszük a jobb oldalra.',
+    'Teljes négyzetté kiegészítés: mindkét oldalhoz hozzáadjuk (b / 2a)²-t. Ez felel meg a hiányzó saroknak a geometriai ábrán.',
+    'A bal oldal teljes négyzet. A jobb oldalon közös nevezőre hozunk: b²/(4a²) − 4ac/(4a²).',
+    'Gyököt vonunk. A ± jel lefedi az előjeleket, ezért ' + sqrtHtml('4a²') + ' = 2a. A gyök alatt a diszkrimináns áll: D = b² − 4ac.',
+    'Megkapjuk a megoldóképletet. A diszkrimináns előjele dönti el a valós gyökök számát.'
+  ];
+
+  const ul = $('#alg3');
+  const S = stepper(6, { dots: 'dots3', prev: 'prev3', next: 'next3', play: 'play3', reset: 'reset3' }, step => {
+    ul.innerHTML = '';
+    eqs.forEach((h, i) => {
+      if (i > step) return;
+      const li = document.createElement('li');
+      li.innerHTML = h;
+      li.className = i === step ? 'cur' : 'done';
+      ul.appendChild(li);
+    });
+    $('#cap3').innerHTML = caps[step];
+  }, 6000);
+
+  function calc() {
+    const A = +$('#a3').value, B = +$('#b3').value, C = +$('#c3').value;
+    const out = $('#calc3');
+    if (!isFinite(A) || !isFinite(B) || !isFinite(C) || A === 0) {
+      out.innerHTML = '<span class="note">Az a értéke nem lehet 0.</span>';
+      return;
+    }
+    const D = B * B - 4 * A * C;
+    let s = eqStr(A, B, C) + '<br>D = ' + par(B) + '² ' + MINUS + ' 4·' + par(A) + '·' + par(C) + ' = <b>' + fmt(D) + '</b><br>';
+    if (D < 0) {
+      s += '<span class="badge none">D &lt; 0</span> nincs valós gyök.';
+    } else {
+      const sq = Math.sqrt(D);
+      s += 'x = (' + MINUS + par(B) + ' ± ' + sqrtHtml(fmt(D)) + ') / (2·' + par(A) + ')';
+      const x1 = (-B - sq) / (2 * A), x2 = (-B + sq) / (2 * A);
+      s += D === 0 ? '<br><span class="badge one">D = 0</span> x = <b>' + fmt(x1) + '</b> (kétszeres gyök)'
+        : '<br><span class="badge two">D &gt; 0</span> x₁ = <b>' + fmt(Math.min(x1, x2)) + '</b>, x₂ = <b>' + fmt(Math.max(x1, x2)) + '</b>';
+    }
+    out.innerHTML = s;
+  }
+
+  ['a3', 'b3', 'c3'].forEach(id => $('#' + id).addEventListener('input', calc));
+  calc();
+})();
+
+// ================= 4. RÉSZ: VIÈTE-FORMULÁK =================
+(function() {
+  const plot = makeTwoPlot('plot4Container');
+  const S = { a: 1, x1: -1, x2: 3 };
+  let stopAnim = null;
+
+  const fac = r => Math.abs(r) < 1e-9 ? 'x' : '(x ' + (r > 0 ? MINUS : '+') + ' ' + fmt(Math.abs(r)) + ')';
+
+  function sync() {
+    $('#a4').value = S.a; $('#x14').value = S.x1; $('#x24').value = S.x2;
+    $('#a4o').textContent = fmt(S.a); $('#x14o').textContent = fmt(S.x1); $('#x24o').textContent = fmt(S.x2);
+  }
+
+  function render() {
+    const a = Math.abs(S.a) < 0.1 ? (S.a < 0 ? -0.1 : 0.1) : S.a;
+    const b = -a * (S.x1 + S.x2), c = a * S.x1 * S.x2;
+
+    updateTwoPlot(plot, a, b, c, { vertex: true, viete: true });
+
+    const aTxt = Math.abs(a - 1) < 1e-9 ? '' : (Math.abs(a + 1) < 1e-9 ? MINUS : fmt(a) + '·');
+    $('#fac4').textContent = aTxt + fac(S.x1) + fac(S.x2) + ' = 0';
+
+    const sum = S.x1 + S.x2, prod = S.x1 * S.x2;
+    $('#vSumVal').textContent = fmt(sum);
+    $('#vSumFormula').innerHTML = 'x₁ + x₂ = ' + MINUS + 'b/a = ' + MINUS + par(b) + '/' + par(a);
+
+    $('#vProdVal').textContent = fmt(prod);
+    $('#vProdFormula').innerHTML = 'x₁ · x₂ = c/a = ' + par(c) + '/' + par(a);
+
+    const midX = sum / 2;
+    $('#exp4').innerHTML =
+      '<b>Együtthatók:</b> a = ' + fmt(a) + ', b = ' + fmt(b) + ', c = ' + fmt(c) + '<br>' +
+      'Kifejtett normálalak: <b>' + eqStr(a, b, c) + '</b><br>' +
+      '<div style="margin-top:6px;">' +
+      '• <b>Szimmetriatengely:</b> x = (x₁ + x₂) / 2 = <b>' + fmt(midX) + '</b> (a két gyök számtani közepe)<br>' +
+      '• <b>Gyökök távolsága:</b> |x₂ ' + MINUS + ' x₁| = <b>' + fmt(Math.abs(S.x2 - S.x1)) + '</b> = ' + sqrtHtml('D') + ' / |a|<br>' +
+      '• <b>y-tengelymetszet:</b> a függvény az y tengelyt a (0; ' + fmt(c) + ') pontban metszi (c = a · x₁ · x₂).' +
+      '</div>';
+
+    $('#vieteProof').innerHTML =
+      '<b>1. Induljunk ki a gyöktényezős alakból:</b><br>' +
+      'a(x ' + MINUS + ' x₁)(x ' + MINUS + ' x₂) = 0<br><br>' +
+      '<b>2. Végezzük el a beszorzást a zárójelekben:</b><br>' +
+      'a · [ x² ' + MINUS + ' x₁x ' + MINUS + ' x₂x + x₁x₂ ] = a · [ x² ' + MINUS + ' <span class="hl-sum">(x₁ + x₂)</span>x + <span class="hl-prod">x₁x₂</span> ]<br><br>' +
+      '<b>3. Szorozzunk be az a együtthatóval:</b><br>' +
+      'ax² ' + MINUS + ' a<span class="hl-sum">(x₁ + x₂)</span>x + a<span class="hl-prod">x₁x₂</span> = ax² + <span class="hl-sum">b</span>x + <span class="hl-prod">c</span><br><br>' +
+      '<b>4. Az együtthatók egyeztetéséből:</b><br>' +
+      '• b = ' + MINUS + 'a(x₁ + x₂)  →  <span class="hl-sum">x₁ + x₂ = ' + MINUS + 'b / a</span><br>' +
+      '• c = a(x₁ · x₂)  →  <span class="hl-prod">x₁ · x₂ = c / a</span>';
+  }
+
+  ['a4', 'x14', 'x24'].forEach(id => {
+    $('#' + id).addEventListener('input', e => {
+      if (stopAnim) { stopAnim(); stopAnim = null; }
+      const prop = id === 'a4' ? 'a' : (id === 'x14' ? 'x1' : 'x2');
+      S[prop] = +e.target.value;
+      sync();
+      render();
+    });
+  });
+
+  $$('[data-v]').forEach(b => {
+    b.addEventListener('click', () => {
+      if (stopAnim) { stopAnim(); stopAnim = null; }
+      const [a, x1, x2] = b.dataset.v.split(',').map(Number);
+      S.a = a; S.x1 = x1; S.x2 = x2;
+      sync();
+      render();
+    });
+  });
+
+  $('#play4').addEventListener('click', () => {
+    if (stopAnim) { stopAnim(); stopAnim = null; return; }
+    const x1_start = S.x1, x2_start = S.x2;
+    const target = (x1_start + x2_start) / 2;
+    stopAnim = tween(5000, t => {
+      S.x1 = x1_start + (target - x1_start) * t;
+      S.x2 = x2_start + (target - x2_start) * t;
+      sync();
+      render();
+    }, () => { stopAnim = null; });
+  });
+
+  $('#play4shift').addEventListener('click', () => {
+    if (stopAnim) { stopAnim(); stopAnim = null; return; }
+    const d = S.x2 - S.x1;
+    const from = -4, to = 2;
+    stopAnim = tween(6000, t => {
+      S.x1 = from + (to - from) * t;
+      S.x2 = S.x1 + d;
+      sync();
+      render();
+    }, () => { stopAnim = null; });
+  });
+
+  sync();
+  render();
+
+  // Fejszámolás gyakorlás
+  let curPuzzle = null;
+  function newPuzzle() {
+    const list = [
+      [1, 2, 3], [1, 1, 6], [1, -2, 5], [1, -3, -1], [1, 2, -4],
+      [1, -5, 2], [1, 3, 4], [1, -6, 1], [1, -4, -2], [1, 1, 5]
+    ];
+    const item = list[Math.floor(Math.random() * list.length)];
+    const a = item[0], x1 = item[1], x2 = item[2];
+    const b = -a * (x1 + x2), c = a * x1 * x2;
+    curPuzzle = { a, b, c, x1: Math.min(x1, x2), x2: Math.max(x1, x2) };
+
+    $('#trainerEq').textContent = eqStr(a, b, c);
+    $('#trainerClues').innerHTML = 'Összeg: <b>x₁ + x₂ = ' + fmt(-b / a) + '</b>, Szorzat: <b>x₁ · x₂ = ' + fmt(c / a) + '</b>';
+    $('#trX1').value = '';
+    $('#trX2').value = '';
+    $('#trFeedback').textContent = '';
+  }
+
+  $('#trCheck').addEventListener('click', () => {
+    if (!curPuzzle) return;
+    const v1 = +$('#trX1').value, v2 = +$('#trX2').value;
+    if (isNaN(v1) || isNaN(v2)) {
+      $('#trFeedback').innerHTML = '<span style="color:var(--warn)">Írj be mindkét mezőbe egy-egy számot.</span>';
+      return;
+    }
+    const g1 = Math.min(v1, v2), g2 = Math.max(v1, v2);
+    if (Math.abs(g1 - curPuzzle.x1) < 1e-4 && Math.abs(g2 - curPuzzle.x2) < 1e-4) {
+      $('#trFeedback').innerHTML = '<span style="color:var(--ok)">Helyes megoldás. x₁ = ' + g1 + ', x₂ = ' + g2 + '</span>';
+    } else {
+      $('#trFeedback').innerHTML = '<span style="color:var(--bad)">Nem jó, próbáld újra. Tipp: nézd meg a szorzat lehetséges egész osztópárjait.</span>';
+    }
+  });
+
+  $('#trShow').addEventListener('click', () => {
+    if (!curPuzzle) return;
+    $('#trX1').value = curPuzzle.x1;
+    $('#trX2').value = curPuzzle.x2;
+    $('#trFeedback').innerHTML = '<span style="color:var(--muted)">A gyökök: x₁ = ' + curPuzzle.x1 + ', x₂ = ' + curPuzzle.x2 + '</span>';
+  });
+
+  $('#trNew').addEventListener('click', newPuzzle);
+  newPuzzle();
+})();
+</script>
+</body>
+</html>
