@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>Adatstruktúrák a középiskolában</title>
 <style>
 :root {
   --bg: #ffffff;
   --fg: #1f2937;
   --muted: #4b5563;
-  --line: #e5e7eb;
+  --line: #d1d5db;
   --panel: #f8fafc;
   --accent: #15803d;
   --accent-hover: #166534;
@@ -17,20 +18,19 @@
   --accent-border: #a7f3d0;
   --danger: #b91c1c;
   --warn-bg: #fffbeb;
-  --warn-border: #fef3c7;
+  --warn-border: #fde68a;
   --warn-fg: #92400e;
   --ok: #15803d;
   --ok-bg: #ecfdf5;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   --radius: 10px;
 }
-
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0f172a;
     --fg: #f1f5f9;
-    --muted: #94a3b8;
-    --line: #334155;
+    --muted: #a3b1c6;
+    --line: #475569;
     --panel: #1e293b;
     --accent: #22c55e;
     --accent-hover: #16a34a;
@@ -45,9 +45,8 @@
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
   }
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
+html { font-size: 18px; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background: var(--bg);
@@ -55,290 +54,113 @@ body {
   line-height: 1.5;
   padding: 16px 20px 60px;
 }
-
-.top-nav {
-  max-width: 1440px;
-  margin: 0 auto 16px;
-  padding-bottom: 8px;
-}
-
-.top-nav a {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.95rem;
-}
+.top-nav { max-width: 1500px; margin: 0 auto 16px; padding-bottom: 8px; }
+.top-nav a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
 .top-nav a:hover { text-decoration: underline; }
-
-header {
-  max-width: 1440px;
-  margin: 0 auto 24px;
-}
-
-header h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--fg);
-  margin-bottom: 8px;
-}
-
-.badge {
-  display: inline-block;
-  padding: 3px 10px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  border-radius: 999px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  color: var(--muted);
-}
-.badge-accent { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); }
-.badge-ok { background: var(--ok-bg); border-color: var(--accent-border); color: var(--ok); }
-.badge-warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-fg); }
-
-main {
-  max-width: 1440px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 36px;
-}
-
-.anim-section {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 24px;
-  box-shadow: var(--shadow);
-}
-
-.anim-section h2 {
-  font-size: 1.45rem;
-  font-weight: 700;
-  color: var(--fg);
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--line);
-}
-
-.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-  gap: 24px;
-  align-items: start;
-}
-
-@media (max-width: 992px) {
-  .layout { grid-template-columns: 1fr; }
-}
-
-.plot-container {
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 14px;
-}
-.panel:last-child { margin-bottom: 0; }
-
-.panel h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--fg);
-}
-
-.btns {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-button {
-  font: inherit;
-  font-size: 0.88rem;
-  font-weight: 600;
-  padding: 7px 13px;
-  border-radius: 6px;
-  border: 1px solid var(--line);
-  background: var(--panel);
-  color: var(--fg);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-button:hover {
-  background: var(--accent);
-  color: #ffffff;
-  border-color: var(--accent);
-}
-button.active {
-  background: var(--accent);
-  color: #ffffff;
-  border-color: var(--accent);
-}
-
-.sl {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.sl label {
-  font-weight: 600;
-  font-size: 0.9rem;
-  min-width: 80px;
-}
-.sl input[type="range"] {
-  flex: 1;
-  accent-color: var(--accent);
-}
-.sl output {
-  font-weight: 700;
-  font-size: 1rem;
-  min-width: 32px;
-  text-align: right;
-  color: var(--accent);
-}
-
-.code-box {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 10px 14px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.86rem;
-  line-height: 1.45;
-  color: var(--fg);
-  overflow-x: auto;
-}
-
-.table-wrap {
-  overflow-x: auto;
-  margin: 16px 0;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-
-table.matrix-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.88rem;
-  text-align: left;
-  background: var(--bg);
-}
-table.matrix-table th, table.matrix-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--line);
-}
-table.matrix-table th {
-  background: var(--panel);
-  font-weight: 700;
-  color: var(--fg);
-}
-table.matrix-table tr:last-child td { border-bottom: none; }
-
-.quiz-card {
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 18px;
-}
-.quiz-q {
-  font-size: 1.05rem;
-  font-weight: 600;
-  margin-bottom: 14px;
-}
-.feedback-box {
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  display: none;
-}
-.feedback-ok { background: var(--ok-bg); border: 1px solid var(--accent-border); color: var(--ok); }
-.feedback-bad { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-fg); }
-
-/* ===== Lépésenkénti animációk (7–9. rész) ===== */
-.toc { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 0.95rem; }
-.toc a { color: var(--accent); text-decoration: none; font-weight: 600; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); }
+header { max-width: 1500px; margin: 0 auto 24px; }
+header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+.toc { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px 10px; font-size: 1rem; }
+.toc a { color: var(--accent); text-decoration: none; font-weight: 600; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); }
 .toc a:hover { text-decoration: underline; }
-.pager-wrap { position: sticky; top: 10px; z-index: 20; display: flex; justify-content: flex-end; pointer-events: none; margin: -6px 0 10px; }
-.pager { pointer-events: auto; display: flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; box-shadow: var(--shadow); flex-wrap: wrap; max-width: 100%; }
-.pager button { min-width: 44px; height: 40px; padding: 0 10px; font-size: 1.1rem; border-radius: 999px; }
-.pager .counter { font-weight: 700; min-width: 64px; text-align: center; color: var(--muted); }
-.pager .dots { display: flex; gap: 4px; flex-wrap: wrap; max-width: 420px; }
-.pager .dots .dot { min-width: 0; width: 14px; height: 14px; padding: 0; border-radius: 50%; background: var(--line); border: none; }
-.pager .dots .dot.on { background: var(--accent); }
+main { max-width: 1500px; margin: 0 auto; display: flex; flex-direction: column; gap: 36px; }
+.anim-section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px 24px; box-shadow: var(--shadow); scroll-margin-top: 8px; }
+.anim-section h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } }
+.plot-container { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+.panel { display: flex; flex-direction: column; gap: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+.panel:last-child { margin-bottom: 0; }
+.panel h3 { font-size: 1.1rem; font-weight: 700; }
+.panel p { font-size: 1rem; }
+button { font: inherit; font-size: 1rem; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+button:hover:not(:disabled) { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+button:disabled { opacity: 0.4; cursor: default; }
+
+/* ===== Léptető: Vissza / Előre / Előlről ===== */
+.pager-wrap { position: sticky; top: 10px; z-index: 20; display: flex; justify-content: flex-end; pointer-events: none; margin: -4px 0 12px; }
+.pager { pointer-events: auto; display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; box-shadow: var(--shadow); flex-wrap: wrap; }
+.pager button { height: 46px; padding: 0 18px; font-size: 1.1rem; border-radius: 999px; }
+.pager button.next { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+.pager button.next:hover:not(:disabled) { background: var(--accent-hover); }
+.pager .counter { font-weight: 700; font-size: 1.1rem; min-width: 76px; text-align: center; color: var(--muted); }
+
 .scene { background: var(--bg); padding: 8px; }
 .scene svg { width: 100%; height: auto; display: block; }
-.res-box { font-family: ui-monospace, Consolas, monospace; font-size: 1.15rem; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--panel); white-space: pre-wrap; min-height: 2.2em; }
-.cap-box { font-size: 1.12rem; line-height: 1.55; padding: 12px 16px; border-top: 1px solid var(--line); background: var(--accent-bg); color: var(--fg); min-height: 5.5em; }
-.book { font-size: 1rem; line-height: 1.55; border-left: 4px solid var(--accent); padding: 4px 12px; color: var(--fg); }
+.res-box { font-family: ui-monospace, Consolas, monospace; font-size: 1.2rem; font-weight: 600; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--panel); white-space: pre-wrap; min-height: 2.3em; }
+.cap-box { font-size: 1.25rem; line-height: 1.5; padding: 14px 18px; border-top: 1px solid var(--line); background: var(--accent-bg); min-height: 5.2em; }
+.book { font-size: 1rem; line-height: 1.55; border-left: 4px solid var(--accent); padding: 4px 12px; }
 .book .src { display: block; font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
-.code-steps { font-family: ui-monospace, Consolas, monospace; font-size: 1rem; line-height: 1.6; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 0; overflow-x: auto; }
-.code-steps .ln { display: block; padding: 0 12px; white-space: pre; border-left: 4px solid transparent; transition: background 0.8s, border-color 0.8s; }
-.code-steps .ln.on { background: #fef3c7; border-left-color: #f59e0b; color: #1f2937; }
-.chip { transition: transform 1.8s ease, opacity 1.8s ease; }
-.chip circle, .chip rect { transition: fill 1.6s ease, stroke 1.6s ease; stroke-width: 3; }
-.chip text { font-size: 22px; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: #1e293b; }
-.chip.small text { font-size: 15px; }
+.code-steps { font-family: ui-monospace, Consolas, monospace; font-size: 0.95rem; line-height: 1.65; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 0; overflow-x: auto; }
+.code-steps .ln { display: block; padding: 0 12px; white-space: pre; border-left: 5px solid transparent; transition: background 0.8s, border-color 0.8s; }
+.code-steps .ln.on { background: #fef3c7; border-left-color: #f59e0b; color: #1f2937; font-weight: 700; }
+
+/* ===== Ábraelemek ===== */
+.chip { transition: transform 1.8s ease, opacity 1.6s ease; }
+.chip circle, .chip rect { transition: fill 1.4s ease, stroke 1.4s ease; stroke-width: 3; }
+.chip text { font-size: 28px; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: #1e293b; }
+.chip.small text { font-size: 19px; }
+.chip text.lbl { fill: var(--fg); font-weight: 700; }
+.chip text.lbl.muted { fill: var(--muted); font-weight: 600; }
+.chip text.lbl.acc { fill: var(--accent); }
+.chip text.lbl.bad { fill: var(--danger); }
 .c-normal circle, .c-normal rect { fill: #dbeafe; stroke: #3b82f6; }
 .c-new circle, .c-new rect { fill: #bbf7d0; stroke: #16a34a; }
 .c-warn circle, .c-warn rect { fill: #fef08a; stroke: #ca8a04; }
 .c-gone circle, .c-gone rect, .c-no circle, .c-no rect { fill: #fecaca; stroke: #dc2626; }
 .c-yes circle, .c-yes rect { fill: #bbf7d0; stroke: #16a34a; }
-.c-res circle, .c-res rect { fill: #93c5fd; stroke: #1d4ed8; }
-.c-dim { opacity: 0.28; }
+.c-res circle, .c-res rect { fill: #2563eb; stroke: #1e3a8a; }
+.c-res text { fill: #ffffff; }
+.c-dim circle, .c-dim rect { fill: #dbeafe; stroke: #3b82f6; }
+.c-err rect { fill: #fecaca; stroke: #dc2626; stroke-dasharray: 9 6; }
+.c-ghost rect { fill: none; stroke: #94a3b8; stroke-dasharray: 9 6; }
+.c-ghost text { fill: var(--fg); }
+.c-mark rect { fill: #f59e0b; stroke: #f59e0b; stroke-width: 0; }
+.c-key rect { fill: #ede9fe; stroke: #8b5cf6; }
 .region { transition: opacity 1.6s ease; fill: #60a5fa; }
 .vcircle { fill: none; stroke: var(--muted); stroke-width: 3; transition: opacity 1.6s ease; }
-.vlabel { font-size: 26px; font-weight: 700; fill: var(--fg); transition: opacity 1.6s ease; }
+.vlabel { font-size: 30px; font-weight: 700; fill: var(--fg); transition: opacity 1.6s ease; }
 .fade { transition: opacity 1.6s ease; }
-.dict-box { padding: 16px; display: flex; flex-direction: column; gap: 10px; min-height: 330px; }
-.dict-title { font-family: ui-monospace, Consolas, monospace; font-size: 1.1rem; color: var(--muted); }
-.drow { display: grid; grid-template-columns: 200px 40px 110px 1fr; align-items: center; gap: 8px; font-size: 1.25rem; transition: opacity 1.6s ease; }
+
+/* ===== Szótár sorai (HTML) ===== */
+.dict-box { padding: 16px; display: flex; flex-direction: column; gap: 10px; min-height: 360px; }
+.dict-title { font-family: ui-monospace, Consolas, monospace; font-size: 1.15rem; color: var(--muted); font-weight: 600; }
+.drow { display: grid; grid-template-columns: 230px 40px 120px 1fr; align-items: center; gap: 8px; font-size: 1.4rem; transition: opacity 1.6s ease; }
 .dkey, .dval { border: 3px solid #3b82f6; background: #dbeafe; color: #1e293b; border-radius: 8px; padding: 6px 12px; font-family: ui-monospace, Consolas, monospace; font-weight: 700; transition: background 1.6s, border-color 1.6s; }
 .dkey { border-color: #8b5cf6; background: #ede9fe; }
 .darrow { text-align: center; color: var(--muted); font-weight: 700; }
-.dbar { height: 22px; background: #60a5fa; border-radius: 4px; transition: width 1.8s ease; }
+.dbar { height: 24px; background: #60a5fa; border-radius: 4px; transition: width 1.8s ease; }
 .drow.r-new { animation: rowIn 1.8s ease; }
 .drow.r-new .dkey, .drow.r-new .dval { border-color: #16a34a; background: #bbf7d0; }
-.drow.r-hl .dkey, .drow.r-hl .dval { border-color: #1d4ed8; background: #93c5fd; }
+.drow.r-hl .dkey, .drow.r-hl .dval { border-color: #1e3a8a; background: #2563eb; color: #ffffff; }
 .drow.r-warn .dval { border-color: #ca8a04; background: #fef08a; animation: flash 1.8s ease; }
 .drow.r-err .dkey, .drow.r-err .dval { border-color: #dc2626; background: #fecaca; border-style: dashed; }
-.drow.r-ghost { opacity: 0.55; }
+.drow.r-ghost { opacity: 0.6; }
 .drow.r-ghost .dkey, .drow.r-ghost .dval { border-style: dashed; }
-.drow.r-gone { opacity: 0.25; }
+.drow.r-gone { opacity: 0.3; }
 .drow.r-gone .dkey, .drow.r-gone .dval { border-color: #dc2626; background: #fecaca; text-decoration: line-through; }
 .drow.r-seq { animation: seqHl 1.6s ease both; }
 @keyframes rowIn { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
 @keyframes flash { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
 @keyframes seqHl { 0% { background: transparent; } 40% { background: #fef3c7; } 100% { background: transparent; } }
-.votes { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 16px 0; }
-.vote { font-size: 0.98rem; padding: 4px 10px; border-radius: 999px; border: 2px solid #3b82f6; background: #dbeafe; color: #1e293b; transition: opacity 1.2s, background 1.2s, border-color 1.2s, transform 1.2s; }
+.votes { display: flex; flex-wrap: wrap; gap: 7px; padding: 14px 16px 0; }
+.vote { font-size: 1.1rem; padding: 4px 11px; border-radius: 999px; border: 2px solid #3b82f6; background: #dbeafe; color: #1e293b; transition: opacity 1.2s, background 1.2s, border-color 1.2s, transform 1.2s; }
 .vote.todo { opacity: 0.35; }
 .vote.cur { background: #fef08a; border-color: #ca8a04; transform: scale(1.12); font-weight: 700; }
-</style>
 
-<script src="../animaciok/two.min.js"></script>
-<script>
-if (typeof Two === 'undefined') {
-  document.write('<script src="https://cdn.jsdelivr.net/npm/two.js@v0.8.10/build/two.min.js"><\/script>');
-}
-</script>
+/* ===== Összefoglaló és gyakorlás ===== */
+.table-wrap { overflow-x: auto; margin: 4px 0 18px; border: 1px solid var(--line); border-radius: 8px; }
+table.matrix-table { width: 100%; border-collapse: collapse; font-size: 1rem; text-align: left; background: var(--bg); }
+table.matrix-table th, table.matrix-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+table.matrix-table th { background: var(--panel); font-weight: 700; }
+table.matrix-table tr:last-child td { border-bottom: none; }
+.badge { display: inline-block; padding: 3px 12px; font-size: 0.9rem; font-weight: 600; border-radius: 999px; background: var(--accent-bg); border: 1px solid var(--accent-border); color: var(--accent); }
+.quiz-card { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 18px; }
+.quiz-q { font-size: 1.15rem; font-weight: 600; margin-bottom: 14px; }
+.quiz-card select { width: 100%; padding: 9px 12px; font: inherit; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); }
+.feedback-box { margin-top: 14px; padding: 12px 14px; border-radius: 6px; font-size: 1rem; display: none; }
+.feedback-ok { background: var(--ok-bg); border: 1px solid var(--accent-border); color: var(--ok); }
+.feedback-bad { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-fg); }
+</style>
 </head>
 <body>
 
@@ -349,300 +171,178 @@ if (typeof Two === 'undefined') {
 <header>
   <h1>Adatstruktúrák a középiskolában</h1>
   <nav class="toc">
-    <a href="#ds-array">1. Lista</a><a href="#ds-matrix">2. Mátrix</a><a href="#ds-string">3. Karakterlánc</a><a href="#ds-record">4. Rekord</a><a href="#ds-stack">5. Verem</a><a href="#ds-queue">6. Sor</a><a href="#ds-set">7. Halmaz lépésenként</a><a href="#ds-dict">8. Szótár lépésenként</a><a href="#ds-count">9. Gyakoriság szótárral</a><a href="#ds-set-dict">10. Halmaz és szótár kipróbálása</a><a href="#ds-matrix-feladatok">11. Összefoglaló</a>
+    <a href="#ds-array">Lista</a><a href="#ds-matrix">Mátrix</a><a href="#ds-string">Karakterlánc</a><a href="#ds-record">Rekord</a><a href="#ds-stack">Verem</a><a href="#ds-queue">Sor</a><a href="#ds-set">Halmaz</a><a href="#ds-dict">Szótár</a><a href="#ds-count">Gyakoriság</a><a href="#ds-set-dict">Halmaz vagy szótár?</a><a href="#ds-matrix-feladatok">Összefoglaló</a>
   </nav>
 </header>
 
 <main>
 
-<!-- ================= 1. EGYDIMENZIÓS TÖMB / LISTA ================= -->
+<!-- ================= LISTA ================= -->
 <section class="anim-section" id="ds-array">
-  <h2>1. Egydimenziós tömb / lista (Array / List): folytonos, indexelt tárolás</h2>
+  <h2>Lista</h2>
+  <div class="pager-wrap"></div>
   <div class="layout">
     <div class="plot-container">
-      <div id="canvas-array" style="width:100%; height:auto;"></div>
-      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <div class="btns" style="margin:0;">
-          <button id="arr-append-btn" type="button">Hozzáadás végére (append)</button>
-          <button id="arr-pop-btn" type="button">Utolsó törlése (pop)</button>
-          <button id="arr-insert-btn" type="button">Beszúrás az elejére</button>
-          <button id="arr-rand-btn" type="button">Új véletlen lista</button>
-        </div>
-        <div id="arr-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Indexelés: 0-tól n-1-ig</div>
-      </div>
+      <div class="scene"><svg id="list-svg" viewBox="0 55 880 225" role="img" aria-label="A lista ábrája"></svg></div>
+      <div class="res-box" id="list-res"></div>
+      <div class="cap-box" id="list-cap"></div>
     </div>
-
     <div>
       <div class="panel">
-        <h3>Tulajdonságok és elérés</h3>
-        <p style="font-size:0.92rem;">
-          A lista azonos vagy különböző típusú elemek véges, rendezett sorozata. Minden elemhez a sorszáma (indexe) alapján közvetlenül hozzáférhetünk. Középiskolában (Python, C#, C++) a standard számozás <strong>0-tól</strong> indul.
-        </p>
-        <div class="code-box">
-# Elem lekérdezése index alapján: O(1) idő<br>
-elso = lista[0]<br>
-utolso = lista[-1]  # Pythonban hátulról indexelve<br>
-hossz = len(lista)
-        </div>
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="list-code"></div>
       </div>
-
       <div class="panel">
-        <h3>Műveletek költsége és indexhatárok</h3>
-        <p style="font-size:0.92rem;">
-          • <strong>Indexelés:</strong> O(1) konstans idő, azonnali elérés a memóriacím alapján.<br>
-          • <strong>Hozzáadás végére:</strong> O(1) amortizált idő.<br>
-          • <strong>Beszúrás / Törlés közbenső helyen:</strong> O(n), mert a mögötte lévő elemeket el kell tolni.<br>
-          • <strong>Indexhatár-túllépés:</strong> Ha olyan indexre hivatkozunk, amely nincs a [0, n − 1] tartományban, a program hibával leáll (IndexError / IndexOutOfRangeException).
-        </p>
-        <div style="font-size:0.86rem; color:var(--muted); border-top:1px solid var(--line); padding-top:6px;">
-          Tankönyvi referencia: Digitális kultúra 9–10. évfolyam (Listák bejárása, összegzés, maximumkiválasztás tömbben).
-        </div>
+        <h3>Tulajdonságok</h3>
+        <p>A lista elemek véges, rendezett sorozata. Minden elemhez a sorszáma (indexe) alapján közvetlenül hozzáférhetünk. Pythonban, C#-ban és C++-ban a számozás <strong>0-tól</strong> indul, az utolsó index len(lista) − 1.</p>
+        <p>Az indexelés és a végére fűzés gyors. A beszúrás és a törlés a lista közepén lassú, mert a mögötte lévő elemeket el kell tolni. Nem létező indexre hivatkozva a program IndexError hibával leáll.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= 2. KÉTDIMENZIÓS TÖMB / MÁTRIX ================= -->
+<!-- ================= MÁTRIX ================= -->
 <section class="anim-section" id="ds-matrix">
-  <h2>2. Kétdimenziós tömb / mátrix: táblázatos elrendezés (sorok és oszlopok)</h2>
+  <h2>Mátrix</h2>
+  <div class="pager-wrap"></div>
   <div class="layout">
     <div class="plot-container">
-      <div id="canvas-matrix" style="width:100%; height:auto;"></div>
-      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <div class="btns" style="margin:0;">
-          <button id="mat-walk-row-btn" type="button">Sorfolytonos bejárás</button>
-          <button id="mat-walk-col-btn" type="button">Oszlopfolytonos bejárás</button>
-          <button id="mat-reset-btn" type="button">Alaphelyzet</button>
-        </div>
-        <div id="mat-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Kattints egy cellára az index megtekintéséhez</div>
-      </div>
+      <div class="scene"><svg id="matrix-svg" viewBox="0 0 880 400" role="img" aria-label="A mátrix ábrája"></svg></div>
+      <div class="res-box" id="matrix-res"></div>
+      <div class="cap-box" id="matrix-cap"></div>
     </div>
-
     <div>
       <div class="panel">
-        <h3>Kettős indexelés: Mátrix[sor][oszlop]</h3>
-        <p style="font-size:0.92rem;">
-          A 2D tömb a valóságban egy olyan egydimenziós lista, amelynek minden eleme maga is egy lista (listák listája). Az első index jelöli a sort (i), a második index az oszlopot (j).
-        </p>
-        <div class="code-box">
-# Mátrix bejárása egymásba ágyazott ciklusokkal:<br>
-for i in range(sorok_szama):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for j in range(oszlopok_szama):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ertek = matrix[i][j]
-        </div>
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="matrix-code"></div>
       </div>
-
-      <div class="panel">
-        <h3>Gyakorlati érettségi alkalmazások</h3>
-        <p style="font-size:0.92rem;">
-          • Sakktábla vagy amőba tábla modellezése (8x8 mező).<br>
-          • Térképek, magassági mátrixok (hegycsúcsok keresése, vízszintes/függőleges szomszédok).<br>
-          • Képpontok (pixelek) fényerő- és színértékeinek tárolása.<br>
-          • Menetrendek, két település közötti távolságmátrixok.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= 3. KARAKTERLÁNC ================= -->
-<section class="anim-section" id="ds-string">
-  <h2>3. Karakterlánc (String): karakterek szekvenciája és szeletelése</h2>
-  <div class="layout">
-    <div class="plot-container">
-      <div id="canvas-string" style="width:100%; height:auto;"></div>
-      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <div class="custom-input-row" style="display:flex; gap:8px; width:100%; max-width:400px;">
-          <input type="text" id="str-input" value="INFORMATIKA" maxlength="14" style="flex:1; padding:6px 10px; font:inherit; font-size:0.9rem; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg);">
-          <button id="str-set-btn" type="button">Frissítés</button>
-        </div>
-        <div id="str-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Pozitív és negatív indexek</div>
-      </div>
-    </div>
-
-    <div>
-      <div class="panel">
-        <h3>Szeletelés (Slicing) paraméterei</h3>
-        <div class="sl">
-          <label for="str-start">Kezdő (start)</label>
-          <input type="range" id="str-start" min="0" max="10" value="2">
-          <output id="str-start-val">2</output>
-        </div>
-        <div class="sl">
-          <label for="str-stop">Vég (stop)</label>
-          <input type="range" id="str-stop" min="1" max="11" value="7">
-          <output id="str-stop-val">7</output>
-        </div>
-        <div class="code-box" id="str-slice-code">
-s = "INFORMATIKA"<br>
-resz = s[2:7]  # Eredmény: "FORMA" (a 7. index már nem tartozik bele)
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3>Megváltoztathatatlanság (Immutability)</h3>
-        <p style="font-size:0.92rem;">
-          A legtöbb modern nyelvben (Python, C#, Java) a szöveg <strong>megváltoztathatatlan</strong> (immutable). Ha módosítani akarunk egy betűt (`s[0] = 'A'`), az hibát ad. Ehelyett új karakterlánc jön létre összefűzéssel (`+`) vagy szeleteléssel.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= 4. REKORD / OBJEKTUM ================= -->
-<section class="anim-section" id="ds-record">
-  <h2>4. Rekord / objektum és rekordok listája</h2>
-  <div class="layout">
-    <div class="plot-container">
-      <div id="canvas-record" style="width:100%; height:auto;"></div>
-      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <div class="btns" style="margin:0;">
-          <button id="rec-add-btn" type="button">Új tanuló rögzítése</button>
-          <button id="rec-filter-btn" type="button">Szűrés: átlag ≥ 4.5</button>
-          <button id="rec-all-btn" type="button">Összes mutatása</button>
-        </div>
-        <div id="rec-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Rekord mezői: név, osztály, átlag</div>
-      </div>
-    </div>
-
-    <div>
-      <div class="panel">
-        <h3>Összetett adatszerkezet logikája</h3>
-        <p style="font-size:0.92rem;">
-          A rekord olyan adatszerkezet, amely összetartozó, de különböző típusú adatmezőket fog össze egyetlen egységbe (pl. egy tanuló neve [szöveg], születési éve [egész], tanulmányi átlaga [valós]).
-        </p>
-        <div class="code-box">
-class Tanulo:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;def __init__(self, sor):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m = sor.strip().split(';')<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.nev = m[0]<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.osztaly = m[1]<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.atlag = float(m[2])<br>
-<br>
-tanulok = []  # Rekordok listája a fájlból
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3>Miért nélkülözhetetlen az érettségin?</h3>
-        <p style="font-size:0.92rem;">
-          Az emelt szintű programozási feladatok szinte kivétel nélkül egy bemeneti fájl (pl. `adatok.txt`) feldolgozásával indulnak. A rekordok listáján futnak le a klasszikus programozási tételek: megszámolás (pl. hányan buktak), maximumkiválasztás (legmagasabb átlag), kiválogatás (kitűnő tanulók).
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= 5. VEREM ================= -->
-<section class="anim-section" id="ds-stack">
-  <h2>5. Verem (Stack): LIFO elv (Last-In, First-Out)</h2>
-  <div class="layout">
-    <div class="plot-container">
-      <div id="canvas-stack" style="width:100%; height:auto;"></div>
-      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <div class="btns" style="margin:0;">
-          <button id="st-push-btn" type="button">Betesz (push)</button>
-          <button id="st-pop-btn" type="button">Kivesz (pop)</button>
-          <button id="st-clear-btn" type="button">Verem ürítése</button>
-        </div>
-        <div id="st-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">LIFO: mindig a legfelső elem távozik</div>
-      </div>
-    </div>
-
-    <div>
-      <div class="panel">
-        <h3>Műveletek és működés</h3>
-        <p style="font-size:0.92rem;">
-          A verembe csak felülről lehet elemet tenni (`push`), és csak felülről lehet kivenni (`pop`). A legkésőbb érkezett elem kerül ki legelőször. Olyan, mint egy palacsintarakás vagy egy rugós tányértartó a menzán.
-        </p>
-        <div class="code-box">
-verem = []<br>
-verem.append(elem)   # push: elem verem tetejére<br>
-teteje = verem.pop() # pop: legfelső kivesz és visszatér
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3>Klasszikus alkalmazások</h3>
-        <p style="font-size:0.92rem;">
-          • <strong>Visszavonás (Undo / Redo):</strong> Szerkesztőprogramokban az utolsó lépések visszavonása.<br>
-          • <strong>Függvényhívási verem (Call Stack):</strong> A számítógép a veremben jegyzi meg a visszatérési címeket és helyi változókat függvényhíváskor és rekurzióban.<br>
-          • <strong>Zárójelezés helyessége:</strong> Nyitó zárójel érkezésekor verembe tesszük, csukó zárójelkor a tetején lévő párját ellenőrizzük.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= 6. SOR ================= -->
-<section class="anim-section" id="ds-queue">
-  <h2>6. Sor (Queue): FIFO elv (First-In, First-Out)</h2>
-  <div class="layout">
-    <div class="plot-container">
-      <div id="canvas-queue" style="width:100%; height:auto;"></div>
-      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <div class="btns" style="margin:0;">
-          <button id="q-enqueue-btn" type="button">Beáll a sorba (enqueue)</button>
-          <button id="q-dequeue-btn" type="button">Kiszolgálás (dequeue)</button>
-          <button id="q-clear-btn" type="button">Sor kiürítése</button>
-        </div>
-        <div id="q-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">FIFO: az elsőként érkező távozik először</div>
-      </div>
-    </div>
-
-    <div>
-      <div class="panel">
-        <h3>Műveletek és működés</h3>
-        <p style="font-size:0.92rem;">
-          A sorba új elem mindig a sor végén érkezik (`enqueue`), és az elemek feldolgozása a sor elején történik (`dequeue`). Aki először érkezik, azt szolgálják ki először.
-        </p>
-        <div class="code-box">
-from collections import deque<br>
-sor = deque()<br>
-sor.append(elem)      # enqueue: végére rak<br>
-elso = sor.popleft()  # dequeue: elejéről levesz O(1)
-        </div>
-      </div>
-
       <div class="panel">
         <h3>Gyakorlati alkalmazások</h3>
-        <p style="font-size:0.92rem;">
-          • <strong>Nyomtatási feladatok ütemezése:</strong> A dokumentumok a beküldés sorrendjében nyomtatódnak.<br>
-          • <strong>Operációs rendszerek taszk-ütemezése:</strong> Várakozó folyamatok kiszolgálása.<br>
-          • <strong>Szélességi gráfbejárás (BFS):</strong> Labirintus leggyorsabb útvonalának felderítése szintenként.
-        </p>
+        <p>Sakk- vagy amőbatábla, térkép és magassági adatok (csúcsok, szomszédos mezők), képpontok színértékei, menetrendek, települések távolságtáblázata.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= 7. HALMAZ LÉPÉSRŐL LÉPÉSRE ================= -->
-<section class="anim-section" id="ds-set">
-  <h2>7. Halmaz (set) lépésről lépésre: bővítés, törlés, halmazműveletek</h2>
-  <div class="pager-wrap"><div class="pager"><button type="button" class="prev" title="Előző lépés">◀</button><button type="button" class="play" title="Lejátszás">▶</button><button type="button" class="next" title="Következő lépés">▶▶</button><button type="button" class="reset" title="Újrakezdés">↺</button><span class="counter"></span><span class="dots"></span></div></div>
+<!-- ================= KARAKTERLÁNC ================= -->
+<section class="anim-section" id="ds-string">
+  <h2>Karakterlánc</h2>
+  <div class="pager-wrap"></div>
   <div class="layout">
     <div class="plot-container">
-      <div class="scene"><svg id="set-svg" viewBox="0 0 800 460" role="img" aria-label="Halmazok ábrája"></svg></div>
+      <div class="scene"><svg id="string-svg" viewBox="0 0 840 380" role="img" aria-label="A karakterlánc ábrája"></svg></div>
+      <div class="res-box" id="string-res"></div>
+      <div class="cap-box" id="string-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="string-code"></div>
+      </div>
+      <div class="panel">
+        <h3>Megváltoztathatatlanság</h3>
+        <p>Pythonban, C#-ban és Javában a karakterlánc <strong>nem módosítható</strong>: egy betűjét nem írhatjuk át. Ha mást szeretnénk, új karakterlánc jön létre összefűzéssel (+), szeleteléssel vagy a replace() függvénnyel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REKORD ================= -->
+<section class="anim-section" id="ds-record">
+  <h2>Rekord</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="record-svg" viewBox="0 0 860 420" role="img" aria-label="A rekordok ábrája"></svg></div>
+      <div class="res-box" id="record-res"></div>
+      <div class="cap-box" id="record-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="record-code"></div>
+      </div>
+      <div class="panel">
+        <h3>Miért fontos az érettségin?</h3>
+        <p>Az emelt szintű programozási feladatok szinte mindig egy bemeneti fájl feldolgozásával indulnak. A rekordok listáján futnak a programozási tételek: megszámolás, kiválogatás, maximumkiválasztás.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VEREM ================= -->
+<section class="anim-section" id="ds-stack">
+  <h2>Verem</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="stack-svg" viewBox="0 0 860 430" role="img" aria-label="A verem ábrája"></svg></div>
+      <div class="res-box" id="stack-res"></div>
+      <div class="cap-box" id="stack-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="stack-code"></div>
+      </div>
+      <div class="panel">
+        <h3>Alkalmazások</h3>
+        <p><strong>Visszavonás (Undo):</strong> a szerkesztőprogram az utolsó lépést vonja vissza elsőként. <strong>Függvényhívások:</strong> a gép veremben jegyzi meg, hová kell visszatérni. <strong>Zárójelek ellenőrzése:</strong> a nyitó zárójel a verembe kerül, a csukónál a verem tetején lévő párját nézzük.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SOR ================= -->
+<section class="anim-section" id="ds-queue">
+  <h2>Sor</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="queue-svg" viewBox="0 0 860 360" role="img" aria-label="A sor ábrája"></svg></div>
+      <div class="res-box" id="queue-res"></div>
+      <div class="cap-box" id="queue-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="queue-code"></div>
+      </div>
+      <div class="panel">
+        <h3>Alkalmazások</h3>
+        <p><strong>Nyomtatási sor:</strong> a dokumentumok a beküldés sorrendjében nyomtatódnak. <strong>Ütemezés:</strong> a várakozó feladatok kiszolgálása érkezési sorrendben. <strong>Szélességi bejárás:</strong> labirintusban a legrövidebb út keresése szintenként.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HALMAZ ================= -->
+<section class="anim-section" id="ds-set">
+  <h2>Halmaz</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="set-svg" viewBox="0 0 800 470" role="img" aria-label="Halmazok ábrája"></svg></div>
       <div class="res-box" id="set-res"></div>
       <div class="cap-box" id="set-cap"></div>
     </div>
     <div>
       <div class="panel">
-        <h3>A tankönyv szövege</h3>
-        <p class="book">A halmaz „olyan adathalmaz, amelyben az elemek sorrendje nem fontos, és minden elem csak egyszer szerepelhet benne.” „Létező elem újbóli hozzáadása esetén nem változik a halmaz tartalma.”<span class="src">Okosgyűjtemény 11–12 (emelt szint), 08.09. Halmazok, szótárak és többdimenziós listák</span></p>
-      </div>
-      <div class="panel">
         <h3>Python-kód (a mostani lépés kiemelve)</h3>
         <div class="code-steps" id="set-code"></div>
+      </div>
+      <div class="panel">
+        <h3>A tankönyv szövege</h3>
+        <p class="book">A halmaz „olyan adathalmaz, amelyben az elemek sorrendje nem fontos, és minden elem csak egyszer szerepelhet benne.” „Létező elem újbóli hozzáadása esetén nem változik a halmaz tartalma.”<span class="src">Okosgyűjtemény 11–12 (emelt szint), 08.09. Halmazok, szótárak és többdimenziós listák</span></p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= 8. SZÓTÁR LÉPÉSRŐL LÉPÉSRE ================= -->
+<!-- ================= SZÓTÁR ================= -->
 <section class="anim-section" id="ds-dict">
-  <h2>8. Szótár (dict) lépésről lépésre: kulcs és érték</h2>
-  <div class="pager-wrap"><div class="pager"><button type="button" class="prev" title="Előző lépés">◀</button><button type="button" class="play" title="Lejátszás">▶</button><button type="button" class="next" title="Következő lépés">▶▶</button><button type="button" class="reset" title="Újrakezdés">↺</button><span class="counter"></span><span class="dots"></span></div></div>
+  <h2>Szótár</h2>
+  <div class="pager-wrap"></div>
   <div class="layout">
     <div class="plot-container">
       <div class="dict-box" id="dict-box"></div>
@@ -651,21 +351,21 @@ elso = sor.popleft()  # dequeue: elejéről levesz O(1)
     </div>
     <div>
       <div class="panel">
-        <h3>A tankönyv szövege</h3>
-        <p class="book">„A szótár elempárok tárolására szolgál, a pár első eleme a kulcs, a második eleme az érték. […] Pythonban a szótár a behelyezés sorrendjében tárolja az elemeket, és a legtöbb esetben nem használjuk ki az ebből adódó lehetőségeket, hanem egyszerűen kulcsuk szerint hivatkozunk a szótár elemeire. A szótárban minden kulcsnak egyedinek kell lennie. Ezért olyan kulcsot, ami már szerepel a szótárban, nem lehet felvenni, az ilyen kulcsú elemnek értéket adva felülírjuk az eredeti értéket.”<span class="src">Okosgyűjtemény 11–12 (emelt szint), 08.09; a példa a lecke szotar1.py programjának gyümölcsei (kJ)</span></p>
-      </div>
-      <div class="panel">
         <h3>Python-kód (a mostani lépés kiemelve)</h3>
         <div class="code-steps" id="dict-code"></div>
+      </div>
+      <div class="panel">
+        <h3>A tankönyv szövege</h3>
+        <p class="book">„A szótár elempárok tárolására szolgál, a pár első eleme a kulcs, a második eleme az érték. […] Pythonban a szótár a behelyezés sorrendjében tárolja az elemeket, és a legtöbb esetben nem használjuk ki az ebből adódó lehetőségeket, hanem egyszerűen kulcsuk szerint hivatkozunk a szótár elemeire. A szótárban minden kulcsnak egyedinek kell lennie. Ezért olyan kulcsot, ami már szerepel a szótárban, nem lehet felvenni, az ilyen kulcsú elemnek értéket adva felülírjuk az eredeti értéket.”<span class="src">Okosgyűjtemény 11–12 (emelt szint), 08.09; a példa a lecke szotar1.py programjának gyümölcsei (kJ)</span></p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= 9. GYAKORISÁG SZÓTÁRRAL ================= -->
+<!-- ================= GYAKORISÁG ================= -->
 <section class="anim-section" id="ds-count">
-  <h2>9. Gyakoriság szótárral: a kirándulási szavazatok összeszámlálása</h2>
-  <div class="pager-wrap"><div class="pager"><button type="button" class="prev" title="Előző lépés">◀</button><button type="button" class="play" title="Lejátszás">▶</button><button type="button" class="next" title="Következő lépés">▶▶</button><button type="button" class="reset" title="Újrakezdés">↺</button><span class="counter"></span><span class="dots"></span></div></div>
+  <h2>Gyakoriság</h2>
+  <div class="pager-wrap"></div>
   <div class="layout">
     <div class="plot-container">
       <div class="votes" id="count-votes"></div>
@@ -675,995 +375,160 @@ elso = sor.popleft()  # dequeue: elejéről levesz O(1)
     </div>
     <div>
       <div class="panel">
-        <h3>A feladat</h3>
-        <p class="book">A kirandulas.txt minden sorában egy szavazat áll: a diák neve és az általa választott úticél, pontosvesszővel elválasztva (például Anna;Balaton). Melyik úticél hány szavazatot kapott, és melyik nyert? A szótárban a kulcs az úticél, az érték a szavazatok száma: a megszámolás tétele, csak minden kulcsnak saját számlálója van.</p>
-      </div>
-      <div class="panel">
         <h3>Python-kód (a mostani lépés kiemelve)</h3>
         <div class="code-steps" id="count-code"></div>
       </div>
+      <div class="panel">
+        <h3>A feladat</h3>
+        <p class="book">A kirandulas.txt minden sorában egy szavazat áll: a diák neve és az általa választott úticél, pontosvesszővel elválasztva (például Anna;Balaton). Melyik úticél hány szavazatot kapott, és melyik nyert? A szótárban a kulcs az úticél, az érték a szavazatok száma: a megszámolás tétele, csak minden kulcsnak saját számlálója van.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ================= 10. HALMAZ ÉS SZÓTÁR – KIPRÓBÁLÁS ================= -->
+<!-- ================= HALMAZ VAGY SZÓTÁR ================= -->
 <section class="anim-section" id="ds-set-dict">
-  <h2>10. Halmaz és szótár kipróbálása: egyedi elemek és kulcs-érték tárak</h2>
+  <h2>Halmaz vagy szótár?</h2>
+  <div class="pager-wrap"></div>
   <div class="layout">
     <div class="plot-container">
-      <div id="canvas-setdict" style="width:100%; height:auto;"></div>
-      <div style="padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <div class="btns" style="margin:0;">
-          <button id="sd-add-apple" type="button">+ "alma"</button>
-          <button id="sd-add-pear" type="button">+ "körte"</button>
-          <button id="sd-add-banana" type="button">+ "banán"</button>
-          <button id="sd-clear-btn" type="button">Törlés</button>
-        </div>
-        <div id="sd-status" style="font-size:0.9rem; color:var(--muted); font-weight:600;">Kattints a gyümölcs gombokra a beszúráshoz</div>
-      </div>
+      <div class="scene"><svg id="sd-svg" viewBox="0 0 860 470" role="img" aria-label="Halmaz és szótár egymás mellett"></svg></div>
+      <div class="res-box" id="sd-res"></div>
+      <div class="cap-box" id="sd-cap"></div>
     </div>
-
     <div>
       <div class="panel">
-        <h3>Halmaz (Set)</h3>
-        <p style="font-size:0.92rem;">
-          Egyedi elemek rendezetlen gyűjteménye. Az azonos elemeket automatikusan kiszűri (nem lehetnek duplikátumok). A bennfoglaltság vizsgálata (`elem in halmaz`) hash tábla révén rendkívül gyors: átlagosan <strong>O(1)</strong> idő.
-        </p>
-        <div class="code-box">
-szinek = set()<br>
-szinek.add("piros")<br>
-szinek.add("piros")  # nem változik, már benne van<br>
-if "piros" in szinek: ...
-        </div>
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="sd-code"></div>
       </div>
-
       <div class="panel">
-        <h3>Szótár (Dictionary / Kulcs-érték tár)</h3>
-        <p style="font-size:0.92rem;">
-          Minden bejegyzés egy egyedi <strong>kulcsból</strong> és a hozzá tartozó <strong>értékből</strong> áll. Nem számindexszel, hanem a kulccsal hivatkozunk rá. Tipikus feladat: gyakoriság számlálás.
-        </p>
-        <div class="code-box">
-gyakorisag = {}<br>
-for gyumolcs in kosar:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;gyakorisag[gyumolcs] = gyakorisag.get(gyumolcs, 0) + 1
-        </div>
+        <h3>Mikor melyik?</h3>
+        <p><strong>Halmaz:</strong> ha csak az számít, hogy valami előfordult-e (különböző elemek, ismétlődések kiszűrése, gyors „benne van-e?” vizsgálat).</p>
+        <p><strong>Szótár:</strong> ha minden elemhez egy adat is tartozik: darabszám, összeg, ár, telefonszám. A kulcs itt is csak egyszer szerepelhet.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= 11. ÖSSZEFOGLALÓ DÖNTÉSI MÁTRIX ÉS GYAKORLÓ FELADATOK ================= -->
+<!-- ================= ÖSSZEFOGLALÓ ================= -->
 <section class="anim-section" id="ds-matrix-feladatok">
-  <h2>11. Összefoglaló összehasonlító mátrix és feladatfelismerő gyakorlás</h2>
+  <h2>Összefoglaló</h2>
 
   <div class="table-wrap">
     <table class="matrix-table">
       <thead>
-        <tr>
-          <th>Adatstruktúra</th>
-          <th>Rendezett?</th>
-          <th>Elérés módja</th>
-          <th>Ismétlődés megengedett?</th>
-          <th>Műveletigény</th>
-          <th>Fő felhasználási terület</th>
-        </tr>
+        <tr><th>Adatstruktúra</th><th>Rendezett?</th><th>Elérés módja</th><th>Ismétlődhet?</th><th>Fő felhasználás</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td><strong>1D Tömb / Lista</strong></td>
-          <td>Igen</td>
-          <td>Egész index alapján: L[i]</td>
-          <td>Igen</td>
-          <td>Indexelés: O(1), Beszúrás: O(n)</td>
-          <td>Adatsorok tárolása, rendezések, bejárások</td>
-        </tr>
-        <tr>
-          <td><strong>2D Tömb / Mátrix</strong></td>
-          <td>Igen</td>
-          <td>Sor- és oszlopindex: M[i][j]</td>
-          <td>Igen</td>
-          <td>Cella elérés: O(1)</td>
-          <td>Táblázatok, sakktábla, képpontok, labirintusok</td>
-        </tr>
-        <tr>
-          <td><strong>Karakterlánc (String)</strong></td>
-          <td>Igen</td>
-          <td>Index szerint, megváltoztathatatlan</td>
-          <td>Igen</td>
-          <td>Indexelés: O(1), Szelet: O(k)</td>
-          <td>Szövegfeldolgozás, bemeneti sorok bontása</td>
-        </tr>
-        <tr>
-          <td><strong>Rekord / Objektum</strong></td>
-          <td>Mezők szerint</td>
-          <td>Mezőnév szerint: r.nev</td>
-          <td>Igen</td>
-          <td>Mező elérés: O(1)</td>
-          <td>Összetartozó tulajdonságok egy adatként kezelése</td>
-        </tr>
-        <tr>
-          <td><strong>Verem (Stack)</strong></td>
-          <td>Igen (LIFO)</td>
-          <td>Csak a legfelső elem: top()</td>
-          <td>Igen</td>
-          <td>Push: O(1), Pop: O(1)</td>
-          <td>Visszavonás (Undo), zárójelezés, rekurzió</td>
-        </tr>
-        <tr>
-          <td><strong>Sor (Queue)</strong></td>
-          <td>Igen (FIFO)</td>
-          <td>Elejéről kivesz, végére tesz</td>
-          <td>Igen</td>
-          <td>Enqueue: O(1), Dequeue: O(1)</td>
-          <td>Nyomtatási sor, ütemezés, szélességi bejárás</td>
-        </tr>
-        <tr>
-          <td><strong>Halmaz (Set)</strong></td>
-          <td>Nem</td>
-          <td>Csak tagságvizsgálat: x in H</td>
-          <td>Nem (egyedi)</td>
-          <td>Keresés/Beszúrás: átlag O(1)</td>
-          <td>Duplikációk szűrése, halmazműveletek</td>
-        </tr>
-        <tr>
-          <td><strong>Szótár (Dictionary)</strong></td>
-          <td>Kulcsok szerint</td>
-          <td>Kulcs alapján: D[kulcs]</td>
-          <td>Kulcs egyedi, érték bármi</td>
-          <td>Keresés/Beszúrás: átlag O(1)</td>
-          <td>Gyakoriságszámítás, asszociációk, telefonkönyv</td>
-        </tr>
+        <tr><td><strong>Lista</strong></td><td>Igen</td><td>Index szerint: L[i]</td><td>Igen</td><td>Adatsorok, bejárás, rendezés</td></tr>
+        <tr><td><strong>Mátrix</strong></td><td>Igen</td><td>Sor és oszlop: M[i][j]</td><td>Igen</td><td>Táblázat, tábla, képpontok, labirintus</td></tr>
+        <tr><td><strong>Karakterlánc</strong></td><td>Igen</td><td>Index szerint, nem módosítható</td><td>Igen</td><td>Szövegfeldolgozás, sorok bontása</td></tr>
+        <tr><td><strong>Rekord</strong></td><td>Mezők</td><td>Mezőnév szerint: r.nev</td><td>Igen</td><td>Összetartozó adatok egy egységben</td></tr>
+        <tr><td><strong>Verem</strong></td><td>Igen (LIFO)</td><td>Csak a teteje: v[−1]</td><td>Igen</td><td>Visszavonás, zárójelek, függvényhívások</td></tr>
+        <tr><td><strong>Sor</strong></td><td>Igen (FIFO)</td><td>Elejéről ki, végére be</td><td>Igen</td><td>Nyomtatási sor, ütemezés, szélességi bejárás</td></tr>
+        <tr><td><strong>Halmaz</strong></td><td>Nem</td><td>Csak „benne van-e”: x in H</td><td>Nem</td><td>Ismétlődések kiszűrése, halmazműveletek</td></tr>
+        <tr><td><strong>Szótár</strong></td><td>Kulcsok</td><td>Kulcs szerint: D[kulcs]</td><td>Kulcs nem, érték igen</td><td>Gyakoriság, hozzárendelés, telefonkönyv</td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="layout">
     <div class="quiz-card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <span class="badge badge-accent" id="quiz-num">1 / 8. feladat</span>
-        <button id="quiz-next-btn" type="button" style="padding:4px 10px; font-size:0.85rem;">Következő feladat →</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px;">
+        <span class="badge" id="quiz-num">1 / 8. feladat</span>
+        <button id="quiz-next-btn" type="button">Következő feladat →</button>
       </div>
-
       <div class="quiz-q" id="quiz-question"></div>
-
-      <div style="margin: 16px 0; display:flex; flex-direction:column; gap:12px;">
-        <div>
-          <div style="font-weight:600; font-size:0.92rem; margin-bottom:6px;">Válaszd ki a legmegfelelőbb adatstruktúrát:</div>
-          <select id="quiz-ds-select" style="width:100%; padding:8px 12px; font:inherit; font-size:0.95rem; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg);">
-            <option value="">Válassz adatstruktúrát...</option>
-            <option value="array">1D Tömb / Lista</option>
-            <option value="matrix">2D Tömb / Mátrix</option>
-            <option value="string">Karakterlánc (String)</option>
-            <option value="record">Rekord / Rekordok listája</option>
-            <option value="stack">Verem (Stack)</option>
-            <option value="queue">Sor (Queue)</option>
-            <option value="set">Halmaz (Set)</option>
-            <option value="dict">Szótár (Dictionary)</option>
-          </select>
-        </div>
-      </div>
-
+      <div style="font-weight:600; margin-bottom:6px;">Válaszd ki a legmegfelelőbb adatstruktúrát:</div>
+      <select id="quiz-ds-select">
+        <option value="">Válassz adatstruktúrát…</option>
+        <option value="array">Lista</option>
+        <option value="matrix">Mátrix</option>
+        <option value="string">Karakterlánc</option>
+        <option value="record">Rekord / rekordok listája</option>
+        <option value="stack">Verem</option>
+        <option value="queue">Sor</option>
+        <option value="set">Halmaz</option>
+        <option value="dict">Szótár</option>
+      </select>
       <div style="margin-top:16px;">
-        <button id="quiz-check-btn" type="button" style="width:100%; padding:10px; font-size:1rem;">Válasz ellenőrzése</button>
+        <button id="quiz-check-btn" type="button" style="width:100%; padding:10px;">Válasz ellenőrzése</button>
       </div>
-
       <div class="feedback-box" id="quiz-feedback">
         <div id="quiz-feedback-title" style="font-weight:700;"></div>
-        <div class="feedback-text" id="quiz-feedback-body"></div>
+        <div id="quiz-feedback-body"></div>
       </div>
     </div>
-
     <div class="panel">
       <h3>Gyakorlati tanács az érettségihez</h3>
-      <p style="font-size:0.92rem;">
-        1. Ha több összetartozó tulajdonsága van egy tételnek (pl. név, időpont, helyezés), mindig hozz létre <strong>osztályt vagy rekordot</strong>, és azokból készíts listát.<br>
-        2. Ha gyorsan el kell dönteni, hogy egy elem szerepelt-e már korábban (és nem kellenek duplikátumok), a <strong>halmaz (set)</strong> a leghatékonyabb választás.<br>
-        3. Ha meg kell számolni, melyik típusból / névből hány darab fordult elő, a <strong>szótár (dictionary)</strong> használata a legegyszerűbb és leggyorsabb.
-      </p>
+      <p>1. Ha egy tételnek több összetartozó adata van (pl. név, időpont, helyezés), készíts belőle <strong>rekordot</strong> (osztályt), és ezekből listát.</p>
+      <p>2. Ha azt kell eldönteni, hogy egy elem szerepelt-e már, és nem kellenek ismétlődések, a <strong>halmaz</strong> a legjobb választás.</p>
+      <p>3. Ha azt kell megszámolni, melyik fajtából hány darab van, a <strong>szótár</strong> a legegyszerűbb.</p>
     </div>
   </div>
 </section>
 
 <section class="anim-section" id="ds-forras">
   <h2>Források</h2>
-  <p>A 7–9. rész szövege és példái: Digitális kultúra 11–12. okosgyűjtemény (emelt szint), VIII. fejezet, <a href="https://www.nkp.hu/tankonyv/digitalis_kultura_11-12_okosgyujtemeny_emelt_szint/lecke_08_009">08.09. Halmazok, szótárak és többdimenziós listák</a> (halmaz1.py, halmaz2.py, szotar1.py, lotto.py). A kirándulási szavazás saját példa.</p>
+  <p>A Halmaz, a Szótár és a Gyakoriság rész szövege és példái: Digitális kultúra 11–12. okosgyűjtemény (emelt szint), VIII. fejezet, <a href="https://www.nkp.hu/tankonyv/digitalis_kultura_11-12_okosgyujtemeny_emelt_szint/lecke_08_009">08.09. Halmazok, szótárak és többdimenziós listák</a> (halmaz1.py, halmaz2.py, szotar1.py, lotto.py). A kirándulási szavazás és a többi rész példái saját példák.</p>
 </section>
 
 </main>
 
 <script>
-// ================= SEGÉDFÜGGVÉNYEK =================
-const PALETTE = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316'];
-
-function createTwo(containerId, W, H) {
-  const el = document.getElementById(containerId);
-  el.innerHTML = '';
-  const two = new Two({ width: W, height: H, type: Two.Types.svg }).appendTo(el);
-  two.renderer.domElement.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-  two.renderer.domElement.style.width = '100%';
-  two.renderer.domElement.style.height = 'auto';
-  two.renderer.domElement.style.display = 'block';
-  return two;
-}
-
-// ================= 1. TÖMB / LISTA =================
-let arrayData = [12, 45, 7, 89, 34, 61];
-let twoArray = null;
-
-function drawArray() {
-  const W = 700;
-  const H = 220;
-  if (!twoArray) twoArray = createTwo('canvas-array', W, H);
-  twoArray.clear();
-
-  const n = arrayData.length;
-  const boxW = Math.min(65, (W - 80) / Math.max(n, 1));
-  const boxH = 65;
-  const startX = (W - (n * boxW + (n - 1) * 8)) / 2 + boxW / 2;
-  const startY = 110;
-
-  const title = twoArray.makeText(`Lista hossza (len): ${n} elem`, 30, 30);
-  title.alignment = 'left';
-  title.fill = 'var(--muted)';
-  title.size = 13;
-  title.weight = 700;
-
-  for (let i = 0; i < n; i++) {
-    const x = startX + i * (boxW + 8);
-    const y = startY;
-
-    const rect = twoArray.makeRoundedRectangle(x, y, boxW, boxH, 8);
-    rect.fill = 'var(--panel)';
-    rect.stroke = PALETTE[i % PALETTE.length];
-    rect.linewidth = 2;
-
-    const valTxt = twoArray.makeText(arrayData[i] + '', x, y);
-    valTxt.fill = 'var(--fg)';
-    valTxt.size = 18;
-    valTxt.weight = 700;
-
-    const idxTxt = twoArray.makeText(`[${i}]`, x, y - 48);
-    idxTxt.fill = 'var(--accent)';
-    idxTxt.size = 12;
-    idxTxt.weight = 700;
-
-    const negIdxTxt = twoArray.makeText(`[${i - n}]`, x, y + 48);
-    negIdxTxt.fill = 'var(--muted)';
-    negIdxTxt.size = 11;
-  }
-
-  twoArray.update();
-}
-
-function initArrayEvents() {
-  document.getElementById('arr-append-btn').addEventListener('click', function() {
-    if (arrayData.length < 8) {
-      arrayData.push(Math.floor(Math.random() * 90) + 10);
-      drawArray();
-    }
-  });
-
-  document.getElementById('arr-pop-btn').addEventListener('click', function() {
-    if (arrayData.length > 1) {
-      arrayData.pop();
-      drawArray();
-    }
-  });
-
-  document.getElementById('arr-insert-btn').addEventListener('click', function() {
-    if (arrayData.length < 8) {
-      arrayData.unshift(Math.floor(Math.random() * 90) + 10);
-      drawArray();
-    }
-  });
-
-  document.getElementById('arr-rand-btn').addEventListener('click', function() {
-    arrayData = Array.from({ length: 6 }, () => Math.floor(Math.random() * 90) + 10);
-    drawArray();
-  });
-}
-
-// ================= 2. 2D TÖMB / MÁTRIX =================
-const matRows = 3;
-const matCols = 4;
-let matrixData = [
-  [10, 20, 30, 40],
-  [50, 60, 70, 80],
-  [90, 15, 25, 35]
-];
-let twoMatrix = null;
-let matHighlight = null;
-
-function drawMatrix() {
-  const W = 700;
-  const H = 260;
-  if (!twoMatrix) twoMatrix = createTwo('canvas-matrix', W, H);
-  twoMatrix.clear();
-
-  const cellW = 80;
-  const cellH = 50;
-  const startX = 180;
-  const startY = 60;
-
-  for (let c = 0; c < matCols; c++) {
-    const colHeader = twoMatrix.makeText(`Oszlop [${c}]`, startX + c * (cellW + 6), startY - 32);
-    colHeader.fill = 'var(--accent)';
-    colHeader.size = 11;
-    colHeader.weight = 700;
-  }
-
-  for (let r = 0; r < matRows; r++) {
-    const rowHeader = twoMatrix.makeText(`Sor [${r}]`, startX - 58, startY + r * (cellH + 6));
-    rowHeader.alignment = 'right';
-    rowHeader.fill = 'var(--accent)';
-    rowHeader.size = 11;
-    rowHeader.weight = 700;
-
-    for (let c = 0; c < matCols; c++) {
-      const x = startX + c * (cellW + 6);
-      const y = startY + r * (cellH + 6);
-      const isHl = (matHighlight && matHighlight.r === r && matHighlight.c === c);
-
-      const cell = twoMatrix.makeRoundedRectangle(x, y, cellW, cellH, 6);
-      cell.fill = isHl ? 'var(--accent)' : 'var(--panel)';
-      cell.stroke = isHl ? 'var(--accent-hover)' : 'var(--line)';
-      cell.linewidth = isHl ? 2.5 : 1.5;
-
-      const txt = twoMatrix.makeText(matrixData[r][c] + '', x, y - 2);
-      txt.fill = isHl ? '#ffffff' : 'var(--fg)';
-      txt.size = 15;
-      txt.weight = 700;
-
-      const sub = twoMatrix.makeText(`[${r}][${c}]`, x, y + 15);
-      sub.fill = isHl ? '#ffffff' : 'var(--muted)';
-      sub.size = 9;
-    }
-  }
-
-  twoMatrix.update();
-}
-
-function initMatrixEvents() {
-  let timer = null;
-
-  document.getElementById('mat-walk-row-btn').addEventListener('click', function() {
-    clearInterval(timer);
-    let step = 0;
-    const total = matRows * matCols;
-    timer = setInterval(() => {
-      if (step >= total) {
-        clearInterval(timer);
-        matHighlight = null;
-        drawMatrix();
-        return;
-      }
-      const r = Math.floor(step / matCols);
-      const c = step % matCols;
-      matHighlight = { r, c };
-      document.getElementById('mat-status').textContent = `Sorfolytonos: matrix[${r}][${c}] = ${matrixData[r][c]}`;
-      drawMatrix();
-      step++;
-    }, 400);
-  });
-
-  document.getElementById('mat-walk-col-btn').addEventListener('click', function() {
-    clearInterval(timer);
-    let step = 0;
-    const total = matRows * matCols;
-    timer = setInterval(() => {
-      if (step >= total) {
-        clearInterval(timer);
-        matHighlight = null;
-        drawMatrix();
-        return;
-      }
-      const c = Math.floor(step / matRows);
-      const r = step % matRows;
-      matHighlight = { r, c };
-      document.getElementById('mat-status').textContent = `Oszlopfolytonos: matrix[${r}][${c}] = ${matrixData[r][c]}`;
-      drawMatrix();
-      step++;
-    }, 400);
-  });
-
-  document.getElementById('mat-reset-btn').addEventListener('click', function() {
-    clearInterval(timer);
-    matHighlight = null;
-    document.getElementById('mat-status').textContent = 'Kattints egy cellára az index megtekintéséhez';
-    drawMatrix();
-  });
-}
-
-// ================= 3. KARAKTERLÁNC =================
-let strText = 'INFORMATIKA';
-let sliceStart = 2;
-let sliceStop = 7;
-let twoString = null;
-
-function updateStringUI() {
-  document.getElementById('str-start-val').textContent = sliceStart;
-  document.getElementById('str-stop-val').textContent = sliceStop;
-
-  const sliced = strText.slice(sliceStart, sliceStop);
-  document.getElementById('str-slice-code').innerHTML = 
-    `s = "${strText}"<br>` +
-    `resz = s[${sliceStart}:${sliceStop}]  # Eredmény: "${sliced}" (hossza: ${sliced.length})`;
-
-  drawString();
-}
-
-function drawString() {
-  const W = 700;
-  const H = 220;
-  if (!twoString) twoString = createTwo('canvas-string', W, H);
-  twoString.clear();
-
-  const n = strText.length;
-  const boxW = Math.min(48, (W - 60) / Math.max(n, 1));
-  const boxH = 56;
-  const startX = (W - (n * boxW + (n - 1) * 6)) / 2 + boxW / 2;
-  const startY = 110;
-
-  for (let i = 0; i < n; i++) {
-    const x = startX + i * (boxW + 6);
-    const y = startY;
-    const inSlice = (i >= sliceStart && i < sliceStop);
-
-    const rect = twoString.makeRoundedRectangle(x, y, boxW, boxH, 6);
-    rect.fill = inSlice ? 'var(--accent)' : 'var(--panel)';
-    rect.stroke = inSlice ? 'var(--accent-hover)' : 'var(--line)';
-    rect.linewidth = inSlice ? 2.5 : 1.5;
-
-    const charTxt = twoString.makeText(strText[i], x, y);
-    charTxt.fill = inSlice ? '#ffffff' : 'var(--fg)';
-    charTxt.size = 20;
-    charTxt.weight = 700;
-
-    const posTxt = twoString.makeText(i + '', x, y - 40);
-    posTxt.fill = inSlice ? 'var(--accent)' : 'var(--muted)';
-    posTxt.size = 11;
-    posTxt.weight = 700;
-
-    const negTxt = twoString.makeText((i - n) + '', x, y + 42);
-    negTxt.fill = 'var(--muted)';
-    negTxt.size = 10;
-  }
-
-  twoString.update();
-}
-
-function initStringEvents() {
-  const startSl = document.getElementById('str-start');
-  const stopSl = document.getElementById('str-stop');
-
-  startSl.addEventListener('input', function() {
-    sliceStart = parseInt(this.value, 10);
-    if (sliceStart >= sliceStop) {
-      sliceStop = Math.min(sliceStart + 1, strText.length);
-      stopSl.value = sliceStop;
-    }
-    updateStringUI();
-  });
-
-  stopSl.addEventListener('input', function() {
-    sliceStop = parseInt(this.value, 10);
-    if (sliceStop <= sliceStart) {
-      sliceStart = Math.max(0, sliceStop - 1);
-      startSl.value = sliceStart;
-    }
-    updateStringUI();
-  });
-
-  document.getElementById('str-set-btn').addEventListener('click', function() {
-    const v = document.getElementById('str-input').value.trim().toUpperCase();
-    if (v.length >= 2) {
-      strText = v;
-      startSl.max = strText.length - 1;
-      stopSl.max = strText.length;
-      sliceStart = 0;
-      sliceStop = strText.length;
-      startSl.value = 0;
-      stopSl.value = strText.length;
-      updateStringUI();
-    }
-  });
-}
-
-// ================= 4. REKORD / OBJEKTUM =================
-const INITIAL_STUDENTS = [
-  { nev: 'Kovács Anna', osztaly: '12.A', atlag: 4.8 },
-  { nev: 'Nagy Bence', osztaly: '12.B', atlag: 3.9 },
-  { nev: 'Szabó Dániel', osztaly: '12.A', atlag: 4.6 },
-  { nev: 'Tóth Eszter', osztaly: '12.C', atlag: 4.2 }
-];
-let studentRecords = [...INITIAL_STUDENTS];
-let recordFilter = false;
-let twoRecord = null;
-
-function drawRecord() {
-  const W = 700;
-  const H = 260;
-  if (!twoRecord) twoRecord = createTwo('canvas-record', W, H);
-  twoRecord.clear();
-
-  const disp = recordFilter ? studentRecords.filter(s => s.atlag >= 4.5) : studentRecords;
-  const cardW = 150;
-  const cardH = 170;
-  const count = disp.length;
-  const startX = (W - (count * cardW + (count - 1) * 16)) / 2 + cardW / 2;
-  const startY = 130;
-
-  const title = twoRecord.makeText(
-    `Rekordok a memóriában (lista hossza: ${count} db)${recordFilter ? ' [Szűrve: átlag ≥ 4.5]' : ''}`,
-    30, 25
-  );
-  title.alignment = 'left';
-  title.fill = 'var(--muted)';
-  title.size = 13;
-  title.weight = 700;
-
-  for (let i = 0; i < count; i++) {
-    const x = startX + i * (cardW + 16);
-    const y = startY;
-    const s = disp[i];
-
-    const card = twoRecord.makeRoundedRectangle(x, y, cardW, cardH, 8);
-    card.fill = 'var(--panel)';
-    card.stroke = s.atlag >= 4.5 ? 'var(--accent)' : 'var(--line)';
-    card.linewidth = 2;
-
-    const tag = twoRecord.makeText(`Tanulo[${i}]`, x, y - 62);
-    tag.fill = 'var(--muted)';
-    tag.size = 11;
-    tag.weight = 700;
-
-    const nTxt = twoRecord.makeText(s.nev, x, y - 32);
-    nTxt.fill = 'var(--fg)';
-    nTxt.size = 13;
-    nTxt.weight = 700;
-
-    const oLabel = twoRecord.makeText('osztaly:', x - 25, y + 2);
-    oLabel.alignment = 'right';
-    oLabel.fill = 'var(--muted)';
-    oLabel.size = 11;
-
-    const oVal = twoRecord.makeText(s.osztaly, x - 15, y + 2);
-    oVal.alignment = 'left';
-    oVal.fill = 'var(--fg)';
-    oVal.size = 12;
-    oVal.weight = 600;
-
-    const aLabel = twoRecord.makeText('atlag:', x - 25, y + 28);
-    aLabel.alignment = 'right';
-    aLabel.fill = 'var(--muted)';
-    aLabel.size = 11;
-
-    const aVal = twoRecord.makeText(s.atlag.toFixed(1), x - 15, y + 28);
-    aVal.alignment = 'left';
-    aVal.fill = s.atlag >= 4.5 ? 'var(--accent)' : 'var(--fg)';
-    aVal.size = 14;
-    aVal.weight = 700;
-  }
-
-  twoRecord.update();
-}
-
-function initRecordEvents() {
-  document.getElementById('rec-add-btn').addEventListener('click', function() {
-    if (studentRecords.length < 5) {
-      const names = ['Varga Zsófia', 'Kiss Márton', 'Horváth Lili', 'Molnár Ádám'];
-      const nextName = names[studentRecords.length % names.length];
-      const nextAvg = Math.round((3.8 + Math.random() * 1.2) * 10) / 10;
-      studentRecords.push({ nev: nextName, osztaly: '12.A', atlag: nextAvg });
-      drawRecord();
-    }
-  });
-
-  document.getElementById('rec-filter-btn').addEventListener('click', function() {
-    recordFilter = true;
-    drawRecord();
-  });
-
-  document.getElementById('rec-all-btn').addEventListener('click', function() {
-    recordFilter = false;
-    drawRecord();
-  });
-}
-
-// ================= 5. VEREM (STACK) =================
-let stackItems = ['A', 'B', 'C'];
-let twoStack = null;
-
-function drawStack() {
-  const W = 700;
-  const H = 260;
-  if (!twoStack) twoStack = createTwo('canvas-stack', W, H);
-  twoStack.clear();
-
-  const cx = W / 2;
-  const btmY = 220;
-  const itemW = 140;
-  const itemH = 34;
-
-  const leftWall = twoStack.makeLine(cx - itemW / 2 - 8, 40, cx - itemW / 2 - 8, btmY + 8);
-  leftWall.stroke = 'var(--line)';
-  leftWall.linewidth = 3;
-
-  const rightWall = twoStack.makeLine(cx + itemW / 2 + 8, 40, cx + itemW / 2 + 8, btmY + 8);
-  rightWall.stroke = 'var(--line)';
-  rightWall.linewidth = 3;
-
-  const btmWall = twoStack.makeLine(cx - itemW / 2 - 8, btmY + 8, cx + itemW / 2 + 8, btmY + 8);
-  btmWall.stroke = 'var(--line)';
-  btmWall.linewidth = 3;
-
-  for (let i = 0; i < stackItems.length; i++) {
-    const y = btmY - (i + 0.5) * (itemH + 6);
-    const isTop = (i === stackItems.length - 1);
-
-    const rect = twoStack.makeRoundedRectangle(cx, y, itemW, itemH, 6);
-    rect.fill = isTop ? 'var(--accent)' : 'var(--panel)';
-    rect.stroke = isTop ? 'var(--accent-hover)' : 'var(--line)';
-    rect.linewidth = 2;
-
-    const txt = twoStack.makeText(stackItems[i], cx, y);
-    txt.fill = isTop ? '#ffffff' : 'var(--fg)';
-    txt.size = 14;
-    txt.weight = 700;
-
-    if (isTop) {
-      const topLabel = twoStack.makeText('← TOP (Tető)', cx + itemW / 2 + 18, y);
-      topLabel.alignment = 'left';
-      topLabel.fill = 'var(--accent)';
-      topLabel.size = 12;
-      topLabel.weight = 700;
-    }
-  }
-
-  twoStack.update();
-}
-
-function initStackEvents() {
-  const letters = ['D', 'E', 'F', 'G'];
-  let lIdx = 0;
-
-  document.getElementById('st-push-btn').addEventListener('click', function() {
-    if (stackItems.length < 5) {
-      stackItems.push(letters[lIdx % letters.length]);
-      lIdx++;
-      document.getElementById('st-status').textContent = `Push: '${stackItems[stackItems.length - 1]}' behelyezve a verem tetejére`;
-      drawStack();
-    }
-  });
-
-  document.getElementById('st-pop-btn').addEventListener('click', function() {
-    if (stackItems.length > 0) {
-      const popped = stackItems.pop();
-      document.getElementById('st-status').textContent = `Pop: '${popped}' levéve a verem tetejéről`;
-      drawStack();
-    }
-  });
-
-  document.getElementById('st-clear-btn').addEventListener('click', function() {
-    stackItems = [];
-    document.getElementById('st-status').textContent = 'A verem kiürítve';
-    drawStack();
-  });
-}
-
-// ================= 6. SOR (QUEUE) =================
-let queueItems = ['X', 'Y', 'Z'];
-let twoQueue = null;
-
-function drawQueue() {
-  const W = 700;
-  const H = 220;
-  if (!twoQueue) twoQueue = createTwo('canvas-queue', W, H);
-  twoQueue.clear();
-
-  const cy = 110;
-  const itemW = 55;
-  const itemH = 55;
-  const startX = 200;
-
-  const topWall = twoQueue.makeLine(120, cy - itemH / 2 - 6, 560, cy - itemH / 2 - 6);
-  topWall.stroke = 'var(--line)';
-  topWall.linewidth = 3;
-
-  const btmWall = twoQueue.makeLine(120, cy + itemH / 2 + 6, 560, cy + itemH / 2 + 6);
-  btmWall.stroke = 'var(--line)';
-  btmWall.linewidth = 3;
-
-  const outTag = twoQueue.makeText('KIJÁRAT (Front)\n← Kiszolgálás', 70, cy);
-  outTag.alignment = 'center';
-  outTag.fill = 'var(--accent)';
-  outTag.size = 11;
-  outTag.weight = 700;
-
-  const inTag = twoQueue.makeText('BEJÁRAT (Rear)\nÉrkezés ←', 620, cy);
-  inTag.alignment = 'center';
-  inTag.fill = 'var(--muted)';
-  inTag.size = 11;
-  inTag.weight = 700;
-
-  for (let i = 0; i < queueItems.length; i++) {
-    const x = startX + i * (itemW + 12);
-    const isFront = (i === 0);
-
-    const rect = twoQueue.makeRoundedRectangle(x, cy, itemW, itemH, 8);
-    rect.fill = isFront ? 'var(--accent)' : 'var(--panel)';
-    rect.stroke = isFront ? 'var(--accent-hover)' : 'var(--line)';
-    rect.linewidth = 2;
-
-    const txt = twoQueue.makeText(queueItems[i], x, cy);
-    txt.fill = isFront ? '#ffffff' : 'var(--fg)';
-    txt.size = 16;
-    txt.weight = 700;
-
-    const posTag = twoQueue.makeText(i === 0 ? 'Első' : `${i + 1}.`, x, cy + 42);
-    posTag.fill = 'var(--muted)';
-    posTag.size = 10;
-  }
-
-  twoQueue.update();
-}
-
-function initQueueEvents() {
-  const letters = ['P', 'Q', 'R', 'S'];
-  let qIdx = 0;
-
-  document.getElementById('q-enqueue-btn').addEventListener('click', function() {
-    if (queueItems.length < 5) {
-      queueItems.push(letters[qIdx % letters.length]);
-      qIdx++;
-      document.getElementById('q-status').textContent = `Enqueue: '${queueItems[queueItems.length - 1]}' beállt a sor végére`;
-      drawQueue();
-    }
-  });
-
-  document.getElementById('q-dequeue-btn').addEventListener('click', function() {
-    if (queueItems.length > 0) {
-      const dequeued = queueItems.shift();
-      document.getElementById('q-status').textContent = `Dequeue: '${dequeued}' kiszolgálva a sor elejéről`;
-      drawQueue();
-    }
-  });
-
-  document.getElementById('q-clear-btn').addEventListener('click', function() {
-    queueItems = [];
-    document.getElementById('q-status').textContent = 'A sor kiürítve';
-    drawQueue();
-  });
-}
-
-// ================= 7. HALMAZ ÉS SZÓTÁR =================
-let setData = new Set(['alma', 'körte']);
-let dictData = { 'alma': 2, 'körte': 1 };
-let twoSetDict = null;
-
-function drawSetDict() {
-  const W = 700;
-  const H = 260;
-  if (!twoSetDict) twoSetDict = createTwo('canvas-setdict', W, H);
-  twoSetDict.clear();
-
-  // Bal oldal: Halmaz
-  const setX = 180;
-  const setY = 135;
-  const setR = 85;
-
-  const setCircle = twoSetDict.makeCircle(setX, setY, setR);
-  setCircle.fill = 'var(--panel)';
-  setCircle.stroke = 'var(--line)';
-  setCircle.linewidth = 2;
-
-  const setHeader = twoSetDict.makeText('Halmaz (Set) — egyedi elemek', setX, 30);
-  setHeader.fill = 'var(--accent)';
-  setHeader.size = 12;
-  setHeader.weight = 700;
-
-  const setArr = Array.from(setData);
-  setArr.forEach((item, idx) => {
-    const angle = (idx * 2 * Math.PI / Math.max(setArr.length, 1)) - Math.PI / 2;
-    const x = setX + (setR * 0.5) * Math.cos(angle);
-    const y = setY + (setR * 0.5) * Math.sin(angle);
-
-    const badge = twoSetDict.makeRoundedRectangle(x, y, 64, 26, 6);
-    badge.fill = 'var(--bg)';
-    badge.stroke = 'var(--accent)';
-    badge.linewidth = 1.5;
-
-    const t = twoSetDict.makeText(item, x, y);
-    t.fill = 'var(--fg)';
-    t.size = 11;
-    t.weight = 600;
-  });
-
-  // Jobb oldal: Szótár
-  const dictX = 490;
-  const dictY = 135;
-
-  const dictHeader = twoSetDict.makeText('Szótár (Dict) — kulcs: érték', dictX, 30);
-  dictHeader.fill = 'var(--accent)';
-  dictHeader.size = 12;
-  dictHeader.weight = 700;
-
-  const dictEntries = Object.entries(dictData);
-  dictEntries.forEach(([k, v], idx) => {
-    const y = 70 + idx * 36;
-
-    const row = twoSetDict.makeRoundedRectangle(dictX, y, 220, 28, 6);
-    row.fill = 'var(--panel)';
-    row.stroke = 'var(--line)';
-    row.linewidth = 1.5;
-
-    const kTxt = twoSetDict.makeText(`"${k}":`, dictX - 45, y);
-    kTxt.fill = 'var(--accent)';
-    kTxt.size = 12;
-    kTxt.weight = 700;
-
-    const vTxt = twoSetDict.makeText(`${v} db`, dictX + 45, y);
-    vTxt.fill = 'var(--fg)';
-    vTxt.size = 12;
-    vTxt.weight = 600;
-  });
-
-  twoSetDict.update();
-}
-
-function initSetDictEvents() {
-  function addItem(name) {
-    const alreadyInSet = setData.has(name);
-    setData.add(name);
-    dictData[name] = (dictData[name] || 0) + 1;
-
-    document.getElementById('sd-status').textContent = alreadyInSet ?
-      `'${name}' már benne volt a halmazban (nem duplázódik), de a szótárban nőtt a számlálója (${dictData[name]} db)` :
-      `'${name}' új elemként bekerült a halmazba és a szótárba`;
-    drawSetDict();
-  }
-
-  document.getElementById('sd-add-apple').addEventListener('click', () => addItem('alma'));
-  document.getElementById('sd-add-pear').addEventListener('click', () => addItem('körte'));
-  document.getElementById('sd-add-banana').addEventListener('click', () => addItem('banán'));
-
-  document.getElementById('sd-clear-btn').addEventListener('click', () => {
-    setData.clear();
-    dictData = {};
-    document.getElementById('sd-status').textContent = 'Halmaz és szótár kiürítve';
-    drawSetDict();
-  });
-}
-
-// ================= 8. FELADATOK =================
+// ================= GYAKORLÓ FELADATOK =================
 const QUIZ_QUESTIONS = [
-  {
-    q: 'Egy szöveges állományban egy futóverseny célbaérkezőinek adatai vannak soronként: rajtszám, név, születési év, célidő. Milyen adatszerkezetbe érdemes beolvasni az adatokat a hatékony feldolgozáshoz?',
-    ans: 'record',
-    desc: 'Több különböző típusú (számok, szövegek), de egy személyhez szorosan összetartozó adatot egy rekordban (osztályban) célszerű tárolni, és a fájl sorait egy rekordokból álló listába (tömbbe) gyűjtjük.'
-  },
-  {
-    q: 'Egy webböngésző "Vissza" gombját implementálod, ahol a felhasználó a legutóbb meglátogatott oldalra ugorhat vissza, majd az azelőttire. Melyik adatszerkezet valósítja meg ezt a LIFO elvet?',
-    ans: 'stack',
-    desc: 'A legutoljára meglátogatott oldalnak kell legelsőként visszajönnie (Last-In, First-Out), amit a verem (stack) valósít meg tökéletesen.'
-  },
-  {
-    q: 'Egy feladatban meg kell adni, hogy egy 100 000 elemű listában hány darab különböző (egyedi) szám található. Melyik adatszerkezettel oldható meg a legegyszerűbben?',
-    ans: 'set',
-    desc: 'A halmaz (set) definíció szerint kizárja a duplikátumokat. Pythonban a len(set(lista)) egyetlen lépésben O(n) idő alatt megadja a különböző elemek számát.'
-  },
-  {
-    q: 'Egy iskolai hálózaton a nyomtatóra egyszerre több diák küld nyomtatási feladatot. A nyomtatónak az érkezés sorrendjében kell kinyomtatnia a dokumentumokat. Melyik struktúra szükséges?',
-    ans: 'queue',
-    desc: 'Az elsőként beküldött feladatot kell elsőként kinyomtatni (First-In, First-Out), amit a sor (queue) adatszerkezet kezel.'
-  },
-  {
-    q: 'Egy szöveges fájlban tárolt regény szavait olvasod be, és meg kell állapítani, hogy melyik szó hányszor szerepel a szövegben. Melyik a legalkalmasabb adatstruktúra?',
-    ans: 'dict',
-    desc: 'A szótár (dictionary / map) kulcsként tárolja az egyes szavakat, értékként pedig az adott szó előfordulásainak számát (gyakoriságszámlálás).'
-  },
-  {
-    q: 'Egy 10x10-es tengeri csata (torpedó) játék mezőit szeretnéd ábrázolni, ahol minden mezőnek van egy vízszintes és egy függőleges koordinátája. Melyik a természetes struktúra?',
-    ans: 'matrix',
-    desc: 'A sorokból és oszlopokból álló négyzetrács reprezentációjára a kétdimenziós tömb (mátrix) a legalkalmasabb: tabla[sor][oszlop].'
-  },
-  {
-    q: 'Egy matematikai kifejezésben (pl. "{[(a+b)*c]-d}") ellenőrizni kell, hogy a zárójelek szabályosan záródnak-e be. Melyik adatszerkezet az algoritmus alapja?',
-    ans: 'stack',
-    desc: 'A nyitó zárójeleket a verembe helyezzük. Záró zárójel esetén kivesszük a verem tetejét és ellenőrizzük, hogy összeillő párt alkotnak-e.'
-  },
-  {
-    q: 'Egy felhasználó által beírt email címből szeretnéd kinyerni a kukac előtti felhasználónevet és a kukac utáni domain nevet. Milyen struktúrán végzel műveletet?',
-    ans: 'string',
-    desc: 'A karakterlánc (string) szöveges adatszerkezet, amelyen a find(), split() vagy szeletelési operátorokkal keresünk és bontunk részszövegekre.'
-  }
+  { q: 'Egy szöveges állományban egy futóverseny célba érkezőinek adatai vannak soronként: rajtszám, név, születési év, célidő. Milyen adatszerkezetbe érdemes beolvasni az adatokat?', ans: 'record',
+    desc: 'Egy személyhez tartozó, különböző típusú adatokat egy rekordban (osztályban) célszerű tárolni, a fájl sorait pedig rekordok listájába gyűjtjük.' },
+  { q: 'Egy webböngésző „Vissza” gombját készíted: a legutóbb meglátogatott oldalra kell visszaugrani, majd az azelőttire. Melyik adatszerkezet valósítja meg ezt?', ans: 'stack',
+    desc: 'A legutoljára meglátogatott oldalnak kell elsőként visszajönnie (Last-In, First-Out): ez a verem.' },
+  { q: 'Meg kell adni, hogy egy 100 000 elemű listában hány különböző szám van. Melyik adatszerkezettel a legegyszerűbb?', ans: 'set',
+    desc: 'A halmazban minden elem csak egyszer szerepel, ezért len(set(lista)) azonnal megadja a különböző elemek számát.' },
+  { q: 'Egy iskolai nyomtatóra egyszerre több diák küld dokumentumot. A nyomtatónak az érkezés sorrendjében kell nyomtatnia. Melyik struktúra kell?', ans: 'queue',
+    desc: 'Az elsőként beküldött feladatot kell elsőként kinyomtatni (First-In, First-Out): ez a sor.' },
+  { q: 'Egy regény szavait olvasod be, és meg kell állapítani, melyik szó hányszor szerepel. Melyik a legalkalmasabb adatstruktúra?', ans: 'dict',
+    desc: 'A szótár kulcsa a szó, értéke az előfordulások száma (gyakoriság).' },
+  { q: 'Egy 10×10-es torpedójáték mezőit szeretnéd ábrázolni, ahol minden mezőnek sora és oszlopa van. Melyik a természetes struktúra?', ans: 'matrix',
+    desc: 'Sorokból és oszlopokból álló rácsra a mátrix (listák listája) való: tabla[sor][oszlop].' },
+  { q: 'Egy kifejezésben (pl. „{[(a+b)*c]-d}”) ellenőrizni kell, hogy a zárójelek szabályosan záródnak-e. Melyik adatszerkezet az algoritmus alapja?', ans: 'stack',
+    desc: 'A nyitó zárójeleket verembe tesszük. Csukó zárójelnél kivesszük a verem tetejét, és megnézzük, hogy összeillenek-e.' },
+  { q: 'Egy e-mail-címből a kukac előtti felhasználónevet és a kukac utáni domaint kell kinyerni. Milyen struktúrán dolgozol?', ans: 'string',
+    desc: 'A karakterláncon a find(), split() függvényekkel és szeleteléssel keresünk és bontunk részekre.' }
 ];
-
+const DS_NAMES = { array: 'Lista', matrix: 'Mátrix', string: 'Karakterlánc', record: 'Rekord / rekordok listája', stack: 'Verem', queue: 'Sor', set: 'Halmaz', dict: 'Szótár' };
 let curQuizIdx = 0;
-
 function loadQuiz(idx) {
   curQuizIdx = idx;
   const q = QUIZ_QUESTIONS[idx];
-  document.getElementById('quiz-num').textContent = `${idx + 1} / ${QUIZ_QUESTIONS.length}. feladat`;
+  document.getElementById('quiz-num').textContent = (idx + 1) + ' / ' + QUIZ_QUESTIONS.length + '. feladat';
   document.getElementById('quiz-question').textContent = q.q;
   document.getElementById('quiz-ds-select').value = '';
   const fb = document.getElementById('quiz-feedback');
   fb.style.display = 'none';
   fb.className = 'feedback-box';
 }
-
 function checkQuiz() {
   const q = QUIZ_QUESTIONS[curQuizIdx];
-  const userVal = document.getElementById('quiz-ds-select').value;
-  if (!userVal) {
-    alert('Kérlek válassz ki egy adatstruktúrát.');
-    return;
-  }
-
+  const v = document.getElementById('quiz-ds-select').value;
   const fb = document.getElementById('quiz-feedback');
   const title = document.getElementById('quiz-feedback-title');
   const body = document.getElementById('quiz-feedback-body');
   fb.style.display = 'block';
-
-  const dsNames = {
-    'array': '1D Tömb / Lista',
-    'matrix': '2D Tömb / Mátrix',
-    'string': 'Karakterlánc (String)',
-    'record': 'Rekord / Rekordok listája',
-    'stack': 'Verem (Stack)',
-    'queue': 'Sor (Queue)',
-    'set': 'Halmaz (Set)',
-    'dict': 'Szótár (Dictionary)'
-  };
-
-  if (userVal === q.ans) {
-    fb.className = 'feedback-box feedback-ok';
-    title.textContent = 'Helyes válasz';
-    body.innerHTML = `<strong>Választott módszer:</strong> ${dsNames[q.ans]}<br><strong>Indoklás:</strong> ${q.desc}`;
-  } else {
-    fb.className = 'feedback-box feedback-bad';
-    title.textContent = 'Nem a legoptimálisabb választás';
-    body.innerHTML = `<strong>Helyes megoldás:</strong> ${dsNames[q.ans]}<br><strong>Indoklás:</strong> ${q.desc}`;
-  }
+  if (!v) { fb.className = 'feedback-box feedback-bad'; title.textContent = 'Előbb válassz egy adatstruktúrát.'; body.textContent = ''; return; }
+  const ok = v === q.ans;
+  fb.className = 'feedback-box ' + (ok ? 'feedback-ok' : 'feedback-bad');
+  title.textContent = ok ? 'Helyes válasz' : 'Nem ez a legjobb választás';
+  body.innerHTML = '<strong>' + (ok ? 'Választott' : 'Helyes') + ':</strong> ' + DS_NAMES[q.ans] + '<br><strong>Indoklás:</strong> ' + q.desc;
 }
-
-function initQuizEvents() {
+window.addEventListener('DOMContentLoaded', () => {
   loadQuiz(0);
   document.getElementById('quiz-check-btn').addEventListener('click', checkQuiz);
-  document.getElementById('quiz-next-btn').addEventListener('click', () => {
-    loadQuiz((curQuizIdx + 1) % QUIZ_QUESTIONS.length);
-  });
-}
-
-// ================= INICIALIZÁLÁS =================
-window.addEventListener('DOMContentLoaded', function() {
-  drawArray();
-  initArrayEvents();
-
-  drawMatrix();
-  initMatrixEvents();
-
-  updateStringUI();
-  initStringEvents();
-
-  drawRecord();
-  initRecordEvents();
-
-  drawStack();
-  initStackEvents();
-
-  drawQueue();
-  initQueueEvents();
-
-  drawSetDict();
-  initSetDictEvents();
-
-  initQuizEvents();
+  document.getElementById('quiz-next-btn').addEventListener('click', () => loadQuiz((curQuizIdx + 1) % QUIZ_QUESTIONS.length));
 });
 </script>
 
 <script>
-// ================= 7–9. LÉPÉSENKÉNTI ANIMÁCIÓK (halmaz, szótár, gyakoriság) =================
+// ================= LÉPÉSENKÉNTI ANIMÁCIÓK =================
 (function () {
   const NS = 'http://www.w3.org/2000/svg';
   function svgEl(tag, attrs, parent) {
@@ -1674,50 +539,41 @@ window.addEventListener('DOMContentLoaded', function() {
   }
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
 
+  // ---------- léptető: Vissza / Előre / Előlről ----------
   const steppers = [];
   function makeStepper(id, n, render) {
     const sec = document.getElementById(id);
-    const pager = sec.querySelector('.pager');
-    const dots = pager.querySelector('.dots');
-    const counter = pager.querySelector('.counter');
-    const q = c => pager.querySelector('.' + c);
-    const playBtn = q('play');
-    let cur = 0, timer = null;
-    for (let i = 0; i < n; i++) {
-      const d = document.createElement('button');
-      d.type = 'button'; d.className = 'dot'; d.title = (i + 1) + '. lépés';
-      d.addEventListener('click', () => { stop(); go(i); });
-      dots.appendChild(d);
-    }
+    const wrap = sec.querySelector('.pager-wrap');
+    wrap.innerHTML = '<div class="pager">' +
+      '<button type="button" class="prev" title="Előző lépés (←)">◀ Vissza</button>' +
+      '<button type="button" class="next" title="Következő lépés (→)">Előre ▶</button>' +
+      '<button type="button" class="reset" title="Vissza az első lépésre (Home)">↺ Előlről</button>' +
+      '<span class="counter"></span></div>';
+    const q = c => wrap.querySelector('.' + c);
+    const prev = q('prev'), next = q('next'), reset = q('reset'), counter = q('counter');
+    let cur = 0;
     function go(i) {
       cur = Math.max(0, Math.min(n - 1, i));
       render(cur);
-      [...dots.children].forEach((d, j) => d.classList.toggle('on', j === cur));
       counter.textContent = (cur + 1) + ' / ' + n;
+      prev.disabled = reset.disabled = cur === 0;
+      next.disabled = cur === n - 1;
     }
-    function stop() {
-      if (timer) { clearInterval(timer); timer = null; }
-      playBtn.textContent = '▶'; playBtn.title = 'Lejátszás';
-    }
-    function play() {
-      if (timer) { stop(); return; }
-      if (cur === n - 1) go(0);
-      timer = setInterval(() => { if (cur >= n - 1) { stop(); return; } go(cur + 1); }, 5500);
-      playBtn.textContent = '❚❚'; playBtn.title = 'Szünet';
-    }
-    q('prev').addEventListener('click', () => { stop(); go(cur - 1); });
-    q('next').addEventListener('click', () => { stop(); go(cur + 1); });
-    q('reset').addEventListener('click', () => { stop(); go(0); });
-    playBtn.addEventListener('click', play);
-    steppers.push({ sec, next: () => { stop(); go(cur + 1); }, prev: () => { stop(); go(cur - 1); } });
+    prev.addEventListener('click', () => go(cur - 1));
+    next.addEventListener('click', () => go(cur + 1));
+    reset.addEventListener('click', () => go(0));
+    steppers.push({ sec, next: () => go(cur + 1), prev: () => go(cur - 1), home: () => go(0) });
     go(0);
   }
 
+  // A billentyűk a képernyőn leginkább látható részt léptetik.
   document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
     if (e.target.closest && e.target.closest('input, textarea, select')) return;
     const fwd = ['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key);
     const back = ['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key);
-    if (!fwd && !back) return;
+    const home = e.key === 'Home';
+    if (!fwd && !back && !home) return;
     let best = null, bestVis = 0;
     for (const s of steppers) {
       const r = s.sec.getBoundingClientRect();
@@ -1727,7 +583,7 @@ window.addEventListener('DOMContentLoaded', function() {
     if (!best || bestVis < innerHeight * 0.35) return;
     e.preventDefault();
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-    if (fwd) best.next(); else best.prev();
+    if (fwd) best.next(); else if (back) best.prev(); else best.home();
   });
 
   function codeBox(id, lines) {
@@ -1735,43 +591,478 @@ window.addEventListener('DOMContentLoaded', function() {
     box.innerHTML = lines.map(l => '<span class="ln">' + esc(l || ' ') + '</span>').join('');
     return on => [...box.children].forEach((ln, i) => ln.classList.toggle('on', on.includes(i)));
   }
+  function texts(prefix, s) {
+    document.getElementById(prefix + '-res').textContent = s.res;
+    document.getElementById(prefix + '-cap').textContent = s.cap;
+  }
+
+  // ---------- kulcsolt jelenet: az elemek a helyükre csúsznak, a hiányzók elhalványulnak ----------
+  // elem: { id, x, y (középpont), k: 'box' | 'text', w, h, t, fs, cls, tc, a, mono, op, from }
+  function scene(svg) {
+    const map = new Map();
+    function build(g, it) {
+      while (g.firstChild) g.removeChild(g.firstChild);
+      const k = it.k || 'box';
+      if (k === 'box') svgEl('rect', { x: -it.w / 2, y: -it.h / 2, width: it.w, height: it.h, rx: it.rx != null ? it.rx : 10 }, g);
+      if (it.t != null && it.t !== '') {
+        const t = svgEl('text', { x: 0, y: 1 }, g);
+        t.textContent = it.t;
+        t.style.fontSize = (it.fs || 26) + 'px';
+        if (it.mono) t.style.fontFamily = 'ui-monospace, Consolas, monospace';
+        if (k === 'text') { t.setAttribute('class', 'lbl ' + (it.tc || '')); if (it.a) t.style.textAnchor = it.a; }
+      }
+    }
+    return items => {
+      const keep = new Set();
+      for (const it of items) {
+        if (!it) continue;
+        keep.add(it.id);
+        let g = map.get(it.id);
+        const fresh = !g;
+        if (fresh) { g = svgEl('g', {}, svg); map.set(it.id, g); }
+        const sig = [it.k, it.w, it.h, it.t, it.fs, it.tc, it.a, it.mono].join('|');
+        if (g._sig !== sig) { build(g, it); g._sig = sig; }
+        const cls = it.cls || (it.k === 'text' ? '' : 'c-normal');
+        g.setAttribute('class', 'chip ' + cls);
+        const op = it.op != null ? it.op : (/c-dim/.test(cls) ? 0.3 : /c-gone/.test(cls) ? 0.45 : 1);
+        const tf = 'translate(' + it.x + 'px, ' + it.y + 'px)';
+        if (fresh) {
+          g.style.transition = 'none';
+          g.style.opacity = 0;
+          g.style.transform = it.from ? 'translate(' + it.from[0] + 'px, ' + it.from[1] + 'px)' : tf + ' scale(0.5)';
+          g.getBoundingClientRect();
+          g.style.transition = '';
+        }
+        g.style.transform = tf;
+        g.style.opacity = op;
+      }
+      map.forEach((g, id) => { if (!keep.has(id)) g.style.opacity = 0; });
+    };
+  }
+  const L = (id, x, y, t, o) => Object.assign({ id, k: 'text', x, y, t, fs: 22 }, o || {});
+
+  // ---------- Lista ----------
+  function initList() {
+    const draw = scene(document.getElementById('list-svg'));
+    const code = codeBox('list-code', [
+      'lista = [12, 45, 7, 89, 34, 61]',
+      'print(lista[0])',
+      'print(lista[-1])',
+      'lista[3] = 90',
+      'lista.append(50)',
+      'lista.insert(0, 5)',
+      'print(lista.pop())',
+      'print(lista[7])',
+      'összeg = 0',
+      'for x in lista:',
+      '    összeg += x',
+      'print(összeg)'
+    ]);
+    const X = i => 150 + i * 96, Y = 165;
+    const base = [['a', 12], ['b', 45], ['c', 7], ['d', 89], ['e', 34], ['f', 61]];
+    const d90 = base.map(r => r[0] === 'd' ? ['d', 90] : r);
+    const with50 = d90.concat([['h', 50]]);
+    const ins = [['g', 5]].concat(with50);
+    const popped = ins.slice(0, 7);
+    const S = [
+      { code: [0], arr: base, res: 'lista = [12, 45, 7, 89, 34, 61]      len(lista) = 6',
+        cap: 'A lista elemei egymás után, sorszámozva állnak. Az első elem indexe 0, az utolsóé len(lista) − 1 = 5. Hátulról negatív indexszel is számolhatunk: az utolsó elem indexe −1.' },
+      { code: [1], arr: base, hl: { a: 'c-res' }, res: '12',
+        cap: 'lista[0]: az index alapján közvetlenül elérjük az elemet, nem kell végigmenni a listán. A 0-s index az első elem.' },
+      { code: [2], arr: base, hl: { f: 'c-res' }, res: '61',
+        cap: 'lista[−1]: a negatív index hátulról számol, a −1 az utolsó elem. Ugyanezt adja a lista[len(lista) − 1], vagyis a lista[5].' },
+      { code: [3], arr: d90, hl: { d: 'c-warn' }, res: 'lista = [12, 45, 7, 90, 34, 61]',
+        cap: 'Értékadás indexszel: a 3-as indexű elem 89-ről 90-re változik (sárga). A lista módosítható, a karakterlánc viszont nem.' },
+      { code: [4], arr: with50, hl: { h: 'c-new' }, res: 'lista = [12, 45, 7, 90, 34, 61, 50]      len(lista) = 7',
+        cap: 'append: az új elem a lista végére kerül (zöld), az indexe 6. Ez gyors, mert a többi elemet nem kell mozgatni.' },
+      { code: [5], arr: ins, hl: { g: 'c-new' }, res: 'lista = [5, 12, 45, 7, 90, 34, 61, 50]      len(lista) = 8',
+        cap: 'insert(0, 5): beszúrás az elejére. Minden elem eggyel jobbra csúszik, és mindegyiknek eggyel nő az indexe: a 12 indexe most már 1. Hosszú listánál ez lassú.' },
+      { code: [6], arr: ins, hl: { h: 'c-gone' }, n: 7, res: '50      lista = [5, 12, 45, 7, 90, 34, 61]',
+        cap: 'pop(): kiveszi és visszaadja az utolsó elemet, az 50-et (piros). A pop(0) az első elemet venné ki, ilyenkor a többi balra csúszna.' },
+      { code: [7], arr: popped, err: true, res: 'IndexError: list index out of range',
+        cap: 'Hét elem van, az indexek 0-tól 6-ig tartanak. A lista[7] nem létező indexre hivatkozik, ezért a program IndexError hibával megáll.' },
+      { code: [8, 9, 10, 11], arr: popped, all: 'c-res', res: '254',
+        cap: 'Bejárás: a for ciklus sorban végigveszi az elemeket, és mindegyiket hozzáadja az összeghez: 5 + 12 + 45 + 7 + 90 + 34 + 61 = 254. Rövidebben: sum(lista).' }
+    ];
+    makeStepper('ds-array', S.length, i => {
+      const s = S[i];
+      const n = s.n || s.arr.length;
+      const items = [L('t1', 20, 95, 'index', { a: 'start', tc: 'acc', fs: 20 }), L('t2', 20, Y, 'lista', { a: 'start', mono: true, fs: 26 }),
+        L('t3', 20, 238, 'negatív', { a: 'start', tc: 'muted', fs: 20 })];
+      s.arr.forEach(([id, v], j) => items.push({ id, x: X(j), y: Y, w: 84, h: 72, t: String(v), fs: 30, cls: (s.hl && s.hl[id]) || s.all || 'c-normal' }));
+      for (let j = 0; j < n; j++) {
+        items.push(L('p' + j, X(j), 95, String(j), { tc: 'acc', fs: 24 }));
+        items.push(L('q' + j, X(j), 238, '−' + (n - j), { tc: 'muted', fs: 20 }));
+      }
+      if (s.err) { items.push({ id: 'err', x: X(7), y: Y, w: 84, h: 72, t: '?', fs: 30, cls: 'c-err' }); items.push(L('p7e', X(7), 95, '7', { tc: 'bad', fs: 24 })); }
+      draw(items);
+      code(s.code);
+      texts('list', s);
+    });
+  }
+
+  // ---------- Mátrix ----------
+  function initMatrix() {
+    const draw = scene(document.getElementById('matrix-svg'));
+    const code = codeBox('matrix-code', [
+      'matrix = [[10, 20, 30, 40],',
+      '          [50, 60, 70, 80],',
+      '          [90, 15, 25, 35]]',
+      'print(matrix[1])',
+      'print(matrix[1][2])',
+      'for i in range(len(matrix)):',
+      '    s = 0',
+      '    for j in range(len(matrix[i])):',
+      '        s += matrix[i][j]',
+      '    print(i, s)',
+      'oszlop = [sor[1] for sor in matrix]',
+      'print(max(max(sor) for sor in matrix))'
+    ]);
+    const M = [[10, 20, 30, 40], [50, 60, 70, 80], [90, 15, 25, 35]];
+    const SUM = M.map(r => r.reduce((a, b) => a + b, 0));
+    const X = j => 290 + j * 128, Y = i => 130 + i * 92;
+    const S = [
+      { code: [0, 1, 2], cell: () => 'c-normal', res: 'len(matrix) = 3 sor      len(matrix[0]) = 4 oszlop',
+        cap: 'A mátrix listák listája: három sor, és mindegyik sor egy négyelemű lista. Az első index a sor (i), a második az oszlop (j), mindkettő 0-tól számolódik.' },
+      { code: [3], cell: i => i === 1 ? 'c-res' : 'c-dim', res: '[50, 60, 70, 80]',
+        cap: 'Egy indexszel egy egész sort kapunk: a matrix[1] az 1-es indexű (második) sor, és ez maga is lista.' },
+      { code: [4], cell: (i, j) => i === 1 && j === 2 ? 'c-res' : i === 1 ? 'c-warn' : 'c-dim', res: '70',
+        cap: 'Két indexszel egy cellát: előbb kiválasztjuk a sort (1, sárga), aztán abban az oszlopot (2). matrix[1][2] = 70.' },
+      { code: [5, 6, 7, 8, 9], cell: i => i === 0 ? 'c-res' : 'c-normal', sums: 1, res: '0 100',
+        cap: 'Sorfolytonos bejárás: a külső ciklus a sorokon (i), a belső az adott sor oszlopain (j) megy végig. i = 0: 10 + 20 + 30 + 40 = 100.' },
+      { code: [5, 6, 7, 8, 9], cell: i => i === 1 ? 'c-res' : 'c-normal', sums: 2, res: '0 100\n1 260',
+        cap: 'i = 1: a belső ciklus most a második soron megy végig: 50 + 60 + 70 + 80 = 260. A belső ciklus minden sornál újraindul, az s is mindig 0-ról.' },
+      { code: [5, 6, 7, 8, 9], cell: i => i === 2 ? 'c-res' : 'c-normal', sums: 3, res: '0 100\n1 260\n2 165',
+        cap: 'i = 2: 90 + 15 + 25 + 35 = 165. Ezzel a külső ciklus is véget ért: mind a 3 · 4 = 12 cellát pontosan egyszer érintettük.' },
+      { code: [10], cell: (i, j) => j === 1 ? 'c-res' : 'c-dim', res: 'oszlop = [20, 60, 15]',
+        cap: 'Egy oszlopot nem kapunk meg egyetlen indexszel: végig kell menni a sorokon, és mindegyik sorból az 1-es indexű elemet kell venni.' },
+      { code: [11], cell: (i, j) => i === 2 && j === 0 ? 'c-res' : 'c-dim', res: '90',
+        cap: 'A legnagyobb elem a 90: minden sor maximumát vesszük, és ezek közül a legnagyobbat. A helye matrix[2][0], vagyis a 2-es indexű sor 0-s indexű oszlopa.' }
+    ];
+    makeStepper('ds-matrix', S.length, k => {
+      const s = S[k];
+      const items = [L('jt', 482, 28, 'oszlopindex (j)', { tc: 'muted', fs: 20 }), L('it', 40, 36, 'sor (i)', { tc: 'muted', fs: 20, a: 'start' })];
+      for (let j = 0; j < 4; j++) items.push(L('c' + j, X(j), 70, String(j), { tc: 'acc', fs: 24 }));
+      for (let i = 0; i < 3; i++) {
+        items.push(L('r' + i, 40, Y(i), 'matrix[' + i + ']', { a: 'start', mono: true, fs: 22, tc: 'muted' }));
+        for (let j = 0; j < 4; j++) items.push({ id: 'm' + i + j, x: X(j), y: Y(i), w: 114, h: 72, t: String(M[i][j]), fs: 30, cls: s.cell(i, j) });
+        if (s.sums && i < s.sums) items.push(L('s' + i, 830, Y(i), '= ' + SUM[i], { tc: 'acc', fs: 26 }));
+      }
+      draw(items);
+      code(s.code);
+      texts('matrix', s);
+    });
+  }
+
+  // ---------- Karakterlánc ----------
+  function initString() {
+    const draw = scene(document.getElementById('string-svg'));
+    const code = codeBox('string-code', [
+      "s = 'INFORMATIKA'",
+      'print(s[0], s[-1])',
+      'print(s[2:7])',
+      'print(s[:4])',
+      'print(s[-4:])',
+      "print(s.find('MAT'))",
+      "print(s.count('A'))",
+      "s[0] = 'A'",
+      "új = 'A' + s[1:]"
+    ]);
+    const STR = 'INFORMATIKA', n = STR.length;
+    const X = i => 110 + i * 66, Y = 160, Y2 = 320;
+    const B = b => X(b) - 33;
+    const rng = (a, b) => Array.from({ length: b - a }, (_, k) => a + k);
+    const S = [
+      { code: [0], on: [], res: "s = 'INFORMATIKA'      len(s) = 11",
+        cap: 'A karakterlánc karakterek sorozata: mindegyiknek van indexe, ugyanúgy 0-tól, mint a lista elemeinek. Hátulról itt is negatív indexszel számolhatunk.' },
+      { code: [1], on: [0, 10], res: 'I A',
+        cap: 's[0] az első karakter, s[−1] az utolsó. A karakterlánc egy karaktere maga is (egy hosszúságú) karakterlánc.' },
+      { code: [2], on: rng(2, 7), mk: [2, 7], res: "'FORMA'",
+        cap: 'Szeletelés: s[start:stop] a start indexű karaktertől a stop előtti karakterig tart. A 7-es indexű T már nem tartozik bele. A szelet hossza stop − start = 5.' },
+      { code: [3], on: rng(0, 4), mk: [0, 4], res: "'INFO'",
+        cap: 'Ha a start elmarad, a szelet az elejéről indul: s[:4] az első négy karakter (0, 1, 2, 3).' },
+      { code: [4], on: rng(7, 11), mk: [7, 11], res: "'TIKA'",
+        cap: 'Ha a stop marad el, a szelet a végéig tart. A negatív start hátulról számol: s[−4:] az utolsó négy karakter.' },
+      { code: [5], on: [5, 6, 7], res: '5',
+        cap: "find: hol kezdődik a részszöveg? A 'MAT' az 5-ös indexen kezdődik. Ha a részszöveg nincs benne, az eredmény −1." },
+      { code: [6], on: [6, 10], res: '2',
+        cap: "count: hányszor fordul elő? Az 'A' kétszer szerepel, a 6-os és a 10-es indexen." },
+      { code: [7], on: [], err: 0, res: "TypeError: 'str' object does not support item assignment",
+        cap: 'A karakterlánc nem módosítható: egy betűjét nem írhatjuk át, a program hibával megáll. A listánál ugyanez működik.' },
+      { code: [8], on: rng(1, 11), copy: true, res: "új = 'ANFORMATIKA'      s = 'INFORMATIKA'",
+        cap: 'Helyette új karakterláncot készítünk: egy A betűhöz hozzáfűzzük (+) az s[1:] szeletet. Az eredeti s nem változott.' }
+    ];
+    makeStepper('ds-string', S.length, k => {
+      const s = S[k];
+      const items = [L('lab', 20, Y, 's', { a: 'start', mono: true, fs: 28 })];
+      for (let i = 0; i < n; i++) {
+        let cls = s.on.includes(i) ? 'c-res' : 'c-normal';
+        if (s.err === i) cls = 'c-err';
+        items.push({ id: 'ch' + i, x: X(i), y: Y, w: 58, h: 66, t: STR[i], fs: 32, mono: true, cls });
+        items.push(L('p' + i, X(i), 100, String(i), { tc: 'acc', fs: 20 }));
+        items.push(L('q' + i, X(i), 222, '−' + (n - i), { tc: 'muted', fs: 17 }));
+      }
+      if (s.mk) {
+        items.push({ id: 'mk1', x: B(s.mk[0]), y: Y, w: 6, h: 120, rx: 2, cls: 'c-mark' });
+        items.push({ id: 'mk2', x: B(s.mk[1]), y: Y, w: 6, h: 120, rx: 2, cls: 'c-mark' });
+        items.push(L('mkt1', B(s.mk[0]), 50, 'start', { tc: 'acc', fs: 20 }));
+        items.push(L('mkt2', B(s.mk[1]), 50, 'stop', { tc: 'acc', fs: 20 }));
+      }
+      if (s.copy) {
+        items.push(L('lab2', 20, Y2, 'új', { a: 'start', mono: true, fs: 28 }));
+        items.push({ id: 'u0', x: X(0), y: Y2, w: 58, h: 66, t: 'A', fs: 32, mono: true, cls: 'c-new' });
+        for (let i = 1; i < n; i++) items.push({ id: 'u' + i, x: X(i), y: Y2, w: 58, h: 66, t: STR[i], fs: 32, mono: true, cls: 'c-res', from: [X(i), Y] });
+      }
+      draw(items);
+      code(s.code);
+      texts('string', s);
+    });
+  }
+
+  // ---------- Rekord ----------
+  function initRecord() {
+    const draw = scene(document.getElementById('record-svg'));
+    const code = codeBox('record-code', [
+      'class Tanulo:',
+      '    def __init__(self, sor):',
+      "        m = sor.strip().split(';')",
+      '        self.nev = m[0]',
+      '        self.osztaly = m[1]',
+      '        self.atlag = float(m[2])',
+      "t = Tanulo('Kovács Anna;12.A;4.8')",
+      'print(t.nev, t.atlag)',
+      "f = open('tanulok.txt', encoding='utf-8')",
+      'tanulok = [Tanulo(sor) for sor in f]',
+      "tanulok.append(Tanulo('Varga Fanni;12.C;4.9'))",
+      'print(tanulok[2].nev)',
+      'db = 0',
+      'for t in tanulok:',
+      "    if t.osztaly == '12.A':",
+      '        db += 1',
+      'jók = [t.nev for t in tanulok if t.atlag >= 4.5]',
+      'legjobb = max(tanulok, key=lambda t: t.atlag)',
+      'print(legjobb.nev, legjobb.atlag)'
+    ]);
+    const R = [['Kovács Anna', '12.A', 4.8], ['Nagy Bence', '12.B', 3.9], ['Szabó Dániel', '12.A', 4.6], ['Tóth Eszter', '12.C', 4.2], ['Varga Fanni', '12.C', 4.9]];
+    const FX = [330, 560, 700], FW = [290, 120, 100], FN = ['.nev', '.osztaly', '.atlag'];
+    const Y = r => 110 + r * 62;
+    const S = [
+      { code: [0, 1, 2, 3, 4, 5, 6], rows: 1, single: true, res: "t.nev = 'Kovács Anna'   t.osztaly = '12.A'   t.atlag = 4.8",
+        cap: 'A rekord egy tanuló összetartozó adatait fogja egybe: a neve és az osztálya szöveg, az átlaga valós szám. A fájl egy sorából (Kovács Anna;12.A;4.8) a split három darabot készít, ezekből lesznek a mezők.' },
+      { code: [7], rows: 1, single: true, f: (r, c) => c !== 1 ? 'c-res' : 'c-normal', res: 'Kovács Anna 4.8',
+        cap: 'A mezőkre a nevükkel hivatkozunk: t.nev, t.atlag. Nem kell fejben tartani, hogy hányadik helyen állnak a fájl sorában.' },
+      { code: [8, 9], rows: 4, res: 'len(tanulok) = 4',
+        cap: 'A fájl minden sorából egy rekord lesz, a rekordok egy listába kerülnek: ez a rekordok listája. A sorok indexe (bal oldalt) a lista indexe.' },
+      { code: [10], rows: 5, f: r => r === 4 ? 'c-new' : 'c-normal', res: 'len(tanulok) = 5',
+        cap: 'A rekordok listája is lista: append-del új rekordot fűzhetünk a végére (zöld).' },
+      { code: [11], rows: 5, f: (r, c) => r === 2 ? (c === 0 ? 'c-res' : 'c-warn') : 'c-dim', res: 'Szabó Dániel',
+        cap: 'Először a lista indexével kiválasztjuk a rekordot (tanulok[2], sárga), aztán a mező nevével a mezőt (.nev).' },
+      { code: [12, 13, 14, 15], rows: 5, f: (r, c) => c === 1 ? (R[r][1] === '12.A' ? 'c-yes' : 'c-no') : 'c-dim', res: 'db = 2',
+        cap: 'Megszámolás: végignézzük az összes rekordot, és ha az osztaly mezője 12.A (zöld), a számlálót eggyel növeljük. Ilyen kettő van.' },
+      { code: [16], rows: 5, f: (r, c) => c === 2 ? (R[r][2] >= 4.5 ? 'c-yes' : 'c-no') : (c === 0 && R[r][2] >= 4.5 ? 'c-res' : 'c-dim'), res: "jók = ['Kovács Anna', 'Szabó Dániel', 'Varga Fanni']",
+        cap: 'Kiválogatás: azoknak a nevét gyűjtjük egy új listába, akiknek az átlaga legalább 4.5. A feltétel az egyik mezőre vonatkozik, az eredmény egy másik mező.' },
+      { code: [17, 18], rows: 5, f: r => r === 4 ? 'c-res' : 'c-dim', res: 'Varga Fanni 4.9',
+        cap: 'Maximumkiválasztás: a key megmondja, melyik mező szerint hasonlítsunk. Az eredmény a teljes rekord, ezért a legjobb tanuló neve és átlaga is elérhető.' }
+    ];
+    makeStepper('ds-record', S.length, k => {
+      const s = S[k];
+      const items = [];
+      for (let c = 0; c < 3; c++) items.push(L('h' + c, FX[c], 50, FN[c], { tc: 'muted', fs: 22, mono: true }));
+      for (let r = 0; r < s.rows; r++) {
+        items.push(L('i' + r, 70, Y(r), s.single ? 't' : '[' + r + ']', { tc: s.single ? '' : 'acc', mono: true, fs: 24 }));
+        for (let c = 0; c < 3; c++) {
+          const v = c === 2 ? R[r][2].toFixed(1) : R[r][c];
+          items.push({ id: 'f' + r + c, x: FX[c], y: Y(r), w: FW[c], h: 50, t: v, fs: 24, cls: s.f ? s.f(r, c) : 'c-normal' });
+        }
+      }
+      draw(items);
+      code(s.code);
+      texts('record', s);
+    });
+  }
+
+  // ---------- Verem ----------
+  function initStack() {
+    const svg = document.getElementById('stack-svg');
+    svgEl('path', { d: 'M 290 70 L 290 410 L 510 410 L 510 70', class: 'vcircle' }, svg);
+    const draw = scene(svg);
+    const code = codeBox('stack-code', [
+      'verem = []',
+      "verem.append('A')",
+      "verem.append('B')",
+      "verem.append('C')",
+      'print(verem[-1])',
+      'print(verem.pop())',
+      'print(verem.pop())',
+      "verem.append('D')",
+      'while verem:',
+      '    print(verem.pop())',
+      'verem.pop()'
+    ]);
+    const SY = k => 370 - k * 66, PY = m => 110 + m * 66;
+    const S = [
+      { code: [0], st: [], out: [], res: 'verem = []',
+        cap: 'Üres verem. Elemet csak a tetejére tehetünk, és csak a tetejéről vehetünk ki. Pythonban egy sima lista a verem: a lista vége a verem teteje.' },
+      { code: [1], st: ['A'], out: [], nw: 'A', res: "verem = ['A']", cap: "append('A'): az A a verem aljára kerül, mert még üres volt. Most ő van legfelül is." },
+      { code: [2], st: ['A', 'B'], out: [], nw: 'B', res: "verem = ['A', 'B']", cap: "append('B'): a B az A tetejére kerül." },
+      { code: [3], st: ['A', 'B', 'C'], out: [], nw: 'C', res: "verem = ['A', 'B', 'C']", cap: "append('C'): a C kerül legfelülre. A beérkezés sorrendje: A, B, C." },
+      { code: [4], st: ['A', 'B', 'C'], out: [], hl: 'C', res: 'C',
+        cap: 'verem[−1]: a verem tetején lévő elem, a lista utolsó eleme. Csak megnézzük, nem vesszük ki: a verem nem változik.' },
+      { code: [5], st: ['A', 'B'], out: ['C'], res: "C      verem = ['A', 'B']",
+        cap: 'pop(): kiveszi és visszaadja a legfelső elemet, a C-t, amely utoljára érkezett. Last-In, First-Out (LIFO): ami utoljára be, az elsőként ki.' },
+      { code: [6], st: ['A'], out: ['C', 'B'], res: "B      verem = ['A']", cap: 'Még egy pop(): most a B van legfelül, ő jön ki. Az A-hoz csak akkor férünk hozzá, ha a fölötte lévőket már kivettük.' },
+      { code: [7], st: ['A', 'D'], out: ['C', 'B'], nw: 'D', res: "verem = ['A', 'D']", cap: "append('D'): az új elem ismét a tetejére kerül, az A fölé." },
+      { code: [8, 9], st: [], out: ['C', 'B', 'D', 'A'], res: 'D\nA      verem = []',
+        cap: 'A ciklus addig vesz ki, amíg a verem nem üres (while verem). A kivétel sorrendje C, B, D, A: mindig az jött ki, amelyik legkésőbb ment be.' },
+      { code: [10], st: [], out: ['C', 'B', 'D', 'A'], err: true, res: 'IndexError: pop from empty list',
+        cap: 'Üres veremből nem lehet kivenni: a program hibával megáll. Ezért kivétel előtt ellenőrizzük, hogy van-e benne elem (if verem: …).' }
+    ];
+    makeStepper('ds-stack', S.length, k => {
+      const s = S[k];
+      const items = [L('vt', 400, 40, 'verem', { mono: true, fs: 26 }), L('ot', 740, 60, 'kivett elemek', { tc: 'muted', fs: 20 })];
+      s.st.forEach((e, j) => items.push({ id: e, x: 400, y: SY(j), w: 190, h: 56, t: e, fs: 30,
+        cls: e === s.nw ? 'c-new' : e === s.hl ? 'c-res' : 'c-normal', from: [400, 0] }));
+      s.out.forEach((e, m) => items.push({ id: e, x: 740, y: PY(m), w: 120, h: 52, t: e, fs: 28, cls: m === s.out.length - 1 && !s.err ? 'c-warn' : 'c-gone', op: 1 }));
+      if (s.st.length) items.push(L('top', 590, SY(s.st.length - 1), '← teteje', { tc: 'acc', fs: 22, a: 'start' }));
+      if (s.err) items.push({ id: 'err', x: 400, y: SY(0), w: 190, h: 56, t: '?', fs: 30, cls: 'c-err' });
+      draw(items);
+      code(s.code);
+      texts('stack', s);
+    });
+  }
+
+  // ---------- Sor ----------
+  function initQueue() {
+    const svg = document.getElementById('queue-svg');
+    svgEl('path', { d: 'M 130 120 L 790 120 M 130 220 L 790 220', class: 'vcircle' }, svg);
+    const draw = scene(svg);
+    const code = codeBox('queue-code', [
+      'from collections import deque',
+      'sor = deque()',
+      "sor.append('Anna')",
+      "sor.append('Bence')",
+      "sor.append('Csenge')",
+      'print(sor[0])',
+      'print(sor.popleft())',
+      "sor.append('Dóra')",
+      'print(sor.popleft())',
+      'print(len(sor), list(sor))'
+    ]);
+    const QX = k => 205 + k * 140, QY = 170, OX = m => 300 + m * 150, OY = 300;
+    const S = [
+      { code: [0, 1], q: [], out: [], res: 'sor = deque([])',
+        cap: 'Üres sor. Új elem mindig a sor végére érkezik (jobbra), és mindig a sor elejéről (balról) távozik, mint a menzán a sorban állók.' },
+      { code: [2], q: ['Anna'], out: [], nw: 'Anna', res: "sor = deque(['Anna'])", cap: 'append: Anna beáll a sorba. Mivel üres volt, ő van elöl is, hátul is.' },
+      { code: [3], q: ['Anna', 'Bence'], out: [], nw: 'Bence', res: "sor = deque(['Anna', 'Bence'])", cap: 'Bence a sor végére áll, Anna mögé.' },
+      { code: [4], q: ['Anna', 'Bence', 'Csenge'], out: [], nw: 'Csenge', res: "sor = deque(['Anna', 'Bence', 'Csenge'])", cap: 'Csenge is beáll. Az érkezés sorrendje: Anna, Bence, Csenge.' },
+      { code: [5], q: ['Anna', 'Bence', 'Csenge'], out: [], hl: 'Anna', res: 'Anna',
+        cap: 'sor[0]: a sor eleje, vagyis aki a legrégebben vár. Csak megnézzük, nem vesszük ki.' },
+      { code: [6], q: ['Bence', 'Csenge'], out: ['Anna'], res: "Anna      sor = deque(['Bence', 'Csenge'])",
+        cap: 'popleft(): a sor elejéről veszi ki azt, aki elsőként érkezett. First-In, First-Out (FIFO): aki elsőként be, az elsőként ki. A többiek előrébb lépnek.' },
+      { code: [7], q: ['Bence', 'Csenge', 'Dóra'], out: ['Anna'], nw: 'Dóra', res: "sor = deque(['Bence', 'Csenge', 'Dóra'])", cap: 'Dóra érkezik: ő is a sor végére áll, nem előzheti meg a többieket.' },
+      { code: [8], q: ['Csenge', 'Dóra'], out: ['Anna', 'Bence'], res: "Bence      sor = deque(['Csenge', 'Dóra'])", cap: 'A következő kiszolgált Bence, mert most ő áll elöl.' },
+      { code: [9], q: ['Csenge', 'Dóra'], out: ['Anna', 'Bence'], all: 'c-res', res: "2 ['Csenge', 'Dóra']",
+        cap: 'A kiszolgálás sorrendje ugyanaz, mint az érkezésé. Sima listával is menne (lista.pop(0)), de az lassú, mert minden elemet előre kell csúsztatni; a deque erre készült.' }
+    ];
+    makeStepper('ds-queue', S.length, k => {
+      const s = S[k];
+      const items = [L('e', 120, 90, 'eleje: innen távozik', { tc: 'acc', fs: 20, a: 'start' }), L('v', 790, 250, 'vége: ide érkezik', { tc: 'acc', fs: 20, a: 'end' }),
+        L('o', 20, OY, 'kiszolgálva:', { tc: 'muted', fs: 22, a: 'start' })];
+      s.q.forEach((e, j) => items.push({ id: e, x: QX(j), y: QY, w: 126, h: 64, t: e, fs: 24, cls: e === s.nw ? 'c-new' : e === s.hl ? 'c-res' : s.all || 'c-normal', from: [900, QY] }));
+      s.out.forEach((e, m) => items.push({ id: e, x: OX(m), y: OY, w: 126, h: 54, t: e, fs: 24, cls: m === s.out.length - 1 && !s.all ? 'c-warn' : 'c-gone', op: 1 }));
+      draw(items);
+      code(s.code);
+      texts('queue', s);
+    });
+  }
+
+  // ---------- Halmaz vagy szótár ----------
+  function initSetDict() {
+    const svg = document.getElementById('sd-svg');
+    svgEl('ellipse', { cx: 210, cy: 320, rx: 180, ry: 125, class: 'vcircle' }, svg);
+    const draw = scene(svg);
+    const code = codeBox('sd-code', [
+      "kosár = ['alma', 'körte', 'alma',",
+      "         'banán', 'körte', 'alma']",
+      'fajták = set()',
+      'darab = {}',
+      'for gyümölcs in kosár:',
+      '    fajták.add(gyümölcs)',
+      '    darab[gyümölcs] = darab.get(gyümölcs, 0) + 1',
+      'print(len(fajták), darab)'
+    ]);
+    const K = ['alma', 'körte', 'alma', 'banán', 'körte', 'alma'];
+    const S = [{ code: [0, 1, 2, 3], cur: -1, kinds: [], cnt: {}, res: "fajták = set()      darab = {}",
+      cap: 'Ugyanazt a kosarat dolgozzuk fel kétféleképpen: a halmazba (bal) a gyümölcsfajták kerülnek, a szótárba (jobb) az is, hogy melyikből hány darab van.' }];
+    const kinds = [], cnt = {};
+    K.forEach((g, i) => {
+      const isNew = !kinds.includes(g);
+      if (isNew) kinds.push(g);
+      cnt[g] = (cnt[g] || 0) + 1;
+      const cap = (i + 1) + '. elem: ' + g + '. ' + (isNew
+        ? 'Még nincs a halmazban, az add hozzáadja (zöld). A szótárban sincs ilyen kulcs: get(\'' + g + '\', 0) = 0, így új pár jön létre: \'' + g + '\': 1.'
+        : 'A halmazban már benne van, az add nem változtat rajta (sárga). A szótárban viszont az értéke ' + (cnt[g] - 1) + '-ről ' + cnt[g] + '-re nő.');
+      S.push({ code: [4, 5, 6], cur: i, kinds: kinds.slice(), cnt: Object.assign({}, cnt), g, isNew,
+        res: 'fajták = {' + kinds.map(x => "'" + x + "'").join(', ') + '}      darab = {' + kinds.map(x => "'" + x + "': " + cnt[x]).join(', ') + '}', cap });
+    });
+    S.push({ code: [7], cur: 99, kinds: kinds.slice(), cnt: Object.assign({}, cnt), all: true,
+      res: "3 {'alma': 3, 'körte': 2, 'banán': 1}",
+      cap: 'A halmaz azt mondja meg, mi fordult elő (3 fajta), a szótár azt is, hányszor (3 alma, 2 körte, 1 banán). Ha csak az számít, hogy szerepel-e valami: halmaz; ha darabszám is kell: szótár.' });
+    makeStepper('ds-set-dict', S.length, k => {
+      const s = S[k];
+      const items = [L('kt', 20, 30, 'kosár (lista)', { tc: 'muted', fs: 20, a: 'start' }), L('ft', 210, 165, 'fajták (halmaz)', { fs: 22 }), L('dt', 650, 165, 'darab (szótár)', { fs: 22 })];
+      K.forEach((g, i) => items.push({ id: 'k' + i, x: 85 + i * 138, y: 85, w: 124, h: 48, t: g, fs: 21,
+        cls: i === s.cur ? 'c-warn' : 'c-normal', op: i > s.cur && s.cur < 99 ? 0.35 : 1 }));
+      s.kinds.forEach((g, j) => {
+        const touched = g === s.g;
+        items.push({ id: 's' + g, x: 210, y: 255 + j * 64, w: 150, h: 50, t: g, fs: 22, cls: touched ? (s.isNew ? 'c-new' : 'c-warn') : s.all ? 'c-res' : 'c-normal', from: [85 + s.cur * 138, 85] });
+        items.push({ id: 'dk' + g, x: 590, y: 225 + j * 70, w: 150, h: 52, t: g, fs: 22, cls: touched && s.isNew ? 'c-new' : 'c-key', from: [85 + s.cur * 138, 85] });
+        items.push(L('da' + g, 690, 225 + j * 70, '→', { tc: 'muted', fs: 26 }));
+        items.push({ id: 'dv' + g + s.cnt[g], x: 760, y: 225 + j * 70, w: 70, h: 52, t: String(s.cnt[g]), fs: 26, cls: touched ? (s.isNew ? 'c-new' : 'c-warn') : s.all ? 'c-res' : 'c-normal' });
+      });
+      draw(items);
+      code(s.code);
+      texts('sd', s);
+    });
+  }
 
   const VOTES = [['Anna', 'Balaton'], ['Bence', 'Eger'], ['Csenge', 'Balaton'], ['Dávid', 'Pécs'],
     ['Emma', 'Visegrád'], ['Feri', 'Balaton'], ['Gergő', 'Eger'], ['Hanna', 'Tihany'], ['Ida', 'Balaton'],
     ['Jónás', 'Eger'], ['Kata', 'Pécs'], ['Bence', 'Balaton'], ['Lili', 'Eger'], ['Máté', 'Balaton'],
     ['Nóra', 'Visegrád']];
 
-  // ---------- 7. Halmaz ----------
+  // ---------- Halmaz ----------
   function initSet() {
     const svg = document.getElementById('set-svg');
+    const AX = 290, BX = 510, CY = 245, R = 195;
     const defs = svgEl('defs', {}, svg);
     const mA = svgEl('mask', { id: 'm-notA' }, defs);
-    svgEl('rect', { x: 0, y: 0, width: 800, height: 460, fill: 'white' }, mA);
-    svgEl('circle', { cx: 310, cy: 230, r: 180, fill: 'black' }, mA);
+    svgEl('rect', { x: 0, y: 0, width: 800, height: 470, fill: 'white' }, mA);
+    svgEl('circle', { cx: AX, cy: CY, r: R, fill: 'black' }, mA);
     const mB = svgEl('mask', { id: 'm-notB' }, defs);
-    svgEl('rect', { x: 0, y: 0, width: 800, height: 460, fill: 'white' }, mB);
-    svgEl('circle', { cx: 490, cy: 230, r: 180, fill: 'black' }, mB);
+    svgEl('rect', { x: 0, y: 0, width: 800, height: 470, fill: 'white' }, mB);
+    svgEl('circle', { cx: BX, cy: CY, r: R, fill: 'black' }, mB);
     const cA = svgEl('clipPath', { id: 'c-A' }, defs);
-    svgEl('circle', { cx: 310, cy: 230, r: 180 }, cA);
+    svgEl('circle', { cx: AX, cy: CY, r: R }, cA);
 
     const venn = svgEl('g', { class: 'fade' }, svg);
     const reg = {
-      onlyA: svgEl('circle', { cx: 310, cy: 230, r: 180, mask: 'url(#m-notB)', class: 'region' }, venn),
-      both: svgEl('circle', { cx: 490, cy: 230, r: 180, 'clip-path': 'url(#c-A)', class: 'region' }, venn),
-      onlyB: svgEl('circle', { cx: 490, cy: 230, r: 180, mask: 'url(#m-notA)', class: 'region' }, venn)
+      onlyA: svgEl('circle', { cx: AX, cy: CY, r: R, mask: 'url(#m-notB)', class: 'region' }, venn),
+      both: svgEl('circle', { cx: BX, cy: CY, r: R, 'clip-path': 'url(#c-A)', class: 'region' }, venn),
+      onlyB: svgEl('circle', { cx: BX, cy: CY, r: R, mask: 'url(#m-notA)', class: 'region' }, venn)
     };
-    svgEl('circle', { cx: 310, cy: 230, r: 180, class: 'vcircle' }, venn);
-    const circB = svgEl('circle', { cx: 490, cy: 230, r: 180, class: 'vcircle' }, venn);
-    svgEl('text', { x: 150, y: 36, class: 'vlabel' }, venn).textContent = 'halmaz_a';
-    const labB = svgEl('text', { x: 540, y: 36, class: 'vlabel' }, venn);
+    svgEl('circle', { cx: AX, cy: CY, r: R, class: 'vcircle' }, venn);
+    const circB = svgEl('circle', { cx: BX, cy: CY, r: R, class: 'vcircle' }, venn);
+    svgEl('text', { x: 100, y: 34, class: 'vlabel' }, venn).textContent = 'halmaz_a';
+    const labB = svgEl('text', { x: 570, y: 34, class: 'vlabel' }, venn);
     labB.textContent = 'halmaz_b';
 
-    const POS = { 1: [195, 140], 3: [265, 140], 5: [195, 230], 7: [265, 230], 11: [195, 320], 13: [265, 320],
-      2: [400, 230], 4: [535, 140], 6: [605, 140], 8: [535, 230], 10: [605, 230], 12: [570, 320] };
+    const POS = { 1: [170, 150], 3: [250, 150], 5: [170, 245], 7: [250, 245], 11: [170, 340], 13: [250, 340],
+      2: [400, 245], 4: [550, 150], 6: [630, 150], 8: [550, 245], 10: [630, 245], 12: [590, 340] };
     const chips = {};
     for (const k in POS) {
       const g = svgEl('g', { class: 'chip c-normal' }, venn);
-      svgEl('circle', { cx: 0, cy: 0, r: 28 }, g);
+      svgEl('circle', { cx: 0, cy: 0, r: 34 }, g);
       svgEl('text', { x: 0, y: 1 }, g).textContent = k;
       chips[k] = g;
     }
@@ -1779,23 +1070,24 @@ window.addEventListener('DOMContentLoaded', function() {
     // a szavazatok listája és a belőle készült halmaz
     const lst = svgEl('g', { class: 'fade' }, svg);
     lst.style.opacity = 0;
-    svgEl('text', { x: 20, y: 26, class: 'vlabel', style: 'font-size:20px' }, lst).textContent = 'célok (lista, 15 elem):';
+    svgEl('text', { x: 20, y: 28, class: 'vlabel', style: 'font-size:22px' }, lst).textContent = 'célok (lista, 15 elem):';
     const seen = new Set();
     VOTES.forEach(([n, c], i) => {
-      const x = 20 + (i % 5) * 155, y = 42 + Math.floor(i / 5) * 48;
+      const x = 20 + (i % 5) * 155, y = 44 + Math.floor(i / 5) * 52;
       const dup = seen.has(c); seen.add(c);
-      const g = svgEl('g', { class: 'chip small ' + (dup ? 'c-normal c-dim' : 'c-new') }, lst);
-      g.style.transform = `translate(${x}px, ${y}px)`;
-      svgEl('rect', { x: 0, y: 0, width: 140, height: 36, rx: 18 }, g);
-      svgEl('text', { x: 70, y: 19 }, g).textContent = c;
+      const g = svgEl('g', { class: 'chip small ' + (dup ? 'c-normal' : 'c-new') }, lst);
+      g.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+      if (dup) g.style.opacity = 0.35;
+      svgEl('rect', { x: 0, y: 0, width: 142, height: 40, rx: 20 }, g);
+      svgEl('text', { x: 71, y: 21 }, g).textContent = c;
     });
-    svgEl('text', { x: 20, y: 226, class: 'vlabel', style: 'font-size:20px' }, lst).textContent = 'set(célok) (halmaz, 5 elem):';
-    svgEl('ellipse', { cx: 400, cy: 335, rx: 370, ry: 90, class: 'vcircle' }, lst);
+    svgEl('text', { x: 20, y: 240, class: 'vlabel', style: 'font-size:22px' }, lst).textContent = 'set(célok) (halmaz, 5 elem):';
+    svgEl('ellipse', { cx: 400, cy: 355, rx: 375, ry: 92, class: 'vcircle' }, lst);
     ['Balaton', 'Eger', 'Pécs', 'Visegrád', 'Tihany'].forEach((c, i) => {
       const g = svgEl('g', { class: 'chip small c-res' }, lst);
-      g.style.transform = `translate(${80 + i * 135}px, 317px)`;
-      svgEl('rect', { x: 0, y: 0, width: 120, height: 36, rx: 18 }, g);
-      svgEl('text', { x: 60, y: 19 }, g).textContent = c;
+      g.style.transform = 'translate(' + (70 + i * 136) + 'px, 335px)';
+      svgEl('rect', { x: 0, y: 0, width: 124, height: 40, rx: 20 }, g);
+      svgEl('text', { x: 62, y: 21 }, g).textContent = c;
     });
 
     const code = codeBox('set-code', [
@@ -1840,9 +1132,8 @@ window.addEventListener('DOMContentLoaded', function() {
       { code: [10], mem: AB, showB: true, all: 'c-dim', cls: { 7: 'c-yes', 4: 'c-no' }, res: 'True False',
         cap: 'Benne van-e? 7 in halmaz_a → True (zöld), 4 in halmaz_a → False (piros): a 4 csak a halmaz_b-ben van. A halmaznál az in gyors, nem kell végignézni az összes elemet, mint a listánál.' },
       { code: [11, 12], list: true, res: "5 {'Balaton', 'Eger', 'Pécs', 'Visegrád', 'Tihany'}   (a sorrend futásonként más lehet)",
-        cap: 'A bemelegítő feladat 15 szavazatának úticéljai egy listában: sok az ismétlődés (a halványak már korábban szerepeltek). A set(célok) halmazba minden úticél csak egyszer kerül be, így len(set(célok)) = 5 különböző úticél.' }
+        cap: 'A Gyakoriság rész 15 szavazatának úticéljai egy listában: sok az ismétlődés (a halványak már korábban szerepeltek). A set(célok) halmazba minden úticél csak egyszer kerül be, így len(set(célok)) = 5 különböző úticél.' }
     ];
-    const res = document.getElementById('set-res'), cap = document.getElementById('set-cap');
     makeStepper('ds-set', S.length, i => {
       const s = S[i];
       venn.style.opacity = s.list ? 0 : 1;
@@ -1854,13 +1145,12 @@ window.addEventListener('DOMContentLoaded', function() {
         const vis = !s.list && (s.mem || []).includes(+k);
         const cls = (s.cls && s.cls[k]) || s.all || 'c-normal';
         g.setAttribute('class', 'chip ' + cls);
-        const sc = vis ? (cls === 'c-gone' ? 0.7 : 1) : 0.2;
-        g.style.transform = `translate(${p[0]}px, ${p[1]}px) scale(${sc})`;
-        g.style.opacity = vis ? (cls === 'c-gone' ? 0.45 : (cls === 'c-dim' ? 0.28 : 1)) : 0;
+        const sc = vis ? (cls === 'c-gone' ? 0.75 : 1) : 0.2;
+        g.style.transform = 'translate(' + p[0] + 'px, ' + p[1] + 'px) scale(' + sc + ')';
+        g.style.opacity = vis ? (cls === 'c-gone' ? 0.45 : (cls === 'c-dim' ? 0.3 : 1)) : 0;
       }
       code(s.code);
-      res.textContent = s.res;
-      cap.textContent = s.cap;
+      texts('set', s);
     });
   }
 
@@ -1875,7 +1165,7 @@ window.addEventListener('DOMContentLoaded', function() {
     }).join('');
   }
 
-  // ---------- 8. Szótár ----------
+  // ---------- Szótár ----------
   function initDict() {
     const box = document.getElementById('dict-box');
     const code = codeBox('dict-code', [
@@ -1913,17 +1203,15 @@ window.addEventListener('DOMContentLoaded', function() {
       { code: [9, 10], rows: [[...al2, 'r-seq'], [...an, 'r-seq'], [...ba, 'r-seq'], [...ko, 'r-seq']], res: 'alma: 135 kJ\nananász: 223 kJ\nbanán: 441 kJ\nkörte: 200 kJ',
         cap: 'Bejárás: az items() a (kulcs, érték) párokat adja, a beszúrás sorrendjében. A for kulcs in gyümölcsök csak a kulcsokat, a gyümölcsök.values() csak az értékeket járja be.' }
     ];
-    const res = document.getElementById('dict-res'), cap = document.getElementById('dict-cap');
     makeStepper('ds-dict', S.length, i => {
       const s = S[i];
       drawRows(box, 'gyümölcsök (szótár: kulcs → érték)', s.rows);
       code(s.code);
-      res.textContent = s.res;
-      cap.textContent = s.cap;
+      texts('dict', s);
     });
   }
 
-  // ---------- 9. Gyakoriság szótárral ----------
+  // ---------- Gyakoriság ----------
   function initCount() {
     const votesBox = document.getElementById('count-votes');
     votesBox.innerHTML = VOTES.map(([n, c]) => '<span class="vote">' + esc(n) + ': ' + esc(c) + '</span>').join('');
@@ -1974,7 +1262,10 @@ window.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  window.addEventListener('DOMContentLoaded', () => { initSet(); initDict(); initCount(); });
+  window.addEventListener('DOMContentLoaded', () => {
+    initList(); initMatrix(); initString(); initRecord(); initStack(); initQueue();
+    initSet(); initDict(); initCount(); initSetDict();
+  });
 })();
 </script>
 
