@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Kombinatorika, halmazok, gráfok – fogalmak</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1f2937;
+  --muted: #4b5563;
+  --line: #d1d5db;
+  --panel: #f8fafc;
+  --accent: #15803d;
+  --accent-bg: #ecfdf5;
+  --accent-border: #a7f3d0;
+  --hl: #2563eb;
+  --hl-fill: rgba(37, 99, 235, 0.35);
+  --hl2-fill: rgba(22, 163, 74, 0.30);
+  --def-bg: #eff6ff;
+  --def-border: #93c5fd;
+  --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --fg: #f1f5f9;
+    --muted: #a3b1c6;
+    --line: #475569;
+    --panel: #1e293b;
+    --accent: #22c55e;
+    --accent-bg: rgba(34,197,94,0.15);
+    --accent-border: #166534;
+    --hl: #60a5fa;
+    --hl-fill: rgba(96,165,250,0.40);
+    --hl2-fill: rgba(74,222,128,0.30);
+    --def-bg: rgba(59,130,246,0.12);
+    --def-border: #1d4ed8;
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.4);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 18px; scroll-behavior: smooth; }
+body { font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; background: var(--bg); color: var(--fg); line-height: 1.55; padding: 16px 20px 60px; }
+.top-nav { max-width: 1100px; margin: 0 auto 16px; padding-bottom: 8px; }
+.top-nav a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.top-nav a:hover { text-decoration: underline; }
+header, main, footer { max-width: 1100px; margin-left: auto; margin-right: auto; }
+header { margin-bottom: 20px; }
+header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+header p { color: var(--muted); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-top: 12px; }
+.progress { font-weight: 600; }
+.toolbar button { font: inherit; font-size: 0.95rem; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; }
+main { display: flex; flex-direction: column; gap: 30px; }
+section.topic { scroll-margin-top: 8px; }
+section.topic > h2 { font-size: 1.6rem; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid var(--line); }
+.item { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 10px; box-shadow: var(--shadow); }
+.item.known { border-color: var(--accent-border); background: var(--accent-bg); }
+details > summary { list-style: none; cursor: pointer; padding: 12px 120px 12px 44px; font-size: 1.12rem; font-weight: 600; position: relative; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; position: absolute; left: 16px; top: 11px; color: var(--accent); font-size: 1.1rem; transition: transform .2s; }
+details[open] > summary::before { transform: rotate(90deg); }
+.know { position: absolute; right: 12px; top: 10px; display: flex; gap: 6px; align-items: center; font-size: 0.95rem; color: var(--muted); cursor: pointer; user-select: none; }
+.know input { width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer; }
+.ans { padding: 4px 20px 18px 44px; }
+.ans p, .ans ul, .ans ol, .ans table { margin-top: 10px; }
+.ans ul, .ans ol { padding-left: 24px; }
+.def { background: var(--def-bg); border-left: 4px solid var(--def-border); padding: 10px 14px; border-radius: 6px; margin-top: 10px; }
+.def p:first-child { margin-top: 0; }
+.src { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+.formula { font-size: 1.2rem; text-align: center; margin: 12px 0; font-family: "Cambria Math", "Times New Roman", serif; }
+.ex { margin-top: 10px; }
+.ex b { color: var(--accent); }
+table { border-collapse: collapse; }
+td, th { border: 1px solid var(--line); padding: 4px 10px; text-align: left; vertical-align: top; }
+th { background: var(--bg); }
+.fig { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; }
+.fig figure { text-align: center; }
+.fig figcaption { font-size: 0.9rem; color: var(--muted); }
+.fig svg { max-width: 100%; height: auto; display: block; }
+.frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: 0.95em; }
+.frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 3px; }
+.binom { display: inline-flex; align-items: center; vertical-align: middle; }
+.binom > span.b { display: inline-flex; flex-direction: column; text-align: center; line-height: 1.1; padding: 0 2px; }
+.binom::before { content: "("; font-size: 2.1em; font-weight: 200; }
+.binom::after { content: ")"; font-size: 2.1em; font-weight: 200; }
+.anim-link { margin-top: 14px; }
+.anim-link a { display: inline-block; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--accent-border); background: var(--accent-bg); color: var(--accent); font-weight: 600; text-decoration: none; }
+.anim-link a:hover { text-decoration: underline; }
+.links a { color: var(--accent); font-weight: 600; }
+footer { margin-top: 36px; font-size: 0.9rem; color: var(--muted); }
+footer ul { padding-left: 22px; }
+.hidden { display: none; }
+@media (max-width: 640px) {
+  body { padding: 12px 16px 40px; }
+  details > summary { padding-right: 16px; padding-bottom: 36px; }
+  .know { top: auto; bottom: 8px; left: 44px; right: auto; }
+  .ans { padding-left: 16px; padding-right: 12px; }
+}
+</style>
+</head>
+<body>
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Kombinatorika, halmazok, gráfok – fogalmak</h1>
+  <p>Kattintson egy kérdésre: lenyílik a válasz (definíció a tankönyv szövegével, példa, ábra, és ahol van, link a hozzá tartozó animációra, amely új lapon nyílik). Előbb próbálja meg fejben megfogalmazni a választ, csak utána nyissa le! A „Tudom” jelölés csak az Ön böngészőjében marad meg.</p>
+  <div class="toolbar">
+    <span class="progress" id="progress">Tudom: 0 / 0</span>
+    <button type="button" id="reset">Jelölések törlése</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ===================== ÖSSZESZÁMLÁLÁS ===================== -->
+<section class="topic" id="osszeszamlalas">
+<h2>Összeszámlálás</h2>
+
+<div class="item" id="szorzasi-szabaly"><details><summary>Mikor szorozzuk össze a lehetőségek számát?</summary><div class="ans">
+  <div class="def"><p><b>Szorzás vagy összeadás?</b> Gondold végig, hogyan állítasz össze egy konkrét esetet! Gondold végig, hogy miután kiválasztottad az első elemet, hányféle elemből választhatod a másodikat. Megváltozik-e ez a szám, ha egy másik elemet választasz elsőre?</p>
+  <ul>
+    <li>Ha nem: összeszorozhatod a lehetőségek számát.</li>
+    <li>Ha igen: esetszétválasztás: össze kell adni a különböző csoportba tartozó lehetőségek számát.</li>
+  </ul></div>
+  <p class="ex"><b>Példa:</b> Nóri az első. Nóri után 4-féleképpen választhatjuk ki, hogy ki a második. A 3. helyen álló ünneplőt már csak 3-féleképpen, mert 2 ember már szerepelt. Mind a 4 korábbi kiválasztást folytathatjuk 3-féleképpen, ez eddig összesen 4 ∙ 3 lehetőség. A 4. helyen állót már csak 2-féleképpen választhatjuk, ez 4 ∙ 3 ∙ 2 lehetőség, s az utolsó felköszöntő pedig már egyértelmű. Összesen: 4 ∙ 3 ∙ 2 ∙ 1 = 24.</p>
+  <div class="fig" data-fig="tree"></div>
+  <p class="src">Gyűjtemény a matematika emelt szintű oktatásához 9–12. (OH-MAT912AE), 29. lecke, Elmélet, 77. o.; a példa: Matematika 9. (OH-MAT09TA), 1. lecke, Bevezető, 6. o.</p>
+</div></details></div>
+
+<div class="item" id="osszeadasi-szabaly"><details><summary>Mikor adjuk össze a lehetőségek számát?</summary><div class="ans">
+  <div class="def"><p>Esetszétválasztás: össze kell adni a különböző csoportba tartozó lehetőségek számát.</p>
+  <p>Nagyon fontos, hogy olyan csoportokat keressünk, amelyekben egy jelszó csak egyszer fordul elő, de mindegyik benne van valamelyik csoportban. Mindkét csoport elemeit külön összeszámoljuk, s az eredményeket összeadjuk.</p></div>
+  <p class="ex"><b>Példa:</b> Zoli új jelszót állít be a számítógépén. Kitalálta, hogy a jelszava a z, o, l, i betűkből és a 3-as számból fog állni. Hányféle lehetőség közül választhat, ha mind az öt karaktert pontosan egyszer szeretné felhasználni, de ezen kívül úgy gondolja, hogy a számjegy vagy a jelszó közepére, vagy a végére kerüljön? A lehetséges jelszavakat most két jól elkülönülő csoportra lehet szétválasztani. Az egyik csoportot azok a jelszavak alkotják, amelyekben a hármas számjegy a középső, és a többi 4 betűt a maradék 4 helyre helyezem el. Ezt az elrendezést megtehetjük 4 ∙ 3 ∙ 2 ∙ 1 = 24-féleképpen. A másik csoportot azok a jelszavak alkotják, amelyekben a hármas számjegy az utolsó. Ilyen jelszó is 24-féle lehet. Összesen 24 + 24 = 48 lehetőség van.</p>
+  <p class="src">OH-MAT912AE, 29. lecke, Elmélet, 77. o.; Matematika 9., 4. lecke, Kidolgozott feladat b), 16. o.</p>
+</div></details></div>
+
+<div class="item" id="komplementer-modszer"><details><summary>Mi a komplementer módszer?</summary><div class="ans">
+  <div class="def"><p>Gondoljuk végig, hány olyan eset van, amelyre NEM teljesül az állítás, s ezt vonjuk ki az összes eset számából!</p>
+  <p>Melyiket könnyebb összeszámolni: a kérdésben szereplő eseteket, vagy az összeset és a kimaradókat?</p></div>
+  <p class="ex"><b>Példa:</b> Zoli új jelszót állít be a számítógépén. Kitalálta, hogy a jelszava a z, o, l, i betűkből és a 3-as számból fog állni. Hányféle lehetőség közül választhat, ha mind az öt karaktert pontosan egyszer szeretné felhasználni, de nem akar számjeggyel kezdeni? Összesen az 5 karaktert 5 ∙ 4 ∙ 3 ∙ 2 ∙ 1 = 120-féleképpen állíthatjuk sorba. Ezek közül a hármas számjeggyel kezdődő jelszavak száma: 4 ∙ 3 ∙ 2 ∙ 1 = 24. Azoknak az eseteknek a száma tehát, amelyek NEM hármassal kezdődnek: 120 – 24 = 96.</p>
+  <p class="src">Matematika 9., 4. lecke, Kidolgozott feladat a), 2. megoldás, 16. o.; OH-MAT912AE, 29. lecke, Elmélet és Kidolgozott feladat (a komplementer módszer elnevezés), 77–79. o.</p>
+</div></details></div>
+
+<div class="item" id="faktorialis"><details><summary>Mit jelent az n!?</summary><div class="ans">
+  <div class="def"><p>Ha van 4 különböző elemünk, és azokat sorba rendezzük, akkor a lehetőségek száma 4 ⋅ 3 ⋅ 2 ⋅ 1. Általánosan: ha van n különböző elemünk, és azokat sorba rendezzük, akkor a lehetőségek száma n ⋅ (n − 1) ⋅ (n − 2) ⋅ … ⋅ 3 ⋅ 2 ⋅ 1. Ennek a szorzatnak a felírására egy egyszerű jelölést használunk. Például a 4 ⋅ 3 ⋅ 2 ⋅ 1 szorzatot úgy jelöljük, hogy 4! (úgy olvassuk, hogy „négy faktoriális”). Általában:</p>
+  <p class="formula">n! = n ⋅ (n − 1) ⋅ (n − 2) ⋅ … ⋅ 1</p>
+  <p class="formula">0! := 1</p></div>
+  <p class="ex"><b>A faktoriálisok értékei:</b> 0! = 1, 1! = 1, 2! = 2, 3! = 6, 4! = 24, 5! = 120, 6! = 720, 7! = 5040.</p>
+  <p class="src">Matematika 9., 1. lecke, Elmélet, 8. o.; a 0! és az értékek: Függvénytáblázatok (OH-FGV912GY), 13. o.</p>
+</div></details></div>
+
+<div class="item" id="ism-nelk-perm"><details><summary>Mi az ismétlés nélküli permutáció, és hány ilyen van?</summary><div class="ans">
+  <div class="def"><p>n különböző elemet kell az összes lehetséges módon sorba rendezni. A különböző elrendezések száma:</p>
+  <p class="formula">P<sub>n</sub> = n · (n − 1) · … · 2 · 1 = n!</p></div>
+  <p class="ex"><b>Példa:</b> Négy lány (Anna, Bogi, Cili és Dóri) és négy fiú (Elek, Feri, Gábor és Henrik) táncolni mennek. Hányféleképpen alakíthatnak négy táncoló párt, ha minden párban egy lány és egy fiú táncol? A lehetőségek száma 4 ∙ 3 ∙ 2 ∙ 1 = 4! = 24.</p>
+  <p class="src">Függvénytáblázatok, 13. o.; a példa: Matematika 9., 1. lecke, Kidolgozott feladat, 8. o.</p>
+  <p class="anim-link"><a href="/animaciok/osszeszamolasi-modszerek.html#perm-no-rep" target="_blank" rel="noopener">▶ Animáció: Összeszámlálási módszerek: ismétlés nélküli permutáció <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="ism-perm"><details><summary>Mi az ismétléses permutáció, és hány ilyen van?</summary><div class="ans">
+  <div class="def"><p>n olyan elemet kell az összes lehetséges módon sorba rendezni, amelyek között ismétlődő elemek is vannak. Ha az ismétlődések száma k<sub>1</sub>, k<sub>2</sub>, …, k<sub>r</sub> (k<sub>1</sub> + k<sub>2</sub> + … + k<sub>r</sub> ≤ n), akkor a különböző elrendezések száma:</p>
+  <p class="formula">P<sub>n</sub><sup>k<sub>1</sub>, k<sub>2</sub>, …, k<sub>r</sub></sup> = <span class="frac"><span>n!</span><span>k<sub>1</sub>! · k<sub>2</sub>! · … · k<sub>r</sub>!</span></span></p></div>
+  <p class="ex"><b>Példa:</b> Az 5 éves Csilla szeretne jelszót készíteni, amit testvérének Bencének kell kitalálnia. Csilla csak az A és a B betűt ismeri fel biztonságosan, ezért a következő négy betűkártyát használja: A A B B. Hányféle jelszót készíthet Csilla, ha csak a betűk sorrendje számít, és akkor, ha a színek megkülönböztetik őket? Ha csak a betűk sorrendje számít: <span class="frac"><span>4!</span><span>2! · 2!</span></span> = 6; ha a színek megkülönböztetik őket: 4! = 24.</p>
+  <p class="src">Függvénytáblázatok, 13. o.; a példa: Matematika 9., 3. lecke, 1. házi feladat a), 15. o.</p>
+  <p class="anim-link"><a href="/animaciok/osszeszamolasi-modszerek.html#perm-rep" target="_blank" rel="noopener">▶ Animáció: Összeszámlálási módszerek: ismétléses permutáció <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="ism-nelk-var"><details><summary>Mi az ismétlés nélküli variáció, és hány ilyen van?</summary><div class="ans">
+  <div class="def"><p>n különböző elem közül k ≤ n elemet kell kiválasztani. Egy elemet csak egyszer választhatunk ki, a sorrend számít, vagyis ha ugyanazokat az elemeket más sorrendben választjuk ki, az más kiválasztásnak számít. A különböző kiválasztások száma:</p>
+  <p class="formula">V<sub>n</sub><sup>k</sup> = n · (n − 1) · … · (n − k + 1) = <span class="frac"><span>n!</span><span>(n − k)!</span></span></p></div>
+  <p class="ex"><b>Példa:</b> Egy futóversenyen 6 gyerek indul. Hányféle kiosztása lehet az arany-, ezüst- és bronzéremnek (a többiek helyezését nem figyeljük, és nincs holtverseny)? 6 · 5 · 4 = 120.</p>
+  <p class="src">Függvénytáblázatok, 13. o.; a példa: Matematika 9., 1. lecke, 2. b) feladat, 7. o.</p>
+  <p class="anim-link"><a href="/animaciok/osszeszamolasi-modszerek.html#vari-no-rep" target="_blank" rel="noopener">▶ Animáció: Összeszámlálási módszerek: ismétlés nélküli variáció <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="ism-var"><details><summary>Mi az ismétléses variáció, és hány ilyen van?</summary><div class="ans">
+  <div class="def"><p>n különböző elem közül k elemet kell kiválasztani. Egy elemet többször is kiválaszthatunk, a sorrend számít. A különböző kiválasztások száma:</p>
+  <p class="formula">V<sub>n</sub><sup>k,i</sup> = n<sup>k</sup></p></div>
+  <p class="ex"><b>Példa:</b> A számzáras lakat négy kereke egymástól függetlenül elforgatható. Mindegyik keréken 10 számjegy van 0-tól 9-ig. Hány különböző számnégyes állítható be ezen a záron? 10<sup>4</sup> = 10 000.</p>
+  <p class="src">Függvénytáblázatok, 13. o.; a példa: Matematika 9., 3. lecke, 1. a) feladat, 14. o.</p>
+  <p class="anim-link"><a href="/animaciok/osszeszamolasi-modszerek.html#vari-rep" target="_blank" rel="noopener">▶ Animáció: Összeszámlálási módszerek: ismétléses variáció <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="kombinacio"><details><summary>Mi az ismétlés nélküli kombináció, és mit jelent az „n alatt a k”?</summary><div class="ans">
+  <div class="def"><p>n különböző elem közül k ≤ n elemet kell kiválasztani. Egy elemet csak egyszer választhatunk ki, a sorrend nem számít, vagyis ha ugyanazokat az elemeket más sorrendben választjuk ki, az ugyanannak a kiválasztásnak számít. A különböző kiválasztások száma:</p>
+  <p class="formula">C<sub>n</sub><sup>k</sup> = <span class="frac"><span>n · (n − 1) · … · (n − k + 1)</span><span>k!</span></span> = <span class="frac"><span>n!</span><span>k! · (n − k)!</span></span> = <span class="binom"><span class="b"><span>n</span><span>k</span></span></span></p>
+  <p>Binomiális együtthatók: <span class="binom"><span class="b"><span>n</span><span>k</span></span></span> = <span class="frac"><span>n!</span><span>k! · (n − k)!</span></span>, 0 ≤ k ≤ n. (Kiolvasva: „n alatt a k”.)</p></div>
+  <p class="ex"><b>Példa:</b> Egy 10 tagú társaságban mindenki mindenkivel kezet fogott. Hány kézfogás történt? Emese 9-szer nyújtotta a kezét, ugyanígy a többiek is. Ez összesen 90 kéznyújtás. Egy kézfogás 2 kéznyújtás eredménye, ezért minden kézfogást kétszer számoltunk. A kézfogások száma tehát 90 : 2 = 45. Ez éppen <span class="binom"><span class="b"><span>10</span><span>2</span></span></span> = 45.</p>
+  <p class="src">Függvénytáblázatok, 14. o.; a példa: Matematika 9., 1. lecke, Kidolgozott feladat 1., 7. o.</p>
+  <p class="anim-link"><a href="/animaciok/osszeszamolasi-modszerek.html#comb-no-rep" target="_blank" rel="noopener">▶ Animáció: Összeszámlálási módszerek: ismétlés nélküli kombináció <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="melyik-modszer"><details><summary>Hogyan döntjük el, melyik összeszámlálási módszert kell használni?</summary><div class="ans">
+  <table>
+    <tr><th>Módszer</th><th>Mit csinálunk?</th><th>Darabszám</th></tr>
+    <tr><td>ismétlés nélküli permutáció</td><td>sorba rendezés: n különböző elemet rendezünk sorba</td><td>n!</td></tr>
+    <tr><td>ismétléses permutáció</td><td>sorba rendezés, az elemek között ismétlődők is vannak</td><td>n! / (k<sub>1</sub>! · k<sub>2</sub>! · … · k<sub>r</sub>!)</td></tr>
+    <tr><td>ismétlés nélküli variáció</td><td>kiválasztás sorrenddel, egy elemet csak egyszer</td><td>n! / (n − k)!</td></tr>
+    <tr><td>ismétléses variáció</td><td>kiválasztás sorrenddel, egy elemet többször is</td><td>n<sup>k</sup></td></tr>
+    <tr><td>ismétlés nélküli kombináció</td><td>kiválasztás sorrend nélkül, egy elemet csak egyszer</td><td><span class="binom"><span class="b"><span>n</span><span>k</span></span></span></td></tr>
+  </table>
+  <p class="src">Függvénytáblázatok, 13–14. o. (Permutáció (sorba rendezés); Variáció (kiválasztás sorrenddel); Kombináció (kiválasztás sorrend nélkül)).</p>
+  <p class="anim-link"><a href="/animaciok/osszeszamolasi-modszerek.html#matrix-gyakorlas" target="_blank" rel="noopener">▶ Animáció: Összeszámlálási módszerek: döntési mátrix és gyakorlás <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="skatulyaelv"><details><summary>Mit mond ki a skatulyaelv?</summary><div class="ans">
+  <div class="def"><p><b>Tétel (skatulyaelv):</b> Ha n darab elemet k darab skatulyába („kategóriába”) helyezünk el, és n &gt; k, akkor biztosan lesz olyan skatulya, amelybe egynél több, azaz legalább két elem kerül. (n, k ∈ ℤ<sup>+</sup>)</p>
+  <p>Nem igaz ugyanakkor, hogy biztosan létezik olyan skatulya, amelybe pontosan két elem kerül. Előfordulhat például, hogy vannak üres skatulyák, vagy hogy ugyanabba a skatulyába kerül az összes elem.</p>
+  <p>A skatulyaelv általánosítható. Ha n darab elemet k darab skatulyába szeretnénk elhelyezni, és n &gt; k · p, akkor biztosan lesz olyan skatulya, amelybe p-nél több, azaz legalább (p + 1) elem kerül. (n, k, p ∈ ℤ<sup>+</sup>)</p></div>
+  <div class="fig" data-fig="pigeon"></div>
+  <p class="ex"><b>Példa:</b> A mobiltelefonok bekapcsolásakor a SIM kártya PIN kódját (négyjegyű számkódot) kell megadni. A négy számjegyből álló PIN kód számjegyei bármilyenek lehetnek. 2011-ben Magyarországon a SIM kártyák száma 11,69 millió volt. Közülük legalább hányhoz tartozott egyforma PIN kód? Megoldás: 1169.</p>
+  <p class="src">OH-MAT912AE, 100. lecke, Elmélet, 254. o.; a példa: Matematika 9., 3. lecke, Ráadás 3., 15. o., megoldás a megoldókönyvből.</p>
+</div></details></div>
+</section>
+
+<!-- ===================== GRÁFOK ===================== -->
+<section class="topic" id="grafok">
+<h2>Gráfok</h2>
+
+<div class="item" id="graf"><details><summary>Mi a gráf? Mit nevezünk a gráf csúcsainak és éleinek?</summary><div class="ans">
+  <div class="def"><p>Gráfokkal szoktunk ábrázolni elemeket, ha azt is szeretnénk az ábrában megjeleníteni, hogy mely elemek között van kapcsolat. A gráf pontjai (vagy más szóval csúcsai) jelölik a különböző elemeket, és a pontokat összekötő vonalak (vagy más szóval élek) jelölik a kapcsolatot. Az ábrában nem számít az összekötő vonalak hossza, és nem számít, hogy egyenes vonalakat rajzolunk vagy görbéket. A gráffal a kapcsolatok hálózatát szeretnénk szemléltetni.</p></div>
+  <div class="fig" data-fig="graph-basic"></div>
+  <p class="src">Matematika 9., 2. lecke, Elmélet, 10. o.</p>
+  <p class="anim-link"><a href="/animaciok/grafok.html#mi-a-graf" target="_blank" rel="noopener">▶ Animáció: Gráfok: Mi a gráf? <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="fokszam"><details><summary>Mi egy csúcs fokszáma? Mi az izolált pont?</summary><div class="ans">
+  <div class="def"><p><b>Fokszám:</b> Egy csúcs fokszáma a csúcsból kiinduló élek száma, a hurokéleket duplán számoljuk.</p>
+  <p><b>Izolált pont:</b> A gráf egy pontja izolált, ha fokszáma nulla.</p></div>
+  <div class="fig" data-fig="graph-degree"></div>
+  <p class="src">Függvénytáblázatok, 15. o.</p>
+</div></details></div>
+
+<div class="item" id="iranyitott"><details><summary>Mi az irányított gráf?</summary><div class="ans">
+  <div class="def"><p>Vannak olyan gráfok, amelyekben az elemek közötti kapcsolatok iránya is fontos, ilyenkor az összekötő vonalakat nyilakkal egészítjük ki (irányított gráf).</p></div>
+  <div class="fig" data-fig="graph-directed"></div>
+  <p class="src">Matematika 9., 2. lecke, Elmélet, 10. o.</p>
+</div></details></div>
+
+<div class="item" id="egyszeru-graf"><details><summary>Mi a hurokél, a többszörös él, és mi az egyszerű gráf?</summary><div class="ans">
+  <div class="def"><p><b>Többszörös él</b> (másként: párhuzamos élek): két csúcs között egynél több él fut.</p>
+  <p><b>Hurokél:</b> olyan él, amelynek két végpontja azonos (a hurokél a fokszámot 2-vel növeli).</p>
+  <p><b>Definíció:</b> Egy gráf egyszerű gráf, ha nem tartalmaz hurokélt és többszörös élt.</p></div>
+  <div class="fig" data-fig="graph-loop"></div>
+  <p class="src">OH-MAT912AE, 31. lecke, Elmélet, 82. o.</p>
+  <p class="anim-link"><a href="/animaciok/grafok.html#hurokel" target="_blank" rel="noopener">▶ Animáció: Gráfok: Hurokél, többszörös él, egyszerű gráf <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="fokszamtetel"><details><summary>Mit mond ki a fokszámtétel?</summary><div class="ans">
+  <div class="def"><p><b>Tétel:</b> Minden gráfban a fokszámok összege egyenlő az élek számának kétszeresével.</p>
+  <p class="formula">fokszámok összege = 2 ∙ élek száma</p>
+  <p>A tételből következik, hogy bármely véges gráfban a páratlan fokú csúcsok száma páros.</p></div>
+  <p class="src">OH-MAT912AE, 31. lecke, Elmélet, 82. o.; a következmény: Függvénytáblázatok, 16. o.</p>
+  <p class="anim-link"><a href="/animaciok/grafok.html#fokszamtetel" target="_blank" rel="noopener">▶ Animáció: Gráfok: Fokszámtétel <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="teljes-graf"><details><summary>Mi a teljes gráf, és hány éle van?</summary><div class="ans">
+  <div class="def"><p><b>Definíció:</b> Egy gráf teljes gráf, ha a gráf bármely két csúcsa között pontosan egy él fut.</p>
+  <p>Az n pontú teljes gráf éleinek száma annyi, ahányféleképpen kiválaszthatunk az n csúcs közül kettőt úgy, hogy a kiválasztás sorrendje nem számít. Ez éppen <span class="binom"><span class="b"><span>n</span><span>2</span></span></span> = <span class="frac"><span>n(n − 1)</span><span>2</span></span>.</p></div>
+  <div class="fig" data-fig="graph-k5"></div>
+  <p class="src">OH-MAT912AE, 31. lecke, Elmélet, 83. o.</p>
+  <p class="anim-link"><a href="/animaciok/grafok.html#teljes-graf" target="_blank" rel="noopener">▶ Animáció: Gráfok: Teljes gráf <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="komplementer-graf"><details><summary>Mi egy gráf komplementere?</summary><div class="ans">
+  <div class="def"><p>Egy egyszerű gráf komplementer gráfja az a gráf, melynek csúcsai megegyeznek a gráf csúcsaival, és két csúcsa között akkor és csak akkor van él, ha az eredeti gráfban nincs. A komplementer gráf élei tehát pontosan azok az élek, amelyekkel kiegészítve teljes gráfot kapunk.</p></div>
+  <div class="fig" data-fig="graph-compl"></div>
+  <p class="src">OH-MAT912AE, 31. lecke, Elmélet, 83. o.</p>
+  <p class="anim-link"><a href="/animaciok/grafok.html#komplementer" target="_blank" rel="noopener">▶ Animáció: Gráfok: Komplementer gráf <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="izomorf"><details><summary>Mikor izomorf két gráf?</summary><div class="ans">
+  <div class="def"><p>Két gráfot izomorfnak (gráfelméleti szempontból megegyezőnek) nevezünk, ha csúcsaik megfeleltethetők egymásnak úgy, hogy két csúcs között az egyik gráfban pontosan akkor van él, amikor a másik gráfban.</p>
+  <p>Sokszor nem egyszerű feladat két gráfról eldönteni, hogy izomorfak-e. (Ennek vizsgálatát érdemes az élek számának és a csúcsok fokszámának meghatározásával kezdeni, és azt követően vizsgálni a csúcsok egymásnak való megfelelését.)</p></div>
+  <div class="fig" data-fig="graph-iso"></div>
+  <p class="src">OH-MAT912AE, 31. lecke, Elmélet, 83. o.</p>
+  <p class="anim-link"><a href="/animaciok/grafok.html#izomorf" target="_blank" rel="noopener">▶ Animáció: Gráfok: Izomorf gráfok <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="seta-ut-kor"><details><summary>Mi a séta, a körséta, az út és a kör egy gráfban?</summary><div class="ans">
+  <div class="def"><p>A <b>séta</b> a gráf éleinek egymáshoz csatlakozó sorozata, amelyben egy-egy csúcs vagy él akár többször is szerepelhet. Ha az élsorozat kezdő és végpontja azonos, akkor <b>körsétának</b> nevezzük.</p>
+  <p><b>Út:</b> a gráf éleinek egymáshoz csatlakozó sorozata, amelyben nincs ismétlődő csúcs.</p>
+  <p><b>Kör:</b> a gráf éleinek egymáshoz csatlakozó sorozata, melynek kezdő és végpontja azonos, a többi csúcs viszont nem ismétlődik.</p></div>
+  <div class="fig" data-fig="graph-path"></div>
+  <p class="src">OH-MAT912AE, 32. lecke, Elmélet, 84. o.</p>
+  <p class="anim-link"><a href="/animaciok/grafok.html#ut-kor" target="_blank" rel="noopener">▶ Animáció: Gráfok: Út, séta, kör, összefüggő gráf <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="osszefuggo"><details><summary>Mikor összefüggő egy gráf?</summary><div class="ans">
+  <div class="def"><p>Egy gráf összefüggő, ha bármely két csúcsa között van út.</p></div>
+  <div class="fig" data-fig="graph-comp"></div>
+  <p class="src">OH-MAT912AE, 32. lecke, Elmélet, 84. o.</p>
+</div></details></div>
+
+<div class="item" id="fa"><details><summary>Mi a fagráf, és hány éle van egy n pontú fagráfnak?</summary><div class="ans">
+  <div class="def"><p><b>Definíció:</b> Egy egyszerű gráfot fagráfnak nevezünk, ha bármely két csúcsa között pontosan egy út létezik.</p>
+  <p>A fagráf tulajdonságai:</p>
+  <ul>
+    <li>összefüggő gráf (azaz bármely két csúcsa között van út);</li>
+    <li>nincs benne kör (ellenkező esetben lenne két olyan csúcsa, amelyek között több út van);</li>
+    <li>ha elhagyunk belőle egy élt, akkor már nem lesz összefüggő;</li>
+    <li>ha hozzáveszünk még egy élt, akkor lesz benne kör.</li>
+  </ul>
+  <p><b>Tétel:</b> Az n pontú fagráf éleinek száma n – 1.</p></div>
+  <div class="fig" data-fig="graph-tree"></div>
+  <p class="src">OH-MAT912AE, 32. lecke, Elmélet, 84. o.</p>
+  <p class="anim-link"><a href="/animaciok/grafok.html#fak" target="_blank" rel="noopener">▶ Animáció: Gráfok: Fák <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+</section>
+
+<!-- ===================== HALMAZOK ===================== -->
+<section class="topic" id="halmazok">
+<h2>Halmazok</h2>
+
+<div class="item" id="halmaz"><details><summary>Mikor mondjuk, hogy megadtunk egy halmazt? Mit nevezünk a halmaz elemeinek?</summary><div class="ans">
+  <div class="def"><p>Akkor mondjuk, hogy megadtunk egy halmazt, ha minden dologról, személyről, fogalomról pontosan el lehet dönteni, hogy a halmazhoz tartozik-e vagy nem. A halmazhoz tartozó, azaz a halmazban lévő dolgok a halmaz elemei.</p></div>
+  <p class="ex"><b>Például:</b> a természetes számok halmazt alkotnak, osztályod tanulói halmazt alkotnak, a Naprendszer bolygói halmazt alkotnak. De: a szép őszi napok nem alkotnak halmazt, a nagy számok nem alkotnak halmazt (mert nem lehet egyértelműen eldönteni, melyik őszi nap szép vagy melyik szám nagy), a MATEMATIKA szó betűinek a halmaza: {A; E; I; K; M; T}.</p>
+  <p class="src">Matematika 9., 6. lecke, Bevezető, 20. o.</p>
+</div></details></div>
+
+<div class="item" id="ures-halmaz"><details><summary>Mi az üres halmaz?</summary><div class="ans">
+  <div class="def"><p>Azt a halmazt, melynek nincs eleme, üres halmaznak nevezzük. Jele: Ø vagy { }.</p></div>
+  <p class="ex"><b>Például:</b> a –6-nál kisebb természetes számok halmaza üres halmaz. Üres halmazból egy van – bár sokféle módon megadható.</p>
+  <p class="src">Matematika 9., 6. lecke, Bevezető, 20. o.; a jel: Jelölések, 21. o.</p>
+</div></details></div>
+
+<div class="item" id="halmaz-megadasa"><details><summary>Milyen módokon adhatunk meg egy halmazt?</summary><div class="ans">
+  <div class="def"><p>Halmaz megadása történhet a halmaz elemeinek felsorolásával (véges halmaz esetén). Megadhatjuk szavakkal vagy jelekkel, hogy milyen tulajdonságú elemek tartoznak a halmazba. Szemléltethetjük a halmazt Venn-diagrammal.</p></div>
+  <p class="ex"><b>Halmaz megadása az elemek felsorolásával:</b> {Anikó, Kriszti, Béla, Zsombor, Dóri}.</p>
+  <div class="fig" data-fig="venn-elements"></div>
+  <p class="src">Matematika 9., 6. lecke, Bevezető, 20. o.; az ábra a 7. lecke Elméletének példája (25. o.).</p>
+</div></details></div>
+
+<div class="item" id="egyenlo"><details><summary>Mikor egyenlő két halmaz?</summary><div class="ans">
+  <div class="def"><p>Két halmazt egyenlőnek mondunk, ha ugyanazok az elemeik.</p></div>
+  <p class="ex"><b>Például:</b> az egyjegyű prímszámok halmaza egyenlő a {2; 3; 5; 7} halmazzal.</p>
+  <p class="src">Matematika 9., 6. lecke, Bevezető, 20. o.</p>
+</div></details></div>
+
+<div class="item" id="elemszam"><details><summary>Mit jelent egy halmaz elemszáma?</summary><div class="ans">
+  <div class="def"><p>H halmaz elemszáma (számossága): |H|. Ha H halmaz elemszáma végtelen: |H| = ∞.</p></div>
+  <p class="ex"><b>Például:</b> egy téglalap csúcsainak a halmaza véges (4 elemű) halmaz; az üres halmaz elemszáma 0, az egyjegyű prímszámok elemszáma pedig 4. Azt mondjuk, hogy a végtelen halmaz elemeinek száma végtelen.</p>
+  <p class="src">Matematika 9., 6. lecke, Bevezető, 20. o., és Jelölések, 21. o.</p>
+</div></details></div>
+
+<div class="item" id="veges-vegtelen"><details><summary>Mikor véges és mikor végtelen egy halmaz?</summary><div class="ans">
+  <div class="def"><p>Egy halmazt véges halmaznak mondunk, ha elemeinek száma megadható egy természetes számmal. Az üres halmaz is véges halmaz.</p>
+  <p>Ha egy halmaz nem véges, akkor végtelen halmaznak nevezzük.</p></div>
+  <p class="ex"><b>Például:</b> egy téglalap csúcsainak a halmaza véges (4 elemű) halmaz; egy körvonal pontjainak a halmaza végtelen halmaz.</p>
+  <p class="src">Matematika 9., 6. lecke, Bevezető, 20. o.</p>
+</div></details></div>
+
+<div class="item" id="reszhalmaz"><details><summary>Mikor részhalmaza egy halmaz egy másiknak?</summary><div class="ans">
+  <div class="def"><p>Ha egy halmaz mindegyik eleme benne van egy másik halmazban, akkor ezt a halmazt a másik halmaz részhalmazának nevezzük. Az üres halmaz minden halmaznak részhalmaza.</p>
+  <p>Jele: V ⊆ U (V részhalmaza U-nak).</p></div>
+  <div class="fig" data-fig="venn-subset"></div>
+  <p class="ex"><b>Például:</b> a prímszámok halmaza részhalmaza az egész számok halmazának; az osztályod tanulóinak halmaza részhalmaza az iskolád tanulóiból álló halmaznak.</p>
+  <p class="src">Matematika 9., 6. lecke, Bevezető, 20. o.; a jel: Jelölések, 21. o.</p>
+</div></details></div>
+
+<div class="item" id="valodi-reszhalmaz"><details><summary>Mikor valódi részhalmaz egy részhalmaz?</summary><div class="ans">
+  <div class="def"><p>Ha egy A halmaz részhalmaza egy B halmaznak, de A ≠ B, akkor A-t a B valódi részhalmazának mondjuk. Jele: A ⊂ B.</p></div>
+  <p class="ex"><b>Például:</b> a prímszámok halmaza valódi részhalmaza az egész számok halmazának; a {2; 3; 5; 7} nem valódi részhalmaza az egyjegyű prímszámok halmazának (egyenlő a két halmaz).</p>
+  <p class="src">Matematika 9., 6. lecke, Bevezető, 20. o.; a jel: Jelölések, 21. o.</p>
+</div></details></div>
+
+<div class="item" id="reszhalmazok-szama"><details><summary>Hány részhalmaza van egy n elemű halmaznak?</summary><div class="ans">
+  <div class="def"><p><b>n elemű halmaz összes részhalmazának száma:</b> Egy n elemű halmaz egy részhalmazát úgy kapjuk meg, hogy mindegyik elemről eldöntjük, hogy beletesszük-e a részhalmazba vagy sem. Mind az n db elem esetén dönthetünk kétféleképpen.</p>
+  <p class="formula">n elemű halmaz összes részhalmazának száma: 2<sup>n</sup></p>
+  <p><b>n elemű halmaz k elemű részhalmazainak száma:</b> Egy k elemű részhalmazt úgy kapunk, hogy kiválasztunk k db elemet, és nem számít a kiválasztás sorrendje: <span class="binom"><span class="b"><span>n</span><span>k</span></span></span>.</p></div>
+  <p class="ex"><b>Példa:</b> Soroljuk fel az {a; b; c; d} halmaz részhalmazait! 1 elemű részhalmazok: {a}, {b}, {c}, {d} (4 db). 2 elemű részhalmazok: {a; b}, {a; c}, {a; d}, {b; c}, {b; d}, {c; d} (6 db). 3 elemű részhalmazok: {a; b; c}, {a; b; d}, {a; c; d}, {b; c; d} (4 db). 4 elemű részhalmaz: {a; b; c; d} (1 db). Ez 15 részhalmaz. Rajtuk kívül még az üres halmaz is részhalmaza az adott halmaznak, vagyis van még egy 0 elemű részhalmaz is: { } (1 db). Tehát az {a; b; c; d} halmaznak 16 részhalmaza van.</p>
+  <p class="src">OH-MAT912AE, 30. lecke, Elmélet, 80. o.; a példa: Matematika 9., 6. lecke, Kidolgozott feladat 2., 21. o.</p>
+  <p class="anim-link"><a href="/animaciok/halmazok.html#reszhalmazok" target="_blank" rel="noopener">▶ Animáció: Halmazok: Részhalmazok száma <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="jelolesek"><details><summary>Milyen jelöléseket használunk a halmazoknál?</summary><div class="ans">
+  <table>
+    <tr><th>Jel</th><th>Jelentése</th></tr>
+    <tr><td>x ∈ H</td><td>x eleme a H halmaznak</td></tr>
+    <tr><td>x ∉ H</td><td>x nem eleme a H halmaznak</td></tr>
+    <tr><td>Ø vagy { }</td><td>üres halmaz</td></tr>
+    <tr><td>|H|</td><td>H halmaz elemszáma (számossága)</td></tr>
+    <tr><td>|H| = ∞</td><td>H halmaz elemszáma végtelen</td></tr>
+    <tr><td>V ⊆ U</td><td>V részhalmaza U-nak</td></tr>
+    <tr><td>V ⊂ U</td><td>V valódi részhalmaza U-nak</td></tr>
+    <tr><td>A ∩ B</td><td>az A és a B halmaz metszete</td></tr>
+    <tr><td>A ∪ B</td><td>az A és a B halmaz uniója</td></tr>
+    <tr><td>A \ B</td><td>az A és a B különbséghalmaza</td></tr>
+    <tr><td><span style="text-decoration:overline">H</span></td><td>a H halmaz komplementere (mindig egy adott alaphalmazra nézve)</td></tr>
+    <tr><td>A × B</td><td>az A és B halmazok Descartes-szorzata</td></tr>
+    <tr><td>ℕ, ℤ, ℚ, ℚ*, ℝ</td><td>a természetes, az egész, a racionális, az irracionális és a valós számok halmaza</td></tr>
+  </table>
+  <p class="src">Matematika 9., 6. lecke, Jelölések, 21. o., és Kiegészítő halmaz, 22. o.; 7. lecke, Elmélet, 25. o.; Függvénytáblázatok, 10. és 19. o.</p>
+</div></details></div>
+</section>
+
+<!-- ===================== HALMAZMŰVELETEK ===================== -->
+<section class="topic" id="muveletek">
+<h2>Halmazműveletek</h2>
+
+<div class="item" id="komplementer"><details><summary>Mi az alaphalmaz, és mi egy halmaz komplementere?</summary><div class="ans">
+  <div class="def"><p>Legyen A egy halmaz, és H ennek egy részhalmaza. Azoknak az A-beli elemeknek a halmazát, amelyek nem elemei a H-nak, a H halmaz A-ra vonatkozó kiegészítő vagy komplementer halmazának nevezzük. Itt az A halmazt alaphalmaznak is mondjuk.</p>
+  <p>Alaphalmaz értelmezése nélkül nincs értelme a komplementer halmaz képzésének!</p>
+  <p>Jelölés: A H halmaz komplementerét (mindig egy adott alaphalmazra nézve) így jelöljük: <span style="text-decoration:overline">H</span>.</p></div>
+  <div class="fig" data-fig="venn-compl"></div>
+  <p class="ex"><b>Például:</b> az {1; 2; 4; 5; 7} halmaznak a {0; 1; 2; 3; 4; 5; 6; 7} halmazra vonatkozó kiegészítő halmaza a {0; 3; 6} halmaz; a páros számok halmazának az egész számok halmazára vonatkozó kiegészítő halmaza a páratlan számok halmaza.</p>
+  <p class="src">Matematika 9., 6. lecke, Elmélet, 22. o.</p>
+  <p class="anim-link"><a href="/animaciok/halmazok.html#muveletek" target="_blank" rel="noopener">▶ Animáció: Halmazok: Halmazműveletek <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="metszet"><details><summary>Mi két halmaz metszete?</summary><div class="ans">
+  <div class="def"><p>Két halmaz metszete (közös része) azoknak az elemeknek a halmaza, amelyek mindkét halmaznak elemei. Az A és a B halmaz metszetének a jele: A ∩ B.</p>
+  <p>A ∩ B = B ∩ A, &nbsp; A ∩ Ø = Ø</p></div>
+  <div class="fig" data-fig="venn-and"></div>
+  <p class="ex"><b>Például:</b> ha A = {1; 3; 5; 7; 9} és B = {1; 2; 3; 4}, akkor A ∩ B = {1; 3}.</p>
+  <p class="src">Matematika 9., 7. lecke, Elmélet, 25. o.</p>
+  <p class="anim-link"><a href="/animaciok/halmazok.html#muveletek" target="_blank" rel="noopener">▶ Animáció: Halmazok: Halmazműveletek <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="unio"><details><summary>Mi két halmaz uniója?</summary><div class="ans">
+  <div class="def"><p>Két halmaz uniója (egyesítése) azoknak az elemeknek a halmaza, amelyek legalább az egyik halmaznak elemei. Az A és a B halmaz uniójának a jele: A ∪ B.</p>
+  <p>A ∪ B = B ∪ A, &nbsp; A ∪ Ø = A</p></div>
+  <div class="fig" data-fig="venn-or"></div>
+  <p class="ex"><b>Például:</b> ha A = {1; 3; 5; 7; 9} és B = {1; 2; 3; 4}, akkor A ∪ B = {1; 2; 3; 4; 5; 7; 9}.</p>
+  <p class="src">Matematika 9., 7. lecke, Elmélet, 25. o.</p>
+  <p class="anim-link"><a href="/animaciok/halmazok.html#muveletek" target="_blank" rel="noopener">▶ Animáció: Halmazok: Halmazműveletek <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="kulonbseg"><details><summary>Mi két halmaz különbsége?</summary><div class="ans">
+  <div class="def"><p>Az A és a B halmaz különbséghalmazának nevezzük azoknak az elemeknek a halmazát, amelyek az A-nak elemei, de a B-nek nem elemei. Az A és a B különbséghalmazának a jele: A \ B.</p>
+  <p>A \ B ≠ B \ A, &nbsp; A \ Ø = A, &nbsp; Ø \ A = Ø</p></div>
+  <div class="fig" data-fig="venn-minus"></div>
+  <p class="ex"><b>Például:</b> ha A = {1; 3; 5; 7; 9} és B = {1; 2; 3; 4}, akkor A \ B = {5; 7; 9} és B \ A = {2; 4}.</p>
+  <p class="src">Matematika 9., 7. lecke, Elmélet, 25. o.</p>
+  <p class="anim-link"><a href="/animaciok/halmazok.html#muveletek" target="_blank" rel="noopener">▶ Animáció: Halmazok: Halmazműveletek <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="diszjunkt"><details><summary>Mikor diszjunkt két halmaz?</summary><div class="ans">
+  <div class="def"><p>Ha két halmaznak nincs közös eleme – vagyis a metszetük üres halmaz – akkor azt mondjuk, hogy diszjunkt halmazok.</p></div>
+  <div class="fig" data-fig="venn-disjoint"></div>
+  <p class="src">Matematika 9., 7. lecke, Elmélet, 25. o.</p>
+</div></details></div>
+
+<div class="item" id="de-morgan"><details><summary>Mit mondanak ki a de Morgan-azonosságok?</summary><div class="ans">
+  <div class="def"><p><b>De Morgan-azonosságok:</b></p>
+  <p class="formula"><span style="text-decoration:overline">A ∪ B</span> = <span style="text-decoration:overline">A</span> ∩ <span style="text-decoration:overline">B</span> &nbsp;&nbsp; és &nbsp;&nbsp; <span style="text-decoration:overline">A ∩ B</span> = <span style="text-decoration:overline">A</span> ∪ <span style="text-decoration:overline">B</span></p>
+  <p>A tapasztalt azonosságokat de Morgan-azonosságoknak [de morgen] nevezzük, a nevüket Augustus de Morgan [ógusztusz de morgen] angol matematikusról kapták (noha már William Ockham [viliam okem] is feljegyezte azokat Summa Logicae [szumma logiké] című művében).</p></div>
+  <div class="fig" data-fig="venn-demorgan"></div>
+  <p class="links"><a href="https://www.youtube.com/watch?v=HlFoZyQQ0Wk" target="_blank" rel="noopener">Videó a de Morgan-azonosságokról (YouTube)</a></p>
+  <p class="src">Függvénytáblázatok, 10. o.; Matematika 9., 8. lecke, 2. feladat, 31. o.</p>
+  <p class="anim-link"><a href="/animaciok/de-morgan.html#unio" target="_blank" rel="noopener">▶ Animáció: De Morgan-azonosságok: az unió és a metszet komplementere <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+</section>
+
+<!-- ===================== VÉGTELEN HALMAZOK, SZÁMHALMAZOK ===================== -->
+<section class="topic" id="vegtelen">
+<h2>Végtelen halmazok, számhalmazok</h2>
+
+<div class="item" id="ekvivalens"><details><summary>Mikor ekvivalens két halmaz?</summary><div class="ans">
+  <div class="def"><p>Ha két halmaz elemei között létezik olyan párba állítás, melyben az egyik halmaz minden elemének pontosan egy párja van a másik halmazból és viszont, akkor ezeket ekvivalens halmazoknak nevezzük.</p></div>
+  <p class="ex"><b>Példa:</b> Állítsuk párba a pozitív egész számok halmazának az elemeit és a pozitív páros számok halmazának az elemeit! Az egymás alatti számokból alkotjuk a párokat: (1; 2), (2; 4), (3; 6), (4; 8), (5; 10), … Érdekes: azt gondolnánk, hogy kétszer annyi pozitív egész szám van, mint ahány pozitív páros szám, a két halmaz elemei mégis párba állíthatók. Ilyesmi csak végtelen halmazoknál lehetséges, végeseknél nem.</p>
+  <div class="fig" data-fig="pairing"></div>
+  <p class="src">Matematika 9., 6. lecke, Ráadás és Elmélet, 23. o.</p>
+</div></details></div>
+
+<div class="item" id="szamossag"><details><summary>Mikor egyenlő két halmaz számossága?</summary><div class="ans">
+  <div class="def"><p>Két véges halmaz számossága egyenlő, ha elemeik száma egyenlő.</p>
+  <p>Ha két véges halmaz számossága egyenlő, akkor az elemeik „párba állíthatók”, azaz létezik közöttük kölcsönösen egyértelmű hozzárendelés. Ezt a tulajdonságot végtelen halmazok között is meg lehet vizsgálni. Ha két végtelen halmaz elemei között létezik kölcsönösen egyértelmű hozzárendelés, akkor azt mondjuk, hogy a két halmaz számossága egyenlő.</p></div>
+  <p class="ex"><b>Példa (Hilbert Grand Hotelje):</b> kölcsönösen egyértelmű hozzárendelést adtunk meg az {1; 2; 3; 4; …} halmaz elemei és az {a; b; 1; 2; 3; 4; …} halmaz elemei között. Ez azért is érdekes, mert az első halmaz részhalmaza a második halmaznak.</p>
+  <p class="src">OH-MAT912AE, 96. lecke, Bevezető és Elmélet, 244. o.</p>
+</div></details></div>
+
+<div class="item" id="megszamlalhato"><details><summary>Mikor megszámlálhatóan végtelen egy halmaz?</summary><div class="ans">
+  <div class="def"><p>A természetes számok halmazának számosságát megszámlálhatóan végtelennek nevezzük. Azok a halmazok megszámlálhatóan végtelen számosságúak, amelyek esetén megadható egy kölcsönösen egyértelmű hozzárendelés a halmaz elemei és a természetes számok között (tehát a halmaz elemeinek létezik sorba rendezése).</p></div>
+  <ul>
+    <li>Megszámlálhatóan végtelen számosságú halmazok például a négyzetszámok halmaza, a 3-mal osztható természetes számok halmaza, az egész számok halmaza, a racionális számok halmaza. (Az egész számok egy lehetséges sorba rendezése: 0; 1; –1; 2; –2; 3; –3; … .)</li>
+    <li>Vannak olyan végtelen halmazok, amelyek számossága nem megszámlálhatóan végtelen. Ilyen halmazok például: a valós számok halmaza, a valós számokon megadott intervallumok (pl. [a; b], ahol a, b ∈ ℝ, a ≠ b), egy szakasz pontjainak halmaza, egy egyenes pontjainak halmaza.</li>
+  </ul>
+  <p class="ex"><b>Tétel:</b> A pozitív racionális számok halmaza kölcsönösen egyértelmű módon hozzárendelhető a pozitív egészek halmazához.</p>
+  <div class="fig" data-fig="rational"></div>
+  <p class="src">OH-MAT912AE, 96. lecke, Elmélet, 244–245. o.; a tétel: Matematika 9., 7. lecke, Elmélet, 27. o.</p>
+</div></details></div>
+
+<div class="item" id="szamhalmazok"><details><summary>Melyek a számhalmazok, és hogyan viszonyulnak egymáshoz?</summary><div class="ans">
+  <div class="def">
+  <p><b>Természetes számok:</b> ℕ = {0, 1, 2, …, n, …}</p>
+  <p><b>Egész számok:</b> ℤ = {… –3, –2, –1, 0, 1, 2, 3, …}</p>
+  <p><b>Racionális számok:</b> A két egész szám hányadosaként felírható számokat racionális számoknak nevezzük. ℚ = { p/q | p, q ∈ ℤ, q ≠ 0 }. Bármely racionális szám felírható egész szám, véges tizedes tört vagy végtelen szakaszos tizedes tört alakban. Megfordítva is igaz, minden véges vagy végtelen szakaszos tizedes tört racionális szám.</p>
+  <p><b>Irracionális számok:</b> A nem szakaszos végtelen tizedes törteket irracionális számoknak nevezzük. Az irracionális számok halmazának jele: ℚ*. Az irracionális számok nem írhatók fel két egész szám hányadosaként. Irracionális számok például π, √2, −√3, lg 3, …</p>
+  <p><b>Valós számok:</b> A racionális és az irracionális számok halmazának egyesítése a valós számok halmaza. Jele: ℝ. ℝ = ℚ ∪ ℚ*</p>
+  <p><b>A számhalmazok kapcsolata:</b></p>
+  <p class="formula">ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ</p></div>
+  <div class="fig" data-fig="numbersets"></div>
+  <p class="src">Függvénytáblázatok, 19. o.</p>
+  <p class="anim-link"><a href="/animaciok/halmazok.html#szamhalmazok" target="_blank" rel="noopener">▶ Animáció: Halmazok: Számhalmazok <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="muveletre-zart"><details><summary>Mikor zárt egy halmaz egy műveletre?</summary><div class="ans">
+  <div class="def"><p>Egy H halmaz zárt egy adott műveletre, ha a H halmaz bármely elemei esetén a művelet eredménye is eleme H-nak.</p></div>
+  <p class="ex"><b>Például:</b> A természetes számok halmaza zárt az összeadás műveletére nézve. Azaz minden a, b ∈ ℕ esetén a + b ∈ ℕ. A természetes számok halmaza nem zárt a kivonás műveletére, mert meg tudunk adni két természetes számot, melyek különbsége nem természetes szám. Például 8 ∈ ℕ és 10 ∈ ℕ, de 8 – 10 = –2 ∉ ℕ.</p>
+  <p><b>Az alapműveletek elvégezhetősége a nevezetes számhalmazokon belül:</b></p>
+  <table>
+    <tr><th></th><th>ℕ</th><th>ℤ</th><th>ℚ</th><th>ℝ</th></tr>
+    <tr><td>Összeadás</td><td colspan="4">mindig elvégezhető</td></tr>
+    <tr><td>Kivonás</td><td>nem mindig végezhető el</td><td colspan="3">mindig elvégezhető</td></tr>
+    <tr><td>Szorzás</td><td colspan="4">mindig elvégezhető</td></tr>
+    <tr><td>Osztás</td><td colspan="2">nem mindig végezhető el</td><td colspan="2">a 0-val való osztás kivételével mindig elvégezhető</td></tr>
+  </table>
+  <p class="src">OH-MAT912AE, 96. lecke, Elmélet, 245. o.; a táblázat: Függvénytáblázatok, 20. o., 4. táblázat.</p>
+</div></details></div>
+</section>
+
+<!-- ===================== SZITAFORMULA ===================== -->
+<section class="topic" id="szita">
+<h2>Szitaformula</h2>
+
+<div class="item" id="szita-ket"><details><summary>Mit mond ki a szitaformula két halmazra?</summary><div class="ans">
+  <div class="def"><p>Két véges halmaz uniójának elemszámát megkapjuk, ha a halmazok számosságát összeadjuk, és kivonjuk ebből a metszetük számosságát, hiszen a metszetben lévő elemeket az összeadás során kétszer is számoltuk.</p>
+  <p class="formula">|A ∪ B| = |A| + |B| − |A ∩ B|</p></div>
+  <div class="fig" data-fig="venn-sieve2"></div>
+  <p class="src">Matematika 9., 8. lecke, Elmélet, 30. o.</p>
+  <p class="anim-link"><a href="/animaciok/halmazok.html#szita-ket-halmazra" target="_blank" rel="noopener">▶ Animáció: Halmazok: Szitaformula két halmazra <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+
+<div class="item" id="szita-harom"><details><summary>Mit mond ki a szitaformula három halmazra?</summary><div class="ans">
+  <div class="def"><p>Három véges halmaz uniója elemszámának vizsgálatakor még körültekintőbben kell eljárnunk:</p>
+  <ul>
+    <li>összeadjuk a három halmaz számosságát;</li>
+    <li>majd kivonjuk ebből a kettős metszetek számosságát, hiszen az azokban szereplő elemeket kétszer számoltuk az előző összeadásnál;</li>
+    <li>végül hozzáadjuk a hármas metszet számosságát, hiszen az abban szereplő elemek számát háromszor számoltuk első lépésben, majd háromszor kivontuk a másodikban.</li>
+  </ul>
+  <p class="formula">|A ∪ B ∪ C| = |A| + |B| + |C| − |A ∩ B| − |A ∩ C| − |B ∩ C| + |A ∩ B ∩ C|</p>
+  <p>Ezeket az összefüggéseket együttesen szitaformulának nevezzük.</p></div>
+  <div class="fig" data-fig="venn3"></div>
+  <p class="src">Matematika 9., 8. lecke, Elmélet, 30. o.</p>
+  <p class="anim-link"><a href="/animaciok/halmazok.html#harom-halmaz-abraja" target="_blank" rel="noopener">▶ Animáció: Halmazok: Három halmaz ábrája (kitöltés belülről kifelé) <span aria-hidden="true">↗</span></a></p>
+  <p class="anim-link"><a href="/animaciok/halmazok.html#szita-harom-halmazra" target="_blank" rel="noopener">▶ Animáció: Halmazok: Szitaformula három halmazra <span aria-hidden="true">↗</span></a></p>
+</div></details></div>
+</section>
+
+<!-- ===================== TOVÁBBI ===================== -->
+<section class="topic" id="tovabbi">
+<h2>Descartes-szorzat, intervallum</h2>
+
+<div class="item" id="descartes"><details><summary>Mi két halmaz Descartes-szorzata?</summary><div class="ans">
+  <div class="def"><p>Azoknak a rendezett pároknak a halmaza, amelyeknek az első komponense az A-nak, második komponense pedig a B-nek eleme, az A és B halmazok Descartes-szorzata (direkt szorzata).</p>
+  <p>Jelölés: A × B</p>
+  <p class="formula">A × B := {(x, y) ; x ∈ A és y ∈ B}</p>
+  <p>Ha |A| = n és |B| = m, akkor |A × B| = n ∙ m.</p></div>
+  <div class="fig" data-fig="cartesian"></div>
+  <p class="src">Függvénytáblázatok, 10. o.</p>
+</div></details></div>
+
+<div class="item" id="intervallum"><details><summary>Mi az intervallum? Milyen fajtái vannak?</summary><div class="ans">
+  <div class="def"><p>Ha a &lt; b, akkor a közöttük lévő számok halmazát a, b nyílt intervallumnak nevezzük. Jele: ]a; b[.</p>
+  <p>Ha ehhez az a-t és a b-t is hozzávesszük, akkor ezt a halmazt a, b zárt intervallumnak nevezzük. Jele: [a; b].</p>
+  <p>Ha az [a; b]-ből elhagyjuk az a-t, illetve a b-t, akkor az ]a; b]-vel jelölt balról nyílt, jobbról zárt intervallumot, illetve az [a; b[-vel jelölt balról zárt, jobbról nyílt intervallumot kapjuk.</p></div>
+  <div class="fig" data-fig="interval"></div>
+  <p class="ex"><b>Például:</b> az ábrán a [–3; 0] zárt intervallumot és az [1; 4[ balról zárt, jobbról nyílt intervallumot szemléltettük.</p>
+  <p class="ex">Az intervallumok számhalmazok, ezért uniójuk, metszetük, különbségük értelmezhető. Például: [2; 7] \ {5} = [2; 5[ ∪ ]5; 7].</p>
+  <p class="src">Matematika 9., 9. lecke, Elmélet, 33. o.</p>
+</div></details></div>
+</section>
+
+</main>
+
+
+<footer>
+  <p><b>Források</b></p>
+  <ul>
+    <li>Matematika 9. tankönyv, I. kötet (OH-MAT09TA_I), 1–9. lecke, 6–33. o., és a hozzá tartozó megoldókönyv.</li>
+    <li>Függvénytáblázatok – Matematikai, fizikai, kémiai, biológiai összefüggések (OH-FGV912GY), 10–20. o.</li>
+    <li>Gyűjtemény a matematika emelt szintű oktatásához 9–12. (OH-MAT912AE), 29–32., 96. és 100. lecke.</li>
+  </ul>
+  <p>Az animációs linkek a <a href="https://repassylaszlo.hu/animaciok" target="_blank" rel="noopener">repassylaszlo.hu/animaciok</a> oldal megfelelő fejezetére visznek.</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var STORE_KEY = "fogalmak-kombi-halmaz-graf-v1";
+  var NS = "http://www.w3.org/2000/svg";
+  var uid = 0;
+
+  /* ---------- „Tudom” jelölés ---------- */
+  var known = {};
+  try { known = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {}; } catch (e) { known = {}; }
+  function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(known)); } catch (e) {} }
+  var items = Array.prototype.slice.call(document.querySelectorAll(".item"));
+  function updateProgress() {
+    var n = 0;
+    items.forEach(function (it) { if (known[it.id]) n++; });
+    document.getElementById("progress").textContent = "Tudom: " + n + " / " + items.length;
+  }
+  items.forEach(function (it) {
+    var lab = document.createElement("label");
+    lab.className = "know";
+    var cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = !!known[it.id];
+    it.classList.toggle("known", cb.checked);
+    cb.addEventListener("change", function () {
+      if (cb.checked) known[it.id] = 1; else delete known[it.id];
+      it.classList.toggle("known", cb.checked);
+      save(); updateProgress();
+    });
+    lab.appendChild(cb);
+    lab.appendChild(document.createTextNode("Tudom"));
+    it.appendChild(lab);
+  });
+  document.getElementById("reset").addEventListener("click", function () {
+    if (!confirm("Biztosan törli az összes „Tudom” jelölést?")) return;
+    known = {}; save();
+    items.forEach(function (it) { it.classList.remove("known"); it.querySelector(".know input").checked = false; });
+    updateProgress();
+  });
+  updateProgress();
+
+  // Ha a cím #azonosítóval érkezik, nyissuk le azt a kérdést.
+  function openFromHash() {
+    var id = location.hash.slice(1);
+    var it = id && document.getElementById(id);
+    if (it && it.classList.contains("item")) it.querySelector("details").open = true;
+  }
+  window.addEventListener("hashchange", openFromHash);
+  openFromHash();
+
+  /* ---------- SVG-segédek ---------- */
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function svg(w, h) { return el("svg", { viewBox: "0 0 " + w + " " + h, width: w, height: h, role: "img" }); }
+  function text(s, x, y, p, opts) {
+    opts = opts || {};
+    var t = el("text", { x: x, y: y, "text-anchor": opts.anchor || "middle", "font-size": opts.size || 18,
+      fill: opts.fill || "var(--fg)", "font-weight": opts.weight || "normal", "font-style": opts.italic ? "italic" : "normal",
+      "dominant-baseline": "middle" }, p);
+    t.textContent = s;
+    return t;
+  }
+  function figure(container, node, caption) {
+    var f = document.createElement("figure");
+    f.appendChild(node);
+    if (caption) { var c = document.createElement("figcaption"); c.textContent = caption; f.appendChild(c); }
+    container.appendChild(f);
+  }
+  var STROKE = "var(--fg)", FILL = "var(--hl-fill)", FILL2 = "var(--hl2-fill)", BG = "var(--bg)";
+
+  /* Két halmaz Venn-diagramja: mode = and | or | minus | compl | none | demorganOr | demorganAnd */
+  function venn2(mode, labels) {
+    labels = labels || ["A", "B"];
+    var s = svg(300, 190), id = "v" + (uid++);
+    var defs = el("defs", {}, s);
+    var ax = 120, bx = 185, cy = 100, r = 62;
+    var cpA = el("clipPath", { id: id + "ca" }, defs); el("circle", { cx: ax, cy: cy, r: r }, cpA);
+    var mB = el("mask", { id: id + "mb" }, defs);
+    el("rect", { x: 0, y: 0, width: 300, height: 190, fill: "white" }, mB);
+    el("circle", { cx: bx, cy: cy, r: r, fill: "black" }, mB);
+    var mAB = el("mask", { id: id + "mab" }, defs);
+    el("rect", { x: 0, y: 0, width: 300, height: 190, fill: "white" }, mAB);
+    el("circle", { cx: ax, cy: cy, r: r, fill: "black" }, mAB);
+    el("circle", { cx: bx, cy: cy, r: r, fill: "black" }, mAB);
+    var mAandB = el("mask", { id: id + "mand" }, defs);
+    el("rect", { x: 0, y: 0, width: 300, height: 190, fill: "white" }, mAandB);
+    el("circle", { cx: bx, cy: cy, r: r, fill: "black", "clip-path": "url(#" + id + "ca)" }, mAandB);
+    el("rect", { x: 5, y: 5, width: 290, height: 180, rx: 8, fill: "none", stroke: STROKE, "stroke-width": 1.5 }, s);
+    if (mode === "and") el("circle", { cx: bx, cy: cy, r: r, fill: FILL, "clip-path": "url(#" + id + "ca)" }, s);
+    if (mode === "or") {
+      el("circle", { cx: ax, cy: cy, r: r, fill: FILL }, s);
+      el("circle", { cx: bx, cy: cy, r: r, fill: FILL, mask: "url(#" + id + "mand)" }, s); // B \ A, hogy a metszet egyszer legyen színezve
+    }
+    if (mode === "minus") el("circle", { cx: ax, cy: cy, r: r, fill: FILL, mask: "url(#" + id + "mb)" }, s);
+    if (mode === "demorganOr") el("rect", { x: 6, y: 6, width: 288, height: 178, rx: 8, fill: FILL, mask: "url(#" + id + "mab)" }, s);
+    if (mode === "demorganAnd") el("rect", { x: 6, y: 6, width: 288, height: 178, rx: 8, fill: FILL, mask: "url(#" + id + "mand)" }, s);
+    el("circle", { cx: ax, cy: cy, r: r, fill: "none", stroke: STROKE, "stroke-width": 2 }, s);
+    el("circle", { cx: bx, cy: cy, r: r, fill: "none", stroke: STROKE, "stroke-width": 2 }, s);
+    text(labels[0], ax - 62, 30, s, { size: 22, weight: "bold" });
+    text(labels[1], bx + 62, 30, s, { size: 22, weight: "bold" });
+    text("U", 22, 175, s, { size: 16, fill: "var(--muted)" });
+    return s;
+  }
+  function vennDisjoint() {
+    var s = svg(300, 170);
+    el("rect", { x: 5, y: 5, width: 290, height: 160, rx: 8, fill: "none", stroke: STROKE, "stroke-width": 1.5 }, s);
+    el("circle", { cx: 90, cy: 88, r: 55, fill: FILL, stroke: STROKE, "stroke-width": 2 }, s);
+    el("circle", { cx: 215, cy: 88, r: 55, fill: FILL2, stroke: STROKE, "stroke-width": 2 }, s);
+    text("A", 90, 88, s, { size: 22, weight: "bold" }); text("B", 215, 88, s, { size: 22, weight: "bold" });
+    text("A ∩ B = Ø", 150, 155, s, { size: 16 });
+    return s;
+  }
+  function vennSubset() {
+    var s = svg(300, 190);
+    el("ellipse", { cx: 150, cy: 95, rx: 135, ry: 85, fill: "none", stroke: STROKE, "stroke-width": 2 }, s);
+    el("circle", { cx: 175, cy: 105, r: 50, fill: FILL, stroke: STROKE, "stroke-width": 2 }, s);
+    text("U", 60, 70, s, { size: 22, weight: "bold" });
+    text("V", 175, 105, s, { size: 22, weight: "bold" });
+    text("V ⊆ U", 70, 120, s, { size: 18 });
+    return s;
+  }
+  function vennCompl() {
+    var s = svg(300, 190), id = "v" + (uid++);
+    var defs = el("defs", {}, s);
+    var m = el("mask", { id: id + "m" }, defs);
+    el("rect", { x: 0, y: 0, width: 300, height: 190, fill: "white" }, m);
+    el("circle", { cx: 130, cy: 100, r: 60, fill: "black" }, m);
+    el("rect", { x: 5, y: 5, width: 290, height: 180, rx: 8, fill: FILL, stroke: STROKE, "stroke-width": 2, mask: "url(#" + id + "m)" }, s);
+    el("rect", { x: 5, y: 5, width: 290, height: 180, rx: 8, fill: "none", stroke: STROKE, "stroke-width": 2 }, s);
+    el("circle", { cx: 130, cy: 100, r: 60, fill: BG, stroke: STROKE, "stroke-width": 2 }, s);
+    text("H", 130, 100, s, { size: 22, weight: "bold" });
+    text("A (alaphalmaz)", 290, 22, s, { size: 15, anchor: "end" });
+    text("H̄", 245, 120, s, { size: 24, weight: "bold" });
+    return s;
+  }
+  function vennElements() {
+    var s = svg(320, 190);
+    el("rect", { x: 5, y: 5, width: 310, height: 180, rx: 8, fill: "none", stroke: STROKE, "stroke-width": 1.5 }, s);
+    el("circle", { cx: 125, cy: 100, r: 65, fill: FILL, stroke: STROKE, "stroke-width": 2 }, s);
+    el("circle", { cx: 195, cy: 100, r: 65, fill: FILL2, stroke: STROKE, "stroke-width": 2 }, s);
+    text("A", 70, 35, s, { size: 20, weight: "bold" }); text("B", 250, 35, s, { size: 20, weight: "bold" });
+    [["5", 95, 80], ["7", 100, 120], ["9", 80, 100], ["1", 160, 85], ["3", 160, 118], ["2", 220, 85], ["4", 225, 118]].forEach(function (p) { text(p[0], p[1], p[2], s, { size: 20 }); });
+    text("A = {1; 3; 5; 7; 9}, B = {1; 2; 3; 4}", 160, 176, s, { size: 14, fill: "var(--muted)" });
+    return s;
+  }
+  function venn3() {
+    var s = svg(320, 290);
+    el("rect", { x: 5, y: 5, width: 310, height: 280, rx: 8, fill: "none", stroke: STROKE, "stroke-width": 1.5 }, s);
+    var c = [[125, 110, "A", 60, 45], [195, 110, "B", 260, 45], [160, 170, "C", 160, 272]];
+    c.forEach(function (k, i) { el("circle", { cx: k[0], cy: k[1], r: 70, fill: [FILL, FILL2, "rgba(234,179,8,0.25)"][i], stroke: STROKE, "stroke-width": 2 }, s); text(k[2], k[3], k[4], s, { size: 22, weight: "bold" }); });
+    text("A∩B∩C", 160, 132, s, { size: 13, weight: "bold" });
+    text("1.", 160, 148, s, { size: 13 });
+    text("2.", 160, 85, s, { size: 15 }); text("2.", 122, 162, s, { size: 15 }); text("2.", 198, 162, s, { size: 15 });
+    text("3.", 95, 90, s, { size: 15 }); text("3.", 225, 90, s, { size: 15 }); text("3.", 160, 210, s, { size: 15 });
+    return s;
+  }
+  function sieve2() {
+    var s = svg(300, 190);
+    el("rect", { x: 5, y: 5, width: 290, height: 180, rx: 8, fill: "none", stroke: STROKE, "stroke-width": 1.5 }, s);
+    el("circle", { cx: 120, cy: 95, r: 62, fill: FILL, stroke: STROKE, "stroke-width": 2 }, s);
+    el("circle", { cx: 185, cy: 95, r: 62, fill: FILL, stroke: STROKE, "stroke-width": 2 }, s);
+    text("A", 70, 28, s, { size: 22, weight: "bold" }); text("B", 235, 28, s, { size: 22, weight: "bold" });
+    text("2×", 152, 95, s, { size: 18, weight: "bold" });
+    text("a metszetet kétszer számoltuk", 150, 172, s, { size: 14, fill: "var(--muted)" });
+    return s;
+  }
+  function numberSets() {
+    var s = svg(380, 250);
+    var r = [[5, 5, 370, 240, "ℝ", "π, √2 (ℚ*)"], [20, 40, 250, 195, "ℚ", "1/2, −0,75"], [35, 85, 185, 140, "ℤ", "−3, −1"], [50, 130, 110, 85, "ℕ", "0, 1, 2, …"]];
+    r.forEach(function (q, i) {
+      el("rect", { x: q[0], y: q[1], width: q[2], height: q[3], rx: 12, fill: i % 2 ? FILL2 : FILL, "fill-opacity": 0.6, stroke: STROKE, "stroke-width": 2 }, s);
+      text(q[4], q[0] + 18, q[1] + 20, s, { size: 22, weight: "bold" });
+    });
+    text("0, 1, 2, …", 105, 185, s, { size: 15 });
+    text("−3, −1", 200, 120, s, { size: 15 });
+    text("1/2; −0,75", 240, 75, s, { size: 15 });
+    text("π, √2", 325, 140, s, { size: 15 });
+    text("ℚ*", 325, 115, s, { size: 18, weight: "bold" });
+    return s;
+  }
+
+  /* Gráfrajzoló: pts = {név: [x, y]}, edges = [[u, v, opt]] */
+  function graph(w, h, pts, edges, opt) {
+    opt = opt || {};
+    var s = svg(w, h);
+    edges.forEach(function (e) {
+      var a = pts[e[0]], b = pts[e[1]], o = e[2] || {};
+      var col = o.color || STROKE, sw = o.width || 2.5;
+      if (e[0] === e[1]) {
+        el("path", { d: "M" + a[0] + " " + a[1] + " c -40 -55, 40 -55, 0 0", fill: "none", stroke: col, "stroke-width": sw }, s);
+      } else if (o.bend) {
+        var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, dx = b[0] - a[0], dy = b[1] - a[1];
+        var cx = mx - dy * o.bend, cy = my + dx * o.bend;
+        el("path", { d: "M" + a[0] + " " + a[1] + " Q " + cx + " " + cy + " " + b[0] + " " + b[1], fill: "none", stroke: col, "stroke-width": sw }, s);
+      } else {
+        var ln = el("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: col, "stroke-width": sw }, s);
+        if (o.dash) ln.setAttribute("stroke-dasharray", "6 5");
+        if (opt.directed) {
+          var L = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / L, uy = (b[1] - a[1]) / L;
+          var tx = b[0] - ux * 16, ty = b[1] - uy * 16;
+          el("polygon", { points: [tx, ty, tx - ux * 14 - uy * 7, ty - uy * 14 + ux * 7, tx - ux * 14 + uy * 7, ty - uy * 14 - ux * 7].join(","), fill: col }, s);
+        }
+      }
+    });
+    Object.keys(pts).forEach(function (k) {
+      var p = pts[k], hl = opt.hl && opt.hl.indexOf(k) >= 0;
+      el("circle", { cx: p[0], cy: p[1], r: 15, fill: hl ? "var(--hl)" : BG, stroke: STROKE, "stroke-width": 2 }, s);
+      text(opt.labels && opt.labels[k] !== undefined ? opt.labels[k] : k, p[0], p[1] + 1, s, { size: 15, weight: "bold", fill: hl ? "#fff" : "var(--fg)" });
+    });
+    return s;
+  }
+  function regular(n, cx, cy, r, names) {
+    var o = {};
+    for (var i = 0; i < n; i++) o[names[i]] = [cx + r * Math.sin(2 * Math.PI * i / n), cy - r * Math.cos(2 * Math.PI * i / n)];
+    return o;
+  }
+
+  var FIGS = {
+    "tree": function (c) {
+      var s = svg(360, 200);
+      text("1. hely", 40, 20, s, { size: 14, fill: "var(--muted)" });
+      text("2. hely", 180, 20, s, { size: 14, fill: "var(--muted)" });
+      text("3. hely", 320, 20, s, { size: 14, fill: "var(--muted)" });
+      var A = ["A", "B", "C"];
+      A.forEach(function (a, i) {
+        var y = 50 + i * 60;
+        A.filter(function (b) { return b !== a; }).forEach(function (b, j) {
+          var y2 = y - 15 + j * 30;
+          el("line", { x1: 55, y1: y, x2: 165, y2: y2, stroke: STROKE, "stroke-width": 1.5 }, s);
+          el("line", { x1: 195, y1: y2, x2: 305, y2: y2, stroke: STROKE, "stroke-width": 1.5 }, s);
+          text(b, 180, y2, s, { size: 16 });
+          text(A.filter(function (x) { return x !== a && x !== b; })[0], 320, y2, s, { size: 16 });
+        });
+        text(a, 40, y, s, { size: 18, weight: "bold" });
+      });
+      figure(c, s, "3 elem sorrendjei: 3 · 2 · 1 = 6 ág");
+    },
+    "pigeon": function (c) {
+      var s = svg(340, 130);
+      for (var i = 0; i < 4; i++) el("rect", { x: 20 + i * 80, y: 50, width: 64, height: 60, rx: 6, fill: "none", stroke: STROKE, "stroke-width": 2 }, s);
+      var pos = [[52, 80], [132, 80], [212, 80], [282, 70], [302, 92]];
+      pos.forEach(function (p, i) { el("circle", { cx: p[0], cy: p[1], r: 11, fill: i >= 3 ? "var(--hl)" : FILL, stroke: STROKE }, s); });
+      text("5 elem, 4 skatulya → valamelyikben legalább 2", 170, 22, s, { size: 15 });
+      figure(c, s);
+    },
+    "graph-basic": function (c) {
+      var p = { "előszoba": [60, 60], "étkező": [190, 60], "konyha": [320, 30], "nappali": [320, 110] };
+      var s = graph(380, 150, { E: p["előszoba"], É: p["étkező"], K: p["konyha"], N: p["nappali"] }, [["E", "É"], ["É", "K"], ["É", "N"]]);
+      figure(c, s, "4 csúcs (helyiségek), 3 él (ajtók): E = előszoba, É = étkező, K = konyha, N = nappali");
+    },
+    "graph-degree": function (c) {
+      var pts = { A: [50, 50], B: [170, 40], C: [110, 130], D: [240, 120], E: [330, 70] };
+      var s = graph(380, 170, pts, [["A", "B"], ["A", "C"], ["B", "C"], ["C", "D"]], { labels: { A: "2", B: "2", C: "3", D: "1", E: "0" }, hl: ["E"] });
+      figure(c, s, "A számok a fokszámok; a 0 fokú pont izolált.");
+    },
+    "graph-directed": function (c) {
+      var s = graph(300, 150, { A: [50, 110], B: [150, 30], C: [250, 110] }, [["A", "B"], ["B", "C"], ["C", "A"]], { directed: true });
+      figure(c, s, "Irányított gráf: az éleknek iránya van.");
+    },
+    "graph-loop": function (c) {
+      var s = graph(380, 160, { A: [60, 110], B: [200, 110], C: [320, 110] }, [["A", "A"], ["A", "B", { bend: 0.25 }], ["A", "B", { bend: -0.25 }], ["B", "C"]]);
+      figure(c, s, "Hurokél A-nál, többszörös él A és B között: ez nem egyszerű gráf.");
+    },
+    "graph-k5": function (c) {
+      var pts = regular(5, 110, 100, 75, ["1", "2", "3", "4", "5"]), e = [];
+      for (var i = 1; i <= 5; i++) for (var j = i + 1; j <= 5; j++) e.push([String(i), String(j)]);
+      var s = graph(220, 190, pts, e);
+      figure(c, s, "Ötpontú teljes gráf: 5 · 4 / 2 = 10 él");
+    },
+    "graph-compl": function (c) {
+      var names = ["A", "B", "C", "D", "E"], pts = regular(5, 100, 100, 70, names);
+      var G = [["A", "B"], ["B", "C"], ["C", "D"]], all = [], Gc = [];
+      for (var i = 0; i < 5; i++) for (var j = i + 1; j < 5; j++) all.push([names[i], names[j]]);
+      all.forEach(function (e) { if (!G.some(function (g) { return g[0] === e[0] && g[1] === e[1]; })) Gc.push([e[0], e[1], { color: "var(--hl)" }]); });
+      figure(c, graph(200, 190, pts, G), "G (3 él)");
+      figure(c, graph(200, 190, pts, Gc), "G komplementere (7 él)");
+    },
+    "graph-iso": function (c) {
+      var p1 = { A: [40, 40], B: [160, 40], C: [160, 150], D: [40, 150] };
+      figure(c, graph(200, 190, p1, [["A", "B"], ["B", "C"], ["C", "D"], ["D", "A"]]), "négyzet alakban");
+      var p2 = { "1": [40, 40], "2": [160, 150], "3": [160, 40], "4": [40, 150] };
+      figure(c, graph(200, 190, p2, [["1", "2"], ["2", "3"], ["3", "4"], ["4", "1"]]), "„keresztezve” rajzolva: izomorf");
+    },
+    "graph-path": function (c) {
+      var pts = { A: [40, 120], B: [130, 40], C: [220, 120], D: [310, 40], E: [130, 160] };
+      figure(c, graph(350, 190, pts, [["A", "B", { color: "var(--hl)", width: 4 }], ["B", "C", { color: "var(--hl)", width: 4 }], ["C", "D", { color: "var(--hl)", width: 4 }], ["A", "E"], ["E", "C"]]), "Út: A–B–C–D (kék); kör: A–B–C–E–A");
+    },
+    "graph-comp": function (c) {
+      var pts = { A: [40, 50], B: [130, 40], C: [80, 140], D: [230, 50], E: [320, 50], F: [275, 140] };
+      figure(c, graph(360, 180, pts, [["A", "B"], ["B", "C"], ["C", "A"], ["D", "E"], ["E", "F"]]), "Nem összefüggő gráf");
+    },
+    "graph-tree": function (c) {
+      var pts = { A: [180, 30], B: [90, 90], C: [270, 90], D: [40, 160], E: [140, 160], F: [230, 160], G: [320, 160] };
+      figure(c, graph(360, 190, pts, [["A", "B"], ["A", "C"], ["B", "D"], ["B", "E"], ["C", "F"], ["C", "G"]]), "7 pontú fagráf: 6 éle van");
+    },
+    "venn-elements": function (c) { figure(c, vennElements()); },
+    "venn-subset": function (c) { figure(c, vennSubset()); },
+    "venn-compl": function (c) { figure(c, vennCompl(), "Színezve: H komplementere az A alaphalmazra"); },
+    "venn-and": function (c) { figure(c, venn2("and"), "A ∩ B"); },
+    "venn-or": function (c) { figure(c, venn2("or"), "A ∪ B"); },
+    "venn-minus": function (c) { figure(c, venn2("minus"), "A \\ B"); },
+    "venn-disjoint": function (c) { figure(c, vennDisjoint(), "Diszjunkt halmazok"); },
+    "venn-demorgan": function (c) {
+      figure(c, venn2("demorganOr"), "A ∪ B komplementere = Ā ∩ B̄");
+      figure(c, venn2("demorganAnd"), "A ∩ B komplementere = Ā ∪ B̄");
+    },
+    "venn-sieve2": function (c) { figure(c, sieve2()); },
+    "venn3": function (c) { figure(c, venn3(), "Kitöltés belülről kifelé: 1. hármas metszet, 2. kettős metszetek többi része, 3. csak egy halmazba tartozók"); },
+    "numbersets": function (c) { figure(c, numberSets()); },
+    "pairing": function (c) {
+      var s = svg(380, 110);
+      for (var i = 1; i <= 6; i++) {
+        var x = 30 + (i - 1) * 60;
+        text(String(i), x, 22, s, { size: 20 });
+        text(String(2 * i), x, 92, s, { size: 20, fill: "var(--hl)", weight: "bold" });
+        el("line", { x1: x, y1: 36, x2: x, y2: 76, stroke: STROKE, "stroke-width": 1.5 }, s);
+      }
+      text("…", 365, 22, s, { size: 20 }); text("…", 365, 92, s, { size: 20 });
+      figure(c, s, "pozitív egészek ↔ pozitív páros számok");
+    },
+    "rational": function (c) {
+      var s = svg(330, 240), order = [[1,1],[2,1],[1,2],[1,3],[2,2],[3,1],[4,1],[3,2],[2,3],[1,4]];
+      function pos(p, q) { return [40 + (q - 1) * 70, 30 + (p - 1) * 52]; }
+      for (var p = 1; p <= 4; p++) for (var q = 1; q <= 4; q++) { var xy = pos(p, q); text(p + "/" + q, xy[0], xy[1], s, { size: 17 }); }
+      var d = "";
+      order.forEach(function (o, i) { var xy = pos(o[0], o[1]); d += (i ? " L " : "M ") + xy[0] + " " + (xy[1] + 12); });
+      el("path", { d: d, fill: "none", stroke: "var(--hl)", "stroke-width": 2, "stroke-dasharray": "5 4" }, s);
+      text("cikcakkban végigjárva minden p/q sorszámot kap", 165, 228, s, { size: 13, fill: "var(--muted)" });
+      figure(c, s);
+    },
+    "cartesian": function (c) {
+      var s = svg(330, 200), A = ["1", "2", "3"], B = ["a", "b"];
+      A.forEach(function (x, i) { text(x, 90 + i * 80, 185, s, { size: 18, weight: "bold" }); });
+      B.forEach(function (y, j) { text(y, 30, 130 - j * 70, s, { size: 18, weight: "bold" }); });
+      A.forEach(function (x, i) { B.forEach(function (y, j) {
+        el("circle", { cx: 90 + i * 80, cy: 130 - j * 70, r: 26, fill: FILL, stroke: STROKE }, s);
+        text("(" + x + "; " + y + ")", 90 + i * 80, 130 - j * 70, s, { size: 15 });
+      }); });
+      text("A", 300, 185, s, { size: 16, fill: "var(--muted)" }); text("B", 30, 20, s, { size: 16, fill: "var(--muted)" });
+      figure(c, s, "A = {1; 2; 3}, B = {a; b}: |A × B| = 3 · 2 = 6");
+    },
+    "interval": function (c) {
+      var s = svg(400, 110), x0 = 30, unit = 42;
+      function X(v) { return x0 + (v + 4) * unit; }
+      el("line", { x1: 15, y1: 60, x2: 390, y2: 60, stroke: STROKE, "stroke-width": 2 }, s);
+      for (var v = -4; v <= 4; v++) { el("line", { x1: X(v), y1: 54, x2: X(v), y2: 66, stroke: STROKE }, s); text(String(v).replace("-", "−"), X(v), 86, s, { size: 15 }); }
+      el("line", { x1: X(-3), y1: 60, x2: X(0), y2: 60, stroke: "var(--hl)", "stroke-width": 6 }, s);
+      el("circle", { cx: X(-3), cy: 60, r: 7, fill: "var(--hl)" }, s); el("circle", { cx: X(0), cy: 60, r: 7, fill: "var(--hl)" }, s);
+      el("line", { x1: X(1), y1: 60, x2: X(4), y2: 60, stroke: "var(--accent)", "stroke-width": 6 }, s);
+      el("circle", { cx: X(1), cy: 60, r: 7, fill: "var(--accent)" }, s); el("circle", { cx: X(4), cy: 60, r: 7, fill: BG, stroke: "var(--accent)", "stroke-width": 3 }, s);
+      text("[−3; 0]", X(-1.5), 30, s, { size: 16, weight: "bold", fill: "var(--hl)" });
+      text("[1; 4[", X(2.5), 30, s, { size: 16, weight: "bold", fill: "var(--accent)" });
+      figure(c, s, "teli karika: a végpont benne van; üres karika: nincs benne");
+    }
+  };
+  document.querySelectorAll(".fig[data-fig]").forEach(function (c) {
+    var f = FIGS[c.dataset.fig];
+    if (f) f(c);
+  });
+})();
+</script>
+</body>
+</html>
