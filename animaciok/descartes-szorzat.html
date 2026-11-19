@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Descartes-szorzat</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1f2937;
+  --muted: #4b5563;
+  --line: #d1d5db;
+  --panel: #f8fafc;
+  --accent: #15803d;
+  --accent-hover: #166534;
+  --accent-bg: #ecfdf5;
+  --accent-border: #a7f3d0;
+  --danger: #b91c1c;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --fg: #f1f5f9;
+    --muted: #a3b1c6;
+    --line: #475569;
+    --panel: #1e293b;
+    --accent: #22c55e;
+    --accent-hover: #16a34a;
+    --accent-bg: rgba(34, 197, 94, 0.15);
+    --accent-border: #166534;
+    --danger: #f87171;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 18px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.5;
+  padding: 16px 20px 60px;
+}
+.top-nav { max-width: 1500px; margin: 0 auto 16px; padding-bottom: 8px; }
+.top-nav a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.top-nav a:hover { text-decoration: underline; }
+header { max-width: 1500px; margin: 0 auto 24px; }
+header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+header p { font-size: 1.1rem; color: var(--muted); }
+.toc { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px 10px; font-size: 1rem; }
+.toc a { color: var(--accent); text-decoration: none; font-weight: 600; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); }
+.toc a:hover { text-decoration: underline; }
+main { max-width: 1500px; margin: 0 auto; display: flex; flex-direction: column; gap: 36px; }
+.anim-section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px 24px; box-shadow: var(--shadow); scroll-margin-top: 8px; }
+.anim-section h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } }
+.plot-container { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+.panel { display: flex; flex-direction: column; gap: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+.panel:last-child { margin-bottom: 0; }
+.panel h3 { font-size: 1.1rem; font-weight: 700; }
+.panel p { font-size: 1.05rem; }
+.formula { font-size: 1.4rem; font-weight: 700; text-align: center; padding: 6px 0; }
+button { font: inherit; font-size: 1rem; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+button:hover:not(:disabled) { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+button:disabled { opacity: 0.4; cursor: default; }
+
+/* ===== Léptető: Vissza / Előre / Előlről ===== */
+.pager-wrap { position: sticky; top: 10px; z-index: 20; display: flex; justify-content: flex-end; pointer-events: none; margin: -4px 0 12px; }
+.pager { pointer-events: auto; display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; box-shadow: var(--shadow); flex-wrap: wrap; }
+.pager button { height: 46px; padding: 0 18px; font-size: 1.1rem; border-radius: 999px; }
+.pager button.next { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+.pager button.next:hover:not(:disabled) { background: var(--accent-hover); }
+.pager .counter { font-weight: 700; font-size: 1.1rem; min-width: 76px; text-align: center; color: var(--muted); }
+
+.scene { background: var(--bg); padding: 8px; }
+.scene svg { width: 100%; height: auto; display: block; max-height: 74vh; }
+.res-box { font-size: 1.4rem; font-weight: 700; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--panel); min-height: 2.3em; }
+.cap-box { font-size: 1.22rem; line-height: 1.5; padding: 14px 18px; border-top: 1px solid var(--line); background: var(--accent-bg); min-height: 5.2em; }
+.cap-box q { font-style: italic; }
+.code-steps { font-family: ui-monospace, Consolas, monospace; font-size: 1rem; line-height: 1.7; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 0; overflow-x: auto; }
+.noanim, .noanim * { transition: none !important; }
+.code-steps .ln { display: block; padding: 0 12px 0 2.2em; text-indent: -1.4em; white-space: pre-wrap; border-left: 5px solid transparent; transition: background 0.8s, border-color 0.8s; }
+.code-steps .ln.on { background: #fef3c7; border-left-color: #f59e0b; color: #1f2937; font-weight: 700; }
+.slider-row { display: grid; grid-template-columns: 5.5em 1fr 2.2em; align-items: center; gap: 10px; font-size: 1.15rem; font-weight: 700; }
+.slider-row input { width: 100%; accent-color: var(--accent); height: 28px; }
+.slider-row output { text-align: right; }
+
+/* ===== SVG: koordináta-rendszer ===== */
+.grid { stroke: var(--line); stroke-width: 1.2; }
+.ax { stroke: var(--fg); stroke-width: 2.5; }
+.tick { font-size: 22px; fill: var(--muted); text-anchor: middle; dominant-baseline: central; }
+.axl { font-size: 26px; font-weight: 700; font-style: italic; fill: var(--fg); }
+.lbl { font-size: 26px; font-weight: 700; fill: var(--fg); paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; }
+.big { font-size: 34px; font-weight: 800; fill: var(--fg); }
+.dash { stroke: var(--muted); stroke-width: 2.5; stroke-dasharray: 8 7; fill: none; }
+
+/* pontok (állapot: new zöld, chg sárga, res kék, bad piros, dim halvány, hid rejtett) */
+.pt { transition: transform 2s ease, opacity 1.8s ease; }
+.pt circle { fill: var(--muted); stroke: var(--bg); stroke-width: 3; transition: fill 1.8s ease, stroke 1.8s ease; }
+.pt text { font-size: 22px; font-weight: 700; fill: var(--fg); paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; dominant-baseline: central; }
+.pt.new circle { fill: #16a34a; }
+.pt.chg circle { fill: #f59e0b; }
+.pt.res circle { fill: #2563eb; }
+.pt.bad circle { fill: #dc2626; }
+.pt.dim { opacity: 0.22; }
+.pt.hid { opacity: 0; }
+.pt.ring circle { fill: none; stroke: #f59e0b; stroke-width: 5; }
+.pt.ring.res circle { fill: none; stroke: #2563eb; }
+.pt.ring.bad circle { fill: none; stroke: #dc2626; }
+
+/* táblázatcellák */
+.cell { transition: opacity 1.8s ease; }
+.cell rect { fill: var(--panel); stroke: var(--line); stroke-width: 2; transition: fill 1.8s ease, stroke 1.8s ease; }
+.cell text { font-size: 28px; font-weight: 700; fill: var(--fg); text-anchor: middle; dominant-baseline: central; transition: fill 1.8s ease; }
+.cell.head rect { fill: var(--bg); stroke: var(--muted); }
+.cell.new rect { fill: #bbf7d0; stroke: #16a34a; }
+.cell.new text { fill: #14532d; }
+.cell.chg rect { fill: #fde68a; stroke: #d97706; }
+.cell.chg text { fill: #78350f; }
+.cell.res rect { fill: #2563eb; stroke: #1d4ed8; }
+.cell.res text { fill: #ffffff; }
+.cell.bad rect { fill: #fecaca; stroke: #dc2626; }
+.cell.bad text { fill: #7f1d1d; }
+.cell.dim { opacity: 0.25; }
+.cell.hid { opacity: 0; }
+
+/* síkidomok */
+.shp { transition: opacity 1.8s ease; }
+.shp.hid { opacity: 0; }
+.shp.dim { opacity: 0.3; }
+.f-green { fill: #22c55e; fill-opacity: 0.35; stroke: #15803d; stroke-width: 3; }
+.f-yellow { fill: #facc15; fill-opacity: 0.4; stroke: #b45309; stroke-width: 3; }
+.f-blue { fill: #2563eb; fill-opacity: 0.6; stroke: #1d4ed8; stroke-width: 4; }
+.f-plane { fill: #2563eb; fill-opacity: 0.22; stroke: none; }
+.o-red { fill: none; stroke: #dc2626; stroke-width: 4; stroke-dasharray: 12 8; }
+.edge { stroke: var(--muted); stroke-width: 3; transition: opacity 1.4s ease; }
+.edge.hid { opacity: 0; }
+.path-seg { stroke: #16a34a; stroke-width: 4; fill: none; transition: opacity 1.4s ease, stroke 1.8s ease; }
+.path-seg.res { stroke: #2563eb; }
+.path-seg.hid { opacity: 0; }
+.src { font-size: 1rem; }
+.src li { margin: 4px 0 4px 22px; }
+.src a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Descartes-szorzat</h1>
+  <p>Két halmaz Descartes-szorzata (direkt szorzata): rendezett párok táblázatban, a koordinátasíkon, dobókockákkal, három halmazra és végtelen halmazokra.</p>
+  <nav class="toc">
+    <a href="#definicio">Descartes-szorzat</a><a href="#sorrend">Sorrend</a><a href="#elemszam">Elemszám</a><a href="#kocka">Dobókocka</a><a href="#sik">Koordinátasík</a><a href="#metszet">Metszet és unió</a><a href="#harom">Három tényező</a><a href="#vegtelen">Végtelen</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ================= DEFINÍCIÓ ================= -->
+<section class="anim-section" id="definicio">
+  <h2>Descartes-szorzat</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="definicio-svg" viewBox="0 0 900 460" role="img" aria-label="Az A × B táblázata"></svg></div>
+      <div class="res-box" id="definicio-res"></div>
+      <div class="cap-box" id="definicio-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Definíció (Függvénytáblázat)</h3>
+        <p>Azoknak a rendezett pároknak a halmaza, amelyeknek az első komponense az A-nak, második komponense pedig a B-nek eleme, az A és B halmazok Descartes-szorzata (direkt szorzata).</p>
+        <div class="formula">A × B := {(x, y) ; x ∈ A és y ∈ B}</div>
+        <p>Ha |A| = n és |B| = m, akkor |A × B| = n ∙ m</p>
+      </div>
+      <div class="panel">
+        <h3>Lépésről lépésre</h3>
+        <div class="code-steps" id="definicio-code"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SORREND ================= -->
+<section class="anim-section" id="sorrend">
+  <h2>Sorrend</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="sorrend-svg" viewBox="0 0 520 500" role="img" aria-label="A × B és B × A a koordináta-rendszerben"></svg></div>
+      <div class="res-box" id="sorrend-res"></div>
+      <div class="cap-box" id="sorrend-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Összefüggések</h3>
+        <div class="code-steps" id="sorrend-code"></div>
+      </div>
+      <div class="panel">
+        <h3>Jelölés</h3>
+        <p>Zöld pont: A × B eleme. Sárga karika: B × A eleme. Kék: mindkettőnek eleme. Piros: csak az egyiknek eleme.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ELEMSZÁM ================= -->
+<section class="anim-section" id="elemszam">
+  <h2>Elemszám</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="elemszam-svg" viewBox="0 0 860 430" role="img" aria-label="Az A × B elemei téglalap alakú táblázatban"></svg></div>
+      <div class="res-box" id="elemszam-res"></div>
+      <div class="cap-box" id="elemszam-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Képlet</h3>
+        <div class="code-steps" id="elemszam-code"></div>
+      </div>
+      <div class="panel">
+        <h3>Próbáld ki!</h3>
+        <div class="slider-row"><label for="sl-n">|A| = n</label><input type="range" id="sl-n" min="0" max="6" value="3"><output id="out-n">3</output></div>
+        <div class="slider-row"><label for="sl-m">|B| = m</label><input type="range" id="sl-m" min="0" max="8" value="2"><output id="out-m">2</output></div>
+        <p>Új sor vagy oszlop: zöld. Ami eltűnik: piros.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DOBÓKOCKA ================= -->
+<section class="anim-section" id="kocka">
+  <h2>Dobókocka</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="kocka-svg" viewBox="0 0 860 480" role="img" aria-label="Két dobókocka dobásainak 6 × 6-os táblázata"></svg></div>
+      <div class="res-box" id="kocka-res"></div>
+      <div class="cap-box" id="kocka-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Számolás</h3>
+        <div class="code-steps" id="kocka-code"></div>
+      </div>
+      <div class="panel">
+        <h3>A feladat (OH-MAT08MA, V/12. Összefoglalás, 9. feladat)</h3>
+        <p>Két dobókockával dobunk. Készítsünk egy, a korábbihoz hasonló 6 × 6-os táblázatot, amelyben a sorok és az oszlopok az egyik illetve a másik dobókocka dobásait mutatja. Legyen az egyik kocka piros, a másik kék.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= KOORDINÁTASÍK ================= -->
+<section class="anim-section" id="sik">
+  <h2>Koordinátasík</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="sik-svg" viewBox="0 0 640 530" role="img" aria-label="Descartes-szorzatok a koordinátasíkon"></svg></div>
+      <div class="res-box" id="sik-res"></div>
+      <div class="cap-box" id="sik-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Halmazok a síkon</h3>
+        <div class="code-steps" id="sik-code"></div>
+      </div>
+      <div class="panel">
+        <h3>René Descartes (1596–1650)</h3>
+        <p>A derékszögű koordináta-rendszert nevezik Descartes-féle koordináta-rendszernek is. Az elnevezés René Descartes (1596–1650) francia matematikus, fizikus és filozófus nevét őrzi. (TB, 51. o.)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= METSZET ÉS UNIÓ ================= -->
+<section class="anim-section" id="metszet">
+  <h2>Metszet és unió</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="metszet-svg" viewBox="0 0 680 530" role="img" aria-label="Téglalapok metszete és uniója"></svg></div>
+      <div class="res-box" id="metszet-res"></div>
+      <div class="cap-box" id="metszet-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Azonosságok</h3>
+        <div class="code-steps" id="metszet-code"></div>
+      </div>
+      <div class="panel">
+        <h3>Miért téglalap?</h3>
+        <p>Ha A és B intervallum, akkor A × B a koordinátasíkon egy tengelyekkel párhuzamos oldalú téglalap: x az A-ban, y a B-ben fut végig.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HÁROM TÉNYEZŐ ================= -->
+<section class="anim-section" id="harom">
+  <h2>Három tényező</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="harom-svg" viewBox="0 0 780 470" role="img" aria-label="Rendezett hármasok térben"></svg></div>
+      <div class="res-box" id="harom-res"></div>
+      <div class="cap-box" id="harom-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Képlet</h3>
+        <div class="code-steps" id="harom-code"></div>
+      </div>
+      <div class="panel">
+        <h3>Kapcsolat az informatikával</h3>
+        <p>A {0; 1} × {0; 1} × {0; 1} elemei éppen a 3 bites bitsorozatok: 000, 001, …, 111. Ezért van 3 biten 2³ = 8 különböző érték, 8 biten (1 bájton) 2⁸ = 256.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VÉGTELEN ================= -->
+<section class="anim-section" id="vegtelen">
+  <h2>Végtelen</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="vegtelen-svg" viewBox="0 0 600 540" role="img" aria-label="N × N rácspontjainak bejárása átlók mentén"></svg></div>
+      <div class="res-box" id="vegtelen-res"></div>
+      <div class="cap-box" id="vegtelen-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Sorszám képlettel</h3>
+        <div class="code-steps" id="vegtelen-code"></div>
+      </div>
+      <div class="panel">
+        <h3>Feladatgyűjtemény, 268. c) megoldása</h3>
+        <p>Általában is igaz, hogy az egész számokból álló számpárok, számhármasok stb. halmaza megszámlálhatóan végtelen. […] Egy másik lehetőség, ha az (x; y) ∈ B párnak a derékszögű koordináta-rendszer rácspontjait feleltetjük meg.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="anim-section" id="forras">
+  <h2>Források</h2>
+  <ul class="src">
+    <li>A definíció és az elemszám képlete: Függvénytáblázatok (OH-FGV912GY), Halmazok, 10. oldal: <q>Két halmaz Descartes-szorzata (direkt szorzata)</q>.</li>
+    <li>A derékszögű (Descartes-féle) koordináta-rendszer: Matematika 9. (OH-MAT09TB), 7. lecke, Ponthalmazok, 51. oldal.</li>
+    <li>A dobókockás táblázat: Matematika 8. (OH-MAT08MA), V/12. Összefoglalás, 9–10. feladat és megoldásuk.</li>
+    <li>A számpárok megszámlálhatósága: Gyakorló és érettségire felkészítő feladatgyűjtemény I., Halmazelmélet, 268. c) megoldása (Végtelen halmazok számossága).</li>
+    <li>Saját összeállítás (nincs tankönyvi szövege): a Sorrend, az Elemszám, a Metszet és unió és a Három tényező rész, valamint a Végtelen rész sorszámképlete.</li>
+  </ul>
+</section>
+
+</main>
+
+<script>
+(function () {
+  // betöltéskor nincs átmenet: az első állapot azonnal látszik
+  document.body.classList.add('noanim');
+  requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.remove('noanim')));
+  const NS = 'http://www.w3.org/2000/svg';
+  function svgEl(tag, attrs, parent, text) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  const STATES = ['hid', 'new', 'chg', 'res', 'bad', 'dim'];
+  function st(el, c) { STATES.forEach(s => el.classList.remove(s)); if (c) el.classList.add(c); }
+  function moveTo(g, x, y, instant) {
+    if (instant) g.style.transition = 'none';
+    g.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+    if (instant) { g.getBoundingClientRect(); g.style.transition = ''; }
+  }
+
+  // ---------- léptető: Vissza / Előre / Előlről ----------
+  const steppers = [];
+  function makeStepper(id, n, render) {
+    const sec = document.getElementById(id);
+    const wrap = sec.querySelector('.pager-wrap');
+    wrap.innerHTML = '<div class="pager">' +
+      '<button type="button" class="prev" title="Előző lépés (←)">◀ Vissza</button>' +
+      '<button type="button" class="next" title="Következő lépés (→)">Előre ▶</button>' +
+      '<button type="button" class="reset" title="Vissza az első lépésre (Home)">↺ Előlről</button>' +
+      '<span class="counter"></span></div>';
+    const q = c => wrap.querySelector('.' + c);
+    const prev = q('prev'), next = q('next'), reset = q('reset'), counter = q('counter');
+    let cur = -1;
+    function go(i) {
+      const from = cur;
+      cur = Math.max(0, Math.min(n - 1, i));
+      render(cur, from);
+      counter.textContent = (cur + 1) + ' / ' + n;
+      prev.disabled = reset.disabled = cur === 0;
+      next.disabled = cur === n - 1;
+    }
+    prev.addEventListener('click', () => go(cur - 1));
+    next.addEventListener('click', () => go(cur + 1));
+    reset.addEventListener('click', () => go(0));
+    steppers.push({ sec, next: () => go(cur + 1), prev: () => go(cur - 1), home: () => go(0) });
+    go(0);
+    return { go, get cur() { return cur; } };
+  }
+
+  // A billentyűk a képernyőn leginkább látható részt léptetik.
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+    if (e.target.closest && e.target.closest('input, textarea, select')) return;
+    const fwd = ['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key);
+    const back = ['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key);
+    const home = e.key === 'Home';
+    if (!fwd && !back && !home) return;
+    let best = null, bestVis = 0;
+    for (const s of steppers) {
+      const r = s.sec.getBoundingClientRect();
+      const vis = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+      if (vis > bestVis) { bestVis = vis; best = s; }
+    }
+    if (!best || bestVis < innerHeight * 0.35) return;
+    e.preventDefault();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    if (fwd) best.next(); else if (back) best.prev(); else best.home();
+  });
+
+  function codeBox(id, lines) {
+    const box = document.getElementById(id);
+    const set = ls => { box.innerHTML = ls.map(l => '<span class="ln"></span>').join(''); [...box.children].forEach((s, i) => s.textContent = ls[i] || ' '); };
+    set(lines);
+    const f = on => [...box.children].forEach((ln, i) => ln.classList.toggle('on', on.includes(i)));
+    f.setLines = set;
+    return f;
+  }
+  function texts(prefix, res, cap) {
+    document.getElementById(prefix + '-res').innerHTML = res;
+    document.getElementById(prefix + '-cap').innerHTML = cap;
+  }
+
+  // ---------- koordináta-rendszer ----------
+  let uid = 0;
+  function arrowDefs(svg) {
+    const id = 'arr' + (++uid);
+    const defs = svgEl('defs', {}, svg);
+    const m = svgEl('marker', { id, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' }, defs);
+    svgEl('path', { d: 'M0,0 L10,5 L0,10 z', fill: 'currentColor' }, m);
+    return id;
+  }
+  function plane(svg, o) {
+    const s = o.s;
+    const X = x => o.L + (x - o.xmin) * s, Y = y => o.T + (o.ymax - y) * s;
+    const g = svgEl('g', {}, svg);
+    const aid = arrowDefs(svg);
+    for (let x = Math.ceil(o.xmin); x <= o.xmax; x++) svgEl('line', { x1: X(x), x2: X(x), y1: Y(o.ymin), y2: Y(o.ymax), class: 'grid' }, g);
+    for (let y = Math.ceil(o.ymin); y <= o.ymax; y++) svgEl('line', { x1: X(o.xmin), x2: X(o.xmax), y1: Y(y), y2: Y(y), class: 'grid' }, g);
+    const ax = svgEl('g', { style: 'color: var(--fg)' }, g);
+    svgEl('line', { x1: X(o.xmin), x2: X(o.xmax) + 14, y1: Y(0), y2: Y(0), class: 'ax', 'marker-end': 'url(#' + aid + ')' }, ax);
+    svgEl('line', { x1: X(0), x2: X(0), y1: Y(o.ymin), y2: Y(o.ymax) - 14, class: 'ax', 'marker-end': 'url(#' + aid + ')' }, ax);
+    svgEl('text', { x: X(o.xmax) - 6, y: Y(0) - 16, class: 'axl', 'text-anchor': 'end' }, g, 'x');
+    svgEl('text', { x: X(0) + 16, y: Y(o.ymax) + 12, class: 'axl' }, g, 'y');
+    for (let x = Math.ceil(o.xmin); x < o.xmax; x++) if (x !== 0) svgEl('text', { x: X(x), y: Y(0) + 20, class: 'tick' }, g, x < 0 ? '−' + (-x) : x);
+    for (let y = Math.ceil(o.ymin); y < o.ymax; y++) if (y !== 0) svgEl('text', { x: X(0) - 18, y: Y(y), class: 'tick' }, g, y < 0 ? '−' + (-y) : y);
+    svgEl('text', { x: X(0) - 16, y: Y(0) + 20, class: 'tick' }, g, '0');
+    return { X, Y, s, g, shapes: svgEl('g', {}, svg), pts: svgEl('g', {}, svg), top: svgEl('g', {}, svg) };
+  }
+  function point(layer, px, py, r, label, lx, ly, anchor) {
+    const g = svgEl('g', { class: 'pt' }, layer);
+    svgEl('circle', { r: r || 12 }, g);
+    if (label != null) svgEl('text', { x: lx || 16, y: ly || -18, 'text-anchor': anchor || 'start' }, g, label);
+    moveTo(g, px, py, true);
+    return g;
+  }
+  function cell(layer, x, y, w, h, txt, cls) {
+    const g = svgEl('g', { class: 'cell' + (cls ? ' ' + cls : '') }, layer);
+    svgEl('rect', { x, y, width: w, height: h, rx: 6 }, g);
+    if (txt != null) svgEl('text', { x: x + w / 2, y: y + h / 2 }, g, txt);
+    return g;
+  }
+  const fmt = v => (v < 0 ? '−' + (-v) : String(v)).replace('.', ',');
+
+  // ================= 1. DEFINÍCIÓ =================
+  (function () {
+    const svg = document.getElementById('definicio-svg');
+    const A = ['1', '2', '3'], B = ['p', 'q'];
+    const L = 150, T = 60, HW = 150, CW = 260, HH = 80, RH = 100;
+    svgEl('text', { x: 75, y: T + HH + 1.5 * RH, class: 'big', 'text-anchor': 'middle', 'dominant-baseline': 'central' }, svg, 'A');
+    svgEl('text', { x: L + HW + CW, y: T - 28, class: 'big', 'text-anchor': 'middle', 'dominant-baseline': 'central' }, svg, 'B');
+    cell(svg, L, T, HW, HH, 'A × B', 'head');
+    const rowH = A.map((a, i) => cell(svg, L, T + HH + i * RH, HW, RH, a, 'head'));
+    const colH = B.map((b, j) => cell(svg, L + HW + j * CW, T, CW, HH, b, 'head'));
+    const cells = [];
+    A.forEach((a, i) => B.forEach((b, j) => cells.push({ g: cell(svg, L + HW + j * CW, T + HH + i * RH, CW, RH, '(' + a + '; ' + b + ')'), i, j, t: '(' + a + '; ' + b + ')' })));
+    const code = codeBox('definicio-code', ['A = {1; 2; 3}, B = {p; q}', 'x ∈ A, y ∈ B  →  (x; y)', '|A × B| = |A| · |B|', '        = 3 · 2 = 6']);
+    makeStepper('definicio', 8, k => {
+      rowH.forEach(h => st(h, null)); colH.forEach(h => st(h, null));
+      cells.forEach((c, idx) => st(c.g, k === 0 ? 'hid' : k === 7 ? 'res' : idx < k - 1 ? null : idx === k - 1 ? 'new' : 'hid'));
+      if (k === 0) {
+        code([0]);
+        texts('definicio', 'A = {1; 2; 3}, B = {p; q}',
+          'Azoknak a rendezett pároknak a halmaza, amelyeknek az első komponense az A-nak, második komponense pedig a B-nek eleme, az A és B halmazok Descartes-szorzata (direkt szorzata). A táblázat sorai A, oszlopai B elemei.');
+      } else if (k < 7) {
+        const c = cells[k - 1];
+        st(rowH[c.i], 'chg'); st(colH[c.j], 'chg');
+        code([1]);
+        const list = cells.slice(0, k).map(x => x.t).join(', ');
+        texts('definicio', 'A × B = {' + list + (k < 6 ? ', …' : '') + '}',
+          'Első komponens: <b>' + A[c.i] + '</b> (A-ból), második komponens: <b>' + B[c.j] + '</b> (B-ből) → új rendezett pár: <b>' + c.t + '</b>. ' +
+          (c.j === 0 ? 'Az A minden eleméhez B minden elemét párosítjuk.' : 'Ez a sor kész: az ' + A[c.i] + '-hez mindkét B-beli elem tartozik.'));
+      } else {
+        code([2, 3]);
+        texts('definicio', '|A × B| = |A| · |B| = 3 · 2 = 6',
+          'Ha |A| = n és |B| = m, akkor |A × B| = n ∙ m. A táblázatnak n sora és m oszlopa van, ezért n · m cellája: itt 3 sor · 2 oszlop = 6 rendezett pár.');
+      }
+    });
+  })();
+
+  // ================= 2. SORREND =================
+  (function () {
+    const svg = document.getElementById('sorrend-svg');
+    const P = plane(svg, { xmin: -1, xmax: 3, ymin: -1, ymax: 3, L: 40, T: 20, s: 110 });
+    const yx = svgEl('line', { x1: P.X(-1), y1: P.Y(-1), x2: P.X(3), y2: P.Y(3), class: 'dash shp hid' }, P.shapes);
+    const yxl = svgEl('text', { x: P.X(2.45), y: P.Y(2.85), class: 'lbl shp hid' }, P.shapes, 'y = x');
+    const p12 = point(P.top, P.X(1), P.Y(2), 13, '(1; 2)', -18, -24, 'end');
+    const p21 = point(P.top, P.X(2), P.Y(1), 13, '(2; 1)', 18, -24, 'start');
+    const A = [0, 1], B = [0, 1, 2];
+    const AB = [], BA = [];
+    A.forEach(a => B.forEach(b => {
+      const lab = (a === 0 && b === 2) ? '(0; 2)' : null;
+      AB.push({ a, b, g: point(P.pts, P.X(a), P.Y(b), 13, lab, -20, -26, 'end') });
+    }));
+    A.forEach(a => B.forEach(b => {
+      const lab = (a === 0 && b === 2) ? '(2; 0)' : null;
+      BA.push({ a, b, g: (() => { const g = point(P.pts, P.X(a), P.Y(b), 22, lab, 26, -30, 'start'); g.classList.add('ring'); return g; })() });
+    }));
+    const labOf = g => g.querySelector('text');
+    const code = codeBox('sorrend-code', ['(1; 2) ≠ (2; 1), de {1; 2} = {2; 1}', 'A × B = {(a; b) | a ∈ A és b ∈ B}', 'B × A = {(b; a) | b ∈ B és a ∈ A}', '(a; b) ∈ A × B ⇔ (b; a) ∈ B × A', '(A × B) ∩ (B × A) = (A ∩ B) × (A ∩ B)', '|A × B| = |B × A| = 2 · 3 = 6']);
+    makeStepper('sorrend', 6, (k, from) => {
+      code([k]);
+      st(p12, k === 0 ? 'chg' : 'hid'); st(p21, k === 0 ? 'new' : 'hid');
+      st(yx, k >= 3 ? null : 'hid'); st(yxl, k >= 3 ? null : 'hid');
+      const common = c => c.a <= 1 && c.b <= 1;
+      AB.forEach(c => {
+        const lab = labOf(c.g); if (lab) lab.style.opacity = k === 5 ? 1 : 0;
+        st(c.g, k === 0 ? 'hid' : k >= 4 && common(c) ? 'res' : k === 5 ? 'bad' : 'new');
+      });
+      BA.forEach(c => {
+        const lab = labOf(c.g); if (lab) lab.style.opacity = k === 5 ? 1 : 0;
+        // a karika az (a; b) helyről a (b; a) helyre fordul át
+        if (k >= 2) {
+          if (k === 2 && from === 1) moveTo(c.g, P.X(c.a), P.Y(c.b), true);
+          moveTo(c.g, P.X(c.b), P.Y(c.a));
+        } else moveTo(c.g, P.X(c.a), P.Y(c.b), true);
+        st(c.g, k < 2 ? 'hid' : k >= 4 && common(c) ? 'res' : k === 5 ? 'bad' : null);
+      });
+      const caps = [
+        'A rendezett párban a sorrend számít: az (1; 2) és a (2; 1) két különböző pont a koordináta-rendszerben. A kételemű halmaznál a sorrend nem számít: {1; 2} = {2; 1}.',
+        'A = {0; 1} és B = {0; 1; 2}. Az A × B párjainak első tagja (x) A-beli, második tagja (y) B-beli: 2 oszlop, 3 sor, 6 zöld pont.',
+        'B × A: most az első tag B-ből, a második A-ból való. Minden (a; b) párból (b; a) lesz: a karikák átfordulnak, 3 oszlop, 2 sor.',
+        'Az (a; b) → (b; a) csere az y = x egyenesre vonatkozó tükrözés: B × A az A × B tükörképe.',
+        'Közös elemek (kék): ahol a pont és a karika egybeesik. Mindkét tagjuk 0 vagy 1, ez éppen {0; 1} × {0; 1}, 4 elem.',
+        'Az elemszám ugyanaz (6 = 6), de a két halmaz nem egyenlő. Piros: a (0; 2) és az (1; 2) csak A × B-nek, a (2; 0) és a (2; 1) csak B × A-nak eleme. A Descartes-szorzás nem felcserélhető: A × B ≠ B × A (ha A ≠ B, és egyik sem üres).'
+      ];
+      const res = [
+        '(1; 2) ≠ (2; 1)',
+        'A × B = {(0; 0), (0; 1), (0; 2), (1; 0), (1; 1), (1; 2)}',
+        'B × A = {(0; 0), (1; 0), (2; 0), (0; 1), (1; 1), (2; 1)}',
+        'B × A = A × B tükörképe az y = x egyenesre',
+        '(A × B) ∩ (B × A) = {(0; 0), (0; 1), (1; 0), (1; 1)}',
+        '|A × B| = |B × A| = 6, de A × B ≠ B × A'
+      ];
+      texts('sorrend', res[k], caps[k]);
+    });
+  })();
+
+  // ================= 3. ELEMSZÁM =================
+  (function () {
+    const svg = document.getElementById('elemszam-svg');
+    const NMAX = 6, MMAX = 8, L = 150, T = 70, CW = 80, CH = 56, HW = 60, HH = 46;
+    const sub = i => String(i).split('').map(d => '₀₁₂₃₄₅₆₇₈₉'[d]).join('');
+    svgEl('text', { x: 70, y: T + 3 * CH, class: 'big', 'text-anchor': 'middle', 'dominant-baseline': 'central' }, svg, 'A');
+    svgEl('text', { x: L + MMAX * CW / 2, y: 20, class: 'big', 'text-anchor': 'middle', 'dominant-baseline': 'central' }, svg, 'B');
+    const rowH = [], colH = [], cells = [];
+    for (let i = 0; i < NMAX; i++) rowH.push(cell(svg, L - HW - 6, T + i * CH, HW, CH, 'a' + sub(i + 1), 'head'));
+    for (let j = 0; j < MMAX; j++) colH.push(cell(svg, L + j * CW, T - HH - 6, CW, HH, 'b' + sub(j + 1), 'head'));
+    for (let i = 0; i < NMAX; i++) { cells.push([]); for (let j = 0; j < MMAX; j++) cells[i].push(cell(svg, L + j * CW + 4, T + i * CH + 4, CW - 8, CH - 8, null)); }
+    const slN = document.getElementById('sl-n'), slM = document.getElementById('sl-m');
+    const outN = document.getElementById('out-n'), outM = document.getElementById('out-m');
+    const code = codeBox('elemszam-code', ['']);
+    let cn = 3, cm = 2;
+    function show(n, m, pn, pm, cap) {
+      for (let i = 0; i < NMAX; i++) for (let j = 0; j < MMAX; j++) {
+        const inNow = i < n && j < m, inPrev = i < pn && j < pm;
+        st(cells[i][j], inNow ? (inPrev ? 'res' : 'new') : (inPrev ? 'bad' : 'hid'));
+      }
+      rowH.forEach((h, i) => st(h, i < n ? null : 'hid'));
+      colH.forEach((h, j) => st(h, j < m ? null : 'hid'));
+      slN.value = n; slM.value = m; outN.textContent = n; outM.textContent = m;
+      code.setLines(['|A × B| = |A| · |B|', '|A| = n = ' + n + ',  |B| = m = ' + m, '|A × B| = n · m', '        = ' + n + ' · ' + m + ' = ' + n * m]);
+      code([2, 3]);
+      texts('elemszam', '|A × B| = n · m = ' + n + ' · ' + m + ' = ' + (n * m), cap);
+      cn = n; cm = m;
+    }
+    const steps = [
+      [3, 2, 'Az A elemei a sorok, a B elemei az oszlopok. Minden cella egy rendezett pár: (aᵢ; bⱼ). 3 sor, 2 oszlop: 3 · 2 = 6 pár.'],
+      [3, 3, 'B-be új elem kerül (b₃): egy új oszlop, A minden eleméhez egy új pár. 3-mal több elem: 3 · 3 = 9.'],
+      [4, 3, 'A-ba új elem kerül (a₄): egy új sor, B minden eleméhez egy új pár. 3-mal több elem: 4 · 3 = 12.'],
+      [4, 6, 'B elemszáma kétszeresére nő (3 → 6): A × B elemszáma is kétszeresére nő (12 → 24).'],
+      [4, 0, 'B = ∅: nincs második komponens, így egyetlen pár sem képezhető. A × ∅ = ∅, és a képlet is ezt adja: 4 · 0 = 0.'],
+      [6, 8, 'A legnagyobb táblázat: 6 sor és 8 oszlop, 6 · 8 = 48 pár. A csúszkákkal bármilyen n és m kipróbálható.']
+    ];
+    const stp = makeStepper('elemszam', steps.length, (k, from) => {
+      const [n, m, cap] = steps[k];
+      const prev = from >= 0 && from !== k ? steps[from] : [n, m];
+      show(n, m, prev[0], prev[1], cap);
+    });
+    function onSlide() {
+      const n = +slN.value, m = +slM.value;
+      show(n, m, cn, cm, (n === 0 || m === 0) ? 'Ha valamelyik halmaz üres, a Descartes-szorzat is üres: ' + n + ' · ' + m + ' = 0.' : 'A csúszkával állítva: ' + n + ' sor és ' + m + ' oszlop, ' + n + ' · ' + m + ' = ' + (n * m) + ' rendezett pár.');
+    }
+    slN.addEventListener('input', onSlide); slM.addEventListener('input', onSlide);
+  })();
+
+  // ================= 4. DOBÓKOCKA =================
+  (function () {
+    const svg = document.getElementById('kocka-svg');
+    const L = 150, T = 50, HW = 70, HH = 55, CW = 100, CH = 60;
+    svgEl('text', { x: L + HW + 3 * CW, y: 24, class: 'lbl', 'text-anchor': 'middle', 'dominant-baseline': 'central', style: 'fill:#1d4ed8' }, svg, 'kék kocka');
+    svgEl('text', { x: 95, y: T + HH + 3 * CH, class: 'lbl', 'text-anchor': 'middle', 'dominant-baseline': 'central', style: 'fill:#dc2626', transform: 'rotate(-90 95 ' + (T + HH + 3 * CH) + ')' }, svg, 'piros kocka');
+    for (let j = 1; j <= 6; j++) { const h = cell(svg, L + HW + (j - 1) * CW, T, CW, HH, j, 'head'); h.querySelector('text').style.fill = '#1d4ed8'; }
+    for (let i = 1; i <= 6; i++) { const h = cell(svg, L, T + HH + (i - 1) * CH, HW, CH, i, 'head'); h.querySelector('text').style.fill = '#dc2626'; }
+    const C = [];
+    for (let i = 1; i <= 6; i++) for (let j = 1; j <= 6; j++) {
+      const g = cell(svg, L + HW + (j - 1) * CW + 3, T + HH + (i - 1) * CH + 3, CW - 6, CH - 6, '(' + i + '; ' + j + ')');
+      g.querySelector('text').style.fontSize = '24px';
+      C.push({ g, r: i, b: j });
+    }
+    const code = codeBox('kocka-code', [
+      'H = {1; 2; 3; 4; 5; 6}',
+      '|H × H| = 6 · 6 = 36',
+      '(1; 1): 1 cella, (6; 6): 1 cella',
+      '(1; 2) és (2; 1): 2 cella',
+      'piros > kék: (36 − 6) : 2 = 15',
+      'összeg 7: 6 cella → 6/36 = 1/6',
+      'nincs 5-ös: 5 · 5 = 25 → 25/36'
+    ]);
+    const rule = [
+      () => 'hid',
+      () => 'new',
+      c => (c.r === 1 && c.b === 1) || (c.r === 6 && c.b === 6) ? 'res' : 'dim',
+      c => (c.r === 1 && c.b === 2) || (c.r === 2 && c.b === 1) ? 'chg' : (c.r === 1 && c.b === 1) ? 'res' : 'dim',
+      c => c.r === c.b ? 'chg' : c.r > c.b ? 'new' : 'dim',
+      c => c.r + c.b === 7 ? 'res' : 'dim',
+      c => c.r === 5 || c.b === 5 ? 'bad' : 'new'
+    ];
+    const res = [
+      'H × H = {1; 2; …; 6} × {1; 2; …; 6}',
+      '|H × H| = 6 · 6 = 36 számpár',
+      'P(1; 1) = P(6; 6) = 1/36',
+      'P(1; 1) = 1/36, de „egyik 1-es, másik 2-es”: 2/36',
+      'piros > kék: (36 − 6) : 2 = 15 eset',
+      'összeg = 7: 6 eset, P = 6/36 = 1/6',
+      '{1; 2; 3; 4; 6} × {1; 2; 3; 4; 6}: 5 · 5 = 25, P = 25/36'
+    ];
+    const caps = [
+      'Két dobókockával dobunk. A sorok a piros, az oszlopok a kék kocka dobásai. Egy dobás egy rendezett pár: (piros; kék).',
+      'a) Milyen dobáspárok fordulhatnak elő? Kitöltve a táblázatot látható, hogy 36 számpár lehetséges. Ez a {1; …; 6} × {1; …; 6} Descartes-szorzat.',
+      'b) Ugyanakkora valószínűségű az (1; 1) pár, mint a (6; 6)? Ebből egy esetben szerepel az 1; 1 és a 6; 6 is, ezért ezek valószínűsége ugyanakkora.',
+      'c) Ha rendezett párként tekintem, tehát a piros kockával kell az 1-est dobnom, és a kékkel a 2-est, akkor egyenlő a valószínűségük. Ha csak annyi a kérdés, hogy az egyiken 1-es, a másikon 2-es szerepel, akkor az 1; 2 pár valószínűsége kétszer akkora, mint az 1; 1 páré.',
+      'A főátlóban (sárga) a két szám egyenlő: 6 eset. A maradék 30 cella a főátlóra szimmetrikusan oszlik meg: alatta (zöld) a piros nagyobb, fölötte a kék. Mindkét oldalon 15 eset.',
+      'Az összeg 7 a mellékátlóban: (1; 6), (2; 5), (3; 4), (4; 3), (5; 2), (6; 1), 6 eset. Ez a legvalószínűbb összeg.',
+      'Mennyi annak a valószínűsége, hogy nem dobunk ötöst? Számoljuk meg, hány olyan cella van, amely nem tartalmaz 5-t. 25 db. Descartes-szorzattal: a piros és a kék is az 5 nem ötös érték egyike, 5 · 5 = 25.'
+    ];
+    makeStepper('kocka', 7, (k, from) => {
+      const wave = k === 1 && from === 0;
+      C.forEach((c, idx) => {
+        c.g.style.transitionDelay = wave ? (idx * 0.06) + 's' : '0s';
+        c.g.querySelector('rect').style.transitionDelay = c.g.style.transitionDelay;
+        st(c.g, rule[k](c));
+      });
+      code([k]);
+      texts('kocka', res[k], caps[k]);
+    });
+  })();
+
+  // ================= 5. KOORDINÁTASÍK =================
+  (function () {
+    const svg = document.getElementById('sik-svg');
+    const o = { xmin: -1, xmax: 7, ymin: -1, ymax: 6, L: 50, T: 20, s: 68 };
+    const P = plane(svg, o);
+    const R = (x1, x2, y1, y2, cls) => svgEl('rect', { x: P.X(x1), y: P.Y(y2), width: (x2 - x1) * P.s, height: (y2 - y1) * P.s, class: 'shp ' + cls }, P.shapes);
+    const full = R(o.xmin, o.xmax, o.ymin, o.ymax, 'f-plane');
+    const vst = R(1, 3, o.ymin, o.ymax, 'f-green');
+    const hst = R(o.xmin, o.xmax, 1, 2, 'f-yellow');
+    const rect = R(1, 3, 1, 2, 'f-blue');
+    const dx = svgEl('line', { x1: P.X(0), y1: P.Y(5), x2: P.X(3), y2: P.Y(5), class: 'dash shp' }, P.shapes);
+    const dy = svgEl('line', { x1: P.X(3), y1: P.Y(0), x2: P.X(3), y2: P.Y(5), class: 'dash shp' }, P.shapes);
+    const pP = point(P.top, P.X(3), P.Y(5), 13, 'P(3; 5)', 18, -20);
+    const pts = [];
+    [1, 2, 3].forEach(x => [1, 2].forEach(y => pts.push(point(P.pts, P.X(x), P.Y(y), 12))));
+    const code = codeBox('sik-code', ['P(3; 5) ∈ R × R', '{1; 2; 3} × {1; 2}: 6 pont', '[1; 3] × [1; 2]: téglalap', '[1; 3] × R: függőleges sáv', '[1; 3] × R  ∩  R × [1; 2]', '   = [1; 3] × [1; 2]', 'R × R: az egész sík']);
+    const states = [
+      { P: null, d: null, pts: 'hid', rect: 'hid', v: 'hid', h: 'hid', f: 'hid', c: [0] },
+      { P: 'dim', d: 'hid', pts: 'new', rect: 'hid', v: 'hid', h: 'hid', f: 'hid', c: [1] },
+      { P: 'hid', d: 'hid', pts: 'res', rect: null, v: 'hid', h: 'hid', f: 'hid', c: [2] },
+      { P: 'hid', d: 'hid', pts: 'hid', rect: 'dim', v: null, h: 'hid', f: 'hid', c: [3] },
+      { P: 'hid', d: 'hid', pts: 'hid', rect: null, v: null, h: null, f: 'hid', c: [4, 5] },
+      { P: null, d: 'hid', pts: 'hid', rect: 'hid', v: 'hid', h: 'hid', f: null, c: [6] }
+    ];
+    const res = ['P(3; 5): első koordináta 3, második 5', '{1; 2; 3} × {1; 2} = {(1; 1), (1; 2), (2; 1), (2; 2), (3; 1), (3; 2)}', '[1; 3] × [1; 2] = {(x; y) | 1 ≤ x ≤ 3 és 1 ≤ y ≤ 2}', '[1; 3] × R = {(x; y) | 1 ≤ x ≤ 3}', '([1; 3] × R) ∩ (R × [1; 2]) = [1; 3] × [1; 2]', 'R × R = a sík összes pontja'];
+    const caps = [
+      'A P pont első koordinátája P-nek az y tengelytől vett előjeles távolsága, míg második koordinátája az x tengelytől vett előjeles távolsága. A sík minden pontja egy valós számpár: a sík pontjai az R × R elemei.',
+      'Véges halmazok szorzata: {1; 2; 3} × {1; 2} hat pontja egy 3 × 2-es „rácsot” alkot (x = 1, 2, 3 és y = 1, 2).',
+      'Ha a két halmaz intervallum, a pontok „összenőnek”: [1; 3] × [1; 2] a teljes (kék) téglalap, a határát is beleértve, mert mindkét intervallum zárt.',
+      'Ha a második tényező az összes valós szám, nincs feltétel y-ra: [1; 3] × R egy végtelen függőleges sáv.',
+      'R × [1; 2] a vízszintes (sárga) sáv. A két sáv metszete éppen a téglalap: (A × R) ∩ (R × B) = A × B.',
+      'R × R: az összes valós számpár, az egész sík. A derékszögű koordináta-rendszert nevezik Descartes-féle koordináta-rendszernek is. Az elnevezés René Descartes (1596–1650) francia matematikus, fizikus és filozófus nevét őrzi.'
+    ];
+    makeStepper('sik', 6, k => {
+      const s = states[k];
+      st(pP, s.P); st(dx, s.d); st(dy, s.d);
+      pts.forEach(p => st(p, s.pts));
+      st(rect, s.rect); st(vst, s.v); st(hst, s.h); st(full, s.f);
+      code(s.c);
+      texts('sik', res[k], caps[k]);
+    });
+  })();
+
+  // ================= 6. METSZET ÉS UNIÓ =================
+  (function () {
+    const svg = document.getElementById('metszet-svg');
+    const o = { xmin: 0, xmax: 9, ymin: 0, ymax: 7, L: 50, T: 20, s: 66 };
+    const P = plane(svg, o);
+    const R = (x1, x2, y1, y2, cls) => svgEl('rect', { x: P.X(x1), y: P.Y(y2), width: (x2 - x1) * P.s, height: (y2 - y1) * P.s, class: 'shp ' + cls }, P.shapes);
+    const T = (x, y, t) => svgEl('text', { x: P.X(x), y: P.Y(y), class: 'lbl shp', 'text-anchor': 'middle', 'dominant-baseline': 'central' }, P.top, t);
+    const r1 = R(1, 5, 1, 4, 'f-green'), r2 = R(3, 8, 2, 6, 'f-yellow');
+    const ri = R(3, 5, 2, 4, 'f-blue');
+    const bb = R(1, 8, 1, 6, 'o-red');
+    const t1 = T(2, 1.5, 'A × B'), t2 = T(6.6, 5.5, 'C × D'), ti = T(4, 3, '∩');
+    const bad1 = point(P.top, P.X(7), P.Y(1.5), 12, '(7; 1,5)', 0, 32, 'middle');
+    const bad2 = point(P.top, P.X(2), P.Y(5), 12, '(2; 5)', 0, -26, 'middle');
+    const s1 = R(1, 3, 1, 2, 'f-green'), s2 = R(1, 3, 4, 6, 'f-yellow');
+    const u1 = T(2, 1.5, 'A × B'), u2 = T(2, 5, 'A × C');
+    const code = codeBox('metszet-code', [
+      '(A × B) ∩ (C × D) = (A ∩ C) × (B ∩ D)',
+      '[3; 5] × [2; 4]',
+      '(A × B) ∪ (C × D) ⊆ (A ∪ C) × (B ∪ D)',
+      'de általában nem egyenlő!',
+      'A × (B ∪ C) = (A × B) ∪ (A × C)'
+    ]);
+    const S = [
+      { r1: null, r2: null, ri: 'hid', bb: 'hid', bad: 'hid', s: 'hid', ti: 'hid', c: [] },
+      { r1: null, r2: null, ri: null, bb: 'hid', bad: 'hid', s: 'hid', ti: null, c: [0, 1] },
+      { r1: null, r2: null, ri: 'hid', bb: null, bad: 'bad', s: 'hid', ti: 'hid', c: [2, 3] },
+      { r1: 'hid', r2: 'hid', ri: 'hid', bb: 'hid', bad: 'hid', s: null, ti: 'hid', c: [4] }
+    ];
+    const res = [
+      'A = [1; 5], B = [1; 4];  C = [3; 8], D = [2; 6]',
+      '(A × B) ∩ (C × D) = [3; 5] × [2; 4]',
+      '(7; 1,5) ∈ (A ∪ C) × (B ∪ D), de ∉ (A × B) ∪ (C × D)',
+      'A = [1; 3], B = [1; 2], C = [4; 6]:  A × (B ∪ C) = (A × B) ∪ (A × C)'
+    ];
+    const caps = [
+      'Két Descartes-szorzat a síkon: A × B a zöld, C × D a sárga téglalap. Mindkettő tengelyekkel párhuzamos oldalú téglalap, mert a tényezők intervallumok.',
+      'A metszet (kék) ismét téglalap, és szintén Descartes-szorzat: x A-ban és C-ben is benne van, y B-ben és D-ben is. A ∩ C = [3; 5], B ∩ D = [2; 4].',
+      'Az unió nem téglalap, ezért nem írható fel két halmaz Descartes-szorzataként. A szaggatott piros téglalap, (A ∪ C) × (B ∪ D) = [1; 8] × [1; 6], nagyobb: a (7; 1,5) és a (2; 5) pont benne van, az unióban nincs.',
+      'Közös első tényezővel viszont az unió is szorzat: A × (B ∪ C) = (A × B) ∪ (A × C). Itt B ∪ C = [1; 2] ∪ [4; 6] nem intervallum, ezért a szorzat két, egymás fölötti téglalap.'
+    ];
+    makeStepper('metszet', 4, k => {
+      const s = S[k];
+      st(r1, s.r1); st(t1, s.r1); st(r2, s.r2); st(t2, s.r2);
+      st(ri, s.ri); st(ti, s.ti); st(bb, s.bb);
+      st(bad1, s.bad); st(bad2, s.bad);
+      [s1, s2, u1, u2].forEach(e => st(e, s.s));
+      code(s.c);
+      texts('metszet', res[k], caps[k]);
+    });
+  })();
+
+  // ================= 7. HÁROM TÉNYEZŐ =================
+  (function () {
+    const svg = document.getElementById('harom-svg');
+    const OX = 170, OY = 420, UX = 200, VX = 100, VY = -65, WZ = -190;
+    const pr = (x, y, z) => [OX + UX * x + VX * y, OY + VY * y + WZ * z];
+    const aid = arrowDefs(svg);
+    const axG = svgEl('g', { style: 'color: var(--fg)' }, svg);
+    const axis = (x, y, z) => { const [a, b] = pr(0, 0, 0), [c, d] = pr(x, y, z); return svgEl('line', { x1: a, y1: b, x2: c, y2: d, class: 'ax', 'marker-end': 'url(#' + aid + ')' }, axG); };
+    axis(2.55, 0, 0); axis(0, 1.75, 0); axis(0, 0, 1.6);
+    const axLab = [[2.62, 0, 0], [0, 1.95, 0], [0, 0, 1.72]].map((p, i) => { const [a, b] = pr(...p); return svgEl('text', { x: a + (i === 0 ? 8 : 0), y: b + (i === 0 ? 8 : 0), class: 'axl', 'text-anchor': i === 0 ? 'start' : 'middle' }, svg, 'xyz'[i]); });
+    const edgeG = svgEl('g', {}, svg), ptG = svgEl('g', {}, svg);
+    // kocka: {0; 1}³
+    const cube = [];
+    for (let z = 0; z <= 1; z++) for (let y = 0; y <= 1; y++) for (let x = 0; x <= 1; x++) {
+      const [px, py] = pr(x, y, z);
+      // címke: y = 0 esetén oldalt, y = 1 esetén ferdén fölötte, hogy ne fedjék egymást
+      const g = point(ptG, px, py, 13, '', x ? 18 : -18, y ? -26 : 0, x ? 'start' : 'end');
+      cube.push({ x, y, z, g });
+    }
+    const cubeEdges = [];
+    cube.forEach(a => cube.forEach(b => {
+      const d = Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z);
+      if (d === 1 && (a.x + a.y * 2 + a.z * 4) < (b.x + b.y * 2 + b.z * 4)) {
+        const [x1, y1] = pr(a.x, a.y, a.z), [x2, y2] = pr(b.x, b.y, b.z);
+        cubeEdges.push({ a, b, dim: a.x !== b.x ? 0 : a.y !== b.y ? 1 : 2, el: svgEl('line', { x1, y1, x2, y2, class: 'edge hid' }, edgeG) });
+      }
+    }));
+    // doboz: 3 póló × 2 nadrág × 2 cipő (koordináták 0-tól, fél egységnyi lépéssel a kocka méretén belül)
+    const box = [], boxEdges = [];
+    const bx = (i, j, k) => pr(i, j, k);
+    for (let k = 0; k < 2; k++) for (let j = 0; j < 2; j++) for (let i = 0; i < 3; i++) {
+      const [px, py] = bx(i, j, k);
+      box.push({ i, j, k, g: point(ptG, px, py, 13) });
+    }
+    box.forEach(a => box.forEach(b => {
+      const d = Math.abs(a.i - b.i) + Math.abs(a.j - b.j) + Math.abs(a.k - b.k);
+      if (d === 1 && (a.i + a.j * 3 + a.k * 6) < (b.i + b.j * 3 + b.k * 6)) {
+        const [x1, y1] = bx(a.i, a.j, a.k), [x2, y2] = bx(b.i, b.j, b.k);
+        boxEdges.push(svgEl('line', { x1, y1, x2, y2, class: 'edge hid' }, edgeG));
+      }
+    }));
+    const code = codeBox('harom-code', ['|{0; 1}| = 2', '|{0; 1} × {0; 1}| = 2 · 2 = 4', '|{0; 1}³| = 2 · 2 · 2 = 8', '|A × B × C| = |A| · |B| · |C|', '        = 3 · 2 · 2 = 12']);
+    const lab = (c, k) => k === 0 ? String(c.x) : k === 1 ? '(' + c.x + '; ' + c.y + ')' : '(' + c.x + '; ' + c.y + '; ' + c.z + ')';
+    makeStepper('harom', 4, (k, from) => {
+      const fwd = from === k - 1;
+      cube.forEach(c => {
+        const vis = k <= 2 && (k >= 1 || c.y === 0) && (k >= 2 || c.z === 0);
+        c.g.querySelector('text').textContent = vis ? lab(c, k) : '';
+        const [tx, ty] = pr(c.x, c.y, c.z);
+        // söprés: az új pontok az előző alakzat másolataként indulnak
+        if (fwd && k === 1 && c.y === 1 && c.z === 0) { const [sx, sy] = pr(c.x, 0, 0); moveTo(c.g, sx, sy, true); }
+        if (fwd && k === 2 && c.z === 1) { const [sx, sy] = pr(c.x, c.y, 0); moveTo(c.g, sx, sy, true); }
+        moveTo(c.g, tx, ty, !fwd);
+        const isNew = (k === 0 && c.y === 0 && c.z === 0) || (k === 1 && c.y === 1) || (k === 2 && c.z === 1);
+        st(c.g, !vis ? 'hid' : isNew ? 'new' : 'res');
+      });
+      cubeEdges.forEach(e => {
+        const vis = k <= 2 && e.dim <= k && [e.a, e.b].every(c => (k >= 1 || c.y === 0) && (k >= 2 || c.z === 0));
+        e.el.style.transitionDelay = vis && fwd ? '1.6s' : '0s';
+        st(e.el, vis ? null : 'hid');
+      });
+      box.forEach(b => st(b.g, k === 3 ? 'new' : 'hid'));
+      boxEdges.forEach(e => { e.style.transitionDelay = k === 3 && fwd ? '1s' : '0s'; st(e, k === 3 ? null : 'hid'); });
+      ['x', 'y', 'z'].forEach((n, i) => axLab[i].textContent = k === 3 ? ['póló', 'nadrág', 'cipő'][i] : n);
+      code(k === 3 ? [3, 4] : [k]);
+      const res = ['{0; 1}: 2 elem', '{0; 1} × {0; 1}: 2 · 2 = 4 rendezett pár', '{0; 1} × {0; 1} × {0; 1}: 2 · 2 · 2 = 8 rendezett hármas', '3 póló · 2 nadrág · 2 cipő = 12 öltözet'];
+      const caps = [
+        'Egy halmaz: {0; 1}, két pont az x tengelyen.',
+        'Szorzás {0; 1}-gyel: a két pontot „elcsúsztatjuk” az y irányban, minden ponthoz két pár tartozik. Az eredmény a négyzet 4 csúcsa: (0; 0), (1; 0), (0; 1), (1; 1).',
+        'Még egy szorzás {0; 1}-gyel: a négyzetet felemeljük a z irányban. A kocka 8 csúcsa a rendezett hármasok: (x; y; z), mindhárom 0 vagy 1. Ez 2 · 2 · 2 = 2³ = 8.',
+        'A szorzási szabály három halmazra is igaz. 3 póló, 2 nadrág és 2 cipő: minden öltözet egy (póló; nadrág; cipő) rendezett hármas, 3 · 2 · 2 = 12 pont a „dobozban”.'
+      ];
+      texts('harom', res[k], caps[k]);
+    });
+  })();
+
+  // ================= 8. VÉGTELEN =================
+  (function () {
+    const svg = document.getElementById('vegtelen-svg');
+    const P = plane(svg, { xmin: 0, xmax: 6, ymin: 0, ymax: 6, L: 70, T: 30, s: 76 });
+    const D = 5, order = [];
+    for (let d = 0; d <= D; d++) for (let y = 0; y <= d; y++) order.push({ x: d - y, y, d });
+    const pts = {};
+    for (let x = 0; x <= 6; x++) for (let y = 0; y <= 6; y++) {
+      const g = point(P.pts, P.X(x), P.Y(y), 11, '', 14, -18);
+      pts[x + ',' + y] = g;
+    }
+    const segs = [];
+    for (let i = 1; i < order.length; i++) {
+      const a = order[i - 1], b = order[i];
+      segs.push({ d: b.d, el: svgEl('line', { x1: P.X(a.x), y1: P.Y(a.y), x2: P.X(b.x), y2: P.Y(b.y), class: 'path-seg hid' }, P.shapes) });
+    }
+    const code = codeBox('vegtelen-code', ['N = {0; 1; 2; …}', 'd = x + y  (az átló sorszáma)', 'előtte: 1 + 2 + … + d = d(d + 1) : 2 pont', 'sorszám = d(d + 1) : 2 + y + 1', '(2; 1): d = 3 → 6 + 1 + 1 = 8']);
+    makeStepper('vegtelen', 8, k => {
+      const shownD = k === 0 ? -1 : Math.min(k - 1, D);
+      for (const key in pts) { st(pts[key], 'dim'); pts[key].querySelector('text').textContent = ''; }
+      order.forEach((p, i) => {
+        const g = pts[p.x + ',' + p.y];
+        if (p.d <= shownD) {
+          st(g, k <= 6 && p.d === shownD ? 'new' : 'res');
+          g.querySelector('text').textContent = i + 1;
+        }
+      });
+      segs.forEach(s => { st(s.el, s.d <= shownD ? (k <= 6 && s.d === shownD ? null : 'res') : 'hid'); });
+      code(k === 0 ? [0] : k <= 3 ? [1] : k <= 6 ? [1, 2] : [3, 4]);
+      let res, cap;
+      if (k === 0) {
+        res = 'N × N = {(x; y) | x, y ∈ N}';
+        cap = 'N × N végtelen sok rácspont. Sorszámozhatók-e úgy a pontjai, mint a természetes számok (1., 2., 3., …), hogy egy se maradjon ki?';
+      } else if (k <= 6) {
+        const d = shownD, from = d * (d + 1) / 2 + 1, to = (d + 1) * (d + 2) / 2;
+        res = d + '. átló: x + y = ' + d + ', ' + (d + 1) + ' pont, sorszámuk ' + (from === to ? from : from + '–' + to);
+        cap = d === 0 ? 'Az origóból indulunk: (0; 0) kapja az 1-es sorszámot. Sorról sorra nem mehetnénk, mert az első sor végtelen, sosem érnénk a végére.'
+          : 'Az x + y = ' + d + ' átló minden pontja véges sok (' + (d + 1) + ') pont, ezeket sorban megszámozzuk, majd jön a következő átló. Így minden rácspont véges sok lépés után sorra kerül.';
+      } else {
+        res = 'N × N megszámlálhatóan végtelen';
+        cap = 'Általában is igaz, hogy az egész számokból álló számpárok, számhármasok stb. halmaza megszámlálhatóan végtelen. A rácspontok „bejárása” átlónként minden (x; y) párhoz egy sorszámot rendel, és minden sorszámhoz pontosan egy pár tartozik.';
+      }
+      texts('vegtelen', res, cap);
+    });
+  })();
+})();
+</script>
+</body>
+</html>
