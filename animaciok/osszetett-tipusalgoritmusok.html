@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Összetett típusalgoritmusok</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1f2937;
+  --muted: #4b5563;
+  --line: #d1d5db;
+  --panel: #f8fafc;
+  --accent: #15803d;
+  --accent-hover: #166534;
+  --accent-bg: #ecfdf5;
+  --accent-border: #a7f3d0;
+  --danger: #b91c1c;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --fg: #f1f5f9;
+    --muted: #a3b1c6;
+    --line: #475569;
+    --panel: #1e293b;
+    --accent: #22c55e;
+    --accent-hover: #16a34a;
+    --accent-bg: rgba(34, 197, 94, 0.15);
+    --accent-border: #166534;
+    --danger: #f87171;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 18px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.5;
+  padding: 16px 20px 60px;
+}
+.top-nav { max-width: 1500px; margin: 0 auto 16px; padding-bottom: 8px; }
+.top-nav a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.top-nav a:hover { text-decoration: underline; }
+header { max-width: 1500px; margin: 0 auto 24px; }
+header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+.toc { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px 10px; font-size: 1rem; }
+.toc a { color: var(--accent); text-decoration: none; font-weight: 600; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); }
+.toc a:hover { text-decoration: underline; }
+main { max-width: 1500px; margin: 0 auto; display: flex; flex-direction: column; gap: 36px; }
+.anim-section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px 24px; box-shadow: var(--shadow); scroll-margin-top: 8px; }
+.anim-section h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 1000px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+.plot-container { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+.panel { display: flex; flex-direction: column; gap: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+.panel:last-child { margin-bottom: 0; }
+.panel h3 { font-size: 1.1rem; font-weight: 700; }
+.panel p, .panel li { font-size: 1rem; }
+.panel ul { padding-left: 1.3em; }
+button { font: inherit; font-size: 1rem; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+button:hover:not(:disabled) { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+button:disabled { opacity: 0.4; cursor: default; }
+.inp-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 1rem; }
+.inp-row input { font: inherit; font-family: ui-monospace, Consolas, monospace; font-size: 1.05rem; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); min-width: 0; flex: 1 1 200px; }
+.inp-row .msg { color: var(--danger); font-size: 0.95rem; width: 100%; }
+
+/* ===== Léptető: Vissza / Előre / Előlről ===== */
+.pager-wrap { position: sticky; top: 10px; z-index: 20; display: flex; justify-content: flex-end; pointer-events: none; margin: -4px 0 12px; }
+.pager { pointer-events: auto; display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; box-shadow: var(--shadow); flex-wrap: wrap; }
+.pager button { height: 46px; padding: 0 18px; font-size: 1.1rem; border-radius: 999px; }
+.pager button.next { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+.pager button.next:hover:not(:disabled) { background: var(--accent-hover); }
+.pager .counter { font-weight: 700; font-size: 1.1rem; min-width: 76px; text-align: center; color: var(--muted); }
+
+.scene { background: var(--bg); padding: 8px; }
+.scene svg { width: 100%; height: auto; display: block; }
+.res-box { font-family: ui-monospace, Consolas, monospace; font-size: 1.2rem; font-weight: 600; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--panel); white-space: pre-wrap; min-height: 2.3em; }
+.cap-box { font-size: 1.25rem; line-height: 1.5; padding: 14px 18px; border-top: 1px solid var(--line); background: var(--accent-bg); min-height: 5.2em; }
+.book { font-size: 1rem; line-height: 1.55; border-left: 4px solid var(--accent); padding: 4px 12px; }
+.book pre { font-family: ui-monospace, Consolas, monospace; font-size: 0.9rem; margin-top: 6px; white-space: pre-wrap; }
+.book .src { display: block; font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+.code-steps { font-family: ui-monospace, Consolas, monospace; font-size: 0.95rem; line-height: 1.65; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 0; overflow-x: auto; }
+.code-steps .ln { display: block; padding: 0 12px; white-space: pre; border-left: 5px solid transparent; transition: background 0.8s, border-color 0.8s; }
+.code-steps .ln.on { background: #fef3c7; border-left-color: #f59e0b; color: #1f2937; font-weight: 700; }
+
+/* ===== Ábraelemek ===== */
+.chip { transition: transform 1.8s ease, opacity 1.6s ease; }
+.chip circle, .chip rect { transition: fill 1.4s ease, stroke 1.4s ease; stroke-width: 3; }
+.chip text { font-size: 28px; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: #1e293b; }
+.chip text.lbl { fill: var(--fg); font-weight: 700; }
+.chip text.lbl.muted { fill: var(--muted); font-weight: 600; }
+.chip text.lbl.acc { fill: var(--accent); }
+.chip text.lbl.bad { fill: var(--danger); }
+.c-normal rect { fill: #dbeafe; stroke: #3b82f6; }
+.c-new rect { fill: #bbf7d0; stroke: #16a34a; }
+.c-warn rect { fill: #fef08a; stroke: #ca8a04; }
+.c-gone rect, .c-no rect { fill: #fecaca; stroke: #dc2626; }
+.c-yes rect { fill: #bbf7d0; stroke: #16a34a; }
+.c-res rect { fill: #2563eb; stroke: #1e3a8a; }
+.c-res text { fill: #ffffff; }
+.c-dim rect { fill: #dbeafe; stroke: #3b82f6; }
+.c-ghost rect { fill: none; stroke: #94a3b8; stroke-dasharray: 8 6; stroke-width: 2; }
+.c-mark rect { fill: #f59e0b; stroke: #f59e0b; stroke-width: 0; }
+.c-key rect { fill: #ede9fe; stroke: #8b5cf6; }
+.c-up rect { fill: #ede9fe; stroke: #7c3aed; }
+
+.sources { max-width: 1500px; margin: 36px auto 0; font-size: 1rem; }
+.sources h2 { font-size: 1.4rem; margin-bottom: 8px; }
+.sources ul { padding-left: 1.3em; }
+.sources a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Összetett típusalgoritmusok</h1>
+  <nav class="toc">
+    <a href="#s-nested">Listák listái</a><a href="#s-record">Rekord</a><a href="#s-copy">Másolás</a><a href="#s-filter">Kiválogatás</a><a href="#s-partition">Szétválogatás</a><a href="#s-minsort">Minimumkiválasztásos rendezés</a><a href="#s-bubble">Buborékrendezés</a><a href="#s-key">Rendezés kulccsal</a><a href="#s-merge">Összefuttatás</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ================= LISTÁK LISTÁI ================= -->
+<section class="anim-section" id="s-nested">
+  <h2>Listák listái</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="nest-svg" viewBox="0 0 880 380" role="img" aria-label="Listák listái"></svg></div>
+      <div class="res-box" id="nest-res"></div>
+      <div class="cap-box" id="nest-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="nest-code"></div>
+      </div>
+      <div class="panel">
+        <h3>A tankönyvből</h3>
+        <p class="book">A többdimenziós listát helyesebb listák listájának nevezni, mégpedig azért, mert a fő listában lévő kis listák vagy allisták nem feltétlenül azonos elemszámúak. Elképzelhető olyan eset is, amikor a fő listának csak néhány eleme lista, a többi pedig elemi érték.</p>
+        <p class="book">A listák listáinak elemeire többszörös indexmegadással hivatkozunk. Például ha az előző mondatból a szóközök mentén hasítva listát hozunk létre (azaz split()-eljük), akkor az „x” a következő utasítással írható a képernyőre: print(szavak[-2][4])<br>Mi kerül a képernyőre, ha lefuttatjuk a következő programot?<span class="src">Okosgyűjtemény (emelt szint), 08.09. lecke: Példa: Listák listáinak elemei Pythonban</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REKORD ================= -->
+<section class="anim-section" id="s-record">
+  <h2>Rekord</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="rec-svg" viewBox="0 0 880 430" role="img" aria-label="Két jelentés szótárban"></svg></div>
+      <div class="res-box" id="rec-res"></div>
+      <div class="cap-box" id="rec-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="rec-code"></div>
+      </div>
+      <div class="panel">
+        <h3>A tankönyvből</h3>
+        <p class="book">Pythonban struktúrát úgy tudunk megvalósítani, hogy egy csak adattagokból álló osztályt hozunk létre. Ezzel a módszerrel a gyakorlatban ritkán élünk, lévén a szótár adattípus tökéletesen alkalmas logikailag összetartozó, de többféle típusba tartozó adatok tárolására.</p>
+        <p class="book">Egy városban feljegyzik több időpontban is a hőmérséklet értékét. A rögzített értékek: a településrész megnevezése egész értékként; a rögzítés időpontja óópp formában; a hőmérséklet értéke tizedes tört formában; a rögzítő neve 3 karakterben. Az alábbiakban definiálunk két jelentést egy-egy megfigyelésről, majd megadjuk annak a jelentésnek az azonosítóját, amelyikben alacsonyabb hőmérsékletet jegyeztek fel.<span class="src">08.09. lecke: Példa: Struktúra használata Pythonban (struct1.py)</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MÁSOLÁS ================= -->
+<section class="anim-section" id="s-copy">
+  <h2>Másolás</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="copy-svg" viewBox="0 0 880 320" role="img" aria-label="Másolás: karakterkódok"></svg></div>
+      <div class="res-box" id="copy-res"></div>
+      <div class="cap-box" id="copy-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Saját szöveg</h3>
+        <div class="inp-row"><input id="copy-inp" maxlength="11" value="Hello Világ" aria-label="Szöveg"><button type="button" id="copy-set">Beállít</button><span class="msg" id="copy-msg"></span></div>
+      </div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="copy-code"></div>
+      </div>
+      <div class="panel">
+        <h3>A tankönyvből</h3>
+        <p class="book">A másolás típusalgoritmusa a legegyszerűbb összetett programozási tétel. Ebben az esetben a bemeneti adatszerkezet minden elemét vizsgáljuk, átalakítjuk, és eredményként egy olyan adatszerkezetet kapunk, amelynek elemszáma megegyezik a bemeneti adatszerkezetével.
+<pre>Ciklus index := 0-tól (sorozat_elemszáma - 1)-ig
+    ujsorozat[index] := Változtatás(sorozat[index])
+Ciklus vége</pre></p>
+        <p class="book"><strong>1. feladat: Kódoló.</strong> Kérjen be a felhasználótól egy szóközökkel elválasztott karaktersorozatot! Hozza létre és írja ki azt a sorozatot, amely a karaktersorozatban lévő karakterek kódjait tárolja!<span class="src">08.10. lecke: A másolás típusalgoritmusa, 1. feladat</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= KIVÁLOGATÁS ================= -->
+<section class="anim-section" id="s-filter">
+  <h2>Kiválogatás</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="filt-svg" viewBox="0 0 880 410" role="img" aria-label="Rövid utónevek kiválogatása"></svg></div>
+      <div class="res-box" id="filt-res"></div>
+      <div class="cap-box" id="filt-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="filt-code"></div>
+      </div>
+      <div class="panel">
+        <h3>A tankönyvből</h3>
+        <p class="book">Ennél a programozási tételnél az eredeti sorozatunk valamilyen szempont, tulajdonság szerint megfelelő elemeit kiválogatjuk egy másik tömbbe. A kiválogatott elemek tárolására egy új sorozatot hozunk létre. Ennek a listának az elemszámát előre nem tudjuk, de az biztos, hogy a kiindulási sorozatnál több eleme nem lehet.</p>
+        <p class="book"><strong>8. feladat: Rövid utónevek.</strong> Adott utónevek egy listája az utonevek.txt fájlban. A szülők a vezetéknevük hossza alapján szeretnének a gyereknek utónevet választani. A céljuk az, hogy a gyerek teljes neve ne legyen harminc karakternél hosszabb. (A szülők csak egy utónevet akarnak adni a gyereknek.) Kérje be a születendő gyermek vezetéknevét! Válogassa ki az utónevek közül azokat, amelyek a szülők által támasztott feltételnek megfelelnek!<span class="src">08.10. lecke: A kiválogatás típusalgoritmusa, 8. feladat</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SZÉTVÁLOGATÁS ================= -->
+<section class="anim-section" id="s-partition">
+  <h2>Szétválogatás</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="part-svg" viewBox="0 0 880 450" role="img" aria-label="Szendvicsek szétválogatása"></svg></div>
+      <div class="res-box" id="part-res"></div>
+      <div class="cap-box" id="part-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="part-code"></div>
+      </div>
+      <div class="panel">
+        <h3>A tankönyvből</h3>
+        <p class="book">A szétválogatás tételénél nemcsak azokra az elemekre van szükségünk a sorozatból, amelyek adott tulajdonságúak, hanem a többire is. Azaz itt kimenetként nem is egy, hanem legalább két sorozatot kapunk. Olyan ez, mintha több kiválogatást csinálnánk egyszerre. Az eredeti sorozat összes elemét megvizsgáljuk, és elhelyezzük egy vagy több sorozatban.</p>
+        <p class="book"><strong>11. feladat: Szendvicsek.</strong> Margit, az eladó felírta az iskolai büfében egy hónapon keresztül az eladott szendvicsek számát. Állítson elő harminc, 1 és 100 közötti véletlenszámot! Az előállított számokat jelenítse meg a képernyőn! Határozza meg az átlagosan egy napra jutó eladások számát! Jelenítse meg két tizedesjegy pontossággal a képernyőn! Készítsen két listát, amelyek a havi átlag szendvicseladás-érték feletti és alatti vagy azzal egyenlő napok sorszámát tartalmazzák. Jelenítse meg előbb az egyes átlag alatti napok sorszámait, majd tegye meg ugyanezt az átlag felettiekkel is!<span class="src">08.10. lecke: A szétválogatás típusalgoritmusa, 11. feladat</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MINIMUMKIVÁLASZTÁSOS RENDEZÉS ================= -->
+<section class="anim-section" id="s-minsort">
+  <h2>Minimumkiválasztásos rendezés</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="min-svg" viewBox="0 0 880 310" role="img" aria-label="Minimumkiválasztásos rendezés"></svg></div>
+      <div class="res-box" id="min-res"></div>
+      <div class="cap-box" id="min-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Saját lista (3–8 egész szám, vesszővel)</h3>
+        <div class="inp-row"><input id="min-inp" value="64, 25, 12, 22, 11, 90, 3" aria-label="Lista"><button type="button" id="min-set">Beállít</button><span class="msg" id="min-msg"></span></div>
+      </div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="min-code"></div>
+      </div>
+      <div class="panel">
+        <h3>A tankönyvből</h3>
+        <p class="book">Ennél a rendezésnél a következőképpen járunk el. Vesszük a sorozat első elemét, majd az összes mögötte lévő elemre nézve vizsgáljuk, hogy van-e nála kisebb. Ha igen, akkor annak megjegyezzük a helyét. Amikor a végére érünk a sornak, megvan a legkisebb elem sorszáma. Ezzel kicseréljük az első elemet. Ezután vesszük a második elemet a sorozatban, és ugyanazt végigcsináljuk, mint az első elemmel. Ezt folytatjuk, míg a végére nem érünk a sorozatnak.
+<pre>Ciklus i=0-tól N-2-ig
+    min := i
+    Ciklus j=i+1-től N-1-ig
+        Ha A[j]&lt;A[min] akkor
+            min := j
+        Elágazás vége
+    Ciklus vége
+    seged := A[i]
+    A[i] := A[min]
+    A[min] := seged
+Ciklus vége</pre><span class="src">08.10. lecke: Példa: Minimumkiválasztásos rendezés</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= BUBORÉKRENDEZÉS ================= -->
+<section class="anim-section" id="s-bubble">
+  <h2>Buborékrendezés</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="bub-svg" viewBox="0 0 880 310" role="img" aria-label="Buborékrendezés"></svg></div>
+      <div class="res-box" id="bub-res"></div>
+      <div class="cap-box" id="bub-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Saját lista (3–8 egész szám, vesszővel)</h3>
+        <div class="inp-row"><input id="bub-inp" value="64, 25, 12, 22, 11, 90, 3" aria-label="Lista"><button type="button" id="bub-set">Beállít</button><span class="msg" id="bub-msg"></span></div>
+      </div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="bub-code"></div>
+      </div>
+      <div class="panel">
+        <h3>A tankönyvből</h3>
+        <p class="book">A másik rendezés, amit vizsgálunk, az úgynevezett buborékos rendezés. Ennek az a lényege, hogy mindig az egymás melletti elemeket hasonlítjuk össze, és ha kell, cseréljük. Ezáltal a kisebb elemek előre (felfelé), a nagyobb elemek hátra (lefelé) mozognak. A belső ciklus lefutásával a legnagyobb elem a sorozat végére kerül.
+<pre>Ciklus i=N-1-től 1-ig -1-esével
+    Ciklus j=0-tól i-1-ig
+        Ha A[j]>A[j+1] akkor
+            seged := A[j]
+            A[j] := A[j+1]
+            A[j+1] := seged
+        Elágazás vége
+    Ciklus vége
+Ciklus vége</pre><span class="src">08.10. lecke: Példa: Buborékos rendezés</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RENDEZÉS KULCCSAL ================= -->
+<section class="anim-section" id="s-key">
+  <h2>Rendezés kulccsal</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="key-svg" viewBox="0 0 880 340" role="img" aria-label="sorted, sort, key"></svg></div>
+      <div class="res-box" id="key-res"></div>
+      <div class="cap-box" id="key-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="key-code"></div>
+      </div>
+      <div class="panel">
+        <h3>A tankönyvből</h3>
+        <p class="book">Pythonban a rendezés eredményét új listába is tehetjük, de rendezhetünk az eredeti lista módosításával is – azaz „helyben”. Az első módszert a sorted(rendezendő_lista) függvény valósítja meg, a másodikat a rendezendő_lista.sort() tagfüggvény. Mindkét módszerrel rendezhetünk visszafelé is, a reverse=True paraméter megadásával.</p>
+        <p class="book">Megjegyezzük, hogy a sorted() függvény és a sort() tagfüggvény nagyon sokoldalúan használható az úgynevezett kulcsfüggvényeiknek köszönhetően.<span class="src">08.10. lecke: Példa: Rendező függvények Pythonban</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ÖSSZEFUTTATÁS ================= -->
+<section class="anim-section" id="s-merge">
+  <h2>Összefuttatás</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="merge-svg" viewBox="0 0 880 450" role="img" aria-label="Új tanulók összefuttatása"></svg></div>
+      <div class="res-box" id="merge-res"></div>
+      <div class="cap-box" id="merge-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Python-kód (a mostani lépés kiemelve)</h3>
+        <div class="code-steps" id="merge-code"></div>
+      </div>
+      <div class="panel">
+        <h3>A tankönyvből</h3>
+        <p class="book">Az összefuttatás tétele legalább két sorozathoz rendel egy sorozatot. Ezt a tételt szokták még a rendezettek uniójának is nevezni. Ebből már sejthető, hogy az unió tételének egy verziójáról van szó. Fontos ennél a tételnél, hogy a sorozatok, amiket össze akarunk futtatni, rendezettek. Az algoritmus eredményeként létrejövő sorozat is rendezett lesz.</p>
+        <p class="book">A két sorozatban párhuzamosan haladunk, összehasonlítjuk az aktuális elemeket, és a kisebbik elemet beletesszük az új sorozatba, majd továbblépünk itt. Ha egyforma a két sorozatban az aktuális elem, akkor beletesszük az egyiket az új sorozatba, majd mindkét sorozatban lépünk egyet előre. Amikor így elértük az egyik sorozat végét, akkor a másik hátralevő elemeit is az új sorozatba másoljuk.<span class="src">08.10. lecke: Az összefuttatás típusalgoritmusa (tanulok.txt, uj_tanulok.txt)</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<section class="sources">
+  <h2>Források</h2>
+  <ul>
+    <li>Digitális kultúra 11–12. okosgyűjtemény (emelt szint), VIII. fejezet, <a href="https://www.nkp.hu/tankonyv/digitalis_kultura_11-12_okosgyujtemeny_emelt_szint/lecke_08_009">9. lecke: Halmazok, szótárak és többdimenziós listák</a> (listák listái, struct1.py)</li>
+    <li>Digitális kultúra 11–12. okosgyűjtemény (emelt szint), VIII. fejezet, <a href="https://www.nkp.hu/tankonyv/digitalis_kultura_11-12_okosgyujtemeny_emelt_szint/lecke_08_010">10. lecke: Összetett típusalgoritmusok</a> (1., 8. és 11. feladat, rendezések, rendező függvények, összefuttatás; utonevek.txt, tanulok.txt, uj_tanulok.txt)</li>
+  </ul>
+</section>
+
+<script>
+(function () {
+  const NS = 'http://www.w3.org/2000/svg';
+  function svgEl(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  const num = x => String(x).replace('.', ',');
+
+  // ---------- léptető: Vissza / Előre / Előlről ----------
+  const steppers = [];
+  function makeStepper(id, n, render) {
+    const sec = document.getElementById(id);
+    const wrap = sec.querySelector('.pager-wrap');
+    wrap.innerHTML = '<div class="pager">' +
+      '<button type="button" class="prev" title="Előző lépés (←)">◀ Vissza</button>' +
+      '<button type="button" class="next" title="Következő lépés (→)">Előre ▶</button>' +
+      '<button type="button" class="reset" title="Vissza az első lépésre (Home)">↺ Előlről</button>' +
+      '<span class="counter"></span></div>';
+    const q = c => wrap.querySelector('.' + c);
+    const prev = q('prev'), next = q('next'), reset = q('reset'), counter = q('counter');
+    let cur = 0;
+    function go(i) {
+      cur = Math.max(0, Math.min(n - 1, i));
+      render(cur);
+      counter.textContent = (cur + 1) + ' / ' + n;
+      prev.disabled = reset.disabled = cur === 0;
+      next.disabled = cur === n - 1;
+    }
+    prev.addEventListener('click', () => go(cur - 1));
+    next.addEventListener('click', () => go(cur + 1));
+    reset.addEventListener('click', () => go(0));
+    const obj = { sec, next: () => go(cur + 1), prev: () => go(cur - 1), home: () => go(0) };
+    const old = steppers.findIndex(s => s.sec === sec);
+    if (old >= 0) steppers[old] = obj; else steppers.push(obj);
+    go(0);
+  }
+
+  // A billentyűk a képernyőn leginkább látható részt léptetik.
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+    if (e.target.closest && e.target.closest('input, textarea, select')) return;
+    const fwd = ['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key);
+    const back = ['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key);
+    const home = e.key === 'Home';
+    if (!fwd && !back && !home) return;
+    let best = null, bestVis = 0;
+    for (const s of steppers) {
+      const r = s.sec.getBoundingClientRect();
+      const vis = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+      if (vis > bestVis) { bestVis = vis; best = s; }
+    }
+    if (!best || bestVis < innerHeight * 0.35) return;
+    e.preventDefault();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    if (fwd) best.next(); else if (back) best.prev(); else best.home();
+  });
+
+  function codeBox(id, lines) {
+    const box = document.getElementById(id);
+    box.innerHTML = lines.map(l => '<span class="ln">' + esc(l || ' ') + '</span>').join('');
+    return on => [...box.children].forEach((ln, i) => ln.classList.toggle('on', on.includes(i)));
+  }
+  function texts(prefix, s) {
+    document.getElementById(prefix + '-res').textContent = s.res;
+    document.getElementById(prefix + '-cap').textContent = s.cap;
+  }
+
+  // ---------- kulcsolt jelenet: az elemek a helyükre csúsznak, a hiányzók elhalványulnak ----------
+  // elem: { id, x, y (középpont), k: 'box' | 'text', w, h, t, fs, cls, tc, a, mono, op, from }
+  function scene(svg) {
+    const map = new Map();
+    function build(g, it) {
+      while (g.firstChild) g.removeChild(g.firstChild);
+      const k = it.k || 'box';
+      if (k === 'box') svgEl('rect', { x: -it.w / 2, y: -it.h / 2, width: it.w, height: it.h, rx: it.rx != null ? it.rx : 10 }, g);
+      if (it.t != null && it.t !== '') {
+        const t = svgEl('text', { x: 0, y: 1 }, g);
+        t.textContent = it.t;
+        t.style.fontSize = (it.fs || 26) + 'px';
+        if (it.mono) t.style.fontFamily = 'ui-monospace, Consolas, monospace';
+        if (k === 'text') { t.setAttribute('class', 'lbl ' + (it.tc || '')); if (it.a) t.style.textAnchor = it.a; }
+      }
+    }
+    return items => {
+      const keep = new Set();
+      for (const it of items) {
+        if (!it) continue;
+        keep.add(it.id);
+        let g = map.get(it.id);
+        const fresh = !g;
+        if (fresh) { g = svgEl('g', {}, svg); map.set(it.id, g); }
+        const sig = [it.k, it.w, it.h, it.t, it.fs, it.tc, it.a, it.mono, it.rx].join('|');
+        if (g._sig !== sig) { build(g, it); g._sig = sig; }
+        const cls = it.cls || (it.k === 'text' ? '' : 'c-normal');
+        g.setAttribute('class', 'chip ' + cls);
+        const op = it.op != null ? it.op : (/c-dim/.test(cls) ? 0.3 : /c-gone/.test(cls) ? 0.45 : 1);
+        const tf = 'translate(' + it.x + 'px, ' + it.y + 'px)';
+        if (fresh || g.style.opacity === '0') {
+          g.style.transition = 'none';
+          g.style.opacity = 0;
+          g.style.transform = it.from ? 'translate(' + it.from[0] + 'px, ' + it.from[1] + 'px)' : tf + ' scale(0.5)';
+          g.getBoundingClientRect();
+          g.style.transition = '';
+        }
+        g.style.transform = tf;
+        g.style.opacity = op;
+      }
+      map.forEach((g, id) => { if (!keep.has(id)) g.style.opacity = 0; });
+    };
+  }
+  const L = (id, x, y, t, o) => Object.assign({ id, k: 'text', x, y, t, fs: 22 }, o || {});
+  const B = (id, x, y, w, h, t, cls, o) => Object.assign({ id, x, y, w, h, t: String(t), fs: 26, cls: cls || 'c-normal' }, o || {});
+  const pyList = a => '[' + a.join(', ') + ']';
+  const pyStrList = a => '[' + a.map(s => "'" + s + "'").join(', ') + ']';
+
+  // ================= Listák listái =================
+  function initNested() {
+    const draw = scene(document.getElementById('nest-svg'));
+    const code = codeBox('nest-code', [
+      "mondat = ('A listák listáinak elemeire többszörös '",
+      "          'indexmegadással hivatkozunk.')",
+      'szavak = mondat.split()',
+      'print(szavak[-2][4])',
+      '',
+      "listák_listája = [['A', 'B', 'C'],",
+      "    {2: 'kettő', '3': 'három'}, 'nagy', 'kis',",
+      "    ['tegnap', 'ma', 'holnap'],",
+      "    {'László': 'Laci', 'Béla': 'Béci'}]",
+      'print(listák_listája[0][0],',
+      "      listák_listája[1]['3'],",
+      '      listák_listája[3] + listák_listája[4][1] +',
+      "          listák_listája[-1]['László'][:3].lower())"
+    ]);
+    const words = ['A', 'listák', 'listáinak', 'elemeire', 'többszörös', 'indexmegadással', 'hivatkozunk.'];
+    const wpos = [];
+    let x = 30, row = 0;
+    words.forEach((w, k) => {
+      if (k === 4) { x = 30; row = 1; }
+      const ww = w.length * 14.5 + 26;
+      wpos.push({ x: x + ww / 2, y: row ? 200 : 80, w: ww });
+      x += ww + 30;
+    });
+    const LET = 'indexmegadással'.split('');
+    function wordItems(hl) {
+      const it = [];
+      words.forEach((w, k) => {
+        const p = wpos[k];
+        it.push(B('w' + k, p.x, p.y, p.w, 54, w, hl[k] || 'c-normal', { fs: 24, mono: true }));
+        it.push(L('wi' + k, p.x, p.y - 42, String(k), { tc: 'acc', fs: 20 }));
+        it.push(L('wn' + k, p.x, p.y + 42, '−' + (7 - k), { tc: 'muted', fs: 20 }));
+      });
+      return it;
+    }
+    function letterItems(hl) {
+      const p = wpos[5];
+      return LET.map((c, k) => B('l' + k, 62 + k * 54, 330, 48, 52, c, k === hl ? 'c-res' : 'c-normal', { mono: true, from: [p.x, p.y] }))
+        .concat(LET.map((c, k) => L('li' + k, 62 + k * 54, 290, String(k), { tc: 'acc', fs: 20 })));
+    }
+    const TOP = ['lista', 'szótár', "'nagy'", "'kis'", 'lista', 'szótár'];
+    const TX = k => 90 + k * 140;
+    function topItems(hl) {
+      const it = [];
+      TOP.forEach((t, k) => {
+        it.push(B('t' + k, TX(k), 90, 128, 56, t, hl[k] || 'c-normal', { fs: 24, mono: k === 2 || k === 3 }));
+        it.push(L('ti' + k, TX(k), 46, String(k), { tc: 'acc', fs: 20 }));
+        it.push(L('tn' + k, TX(k), 134, '−' + (6 - k), { tc: 'muted', fs: 20 }));
+      });
+      return it;
+    }
+    const expr = t => L('ex', 20, 245, t, { a: 'start', mono: true, fs: 22, tc: 'acc' });
+    const out = t => L('out', 440, 345, t, { fs: 30, mono: true });
+    function inner(pref, vals, hl, from) {
+      const it = [];
+      vals.forEach((v, k) => {
+        it.push(B(pref + k, 400 + k * 150, 245, 136, 56, v, k === hl ? 'c-res' : 'c-normal', { fs: 24, mono: true, from }));
+        it.push(L(pref + 'i' + k, 400 + k * 150, 203, String(k), { tc: 'acc', fs: 20 }));
+      });
+      return it;
+    }
+    function pairs(pref, ps, hl, from) {
+      const it = [];
+      ps.forEach(([k, v], p) => {
+        const x0 = 330 + p * 280;
+        const c = p === hl ? 'c-res' : 'c-dim';
+        it.push(B(pref + 'k' + p, x0, 245, 110, 52, k, p === hl ? 'c-key' : 'c-dim', { fs: 22, mono: true, from }));
+        it.push(L(pref + 'a' + p, x0 + 76, 245, '→', { tc: 'muted', fs: 26 }));
+        it.push(B(pref + 'v' + p, x0 + 165, 245, 124, 52, v, c, { fs: 22, mono: true, from }));
+      });
+      return it;
+    }
+    const S = [
+      { code: [0, 1, 2], items: () => wordItems({}),
+        res: "szavak = ['A', 'listák', 'listáinak', 'elemeire', 'többszörös', 'indexmegadással', 'hivatkozunk.']",
+        cap: 'A split() a mondatot a szóközök mentén szavakra vágja: egy 7 elemű lista lesz, minden eleme egy szöveg. A szövegek is sorozatok, ezért a szavak betűit is indexelhetjük.' },
+      { code: [3], items: () => wordItems({ 5: 'c-warn' }).concat(letterItems(-1)),
+        res: "szavak[-2] → 'indexmegadással'",
+        cap: 'Az első index a listából választ: a −2 hátulról a második elem, az „indexmegadással” szó. Ez a szó maga is sorozat, a betűi 0-tól számozódnak.' },
+      { code: [3], items: () => wordItems({ 5: 'c-warn' }).concat(letterItems(4), [out('x')]),
+        res: "szavak[-2][4] → 'x'",
+        cap: 'A második index a kiválasztott szóból választ: a 4-es indexű betű az „x” (i-n-d-e-x). Két szögletes zárójel egymás után: ez a többszörös indexmegadás.' },
+      { code: [5, 6, 7, 8], items: () => topItems({}),
+        res: 'listák_listája: 6 elemű, vegyes lista',
+        cap: 'A fő lista hat eleme: egy lista, egy szótár, két szöveg, megint egy lista és egy szótár. A kis listák nem azonos hosszúak, és nem is minden elem lista.' },
+      { code: [9], items: () => topItems({ 0: 'c-warn' }).concat([expr('[0][0]')], inner('a', ["'A'", "'B'", "'C'"], 0, [TX(0), 90]), [out('A')]),
+        res: "listák_listája[0] → ['A', 'B', 'C']    [0][0] → 'A'",
+        cap: 'A [0] a fő lista első eleme, az [\'A\', \'B\', \'C\'] lista. Ennek a [0] eleme az \'A\'. Ez kerül elsőként a képernyőre.' },
+      { code: [10], items: () => topItems({ 1: 'c-warn' }).concat([expr("[1]['3']")], pairs('d', [['2', "'kettő'"], ["'3'", "'három'"]], 1, [TX(1), 90]), [out('A három')]),
+        res: "listák_listája[1]['3'] → 'három'",
+        cap: "Az [1] elem egy szótár: ebben nem sorszám, hanem kulcs szerint keresünk. A '3' szöveg kulcs, a 2 szám kulcs: a kettő nem ugyanaz! A '3' kulcshoz a 'három' tartozik." },
+      { code: [11], items: () => topItems({ 3: 'c-res' }).concat([expr('[3]')], [out('A három kis')]),
+        res: "listák_listája[3] → 'kis'",
+        cap: "A [3] elem egy elemi érték, a 'kis' szöveg. A + jel szövegeknél összefűzést jelent: a harmadik kiírt érték három szövegből fog összeállni." },
+      { code: [11], items: () => topItems({ 3: 'c-res', 4: 'c-warn' }).concat([expr('[4][1]')], inner('m', ["'tegnap'", "'ma'", "'holnap'"], 1, [TX(4), 90]), [out('A három kisma')]),
+        res: "listák_listája[4][1] → 'ma'",
+        cap: "A [4] elem újra egy lista: ['tegnap', 'ma', 'holnap']. Ennek az 1-es indexű eleme a 'ma'. Eddig: 'kis' + 'ma' = 'kisma'." },
+      { code: [12], items: () => topItems({ 3: 'c-res', 4: 'c-res', 5: 'c-warn' }).concat([expr("[-1]['László']")], pairs('n', [["'László'", "'Laci'"], ["'Béla'", "'Béci'"]], 0, [TX(5), 90]), [out('A három kisma')]),
+        res: "listák_listája[-1]['László'] → 'Laci'",
+        cap: "A [−1] a fő lista utolsó eleme, egy szótár. Ennek a 'László' kulcsú értéke a 'Laci'. Ebből még nem az egész kell." },
+      { code: [12], items: () => topItems({ 3: 'c-res', 4: 'c-res', 5: 'c-res' }).concat([expr("'Laci'[:3].lower()")],
+          ['L', 'a', 'c', 'i'].map((c, k) => B('lc' + k, 400 + k * 70, 245, 58, 56, c, k < 3 ? 'c-res' : 'c-dim', { mono: true })),
+          [L('lcr', 720, 245, "→ 'lac'", { fs: 28, mono: true, tc: 'acc' }), out('A három kismalac')]),
+        res: 'A három kismalac',
+        cap: "A [:3] szelet az első három betű ('Lac'), a lower() kisbetűsre alakít ('lac'). Összefűzve: 'kis' + 'ma' + 'lac' = 'kismalac'. A print szóközzel választja el a három értéket." }
+    ];
+    makeStepper('s-nested', S.length, i => { const s = S[i]; draw(s.items()); code(s.code); texts('nest', s); });
+  }
+
+  // ================= Rekord =================
+  function initRecord() {
+    const draw = scene(document.getElementById('rec-svg'));
+    const code = codeBox('rec-code', [
+      'jelent1 = {}',
+      "jelent1['településazon'] = 123",
+      "jelent1['idő'] = '0803'",
+      "jelent1['hőmérséklet'] = '12.5'",
+      "jelent1['név'] = 'GJ'",
+      '',
+      "jelent2 = {'településazon': 124, 'idő': '0805',",
+      "           'hőmérséklet': '14', 'név': 'KV'}",
+      '',
+      "if jelent1['hőmérséklet'] < jelent2['hőmérséklet']:",
+      "    print(f'A {jelent1[\"településazon\"]} '",
+      "          'településen volt hidegebb.')",
+      "elif jelent1['hőmérséklet'] > jelent2['hőmérséklet']:",
+      "    print(f'A {jelent2[\"településazon\"]} '",
+      "          'településen volt hidegebb.')",
+      'else:',
+      "    print('A két településen azonos volt a hőmérséklet.')",
+      '',
+      '# javítás: a hőmérséklet valódi típusa, szám',
+      "h1 = float(jelent1['hőmérséklet'])",
+      "h2 = float(jelent2['hőmérséklet'])",
+      'print(h1 < h2)'
+    ]);
+    const keys = ["'településazon'", "'idő'", "'hőmérséklet'", "'név'"];
+    function rec(p, x0, title, vals, hl, fresh) {
+      const it = [L(p + 't', x0 + 170, 40, title, { mono: true, fs: 26 })];
+      keys.forEach((k, r) => {
+        const y = 95 + r * 56;
+        it.push(B(p + 'k' + r, x0 + 100, y, 200, 46, k, fresh ? 'c-new' : 'c-key', { fs: 20, mono: true }));
+        it.push(B(p + 'v' + r, x0 + 275, y, 130, 46, vals[r], hl[r] || (fresh ? 'c-new' : 'c-normal'), { fs: 22, mono: true }));
+      });
+      return it;
+    }
+    function chars(l, r, cl, cr, sign, verdict, vtc) {
+      const it = [L('cmpl', 20, 318, 'összehasonlítás betűnként:', { a: 'start', tc: 'muted', fs: 20 })];
+      l.split('').forEach((c, k) => it.push(B('cl' + k, 150 + k * 62, 360, 54, 54, c, cl[k] || 'c-dim', { mono: true, fs: 28 })));
+      it.push(L('csg', 440, 360, sign, { fs: 34 }));
+      r.split('').forEach((c, k) => it.push(B('cr' + k, 530 + k * 62, 360, 54, 54, c, cr[k] || 'c-dim', { mono: true, fs: 28 })));
+      it.push(L('cv', 440, 415, verdict, { fs: 24, tc: vtc || '' }));
+      return it;
+    }
+    const v1 = ['123', "'0803'", "'12.5'", "'GJ'"], v2 = ['124', "'0805'", "'14'", "'KV'"];
+    const S = [
+      { code: [0, 1, 2, 3, 4], items: () => rec('a', 20, 'jelent1', v1, {}, true),
+        res: "jelent1 = {'településazon': 123, 'idő': '0803', 'hőmérséklet': '12.5', 'név': 'GJ'}",
+        cap: 'Egy jelentés egy rekord: logikailag összetartozó, de különböző típusú adatok. Pythonban ezt szótárban tároljuk; az első szótárat kulcsonként töltjük fel.' },
+      { code: [6, 7], items: () => rec('a', 20, 'jelent1', v1, {}).concat(rec('b', 460, 'jelent2', v2, {}, true)),
+        res: "jelent2 = {'településazon': 124, 'idő': '0805', 'hőmérséklet': '14', 'név': 'KV'}",
+        cap: 'A második szótárat egyben adjuk meg. A mezőkre a kulccsal hivatkozunk: jelent2[\'hőmérséklet\']. Figyeljük meg: a hőmérséklet idézőjelben, szövegként van tárolva.' },
+      { code: [9, 10, 11], items: () => rec('a', 20, 'jelent1', v1, { 2: 'c-warn' }).concat(rec('b', 460, 'jelent2', v2, { 2: 'c-warn' }),
+          chars('12.5', '14', { 0: 'c-warn', 1: 'c-res' }, { 0: 'c-warn', 1: 'c-res' }, '<', "'1' = '1', '2' < '4'  →  True", 'acc')),
+        res: "'12.5' < '14' → True\nA 123 településen volt hidegebb.",
+        cap: 'A két szöveget betűnként hasonlítja: az első betű egyenlő (1 = 1), a második dönt: 2 < 4. Az eredmény helyes, de csak szerencséből.' },
+      { code: [9, 12, 13, 14], items: () => rec('a', 20, 'jelent1', ['123', "'0803'", "'9'", "'GJ'"], { 2: 'c-no' }).concat(rec('b', 460, 'jelent2', v2, { 2: 'c-warn' }),
+          chars('9', '14', { 0: 'c-no' }, { 0: 'c-no' }, '>', "'9' > '1'  →  '9' > '14' igaz!", 'bad')),
+        res: "'9' < '14' → False,  '9' > '14' → True\nA 124 településen volt hidegebb.   ← HIBÁS",
+        cap: "Mi lenne, ha az első jelentésben '9' állna? Már az első betű dönt: '9' > '1', ezért a program azt írja, hogy a 124-es településen volt hidegebb. 9 fok pedig hidegebb, mint 14!" },
+      { code: [18, 19, 20, 21], items: () => rec('a', 20, 'jelent1', ['123', "'0803'", "'9'", "'GJ'"], { 2: 'c-warn' }).concat(rec('b', 460, 'jelent2', v2, { 2: 'c-warn' }),
+          [L('cmpl', 20, 318, 'összehasonlítás számként:', { a: 'start', tc: 'muted', fs: 20 }),
+           B('fl', 330, 360, 120, 56, '9.0', 'c-res', { mono: true, fs: 30 }), L('csg', 440, 360, '<', { fs: 34 }),
+           B('fr', 550, 360, 120, 56, '14.0', 'c-res', { mono: true, fs: 30 }), L('cv', 440, 415, '9,0 < 14,0  →  True', { fs: 24, tc: 'acc' })]),
+        res: 'h1 < h2 → 9.0 < 14.0 → True',
+        cap: 'Javítás: float()-tal számmá alakítjuk, és így már a számértékeket hasonlítja: 9,0 < 14,0. Tanulság: a rekordba az adatot a valódi típusával tegyük be.' }
+    ];
+    makeStepper('s-record', S.length, i => { const s = S[i]; draw(s.items()); code(s.code); texts('rec', s); });
+  }
+
+  // ================= Másolás =================
+  const copyDraw = { d: null, code: null };
+  function initCopy(text) {
+    if (!copyDraw.d) {
+      copyDraw.d = scene(document.getElementById('copy-svg'));
+      copyDraw.code = codeBox('copy-code', [
+        "szöveg = input('Szöveg: ')",
+        'kódok = []',
+        'for karakter in szöveg:',
+        '    kódok.append(ord(karakter))',
+        'print(kódok)',
+        'kódok = [ord(karakter) for karakter in szöveg]',
+        'print(kódok)'
+      ]);
+    }
+    const draw = copyDraw.d, code = copyDraw.code;
+    const ch = text.split('');
+    const n = ch.length;
+    const X = k => 440 - (n - 1) * 38 + k * 76;
+    const shown = c => c === ' ' ? '␣' : c;
+    function items(done, cur, all) {
+      const it = [L('sl', 20, 30, "szöveg = '" + text + "'", { a: 'start', mono: true, fs: 22, tc: 'muted' }),
+        L('kl', 20, 185, 'kódok', { a: 'start', mono: true, fs: 22, tc: 'muted' })];
+      ch.forEach((c, k) => {
+        it.push(B('c' + k, X(k), 90, 64, 64, shown(c), k === cur ? 'c-warn' : 'c-normal', { mono: true, fs: 30 }));
+        it.push(L('ci' + k, X(k), 140, String(k), { tc: 'acc', fs: 18 }));
+        if (k < done) it.push(B('o' + k, X(k), 240, 70, 56, ch[k].codePointAt(0), all ? 'c-res' : (k === cur ? 'c-new' : 'c-normal'), { fs: 24, from: [X(k), 90] }));
+      });
+      if (cur >= 0) it.push(L('ord', X(cur), 186, 'ord ↓', { tc: 'acc', fs: 20 }));
+      return it;
+    }
+    const codes = ch.map(c => c.codePointAt(0));
+    const S = [{ code: [0, 1], it: items(0, -1), res: "szöveg = '" + text + "'    kódok = []",
+      cap: 'A bemenet egy szöveg, vagyis karakterek sorozata. A másolás minden eleméből pontosan egy új elemet készít: az ord függvény a karakter kódját adja meg.' }];
+    ch.forEach((c, k) => {
+      let cap = "ord('" + c + "') = " + codes[k] + ': a kód az új lista végére kerül (append). ';
+      if (c === ' ') cap = 'A szóköz is karakter: a kódja 32. Ez is bekerül, a másolás nem hagy ki elemet. ';
+      else if (codes[k] > 127) cap = "ord('" + c + "') = " + codes[k] + ': az ékezetes betű külön Unicode-kódpont, ezért nem a betű ékezet nélküli párjának kódja. ';
+      if (k === n - 1) cap += 'Kész: az új lista ugyanolyan hosszú, mint a szöveg (' + n + ' elem).';
+      S.push({ code: k === n - 1 ? [2, 3, 4] : [2, 3], it: items(k + 1, k),
+        res: "ord('" + c + "') = " + codes[k] + '\nkódok = ' + pyList(codes.slice(0, k + 1)), cap });
+    });
+    S.push({ code: [5, 6], it: items(n, -1, true), res: pyList(codes),
+      cap: 'Ugyanez listaértelmezéssel, egyetlen sorban: [átalakítás for elem in sorozat]. A for előtt áll a változtatás (ord), utána a bejárt sorozat. Ez a másolás tételének egysoros alakja.' });
+    makeStepper('s-copy', S.length, i => { const s = S[i]; draw(s.it); code(s.code); texts('copy', s); });
+  }
+
+  // ================= Kiválogatás =================
+  function initFilter() {
+    const draw = scene(document.getElementById('filt-svg'));
+    const code = codeBox('filt-code', [
+      "vezetéknév = input('Vezetéknév: ')",
+      'megfelelők = []',
+      'for utónév in utónevek:',
+      '    if len(vezetéknév) + 1 + len(utónév) <= 30:',
+      '        megfelelők.append(utónév)',
+      "print(len(megfelelők), 'név felel meg, például:',",
+      "      ', '.join(megfelelők[:5]))"
+    ]);
+    const VN = 'Kovács-Szentmiklósi-Nagy';
+    const names = ['Abélia', 'Abiáta', 'Abigél', 'Ada', 'Adala', 'Adalberta', 'Adalbertina', 'Adalind', 'Adaora', 'Adél', 'Adela', 'Adéla'];
+    const CX = k => 24 + k * 23 + 11.5;
+    const NX = k => 85 + (k % 6) * 142, NY = k => 205 + Math.floor(k / 6) * 52;
+    function ruler(name) {
+      const it = [];
+      for (let k = 0; k < 24; k++) it.push(B('r' + k, CX(k), 80, 21, 40, '', 'c-normal', { rx: 3 }));
+      it.push(L('vn', CX(11.5), 80, VN, { mono: true, fs: 20 }));
+      it.push(B('r24', CX(24), 80, 21, 40, '', 'c-dim', { rx: 3 }));
+      for (let k = 25; k < 36; k++) {
+        const ch = name ? name[k - 25] : null;
+        if (ch) it.push(B('r' + k, CX(k), 80, 21, 40, ch, k < 30 ? 'c-yes' : 'c-no', { rx: 3, mono: true, fs: 20 }));
+      }
+      it.push(B('lim', 24 + 30 * 23, 80, 4, 64, '', 'c-mark', { rx: 1 }));
+      it.push(L('limt', 24 + 30 * 23, 32, '30', { tc: 'bad', fs: 22 }));
+      return it;
+    }
+    function items(k, res) {
+      const it = ruler(k >= 0 && k < names.length ? names[k] : null);
+      it.push(L('nl', 20, 165, 'utónevek (a fájl első 12 neve)', { a: 'start', tc: 'muted', fs: 20 }));
+      it.push(L('ml', 20, 318, 'megfelelők', { a: 'start', tc: 'muted', fs: 20, mono: true }));
+      let m = 0;
+      names.forEach((nm, j) => {
+        const ok = VN.length + 1 + nm.length <= 30;
+        let cls = 'c-normal';
+        if (j < k) cls = ok ? 'c-yes' : 'c-gone';
+        if (j === k) cls = ok ? 'c-yes' : 'c-no';
+        if (j > k && k >= names.length) cls = 'c-normal';
+        if (k >= names.length) cls = ok ? 'c-yes' : 'c-gone';
+        it.push(B('n' + j, NX(j), NY(j), 132, 44, nm, j === k ? 'c-warn' : cls, { fs: 22 }));
+        if (ok && j <= k) {
+          it.push(B('m' + j, 85 + m * 142, 360, 132, 44, nm, k >= names.length ? 'c-res' : (j === k ? 'c-new' : 'c-normal'), { fs: 22, from: [NX(j), NY(j)] }));
+          m++;
+        }
+      });
+      if (k >= 0 && k < names.length) {
+        const tot = VN.length + 1 + names[k].length;
+        it.push(L('len', 440, 132, '24 + 1 + ' + names[k].length + ' = ' + tot + (tot <= 30 ? ' ≤ 30' : ' > 30'), { fs: 26, tc: tot <= 30 ? 'acc' : 'bad' }));
+      }
+      return it;
+    }
+    const passed = names.filter(nm => VN.length + 1 + nm.length <= 30);
+    const S = [{ code: [0, 1], it: items(-1), res: "vezetéknév = '" + VN + "'    len(vezetéknév) = 24\nmegfelelők = []",
+      cap: 'A vezetéknév 24 karakter, utána jön 1 szóköz. A teljes név legfeljebb 30 karakter lehet, tehát az utónév legfeljebb 5 betűs. Az utónevek listáját előtte beolvastuk a fájlból.' }];
+    names.forEach((nm, k) => {
+      const tot = VN.length + 1 + nm.length, ok = tot <= 30;
+      const sofar = names.slice(0, k + 1).filter(x => VN.length + 1 + x.length <= 30);
+      S.push({ code: ok ? [2, 3, 4] : [2, 3], it: items(k),
+        res: 'len(vezetéknév) + 1 + len(\'' + nm + '\') = ' + tot + (ok ? ' <= 30 → True' : ' <= 30 → False') + '\nmegfelelők = ' + pyStrList(sofar),
+        cap: ok ? nm + ': ' + nm.length + ' betű, a teljes név ' + tot + ' karakter, belefér. Bekerül a megfelelők listájába (zöld).'
+          : nm + ': ' + nm.length + ' betű, a teljes név ' + tot + ' karakter, ' + (tot - 30) + ' karakterrel túllóg (piros). Nem kerül be: a kiválogatás csak a feltételnek megfelelő elemeket gyűjti.' });
+    });
+    S.push({ code: [5, 6], it: items(names.length), res: passed.length + ' név felel meg, például: ' + passed.join(', ') + '\n(a teljes fájlból: 1794 név)',
+      cap: 'A 12 névből ' + passed.length + ' felelt meg. Az eredménylista legfeljebb olyan hosszú, mint a bemenet, és előre nem tudjuk, hány elem lesz: ezért van a ciklusban if.' });
+    makeStepper('s-filter', S.length, i => { const s = S[i]; draw(s.it); code(s.code); texts('filt', s); });
+  }
+
+  // ================= Szétválogatás =================
+  function initPartition() {
+    const draw = scene(document.getElementById('part-svg'));
+    const code = codeBox('part-code', [
+      'napok = [random.randint(1, 100) for _ in range(30)]',
+      'print(napok)',
+      'átlag = sum(napok) / len(napok)',
+      "print(f'Átlag: {átlag:.2f}')",
+      'alatta = []',
+      'felette = []',
+      'for sorszám, db in enumerate(napok, start=1):',
+      '    if db <= átlag:',
+      '        alatta.append(sorszám)',
+      '    else:',
+      '        felette.append(sorszám)',
+      "print('Átlag alatt vagy azzal egyenlő:', alatta)",
+      "print('Átlag felett:', felette)"
+    ]);
+    const napok = [18, 73, 98, 9, 33, 16, 64, 98, 58, 61, 84, 49, 27, 13, 63, 4, 50, 56, 78, 98, 99, 1, 90, 58, 35, 93, 30, 76, 14, 41];
+    const avg = napok.reduce((a, b) => a + b, 0) / napok.length;
+    const BX = d => 60 + d * 26, BASE = 250;
+    function items(done, cur, showAvg, final) {
+      const it = [];
+      let na = 0, nf = 0;
+      napok.forEach((v, d) => {
+        let cls = 'c-normal';
+        if (d < done) cls = v <= avg ? 'c-yes' : 'c-up';
+        if (d === cur) cls = 'c-warn';
+        it.push(B('b' + d, BX(d), BASE - v, 20, 2 * v, '', cls, { rx: 3 }));
+        if (d < done) {
+          const below = v <= avg;
+          const x = 60 + (below ? na : nf) * 48, y = below ? 345 : 425;
+          it.push(B('p' + d, x, y, 42, 38, d + 1, final ? 'c-res' : (d === cur ? 'c-new' : 'c-normal'), { fs: 20, from: [BX(d), BASE - 2 * v] }));
+          if (below) na++; else nf++;
+        }
+      });
+      if (showAvg) {
+        it.push(B('avg', 437, BASE - 2 * avg, 800, 4, '', 'c-mark', { rx: 1 }));
+        it.push(L('avgt', 870, BASE - 2 * avg - 18, 'átlag: ' + num(avg.toFixed(2)), { a: 'end', fs: 22, tc: 'bad' }));
+      }
+      if (cur >= 0) {
+        it.push(L('dl', BX(cur), BASE + 22, (cur + 1) + '. nap', { fs: 20, tc: 'acc' }));
+        it.push(L('dv', BX(cur), BASE - 2 * napok[cur] - 18, String(napok[cur]), { fs: 22 }));
+      }
+      it.push(L('al', 20, 305, 'alatta (≤ átlag)', { a: 'start', tc: 'muted', fs: 20 }));
+      it.push(L('fl', 20, 386, 'felette (> átlag)', { a: 'start', tc: 'muted', fs: 20 }));
+      return it;
+    }
+    const al = [], fe = [];
+    const S = [
+      { code: [0, 1], it: items(0, -1, false), res: pyList(napok),
+        cap: 'Margit egy hónapon át felírta az eladott szendvicsek számát: 30 véletlenszám 1 és 100 között. Minden oszlop egy nap.' },
+      { code: [2, 3, 4, 5], it: items(0, -1, true), res: 'Átlag: ' + avg.toFixed(2),
+        cap: 'Az átlag az összeg osztva az elemszámmal: ' + napok.reduce((a, b) => a + b, 0) + ' / 30 = ' + num(avg.toFixed(2)) + '. A szétválogatás előtt két üres listát készítünk.' }
+    ];
+    for (let d = 0; d < 6; d++) {
+      const v = napok[d], below = v <= avg;
+      (below ? al : fe).push(d + 1);
+      S.push({ code: below ? [6, 7, 8] : [6, 7, 9, 10], it: items(d + 1, d, true),
+        res: (d + 1) + '. nap: ' + v + (below ? ' <= ' : ' > ') + avg.toFixed(1) + '\nalatta = ' + pyList(al) + '\nfelette = ' + pyList(fe),
+        cap: (d + 1) + '. nap: ' + v + ' szendvics, ' + (below ? 'nem több az átlagnál, ezért a sorszáma az alatta listába kerül (zöld).' : 'több az átlagnál, ezért a sorszáma a felette listába kerül (lila).') + (d === 0 ? ' Az if mindkét ága hozzáfűz: semmit nem dobunk el.' : '') });
+    }
+    napok.forEach((v, d) => { if (d >= 6) (v <= avg ? al : fe).push(d + 1); });
+    S.push({ code: [6, 7, 8, 9, 10], it: items(30, -1, true), res: 'alatta = ' + pyList(al) + '\nfelette = ' + pyList(fe),
+      cap: 'A ciklus ugyanígy végigmegy a maradék 24 napon. Minden nap pontosan az egyik listába kerül.' });
+    S.push({ code: [11, 12], it: items(30, -1, true, true), res: 'Átlag alatt vagy azzal egyenlő: ' + pyList(al) + '\nÁtlag felett: ' + pyList(fe),
+      cap: 'Ellenőrzés: nem veszett el nap? len(alatta) + len(felette) = ' + al.length + ' + ' + fe.length + ' = 30 = len(napok). A szétválogatás olyan, mintha két kiválogatást csinálnánk egyszerre.' });
+    makeStepper('s-partition', S.length, i => { const s = S[i]; draw(s.it); code(s.code); texts('part', s); });
+  }
+
+  // ================= Rendezések: közös rész =================
+  function parseList(str) {
+    const parts = str.split(',').map(s => s.trim()).filter(s => s !== '');
+    if (parts.length < 3 || parts.length > 8) return null;
+    const a = parts.map(Number);
+    if (a.some(v => !Number.isInteger(v) || v < -99 || v > 999)) return null;
+    return a;
+  }
+  const fmt = a => pyList(a.map(e => e.v));
+  function arrItems(a, cls, extra) {
+    const n = a.length;
+    const X = k => 440 - (n - 1) * 48 + k * 96;
+    const it = [L('lab', 20, 150, 'számok', { a: 'start', mono: true, fs: 22, tc: 'muted' })];
+    for (let k = 0; k < 8; k++) if (k < n) it.push(L('ix' + k, X(k), 88, String(k), { tc: 'acc', fs: 22 }));
+    a.forEach((e, k) => it.push(B(e.id, X(k), 150, 84, 72, e.v, cls(k), { fs: 30 })));
+    (extra || []).forEach(([id, k, t, y, tc]) => it.push(L(id, X(k), y, t, { tc, fs: 24 })));
+    return it;
+  }
+  function inversions(arr) { let c = 0; for (let i = 0; i < arr.length; i++) for (let j = i + 1; j < arr.length; j++) if (arr[i] > arr[j]) c++; return c; }
+  function bindInput(prefix, init) {
+    const inp = document.getElementById(prefix + '-inp'), btn = document.getElementById(prefix + '-set'), msg = document.getElementById(prefix + '-msg');
+    const apply = () => {
+      const a = parseList(inp.value);
+      if (!a) { msg.textContent = '3–8 egész számot adj meg vesszővel elválasztva (pl. 5, 2, 9, 1).'; return; }
+      msg.textContent = '';
+      init(a);
+    };
+    btn.addEventListener('click', apply);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') apply(); });
+  }
+
+  // ================= Minimumkiválasztásos rendezés =================
+  let minDraw = null, minCode = null;
+  function initMin(arr0) {
+    if (!minDraw) {
+      minDraw = scene(document.getElementById('min-svg'));
+      minCode = codeBox('min-code', [
+        'számok = [64, 25, 12, 22, 11, 90, 3]',
+        'for i in range(len(számok) - 1):',
+        '    min_index = i',
+        '    for j in range(i + 1, len(számok)):',
+        '        if számok[j] < számok[min_index]:',
+        '            min_index = j',
+        '    számok[i], számok[min_index] = \\',
+        '        számok[min_index], számok[i]',
+        "    print(f'{i + 1}. lépés: {számok}')"
+      ]);
+    }
+    document.getElementById('min-code').firstChild.textContent = 'számok = ' + pyList(arr0);
+    const a = arr0.map((v, k) => ({ v, id: 'e' + k }));
+    const n = a.length;
+    let cmp = 0, sw = 0;
+    const cnt = () => ['cnt', 0, '', 0];
+    const S = [{ a: a.slice(), cls: () => 'c-normal', extra: [], cmp, sw, code: [0], res: 'számok = ' + fmt(a),
+      cap: 'A rendezés sorozathoz sorozatot rendel: ugyanazok az elemek, növekvő sorrendben. Minden lépésben a még rendezetlen rész legkisebb elemét keressük meg, és előre cseréljük.' }];
+    for (let i = 0; i < n - 1; i++) {
+      let m = i;
+      const c0 = cmp;
+      for (let j = i + 1; j < n; j++) { cmp++; if (a[j].v < a[m].v) m = j; }
+      const ii = i, mm = m;
+      S.push({ a: a.slice(), cls: k => k < ii ? 'c-res' : (k === mm ? 'c-warn' : 'c-normal'),
+        extra: [['pi', ii, 'i', 222, 'acc'], ['pm', mm, 'min', 254, 'bad']], cmp, sw, code: [1, 2, 3, 4, 5],
+        res: 'i = ' + i + ': a(z) ' + i + '–' + (n - 1) + '. elemek legkisebbje ' + a[m].v + ' (min_index = ' + m + ')',
+        cap: (i + 1) + '. lépés: a(z) ' + i + '. elemtől a végéig keressük a legkisebbet. ' + (n - 1 - i) + ' összehasonlítás után megvan: a ' + a[m].v + ' (sárga), a(z) ' + m + '. helyen.' });
+      const same = m === i;
+      [a[i], a[m]] = [a[m], a[i]];
+      if (!same) sw++;
+      S.push({ a: a.slice(), cls: k => k < ii ? 'c-res' : ((k === ii || k === mm) ? 'c-new' : 'c-normal'),
+        extra: [['pi', ii, 'i', 222, 'acc'], ['pm', mm, 'min', 254, 'bad']], cmp, sw, code: [6, 7, 8],
+        res: (i + 1) + '. lépés: ' + fmt(a),
+        cap: same ? 'A ' + a[i].v + ' már a helyén van: saját magával cseréljük, a lista nem változik.' + (i === 0 ? '' : '')
+          : 'Csere: a ' + a[i].v + ' a(z) ' + i + '. helyre kerül, a ' + a[m].v + ' pedig a helyére. A csere nem tolja el a többi elemet.' });
+    }
+    S.push({ a: a.slice(), cls: () => 'c-res', extra: [], cmp, sw, code: [], res: fmt(a),
+      cap: 'Kész. Az összehasonlítások száma mindig n(n − 1)/2 = ' + cmp + ', a valódi cserék száma ' + sw + ' (legfeljebb n − 1 = ' + (n - 1) + '). Az utolsó elemnek már nincs mivel összehasonlítódnia.' });
+    makeStepper('s-minsort', S.length, i => {
+      const s = S[i];
+      const it = arrItems(s.a, s.cls, s.extra);
+      it.push(L('cnt', 20, 292, 'összehasonlítások: ' + s.cmp + '     valódi cserék: ' + s.sw, { a: 'start', fs: 22, tc: 'muted' }));
+      minDraw(it); minCode(s.code); texts('min', s);
+    });
+  }
+
+  // ================= Buborékrendezés =================
+  let bubDraw = null, bubCode = null;
+  function initBub(arr0) {
+    if (!bubDraw) {
+      bubDraw = scene(document.getElementById('bub-svg'));
+      bubCode = codeBox('bub-code', [
+        'számok = [64, 25, 12, 22, 11, 90, 3]',
+        'cserék = 0',
+        'for vége in range(len(számok) - 1, 0, -1):',
+        '    for j in range(vége):',
+        '        if számok[j] > számok[j + 1]:',
+        '            számok[j], számok[j + 1] = \\',
+        '                számok[j + 1], számok[j]',
+        '            cserék += 1',
+        'print(számok)',
+        "print('Cserék száma:', cserék)"
+      ]);
+    }
+    document.getElementById('bub-code').firstChild.textContent = 'számok = ' + pyList(arr0);
+    const a = arr0.map((v, k) => ({ v, id: 'e' + k }));
+    const n = a.length;
+    let cmp = 0, sw = 0;
+    const inv = inversions(arr0);
+    const S = [{ a: a.slice(), cls: () => 'c-normal', extra: [], cmp, sw, code: [0, 1], res: 'számok = ' + fmt(a) + '    cserék = 0',
+      cap: 'Mindig az egymás melletti elemeket hasonlítjuk össze, és ha rossz sorrendben vannak, cseréljük. A belső ciklus végére a legnagyobb elem a lista végére „emelkedik”, mint a buborék.' }];
+    for (let e = n - 1; e >= 1; e--) {
+      for (let j = 0; j < e; j++) {
+        cmp++;
+        const x = a[j].v, y = a[j + 1].v, swap = x > y;
+        if (swap) { [a[j], a[j + 1]] = [a[j + 1], a[j]]; sw++; }
+        const jj = j, ee = e, last = j === e - 1;
+        let cap = swap ? x + ' > ' + y + ', rossz sorrend: cseréljük őket (sárga).' : x + ' ≤ ' + y + ', jó sorrend: nem cserélünk (zöld).';
+        if (last) cap += ' A belső ciklus végén a ' + a[e].v + ' a helyére került, a lista vége innen rendezett (kék).';
+        S.push({ a: a.slice(), cls: k => k > ee || (last && k === ee) ? 'c-res' : ((k === jj || k === jj + 1) ? (swap ? 'c-warn' : 'c-yes') : 'c-normal'),
+          extra: [['pj', jj, 'j', 222, 'acc'], ['pv', ee, 'vége', 254, 'muted']], cmp, sw,
+          code: swap ? [2, 3, 4, 5, 6, 7] : [2, 3, 4],
+          res: 'vége = ' + e + ', j = ' + j + ': ' + x + (swap ? ' > ' : ' > ') + y + (swap ? ' → True, csere' : ' → False') + '\nszámok = ' + fmt(a) + '    cserék = ' + sw, cap });
+      }
+    }
+    S.push({ a: a.slice(), cls: () => 'c-res', extra: [], cmp, sw, code: [8, 9], res: fmt(a) + '\nCserék száma: ' + sw,
+      cap: 'Cserék száma: ' + sw + '. Minden csere két szomszédos elemet cserél fel, ezért pontosan annyi csere kell, ahány fordított sorrendű pár van a listában (itt ' + inv + '). A minimumkiválasztásos rendezés legfeljebb n − 1 cserét végez.' });
+    makeStepper('s-bubble', S.length, i => {
+      const s = S[i];
+      const it = arrItems(s.a, s.cls, s.extra);
+      it.push(L('cnt', 20, 292, 'összehasonlítások: ' + s.cmp + '     cserék: ' + s.sw, { a: 'start', fs: 22, tc: 'muted' }));
+      bubDraw(it); bubCode(s.code); texts('bub', s);
+    });
+  }
+
+  // ================= Rendezés kulccsal =================
+  function initKey() {
+    const draw = scene(document.getElementById('key-svg'));
+    const code = codeBox('key-code', [
+      "szavak = ['körte', 'alma', 'szilva', 'dió', 'barack']",
+      'print(sorted(szavak))',
+      'print(sorted(szavak, reverse=True))',
+      'print(sorted(szavak, key=len))',
+      'szavak.sort()',
+      'print(szavak)',
+      '',
+      "tanulók = [('Máté', 7), ('Anna', 9),",
+      "           ('Zita', 7), ('Bence', 9)]",
+      'for név, pont in sorted(tanulók,',
+      '                        key=lambda t: (-t[1], t[0])):',
+      '    print(név, pont)'
+    ]);
+    const W0 = ['körte', 'alma', 'szilva', 'dió', 'barack'];
+    const X = k => 230 + k * 135;
+    const r1 = (order, cls) => [L('l1', 20, 100, 'szavak', { a: 'start', mono: true, fs: 22, tc: 'muted' })]
+      .concat(order.map((w, k) => B('w-' + w, X(k), 100, 125, 58, w, (cls && cls[w]) || 'c-normal', { fs: 26 })));
+    const r2 = (label, order, cls, keys) => {
+      const it = [L('l2', 20, 190, label, { a: 'start', mono: true, fs: 22, tc: 'acc' })];
+      order.forEach((w, k) => {
+        it.push(B('v-' + w, X(k), 290, 125, 58, w, (cls && cls[w]) || 'c-new', { fs: 26, from: [X(W0.indexOf(w)), 100] }));
+        if (keys) it.push(B('k-' + w, X(k), 236, 60, 34, keys(w), 'c-key', { fs: 20, mono: true }));
+      });
+      return it;
+    };
+    const abc = W0.slice().sort();
+    const byLen = ['dió', 'alma', 'körte', 'szilva', 'barack'];
+    const T0 = [['Máté', 7], ['Anna', 9], ['Zita', 7], ['Bence', 9]];
+    const TX = k => 240 + k * 165;
+    const tkey = t => '(−' + t[1] + ", '" + t[0] + "')";
+    const tRow1 = keys => [L('l1', 20, 120, 'tanulók', { a: 'start', mono: true, fs: 22, tc: 'muted' })]
+      .concat(T0.map((t, k) => B('t-' + t[0], TX(k), 120, 150, 54, "('" + t[0] + "', " + t[1] + ')', 'c-normal', { fs: 21, mono: true })))
+      .concat(keys ? T0.map((t, k) => B('tk-' + t[0], TX(k), 55, 155, 38, tkey(t), 'c-key', { fs: 18, mono: true })) : []);
+    const Ts = T0.slice().sort((p, q) => q[1] - p[1] || (p[0] < q[0] ? -1 : 1));
+    const S = [
+      { code: [0], it: r1(W0), res: "szavak = ['körte', 'alma', 'szilva', 'dió', 'barack']",
+        cap: 'Öt gyümölcsnév, rendezetlenül. Kétféleképpen rendezhetünk: új listába (sorted) vagy helyben (sort).' },
+      { code: [1], it: r1(W0).concat(r2('sorted(szavak)', abc)), res: pyStrList(abc),
+        cap: 'A sorted új listát ad (zöld), az eredetit nem bántja: a szavak lista változatlan maradt.' },
+      { code: [2], it: r1(W0).concat(r2('sorted(szavak, reverse=True)', abc.slice().reverse())), res: pyStrList(abc.slice().reverse()),
+        cap: 'A reverse=True csökkenő sorrendet ad. Ez is új lista.' },
+      { code: [3], it: r1(W0).concat(r2('sorted(szavak, key=len)', byLen, { szilva: 'c-warn', barack: 'c-warn' }, w => String(w.length))), res: pyStrList(byLen),
+        cap: 'A key egy függvény, amely minden elemhez egy rendezési kulcsot rendel (lila: a szó hossza); a Python a kulcsok szerint rendez. A két 6 betűs szó (sárga) az eredeti sorrendjében maradt: a beépített rendezés stabil.' },
+      { code: [4, 5], it: r1(abc, Object.fromEntries(abc.map(w => [w, 'c-warn']))), res: pyStrList(abc),
+        cap: 'A sort() helyben rendez: magát a szavak listát rendezi át, és None-t ad vissza. Ezért a szavak = szavak.sort() hiba: a lista helyett None marad.' },
+      { code: [7, 8], it: tRow1(true), res: "tanulók = [('Máté', 7), ('Anna', 9), ('Zita', 7), ('Bence', 9)]",
+        cap: 'Több szempontú rendezés: pontszám szerint csökkenően, egyenlő pontnál név szerint. A kulcs egy pár (lila): előbb a mínusz pontszám, döntetlennél a név.' },
+      { code: [9, 10, 11], it: tRow1(true).map(x => x.id.startsWith('tk-') ? null : x).concat(
+          [L('l2', 20, 190, 'sorted(tanulók, key=...)', { a: 'start', mono: true, fs: 22, tc: 'acc' })],
+          Ts.map((t, k) => B('u-' + t[0], TX(k), 290, 150, 54, t[0] + ' ' + t[1], 'c-new', { fs: 24, from: [TX(T0.indexOf(t)), 120] })),
+          Ts.map((t, k) => B('tk-' + t[0], TX(k), 236, 155, 38, tkey(t), 'c-key', { fs: 18, mono: true }))),
+        res: Ts.map(t => t[0] + ' ' + t[1]).join('\n'),
+        cap: 'A kulcsok szerint: (−9, \'Anna\') < (−9, \'Bence\') < (−7, \'Máté\') < (−7, \'Zita\'). A kisebb mínusz a nagyobb pontszám, ezért a 9 pontosak állnak elöl. A lambda t: … név nélküli rövid függvény.' }
+    ];
+    makeStepper('s-key', S.length, i => { const s = S[i]; draw(s.it); code(s.code); texts('key', s); });
+  }
+
+  // ================= Összefuttatás =================
+  function initMerge() {
+    const draw = scene(document.getElementById('merge-svg'));
+    const code = codeBox('merge-code', [
+      'osztály = []',
+      'i = 0',
+      'j = 0',
+      'while i < len(tanulók) and j < len(új_tanulók):',
+      '    if tanulók[i] < új_tanulók[j]:',
+      '        osztály.append(tanulók[i])',
+      '        i += 1',
+      '    elif tanulók[i] == új_tanulók[j]:',
+      '        osztály.append(tanulók[i])',
+      '        i += 1',
+      '        j += 1',
+      '    else:',
+      '        osztály.append(új_tanulók[j])',
+      '        j += 1',
+      '# a hiány: a maradék átmásolása',
+      'while i < len(tanulók):',
+      '    osztály.append(tanulók[i])',
+      '    i += 1',
+      'while j < len(új_tanulók):',
+      '    osztály.append(új_tanulók[j])',
+      '    j += 1'
+    ]);
+    const A = ['Aladár', 'Amina', 'Baltazár', 'Borbála', 'Cecília', 'Dezső', 'Emese', 'Flórián', 'Géza', 'Hugó', 'Irén', 'József', 'Katica', 'Klotild', 'Lajos', 'Margit', 'Nóra', 'Ottó', 'Pál', 'Rémusz', 'Sába', 'Szendi', 'Tas', 'Ubul', 'Virág', 'Xénia', 'Zengő'];
+    const Bn = ['András', 'Benő', 'Márton', 'Péter'];
+    const GX = k => 66 + (k % 9) * 96;
+    const AP = k => [GX(k), 62 + Math.floor(k / 9) * 40];
+    const BP = k => [GX(k), 210];
+    const RP = r => [GX(r), 290 + Math.floor(r / 9) * 40];
+    // a lépések: egy lépés = egymás után ugyanabból a listából átvitt nevek
+    const ev = [];
+    let i = 0, j = 0;
+    while (i < A.length && j < Bn.length) {
+      if (A[i] < Bn[j]) ev.push({ s: 'A', k: i++, vs: Bn[j] });
+      else if (A[i] === Bn[j]) { ev.push({ s: 'A', k: i++, vs: Bn[j] }); j++; }
+      else ev.push({ s: 'B', k: j++, vs: A[i] });
+    }
+    const runs = [];
+    ev.forEach(e => { const r = runs[runs.length - 1]; if (r && r.s === e.s) r.e.push(e); else runs.push({ s: e.s, e: [e] }); });
+    const loopEndI = i, loopEndJ = j;
+    function items(movedA, movedB, order, fresh, ci, cj, missing, final) {
+      const it = [L('la', 20, 25, 'tanulók', { a: 'start', mono: true, fs: 22, tc: 'muted' }),
+        L('lb', 20, 178, 'új_tanulók', { a: 'start', mono: true, fs: 22, tc: 'muted' }),
+        L('lr', 20, 258, 'osztály', { a: 'start', mono: true, fs: 22, tc: 'muted' })];
+      A.forEach((nm, k) => {
+        const [x, y] = AP(k);
+        if (movedA.has(k)) it.push(B('ga' + k, x, y, 90, 34, '', 'c-ghost', { rx: 6 }));
+        else it.push(B('a' + k, x, y, 90, 34, nm, k === ci ? 'c-warn' : (missing ? 'c-no' : 'c-normal'), { fs: 20, rx: 6 }));
+      });
+      Bn.forEach((nm, k) => {
+        const [x, y] = BP(k);
+        if (movedB.has(k)) it.push(B('gb' + k, x, y, 90, 34, '', 'c-ghost', { rx: 6 }));
+        else it.push(B('b' + k, x, y, 90, 34, nm, k === cj ? 'c-warn' : 'c-normal', { fs: 20, rx: 6 }));
+      });
+      order.forEach((id, r) => {
+        const [x, y] = RP(r);
+        const nm = id[0] === 'a' ? A[+id.slice(1)] : Bn[+id.slice(1)];
+        it.push(B(id, x, y, 90, 34, nm, final ? 'c-res' : (fresh.has(id) ? 'c-new' : (id[0] === 'b' ? 'c-key' : 'c-normal')), { fs: 20, rx: 6 }));
+      });
+      return it;
+    }
+    const S = [{ code: [0, 1, 2], it: items(new Set(), new Set(), [], new Set(), 0, 0), res: 'i = 0, j = 0, osztály = []',
+      cap: 'Mindkét lista névsorban van: ' + A.length + ' régi és ' + Bn.length + ' új tanuló. Két mutatóval haladunk (sárga: tanulók[i] és új_tanulók[j]), és mindig a kisebbik nevet visszük át.' }];
+    const mA = new Set(), mB = new Set(), order = [];
+    runs.forEach(run => {
+      const fresh = new Set();
+      run.e.forEach(e => { const id = (e.s === 'A' ? 'a' : 'b') + e.k; (e.s === 'A' ? mA : mB).add(e.k); order.push(id); fresh.add(id); });
+      const ni = A.findIndex((_, k) => !mA.has(k)), nj = Bn.findIndex((_, k) => !mB.has(k));
+      const names = run.e.map(e => (e.s === 'A' ? A : Bn)[e.k]);
+      const other = run.e[0].vs;
+      const cap = run.s === 'A'
+        ? names.join(', ') + (names.length > 1 ? ' mind kisebb, mint ' : ' kisebb, mint ') + other + ', ezért ' + (names.length > 1 ? 'ezek kerülnek' : 'ez kerül') + ' át a tanulók listájából, és az i lép.'
+        : names[0] + ' kisebb, mint ' + other + ', ezért az új tanulók listájából visszük át (lila), és a j lép.';
+      S.push({ code: run.s === 'A' ? [3, 4, 5, 6] : [3, 11, 12, 13], it: items(new Set(mA), new Set(mB), order.slice(), fresh, ni, nj),
+        res: 'i = ' + mA.size + ', j = ' + mB.size + '    osztály: ' + order.length + ' név', cap });
+    });
+    S.push({ code: [3], it: items(new Set(mA), new Set(mB), order.slice(), new Set(), -1, -1, true),
+      res: 'j = ' + loopEndJ + ' = len(új_tanulók) → a while feltétele hamis',
+      cap: 'Az új tanulók elfogytak, a while ciklus megáll. A lecke ujtanulok.py programja itt véget ér: a ' + A[loopEndI] + '-tól ' + A[A.length - 1] + '-ig tartó maradék (piros) hiányzik az eredményből. Ez a hiba.' });
+    const fresh = new Set();
+    for (let k = loopEndI; k < A.length; k++) { mA.add(k); order.push('a' + k); fresh.add('a' + k); }
+    S.push({ code: [14, 15, 16, 17], it: items(new Set(mA), new Set(mB), order.slice(), fresh, -1, -1),
+      res: 'osztály: ' + order.length + ' név, névsorban',
+      cap: 'Javítás: amelyik lista nem fogyott el, annak maradékát is átmásoljuk. Itt a tanulók maradéka kerül át; a második maradékciklus most nem fut le, mert az új tanulók elfogytak.' });
+    S.push({ code: [], it: items(new Set(mA), new Set(mB), order.slice(), new Set(), -1, -1, false, true),
+      res: order.map(id => id[0] === 'a' ? A[+id.slice(1)] : Bn[+id.slice(1)]).join(', '),
+      cap: 'Kész: ' + order.length + ' név, névsorban, egyetlen menetben, len(a) + len(b) lépésben. Halmazzal (set(a) | set(b)) a sorrend elveszne: az összefuttatás a rendezettséget is kihasználja.' });
+    makeStepper('s-merge', S.length, k => { const s = S[k]; draw(s.it); code(s.code); texts('merge', s); });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    initNested(); initRecord(); initFilter(); initPartition(); initKey(); initMerge();
+    initCopy('Hello Világ');
+    const ci = document.getElementById('copy-inp'), cm = document.getElementById('copy-msg');
+    const applyCopy = () => {
+      if (!ci.value.length) { cm.textContent = 'Írj be legalább egy karaktert (legfeljebb 11-et).'; return; }
+      cm.textContent = ''; initCopy(ci.value);
+    };
+    document.getElementById('copy-set').addEventListener('click', applyCopy);
+    ci.addEventListener('keydown', e => { if (e.key === 'Enter') applyCopy(); });
+    initMin([64, 25, 12, 22, 11, 90, 3]); bindInput('min', initMin);
+    initBub([64, 25, 12, 22, 11, 90, 3]); bindInput('bub', initBub);
+  });
+})();
+</script>
+
+</body>
+</html>
