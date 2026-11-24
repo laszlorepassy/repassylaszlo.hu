@@ -80,9 +80,9 @@ button:disabled { opacity: 0.4; cursor: default; }
 .scene svg { width: 100%; height: auto; display: block; max-height: 74vh; }
 .res-box { font-size: 1.4rem; font-weight: 700; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--panel); min-height: 2.6em; display: flex; align-items: center; flex-wrap: wrap; gap: 0 .3em; }
 .cap-box { font-size: 1.22rem; line-height: 1.6; padding: 14px 18px; border-top: 1px solid var(--line); background: var(--accent-bg); min-height: 6.4em; }
-.rule { font-size: 1.1rem; line-height: 1.6; background: var(--def-bg); border-left: 4px solid var(--def-border); padding: 10px 14px; border-radius: 6px; min-height: 3.4em; transition: background 0.8s; }
+.rule { font-size: 1.1rem; line-height: 1.6; min-height: 3.4em; }
 .rule p + p { margin-top: 8px; }
-.rule.none { background: transparent; border-left-color: var(--line); color: var(--muted); }
+.panel.empty { visibility: hidden; }
 .code-steps { font-size: 1.05rem; line-height: 1.75; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 0; }
 .code-steps .ln { display: block; padding: 0 12px 0 2.2em; text-indent: -1.4em; border-left: 5px solid transparent; transition: background 0.8s, border-color 0.8s; }
 .code-steps .ln.on { background: #fef3c7; border-left-color: #f59e0b; color: #1f2937; font-weight: 700; }
@@ -162,7 +162,6 @@ button:disabled { opacity: 0.4; cursor: default; }
         <div class="formula" data-f="(3/4 + 5/6) : (7/6 − 6/7)"></div>
       </div>
       <div class="panel">
-        <h3>Szabály (tankönyv)</h3>
         <div class="rule" id="zarojeles-rule"></div>
       </div>
       <div class="panel">
@@ -190,7 +189,6 @@ button:disabled { opacity: 0.4; cursor: default; }
         <div class="formula"><span class="frac"><span>1 + <span class="frac"><span>2</span><span>3</span></span></span><span>3 − <span class="frac"><span>5</span><span>6</span></span></span></span></div>
       </div>
       <div class="panel">
-        <h3>Szabály (tankönyv)</h3>
         <div class="rule" id="emeletes-rule"></div>
       </div>
       <div class="panel">
@@ -217,7 +215,6 @@ button:disabled { opacity: 0.4; cursor: default; }
         <p data-f="A cukrásziskola vizsgájára előkészítettek 2,5 kg mazsolát. Ennek 1/12 részét Klári dolgozza fel, majd Andi kapja a maradék 3/11 részét. Ami még ezután maradt, annak az 1/4 részét Zsolt használja fel, amit ő hagyott, annak a 2/3 része kell Emese tortáihoz. Hányadrésze maradt meg a mazsolának?"></p>
       </div>
       <div class="panel">
-        <h3>Szabály (tankönyv)</h3>
         <div class="rule" id="mazsola-rule"></div>
       </div>
       <div class="panel">
@@ -442,8 +439,8 @@ button:disabled { opacity: 0.4; cursor: default; }
       }
       cap.innerHTML = F(s.cap);
       res.innerHTML = F(s.res || '');
-      if (s.rule) { rule.innerHTML = s.rule.map(k => '<p>' + F(RULES[k]) + '</p>').join(''); rule.classList.remove('none'); }
-      else { rule.innerHTML = 'Ebben a lépésben nem új szabályt használunk.'; rule.classList.add('none'); }
+      rule.innerHTML = s.rule ? s.rule.map(k => '<p>' + F(RULES[k]) + '</p>').join('') : '';
+      rule.parentElement.classList.toggle('empty', !s.rule);
       lnEls.forEach((l, i) => { l.classList.toggle('on', i === cur); l.classList.toggle('later', i > cur); });
     });
   }
