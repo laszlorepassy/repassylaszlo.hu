@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>A számok világa – fogalmak</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1f2937;
+  --muted: #4b5563;
+  --line: #d1d5db;
+  --panel: #f8fafc;
+  --accent: #15803d;
+  --accent-bg: #ecfdf5;
+  --accent-border: #a7f3d0;
+  --hl: #2563eb;
+  --hl-fill: rgba(37, 99, 235, 0.35);
+  --hl2-fill: rgba(22, 163, 74, 0.30);
+  --def-bg: #eff6ff;
+  --def-border: #93c5fd;
+  --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --fg: #f1f5f9;
+    --muted: #a3b1c6;
+    --line: #475569;
+    --panel: #1e293b;
+    --accent: #22c55e;
+    --accent-bg: rgba(34,197,94,0.15);
+    --accent-border: #166534;
+    --hl: #60a5fa;
+    --hl-fill: rgba(96,165,250,0.40);
+    --hl2-fill: rgba(74,222,128,0.30);
+    --def-bg: rgba(59,130,246,0.12);
+    --def-border: #1d4ed8;
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.4);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 18px; scroll-behavior: smooth; }
+body { font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; background: var(--bg); color: var(--fg); line-height: 1.55; padding: 16px 20px 60px; }
+.top-nav { max-width: 1100px; margin: 0 auto 16px; padding-bottom: 8px; }
+.top-nav a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.top-nav a:hover { text-decoration: underline; }
+header, main, footer { max-width: 1100px; margin-left: auto; margin-right: auto; }
+header { margin-bottom: 20px; }
+header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+header p { color: var(--muted); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-top: 12px; }
+.progress { font-weight: 600; }
+.toolbar button { font: inherit; font-size: 0.95rem; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; }
+main { display: flex; flex-direction: column; gap: 30px; }
+section.topic { scroll-margin-top: 8px; }
+section.topic > h2 { font-size: 1.6rem; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid var(--line); }
+.item { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 10px; box-shadow: var(--shadow); }
+.item.known { border-color: var(--accent-border); background: var(--accent-bg); }
+details > summary { list-style: none; cursor: pointer; padding: 12px 120px 12px 44px; font-size: 1.12rem; font-weight: 600; position: relative; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; position: absolute; left: 16px; top: 11px; color: var(--accent); font-size: 1.1rem; transition: transform .2s; }
+details[open] > summary::before { transform: rotate(90deg); }
+.know { position: absolute; right: 12px; top: 10px; display: flex; gap: 6px; align-items: center; font-size: 0.95rem; color: var(--muted); cursor: pointer; user-select: none; }
+.know input { width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer; }
+.ans { padding: 4px 20px 18px 44px; }
+.ans p, .ans ul, .ans ol, .ans table { margin-top: 10px; }
+.ans ul, .ans ol { padding-left: 24px; }
+.def { background: var(--def-bg); border-left: 4px solid var(--def-border); padding: 10px 14px; border-radius: 6px; margin-top: 10px; }
+.def p:first-child { margin-top: 0; }
+.src { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+.formula { font-size: 1.2rem; text-align: center; margin: 12px 0; font-family: "Cambria Math", "Times New Roman", serif; }
+.ex { margin-top: 10px; }
+.ex b { color: var(--accent); }
+table { border-collapse: collapse; }
+td, th { border: 1px solid var(--line); padding: 4px 10px; text-align: left; vertical-align: top; }
+th { background: var(--bg); }
+.fig { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; }
+.fig figure { text-align: center; }
+.fig figcaption { font-size: 0.9rem; color: var(--muted); }
+.fig svg { max-width: 100%; height: auto; display: block; }
+.frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: 0.95em; }
+.frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 3px; }
+.binom { display: inline-flex; align-items: center; vertical-align: middle; }
+.binom > span.b { display: inline-flex; flex-direction: column; text-align: center; line-height: 1.1; padding: 0 2px; }
+.binom::before { content: "("; font-size: 2.1em; font-weight: 200; }
+.binom::after { content: ")"; font-size: 2.1em; font-weight: 200; }
+.anim-link { margin-top: 14px; }
+.anim-link a { display: inline-block; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--accent-border); background: var(--accent-bg); color: var(--accent); font-weight: 600; text-decoration: none; }
+.anim-link a:hover { text-decoration: underline; }
+.links a { color: var(--accent); font-weight: 600; }
+footer { margin-top: 36px; font-size: 0.9rem; color: var(--muted); }
+footer ul { padding-left: 22px; }
+.hidden { display: none; }
+@media (max-width: 640px) {
+  body { padding: 12px 16px 40px; }
+  details > summary { padding-right: 16px; padding-bottom: 36px; }
+  .know { top: auto; bottom: 8px; left: 44px; right: auto; }
+  .ans { padding-left: 16px; padding-right: 12px; }
+}
+.dot { position: relative; display: inline-block; }
+.dot::after { content: "•"; position: absolute; left: 50%; top: -0.75em; transform: translateX(-50%); font-size: 0.8em; }
+.ans .formula .frac { font-size: 1em; }
+</style>
+</head>
+<body>
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>A számok világa – fogalmak</h1>
+  <p>Kattintson egy kérdésre: lenyílik a válasz (a tankönyv szövege, példa, és ahol van, link a hozzá tartozó animációra, amely új lapon nyílik). Előbb próbálja meg fejben megfogalmazni a választ, csak utána nyissa le! A „Tudom” jelölés csak az Ön böngészőjében marad meg. Az oldal a témakör óráival együtt bővül.</p>
+  <div class="toolbar">
+    <span class="progress" id="progress">Tudom: 0 / 0</span>
+    <button type="button" id="reset">Jelölések törlése</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ===================== MŰVELETEK TULAJDONSÁGAI ===================== -->
+<section class="topic" id="muveletek">
+<h2>A műveletek tulajdonságai</h2>
+
+<div class="item" id="felcserelhetoseg"><details><summary>Mit jelent az összeadás és a szorzás felcserélhetősége (kommutativitás)?</summary><div class="ans">
+  <div class="def"><p>Ha <i>a</i>, <i>b</i> és <i>c</i> valós számok, akkor</p>
+  <p class="formula">a + b = b + a &nbsp;&nbsp;&nbsp; a ∙ b = b ∙ a</p>
+  <p><b>felcserélhetőség (kommutativitás)</b></p></div>
+  <p>Vagyis az összeadás tagjai és a szorzás tényezői tetszőleges sorrendben írhatók. A kivonás és az osztás nem ilyen: 5 − 3 ≠ 3 − 5.</p>
+  <p class="ex"><b>Példa:</b> 27,8 + 39,7 + 22,2 + 10,3 = (27,8 + 22,2) + (39,7 + 10,3) = 50 + 50 = 100.</p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 12. lecke, Elmélet, 46. o.; a példa: 12. lecke, 2. házi feladat a).</p>
+</div></details></div>
+
+<div class="item" id="csoportosithatosag"><details><summary>Mit jelent az összeadás és a szorzás csoportosíthatósága (asszociativitás)?</summary><div class="ans">
+  <div class="def"><p>Ha <i>a</i>, <i>b</i> és <i>c</i> valós számok, akkor</p>
+  <p class="formula">(a + b) + c = a + (b + c) &nbsp;&nbsp;&nbsp; (a ∙ b) ∙ c = a ∙ (b ∙ c)</p>
+  <p><b>csoportosíthatóság (asszociativitás)</b></p></div>
+  <p>Vagyis több tag összeadásakor (több tényező szorzásakor) mindegy, melyik kettővel kezdjük.</p>
+  <p class="ex"><b>Példa:</b> 5 ∙ (3,56 − 4,2 + 1,64) ∙ 20 = (5 ∙ 20) ∙ (3,56 + 1,64 − 4,2) = 100 ∙ 1 = 100.</p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 12. lecke, Elmélet, 46. o.; a példa: 12. lecke, 1. házi feladat b).</p>
+</div></details></div>
+
+<div class="item" id="szettagolhatosag"><details><summary>Mit jelent a széttagolhatóság (disztributivitás)?</summary><div class="ans">
+  <div class="def"><p>Ha <i>a</i>, <i>b</i> és <i>c</i> valós számok, akkor</p>
+  <p class="formula">(a + b) ∙ c = a ∙ c + b ∙ c</p>
+  <p><b>széttagolhatóság (disztributivitás)</b></p></div>
+  <p>Visszafelé olvasva ez a kiemelés: ha minden tagban ugyanaz a tényező szerepel, azt kiemelhetjük.</p>
+  <p class="ex"><b>Példa:</b> 535 ∙ 3 + 270 ∙ 3 = (535 + 270) ∙ 3 = 805 ∙ 3 = 2415. A piacon: 2,5 ∙ 120 + 1,5 ∙ 120 + 2 ∙ 120 = (2,5 + 1,5 + 2) ∙ 120 = 6 ∙ 120 = 720 Ft.</p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 12. lecke, Elmélet és Kidolgozott feladat, 46. o.; a második példa: 12. lecke, 3. feladat, 47. o.</p>
+</div></details></div>
+
+<div class="item" id="zarojelek"><details><summary>Hogyan bontunk fel (hagyunk el) egy zárójelet?</summary><div class="ans">
+  <div class="def"><p><b>Zárójelek felbontása, elhagyása</b></p>
+  <p>Ha csak összeadás és kivonás szerepel a műveletek között:<br>
+  12 + (7 − 9 − 16) = 12 + 7 − 9 − 16 = 19 − 25 = −6<br>
+  12 − (7 − 9 − 16) = 12 − 7 + 9 + 16 = 37 − 7 = 30</p>
+  <p>Ha csak szorzás és osztás szerepel a műveletek között:<br>
+  64 ∙ (7 : 32 ∙ 10) = 64 ∙ 7 : 32 ∙ 10 = 64 : 32 ∙ 7 ∙ 10 = 2 ∙ 7 ∙ 10 = 14 ∙ 10 = 140<br>
+  64 : (10 ∙ 32 : 7) = 64 : 10 : 32 ∙ 7 = 64 : 32 ∙ 7 : 10 = 2 ∙ 7 : 10 = 14 : 10 = 1,4</p>
+  <p>Összeadás (vagy kivonás) és szorzás (vagy osztás) is szerepel a műveletek között:<br>
+  12 − 3 ∙ (4 − 22) = 12 − 3 ∙ 4 + 3 ∙ 22 = 12 − 12 + 66 = 66</p>
+  <p>(A zárójelet nem kötelező felbontani. Az is helyes, ha a zárójelben lévő műveletet végezzük el először.)</p></div>
+  <p>Röviden: ha a zárójel előtt <b>kivonás</b> (vagy <b>osztás</b>) áll, a zárójel elhagyásakor a benne lévő műveleti jelek megfordulnak (+ helyett −, ∙ helyett :, és fordítva). Ha összeadás (vagy szorzás) áll előtte, a jelek maradnak.</p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 12. lecke, Elmélet, 46. o.</p>
+</div></details></div>
+</section>
+
+<!-- ===================== SZÁMOLÁS TÖRTEKKEL ===================== -->
+<section class="topic" id="tortek">
+<h2>Számolás törtekkel</h2>
+
+<div class="item" id="tort"><details><summary>Mi a tört? Mi a számláló és a nevező?</summary><div class="ans">
+  <div class="def"><p>A tört két egész szám hányadosa: <span class="frac"><span>a</span><span>b</span></span> = a : b, ahol a nevező nem lehet 0. A törtvonal fölötti szám a <b>számláló</b>, a törtvonal alatti a <b>nevező</b>.</p></div>
+  <p>A nevező megmutatja, hány egyenlő részre osztjuk az egészet, a számláló pedig azt, hogy hány ilyen részt veszünk.</p>
+  <div class="fig" data-fig="bar34"></div>
+  <p class="src">Saját megfogalmazás (a 13. lecke a törteket az általános iskolából ismertnek veszi).</p>
+</div></details></div>
+
+<div class="item" id="osszeadas"><details><summary>Hogyan adunk össze és vonunk ki törteket? Mi a közös nevezőre hozás?</summary><div class="ans">
+  <div class="def"><p><b>Törtek összeadása és kivonása:</b> Először közös nevezőre hozzuk a törteket, azután végezzük az összeadást vagy a kivonást a számlálókkal.</p>
+  <p class="formula"><span class="frac"><span>7</span><span>9</span></span> + <span class="frac"><span>3</span><span>2</span></span> = <span class="frac"><span>14</span><span>18</span></span> + <span class="frac"><span>27</span><span>18</span></span> = <span class="frac"><span>41</span><span>18</span></span> &nbsp;&nbsp;&nbsp; <span class="frac"><span>7</span><span>9</span></span> − <span class="frac"><span>3</span><span>2</span></span> = <span class="frac"><span>14</span><span>18</span></span> − <span class="frac"><span>27</span><span>18</span></span> = −<span class="frac"><span>13</span><span>18</span></span></p></div>
+  <p><b>Közös nevezőre hozás:</b> a törteket bővítjük úgy, hogy mindegyiknek ugyanaz legyen a nevezője. Közös nevező a nevezők bármely közös többszöröse lehet; legkényelmesebb a legkisebb közös többszörös (a 9 és a 2 esetén a 18).</p>
+  <p class="anim-link"><a href="https://repassylaszlo.hu/animaciok/szamolas-tortekkel.html#zarojeles" target="_blank" rel="noopener">Animáció: zárójeles kifejezés törtekkel</a></p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 13. lecke, Bevezető – ismétlés, 48. o.</p>
+</div></details></div>
+
+<div class="item" id="szorzas-egesz"><details><summary>Hogyan szorzunk törtet egész számmal?</summary><div class="ans">
+  <div class="def"><p><b>Tört szorzása egész számmal:</b> A számlálót szorozzuk az egész számmal, a nevező változatlan marad.</p>
+  <p class="formula"><span class="frac"><span>3</span><span>4</span></span> ∙ 5 = <span class="frac"><span>15</span><span>4</span></span></p></div>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 13. lecke, Bevezető – ismétlés, 48. o.</p>
+</div></details></div>
+
+<div class="item" id="osztas-egesz"><details><summary>Hogyan osztunk törtet egész számmal?</summary><div class="ans">
+  <div class="def"><p><b>Tört osztása egész számmal:</b> A nevezőt szorozzuk az egész számmal, a számláló változatlan marad. VAGY (ha lehet) A számlálót elosztjuk az egész számmal, a nevező változatlan marad.</p>
+  <p class="formula"><span class="frac"><span>3</span><span>4</span></span> : 5 = <span class="frac"><span>3</span><span>20</span></span> &nbsp;&nbsp;&nbsp; <span class="frac"><span>35</span><span>4</span></span> : 5 = <span class="frac"><span>7</span><span>4</span></span></p></div>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 13. lecke, Bevezető – ismétlés, 48. o.</p>
+</div></details></div>
+
+<div class="item" id="szorzas-tort"><details><summary>Hogyan szorzunk törtet törttel?</summary><div class="ans">
+  <div class="def"><p><b>Tört szorzása törttel:</b> A számlálót szorozzuk a számlálóval, a nevezőt szorozzuk a nevezővel.</p>
+  <p class="formula"><span class="frac"><span>2</span><span>7</span></span> ∙ <span class="frac"><span>5</span><span>3</span></span> = <span class="frac"><span>10</span><span>21</span></span></p></div>
+  <p>Szorzás előtt érdemes egyszerűsíteni: ha egy számláló és egy (akár a másik törtbeli) nevező közös osztóval rendelkezik, mindkettőt eloszthatjuk vele.</p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 13. lecke, Bevezető – ismétlés, 48. o.</p>
+</div></details></div>
+
+<div class="item" id="osztas-tort"><details><summary>Hogyan osztunk törttel?</summary><div class="ans">
+  <div class="def"><p><b>Osztás törttel:</b> Az osztó reciprokával szorozzuk az osztandót.</p>
+  <p class="formula">5 : <span class="frac"><span>3</span><span>4</span></span> = 5 ∙ <span class="frac"><span>4</span><span>3</span></span> = <span class="frac"><span>20</span><span>3</span></span> &nbsp;&nbsp;&nbsp; <span class="frac"><span>2</span><span>7</span></span> : <span class="frac"><span>5</span><span>3</span></span> = <span class="frac"><span>2</span><span>7</span></span> ∙ <span class="frac"><span>3</span><span>5</span></span> = <span class="frac"><span>6</span><span>35</span></span></p></div>
+  <p class="anim-link"><a href="https://repassylaszlo.hu/animaciok/szamolas-tortekkel.html#zarojeles" target="_blank" rel="noopener">Animáció: osztás törttel egy levezetésben</a></p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 13. lecke, Bevezető – ismétlés, 48. o.</p>
+</div></details></div>
+
+<div class="item" id="egyszerusites"><details><summary>Mit jelent egy tört egyszerűsítése?</summary><div class="ans">
+  <div class="def"><p><b>Tört egyszerűsítése:</b> A tört számlálóját és nevezőjét egyszerre elosztjuk ugyanazzal a 0-tól különböző számmal.</p>
+  <p class="formula"><span class="frac"><span>915</span><span>48</span></span> = <span class="frac"><span>305</span><span>16</span></span> (itt 3-mal egyszerűsítettünk)</p>
+  <p>Ezen eljárások során a tört értéke nem változik.</p></div>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 13. lecke, Bevezető – ismétlés, 48. o.</p>
+</div></details></div>
+
+<div class="item" id="bovites"><details><summary>Mit jelent egy tört bővítése?</summary><div class="ans">
+  <div class="def"><p><b>Tört bővítése:</b> Egy tört számlálóját és nevezőjét egyszerre megszorozzuk ugyanazzal a 0-tól különböző számmal.</p>
+  <p class="formula"><span class="frac"><span>5</span><span>6</span></span> = <span class="frac"><span>15</span><span>18</span></span> (itt 3-mal bővítettünk)</p>
+  <p>Ezen eljárások során a tört értéke nem változik.</p></div>
+  <p>A bővítést a közös nevezőre hozáshoz használjuk.</p>
+  <div class="fig" data-fig="bovites"></div>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 13. lecke, Bevezető – ismétlés, 48. o.</p>
+</div></details></div>
+
+<div class="item" id="emeletes-tort"><details><summary>Mi az emeletes tört, és hogyan számoljuk ki az értékét?</summary><div class="ans">
+  <div class="def"><p>Az emeletes tört olyan tört, amelynek számlálójában vagy nevezőjében is tört (vagy törtekkel végzett művelet) áll. A fő (leghosszabb) törtvonal osztást jelent: a számlálót osztjuk a nevezővel.</p></div>
+  <p>Kiszámítása: előbb külön kiszámoljuk a számláló és a nevező értékét, majd a számlálót elosztjuk a nevezővel (azaz megszorozzuk a nevező reciprokával).</p>
+  <p class="formula"><span class="frac"><span>1</span><span>1 + <span class="frac"><span>1</span><span>5</span></span></span></span> = 1 : <span class="frac"><span>6</span><span>5</span></span> = 1 ∙ <span class="frac"><span>5</span><span>6</span></span> = <span class="frac"><span>5</span><span>6</span></span></p>
+  <p class="anim-link"><a href="https://repassylaszlo.hu/animaciok/szamolas-tortekkel.html#emeletes" target="_blank" rel="noopener">Animáció: emeletes tört lépésről lépésre</a></p>
+  <p class="src">Saját megfogalmazás; a példa: Matematika 9. (OH-MAT09TA_I), 13. lecke, 3. a) feladat, 48. o.</p>
+</div></details></div>
+
+<div class="item" id="reciprok"><details><summary>Mi egy szám reciproka?</summary><div class="ans">
+  <div class="def"><p><b>Számok reciproka:</b> Egy nullától különböző <i>x</i> valós szám reciproka az a valós szám, mellyel az <i>x</i>-et megszorozva 1-et kapunk. Az <i>x</i> szám reciproka <span class="frac"><span>1</span><span>x</span></span>. Például: 3 reciproka <span class="frac"><span>1</span><span>3</span></span>, a 0,4 reciproka 2,5, hiszen 1 : 0,4 = 2,5, valamint 0,4 ∙ 2,5 = 1.</p>
+  <p>Közönséges tört reciprokát úgy kapjuk, hogy a számlálót és a nevezőt felcseréljük. Például: <span class="frac"><span>3</span><span>5</span></span> reciproka <span class="frac"><span>5</span><span>3</span></span>.</p></div>
+  <p>A 0-nak nincs reciproka, mert 0-val bármit szorozva 0-t kapunk, sosem 1-et.</p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 13. lecke, Elmélet, 49. o.</p>
+</div></details></div>
+
+<div class="item" id="tortresz"><details><summary>Hogyan számítjuk ki egy szám törtrészét?</summary><div class="ans">
+  <div class="def"><p><b>Számok törtrésze:</b> Egy szám <span class="frac"><span>2</span><span>7</span></span> részét úgy számoljuk ki, hogy a számot megszorozzuk <span class="frac"><span>2</span><span>7</span></span>-del. <span class="frac"><span>2</span><span>7</span></span> rész = <span class="frac"><span>2</span><span>7</span></span>-szeres.</p>
+  <p>Például: 28-nak a <span class="frac"><span>2</span><span>7</span></span> része 28 ∙ <span class="frac"><span>2</span><span>7</span></span> = 8. A 45-nek a <span class="frac"><span>4</span><span>9</span></span> része 45 ∙ <span class="frac"><span>4</span><span>9</span></span> = 20.</p></div>
+  <p class="anim-link"><a href="https://repassylaszlo.hu/animaciok/szamolas-tortekkel.html#mazsola" target="_blank" rel="noopener">Animáció: törtrészek egymás után (mazsola)</a></p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 13. lecke, Elmélet, 49. o.</p>
+</div></details></div>
+</section>
+
+<!-- ===================== RACIONÁLIS ÉS IRRACIONÁLIS SZÁMOK ===================== -->
+<section class="topic" id="racionalis">
+<h2>Racionális és irracionális számok</h2>
+
+<div class="item" id="racionalis-szam"><details><summary>Mi a racionális szám?</summary><div class="ans">
+  <div class="def"><p><b>Definíció:</b> Azokat a számokat, amelyek felírhatók két egész szám hányadosaként, racionális számoknak nevezzük. (Az osztó természetesen nem lehet nulla.)</p>
+  <p>A racionális számok halmazának jele: ℚ.</p></div>
+  <p>Az egész számok is racionális számok, mert felírhatók két egész szám hányadosaként, pl. −5 = −<span class="frac"><span>15</span><span>3</span></span>. A racionális számok felírhatók közönséges tört alakban, pl. <span class="frac"><span>2</span><span>3</span></span>; −<span class="frac"><span>7</span><span>4</span></span>.</p>
+  <p>Minden racionális számnak megvan a helye a számegyenesen, de ezek nem töltik ki a teljes számegyenest.</p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 14. lecke, Elmélet, 50. o.</p>
+</div></details></div>
+
+<div class="item" id="tizedes-tort"><details><summary>Milyen tizedes tört alakban írhatók fel a racionális számok? Mikor véges a tizedes tört?</summary><div class="ans">
+  <div class="def"><p>A racionális számok felírhatók tizedes tört alakban is:</p>
+  <ul>
+    <li>ha a számláló többszöröse a nevezőnek, akkor egész számként;</li>
+    <li>ha nem többszöröse, akkor véges tizedes tört vagy végtelen szakaszos tizedes tört alakban;</li>
+    <li>ha a lehetséges egyszerűsítések után a tört nevezőjének prím osztói között szerepel más prím, mint a 2 és az 5, akkor végtelen szakaszos tizedes tört; ha nem szerepel más prím, akkor véges tizedes tört.</li>
+  </ul>
+  <p>Például: <span class="frac"><span>7</span><span>4</span></span> = 1,75; <span class="frac"><span>23</span><span>37</span></span> = 0,621621621… = 0,<span class="dot">6</span>2<span class="dot">1</span>.</p></div>
+  <p>A <span class="frac"><span>7</span><span>4</span></span> nevezője 4 = 2 ∙ 2, ezért véges; a <span class="frac"><span>23</span><span>37</span></span> nevezője a 37 prím, ezért végtelen szakaszos. A szakaszt a jegyek fölé tett pontokkal jelöljük (az első és az utolsó ismétlődő jegy fölé).</p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 14. lecke, Elmélet, 50. o.</p>
+</div></details></div>
+
+<div class="item" id="irracionalis-szam"><details><summary>Mi az irracionális szám?</summary><div class="ans">
+  <div class="def"><p><b>Definíció:</b> Azokat a számokat, amelyek nem írhatók fel két egész szám hányadosaként, irracionális számoknak nevezzük. Az irracionális számok halmazának jele: ℚ*.</p>
+  <p>A végtelen nem szakaszos tizedes törtek nem írhatók fel két egész szám hányadosaként.</p></div>
+  <p class="ex"><b>Példa:</b> Ilyen számot kapunk például, ha mindig eggyel több 0-t írunk az 1-esek után: 0,101 001 000 100 001 000 001 00…, vagy ha a tizedesvessző után növekedő sorrendben felsoroljuk a természetes számokat: 6,012 345 678 910 111 213 141 516 171 819 202 122 23…</p>
+  <p>Vigyázat: a végtelen tizedes tört még nem biztosan irracionális! Az <span class="frac"><span>1</span><span>3</span></span> = 0,333… végtelen, de szakaszos, tehát racionális.</p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 14. lecke, Elmélet, 51. o.</p>
+</div></details></div>
+
+<div class="item" id="valos-szamok"><details><summary>Mi a valós számok halmaza? Hogyan viszonyul egymáshoz ℚ és ℚ*?</summary><div class="ans">
+  <div class="def"><p>Minden irracionális számnak megvan a helye a számegyenesen. A racionális és irracionális számok együtt töltik ki a számegyenest.</p>
+  <p>A valós számok halmazának jele: ℝ. Tehát ℝ = ℚ ∪ ℚ* és ℚ ∩ ℚ* = ∅.</p></div>
+  <p>Vagyis minden valós szám vagy racionális, vagy irracionális, a kettő egyszerre nem lehet.</p>
+  <div class="fig" data-fig="halmazok"></div>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 14. lecke, Elmélet, 51. o.</p>
+</div></details></div>
+
+<div class="item" id="muveletek-racionalis"><details><summary>Milyen számot kapunk, ha racionális számokkal végzünk műveleteket?</summary><div class="ans">
+  <div class="def"><p><b>Műveletek racionális számokkal</b></p>
+  <ul>
+    <li>Racionális számok összege, különbsége, szorzata mindig racionális.</li>
+    <li>0-tól különböző osztó esetén két racionális szám hányadosa is mindig racionális.</li>
+  </ul></div>
+  <p class="ex"><b>Példa:</b> <span class="frac"><span>3</span><span>4</span></span> + <span class="frac"><span>5</span><span>6</span></span> = <span class="frac"><span>19</span><span>12</span></span> és <span class="frac"><span>19</span><span>12</span></span> : <span class="frac"><span>13</span><span>42</span></span> = <span class="frac"><span>133</span><span>26</span></span> is racionális.</p>
+  <p class="src">Matematika 9. (OH-MAT09TA_I), 14. lecke, Elmélet, 50. o.</p>
+</div></details></div>
+</section>
+
+</main>
+
+<footer>
+  <p><b>Források</b></p>
+  <ul>
+    <li>Matematika 9. tankönyv, I. kötet (OH-MAT09TA_I), 12–14. lecke, 46–52. o.</li>
+    <li>Saját megfogalmazás: a tört, a közös nevezőre hozás és az emeletes tört meghatározása, valamint a kiegészítő magyarázatok.</li>
+  </ul>
+  <p>Az animációs linkek a <a href="https://repassylaszlo.hu/animaciok" target="_blank" rel="noopener">repassylaszlo.hu/animaciok</a> oldal megfelelő fejezetére visznek.</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var STORE_KEY = "fogalmak-szamok-vilaga-v1";
+  var NS = "http://www.w3.org/2000/svg";
+  var uid = 0;
+
+  /* ---------- „Tudom” jelölés ---------- */
+  var known = {};
+  try { known = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {}; } catch (e) { known = {}; }
+  function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(known)); } catch (e) {} }
+  var items = Array.prototype.slice.call(document.querySelectorAll(".item"));
+  function updateProgress() {
+    var n = 0;
+    items.forEach(function (it) { if (known[it.id]) n++; });
+    document.getElementById("progress").textContent = "Tudom: " + n + " / " + items.length;
+  }
+  items.forEach(function (it) {
+    var lab = document.createElement("label");
+    lab.className = "know";
+    var cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = !!known[it.id];
+    it.classList.toggle("known", cb.checked);
+    cb.addEventListener("change", function () {
+      if (cb.checked) known[it.id] = 1; else delete known[it.id];
+      it.classList.toggle("known", cb.checked);
+      save(); updateProgress();
+    });
+    lab.appendChild(cb);
+    lab.appendChild(document.createTextNode("Tudom"));
+    it.appendChild(lab);
+  });
+  document.getElementById("reset").addEventListener("click", function () {
+    if (!confirm("Biztosan törli az összes „Tudom” jelölést?")) return;
+    known = {}; save();
+    items.forEach(function (it) { it.classList.remove("known"); it.querySelector(".know input").checked = false; });
+    updateProgress();
+  });
+  updateProgress();
+
+  // Ha a cím #azonosítóval érkezik, nyissuk le azt a kérdést.
+  function openFromHash() {
+    var id = location.hash.slice(1);
+    var it = id && document.getElementById(id);
+    if (it && it.classList.contains("item")) it.querySelector("details").open = true;
+  }
+  window.addEventListener("hashchange", openFromHash);
+  openFromHash();
+
+    function figure(container, node, caption) {
+    var f = document.createElement("figure");
+    f.appendChild(node);
+    if (caption) { var c = document.createElement("figcaption"); c.textContent = caption; f.appendChild(c); }
+    container.appendChild(f);
+  }
+  /* ---------- ábrák ---------- */
+  function svgE(tag, attrs, parent, txt) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (txt != null) e.textContent = txt;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function fracBar(parts, filled, w, label) {
+    var s = svgE("svg", { viewBox: "0 0 " + (w + 90) + " 70", width: w + 90, height: 70, role: "img" });
+    var cw = w / parts;
+    for (var i = 0; i < parts; i++)
+      svgE("rect", { x: 80 + i * cw, y: 10, width: cw, height: 46, fill: i < filled ? "var(--hl-fill)" : "var(--bg)", stroke: "var(--fg)", "stroke-width": 1.5 }, s);
+    svgE("rect", { x: 80, y: 10, width: w, height: 46, fill: "none", stroke: "var(--fg)", "stroke-width": 3 }, s);
+    var n = label.split("/");
+    svgE("text", { x: 36, y: 22, "text-anchor": "middle", "font-size": 22, "font-weight": 700, fill: "var(--fg)", "dominant-baseline": "middle" }, s, n[0]);
+    svgE("line", { x1: 18, y1: 33, x2: 54, y2: 33, stroke: "var(--fg)", "stroke-width": 2.5 }, s);
+    svgE("text", { x: 36, y: 46, "text-anchor": "middle", "font-size": 22, "font-weight": 700, fill: "var(--fg)", "dominant-baseline": "middle" }, s, n[1]);
+    return s;
+  }
+  function halmazok() {
+    var s = svgE("svg", { viewBox: "0 0 420 170", width: 420, height: 170, role: "img" });
+    svgE("rect", { x: 5, y: 5, width: 410, height: 160, rx: 10, fill: "none", stroke: "var(--fg)", "stroke-width": 2 }, s);
+    svgE("rect", { x: 5, y: 5, width: 250, height: 160, rx: 10, fill: "var(--hl-fill)", stroke: "var(--fg)", "stroke-width": 2 }, s);
+    svgE("rect", { x: 255, y: 5, width: 160, height: 160, rx: 10, fill: "var(--hl2-fill)", stroke: "var(--fg)", "stroke-width": 2 }, s);
+    var t = function (x, y, str, size, w) { svgE("text", { x: x, y: y, "text-anchor": "middle", "font-size": size, "font-weight": w || 700, fill: "var(--fg)", "dominant-baseline": "middle" }, s, str); };
+    t(40, 28, "ℚ", 24); t(390, 28, "ℚ*", 24); t(210, 148, "ℝ = ℚ ∪ ℚ*", 18, 600);
+    t(130, 70, "−5   0   2/3   1,75", 20, 600);
+    t(130, 104, "0,621621…", 20, 600);
+    t(335, 70, "0,1010010001…", 17, 600);
+    t(335, 104, "6,0123456789…", 17, 600);
+    return s;
+  }
+  document.querySelectorAll(".fig[data-fig]").forEach(function (box) {
+    var k = box.getAttribute("data-fig");
+    if (k === "bar34") figure(box, fracBar(4, 3, 280, "3/4"), "3/4: négy egyenlő részből három");
+    if (k === "bovites") {
+      figure(box, fracBar(6, 5, 300, "5/6"), "5/6");
+      figure(box, fracBar(18, 15, 300, "15/18"), "15/18: ugyanakkora rész, finomabb beosztással");
+    }
+    if (k === "halmazok") figure(box, halmazok(), "A valós számok: racionális vagy irracionális");
+  });
+})();
+</script>
+</body>
+</html>

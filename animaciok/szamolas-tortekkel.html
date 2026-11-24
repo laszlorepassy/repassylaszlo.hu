@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Számolás törtekkel</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1f2937;
+  --muted: #4b5563;
+  --line: #d1d5db;
+  --panel: #f8fafc;
+  --accent: #15803d;
+  --accent-hover: #166534;
+  --accent-bg: #ecfdf5;
+  --accent-border: #a7f3d0;
+  --def-bg: #eff6ff;
+  --def-border: #93c5fd;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --fg: #f1f5f9;
+    --muted: #a3b1c6;
+    --line: #475569;
+    --panel: #1e293b;
+    --accent: #22c55e;
+    --accent-hover: #16a34a;
+    --accent-bg: rgba(34, 197, 94, 0.15);
+    --accent-border: #166534;
+    --def-bg: rgba(59, 130, 246, 0.12);
+    --def-border: #1d4ed8;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 18px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.5;
+  padding: 16px 20px 60px;
+}
+.top-nav { max-width: 1500px; margin: 0 auto 16px; padding-bottom: 8px; }
+.top-nav a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.top-nav a:hover { text-decoration: underline; }
+header { max-width: 1500px; margin: 0 auto 24px; }
+header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+header p { font-size: 1.1rem; color: var(--muted); }
+.toc { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px 10px; font-size: 1rem; }
+.toc a { color: var(--accent); text-decoration: none; font-weight: 600; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); }
+.toc a:hover { text-decoration: underline; }
+main { max-width: 1500px; margin: 0 auto; display: flex; flex-direction: column; gap: 36px; }
+.anim-section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px 24px; box-shadow: var(--shadow); scroll-margin-top: 8px; }
+.anim-section h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } }
+.plot-container { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+.panel { display: flex; flex-direction: column; gap: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+.panel:last-child { margin-bottom: 0; }
+.panel h3 { font-size: 1.1rem; font-weight: 700; }
+.panel p { font-size: 1.05rem; }
+.formula { font-size: 1.45rem; font-weight: 700; text-align: center; padding: 6px 0; }
+button { font: inherit; font-size: 1rem; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: 0.4; cursor: default; }
+.pager-wrap { position: sticky; top: 10px; z-index: 20; display: flex; justify-content: flex-end; pointer-events: none; margin: -4px 0 12px; }
+.pager { pointer-events: auto; display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; box-shadow: var(--shadow); flex-wrap: wrap; }
+.pager button { height: 46px; padding: 0 18px; font-size: 1.1rem; border-radius: 999px; }
+.pager button.next { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+.pager button.next:hover:not(:disabled) { background: var(--accent-hover); }
+.pager .counter { font-weight: 700; font-size: 1.1rem; min-width: 76px; text-align: center; color: var(--muted); }
+
+.scene { background: var(--bg); padding: 8px; }
+.scene svg { width: 100%; height: auto; display: block; max-height: 74vh; }
+.res-box { font-size: 1.4rem; font-weight: 700; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--panel); min-height: 2.6em; display: flex; align-items: center; flex-wrap: wrap; gap: 0 .3em; }
+.cap-box { font-size: 1.22rem; line-height: 1.6; padding: 14px 18px; border-top: 1px solid var(--line); background: var(--accent-bg); min-height: 6.4em; }
+.rule { font-size: 1.1rem; line-height: 1.6; background: var(--def-bg); border-left: 4px solid var(--def-border); padding: 10px 14px; border-radius: 6px; min-height: 3.4em; transition: background 0.8s; }
+.rule p + p { margin-top: 8px; }
+.rule.none { background: transparent; border-left-color: var(--line); color: var(--muted); }
+.code-steps { font-size: 1.05rem; line-height: 1.75; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 0; }
+.code-steps .ln { display: block; padding: 0 12px 0 2.2em; text-indent: -1.4em; border-left: 5px solid transparent; transition: background 0.8s, border-color 0.8s; }
+.code-steps .ln.on { background: #fef3c7; border-left-color: #f59e0b; color: #1f2937; font-weight: 700; }
+.code-steps .ln.later { opacity: 0.45; }
+.frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: 0.92em; line-height: 1.15; margin: 0 1px; }
+.frac > span:first-child { border-bottom: 2px solid currentColor; padding: 0 3px; }
+.frac > span:last-child { padding: 0 3px; }
+.noanim, .noanim * { transition: none !important; animation: none !important; }
+
+/* ===== SVG: levezetés ===== */
+.rows { transition: transform 2s ease; }
+.row { transition: opacity 1.8s ease; }
+.row.gone { opacity: 0; }
+.row.old { opacity: 0.42; }
+.tk text { fill: var(--fg); font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+.tk line { stroke: var(--fg); stroke-width: 3; stroke-linecap: round; }
+.tk.big > line { stroke-width: 4; }
+.tk > rect { fill: none; stroke: none; }
+.tk.new > rect, .tk.chg > rect, .tk.res > rect, .tk.bad > rect { animation: hlin 1.6s ease; stroke-width: 3; }
+.tk.new > rect { fill: #dcfce7; stroke: #16a34a; }
+.tk.chg > rect { fill: #fef3c7; stroke: #f59e0b; }
+.tk.res > rect { fill: #2563eb; stroke: #1d4ed8; }
+.tk.bad > rect { fill: #fee2e2; stroke: #dc2626; }
+.tk.new text, .tk.chg text, .tk.bad text { fill: #1f2937; }
+.tk.new line, .tk.chg line, .tk.bad line { stroke: #1f2937; }
+.tk.res text { fill: #ffffff; }
+.tk.res line { stroke: #ffffff; }
+@keyframes hlin { from { opacity: 0; } to { opacity: 1; } }
+.zone { animation: hlin 1.8s ease; }
+.zline { stroke: var(--line); stroke-width: 2; }
+.cell { stroke: var(--fg); stroke-width: 1.5; fill: var(--bg); }
+.cell.on { fill: #93c5fd; }
+.cell.on2 { fill: #86efac; }
+.cell.on3 { fill: #fcd34d; }
+.zlbl { font-size: 24px; font-weight: 700; fill: var(--fg); dominant-baseline: central; }
+.zsmall { font-size: 22px; fill: var(--muted); dominant-baseline: central; }
+.own-K { fill: #fca5a5; } .own-A { fill: #fcd34d; } .own-Zs { fill: #c4b5fd; } .own-E { fill: #93c5fd; }
+.own-rest { fill: var(--bg); }
+.rest-new { stroke: #16a34a; stroke-width: 5; fill: #dcfce7; }
+.rest-res { stroke: #1d4ed8; stroke-width: 5; fill: #2563eb; }
+
+.src { font-size: 1rem; }
+.src li { margin: 4px 0 4px 22px; }
+.src a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Számolás törtekkel</h1>
+  <p>Levezetett feladatok lépésről lépésre a Matematika 9. tankönyv 13. leckéjéből: zárójeles kifejezés közös nevezővel és osztással, emeletes tört, törtrészek egymás után. Minden lépésnél ott a felhasznált szabály a tankönyv szövegével.</p>
+  <nav class="toc">
+    <a href="#zarojeles">Zárójeles kifejezés</a><a href="#emeletes">Emeletes tört</a><a href="#mazsola">Törtrészek egymás után</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ================= ZÁRÓJELES KIFEJEZÉS ================= -->
+<section class="anim-section" id="zarojeles">
+  <h2>Zárójeles kifejezés</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="zarojeles-svg" viewBox="0 0 900 690" role="img" aria-label="A (3/4 + 5/6) : (7/6 − 6/7) kiszámítása lépésenként"></svg></div>
+      <div class="res-box" id="zarojeles-res"></div>
+      <div class="cap-box" id="zarojeles-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Feladat (13. lecke, 2. a)</h3>
+        <p>Végezd el a műveleteket! Ahol lehet, egyszerűsíts!</p>
+        <div class="formula" data-f="(3/4 + 5/6) : (7/6 − 6/7)"></div>
+      </div>
+      <div class="panel">
+        <h3>Szabály (tankönyv)</h3>
+        <div class="rule" id="zarojeles-rule"></div>
+      </div>
+      <div class="panel">
+        <h3>Lépésről lépésre</h3>
+        <div class="code-steps" id="zarojeles-code"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EMELETES TÖRT ================= -->
+<section class="anim-section" id="emeletes">
+  <h2>Emeletes tört</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="emeletes-svg" viewBox="0 0 900 690" role="img" aria-label="Az (1 + 2/3) / (3 − 5/6) emeletes tört kiszámítása lépésenként"></svg></div>
+      <div class="res-box" id="emeletes-res"></div>
+      <div class="cap-box" id="emeletes-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Feladat (13. lecke, 3. b)</h3>
+        <p>Számold ki az emeletes tört értékét!</p>
+        <div class="formula"><span class="frac"><span>1 + <span class="frac"><span>2</span><span>3</span></span></span><span>3 − <span class="frac"><span>5</span><span>6</span></span></span></span></div>
+      </div>
+      <div class="panel">
+        <h3>Szabály (tankönyv)</h3>
+        <div class="rule" id="emeletes-rule"></div>
+      </div>
+      <div class="panel">
+        <h3>Lépésről lépésre</h3>
+        <div class="code-steps" id="emeletes-code"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MAZSOLA ================= -->
+<section class="anim-section" id="mazsola">
+  <h2>Törtrészek egymás után</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="mazsola-svg" viewBox="0 0 900 690" role="img" aria-label="A mazsola törtrészei egy 12 részre osztott csíkon"></svg></div>
+      <div class="res-box" id="mazsola-res"></div>
+      <div class="cap-box" id="mazsola-cap"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Feladat (13. lecke, 5.)</h3>
+        <p data-f="A cukrásziskola vizsgájára előkészítettek 2,5 kg mazsolát. Ennek 1/12 részét Klári dolgozza fel, majd Andi kapja a maradék 3/11 részét. Ami még ezután maradt, annak az 1/4 részét Zsolt használja fel, amit ő hagyott, annak a 2/3 része kell Emese tortáihoz. Hányadrésze maradt meg a mazsolának?"></p>
+      </div>
+      <div class="panel">
+        <h3>Szabály (tankönyv)</h3>
+        <div class="rule" id="mazsola-rule"></div>
+      </div>
+      <div class="panel">
+        <h3>Lépésről lépésre</h3>
+        <div class="code-steps" id="mazsola-code"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="anim-section" id="forras">
+  <h2>Források</h2>
+  <ul class="src">
+    <li>A feladatok szövege: Matematika 9. tankönyv I. kötet (OH-MAT09TA_I), 13. lecke, Számolás törtekkel, 48–49. oldal: 2. a), 3. b) és 5. feladat.</li>
+    <li>A szabályok szövege: ugyanott, Bevezető – ismétlés (48. oldal), valamint az Elmélet: Számok reciproka és Számok törtrésze (49. oldal).</li>
+    <li>Saját kidolgozás (a megoldókönyv csak a végeredményt adja): a levezetések lépései, a magyarázó szövegek és a törtcsíkok.</li>
+  </ul>
+</section>
+
+</main>
+
+<script>
+(function () {
+  // betöltéskor nincs átmenet: az első állapot azonnal látszik
+  document.body.classList.add('noanim');
+  requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.remove('noanim')));
+  const NS = 'http://www.w3.org/2000/svg';
+  function svgEl(tag, attrs, parent, text) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  // Törtek HTML-ben: „3/4” → egymás alatti számláló és nevező
+  function F(s) {
+    return s.replace(/(\d+(?:,\d+)?)\/(\d+)/g,'<span class="frac"><span>$1</span><span>$2</span></span>');
+  }
+  document.querySelectorAll('[data-f]').forEach(e => { e.innerHTML = F(e.getAttribute('data-f')); });
+
+  // ---------- léptető: Vissza / Előre / Előlről ----------
+  const steppers = [];
+  function makeStepper(id, n, render) {
+    const sec = document.getElementById(id);
+    const wrap = sec.querySelector('.pager-wrap');
+    wrap.innerHTML = '<div class="pager">' +
+      '<button type="button" class="prev" title="Előző lépés (←)">◀ Vissza</button>' +
+      '<button type="button" class="next" title="Következő lépés (→)">Előre ▶</button>' +
+      '<button type="button" class="reset" title="Vissza az első lépésre (Home)">↺ Előlről</button>' +
+      '<span class="counter"></span></div>';
+    const q = c => wrap.querySelector('.' + c);
+    const prev = q('prev'), next = q('next'), reset = q('reset'), counter = q('counter');
+    let cur = -1;
+    function go(i) {
+      const from = cur;
+      cur = Math.max(0, Math.min(n - 1, i));
+      render(cur, from);
+      counter.textContent = (cur + 1) + ' / ' + n;
+      prev.disabled = reset.disabled = cur === 0;
+      next.disabled = cur === n - 1;
+    }
+    prev.addEventListener('click', () => go(cur - 1));
+    next.addEventListener('click', () => go(cur + 1));
+    reset.addEventListener('click', () => go(0));
+    steppers.push({ sec, next: () => go(cur + 1), prev: () => go(cur - 1), home: () => go(0) });
+    go(0);
+  }
+
+  // A billentyűk a képernyőn leginkább látható részt léptetik.
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+    if (e.target.closest && e.target.closest('input, textarea, select')) return;
+    const fwd = ['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key);
+    const back = ['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key);
+    const home = e.key === 'Home';
+    if (!fwd && !back && !home) return;
+    let best = null, bestVis = 0;
+    for (const s of steppers) {
+      const r = s.sec.getBoundingClientRect();
+      const vis = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+      if (vis > bestVis) { bestVis = vis; best = s; }
+    }
+    if (!best || bestVis < innerHeight * 0.35) return;
+    e.preventDefault();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    if (fwd) best.next(); else if (back) best.prev(); else best.home();
+  });
+
+  // ---------- szövegszélesség mérése ----------
+  const cache = {};
+  function measure(svg, s, size) {
+    const k = size + '|' + s;
+    if (cache[k] == null) {
+      const t = svgEl('text', { x: -9999, y: -9999, 'font-size': size, 'font-weight': 700 }, svg, s);
+      cache[k] = t.getComputedTextLength() || s.length * size * 0.56;
+      t.remove();
+    }
+    return cache[k];
+  }
+
+  // ---------- kifejezés rajzolása ----------
+  // token: "3/4" tört, "+" vagy szöveg; előtag: "+n:" új, "+c:" változó, "+r:" eredmény, "+b:" hiba
+  // { big: [számláló-tokenek, nevező-tokenek], s: 'c' } emeletes tört
+  const ST = { n: 'new', c: 'chg', r: 'res', b: 'bad' };
+  const GAP = 12, TS = 38, FS = 32;
+  function parse(tok) {
+    if (typeof tok !== 'string') return { big: tok.big, s: ST[tok.s] || '' };
+    let s = '';
+    const m = /^\+([ncrb]):(.*)$/.exec(tok);
+    if (m) { s = ST[m[1]]; tok = m[2]; }
+    const k = tok.indexOf('/');
+    if (k > 0) return { n: tok.slice(0, k).replace(/·/g, ' · '), d: tok.slice(k + 1).replace(/·/g, ' · '), s };
+    return { t: tok, s };
+  }
+  // visszaadja a szélességet; ha parent adott, rajzol is
+  function layout(svg, toks, parent, x0, ym) {
+    let x = x0;
+    toks.forEach((raw, i) => {
+      const p = parse(raw);
+      let w;
+      if (p.big) {
+        const wn = layout(svg, p.big[0], null, 0, 0), wd = layout(svg, p.big[1], null, 0, 0);
+        w = Math.max(wn, wd) + 36;
+        if (parent) {
+          const g = svgEl('g', { class: 'tk big ' + p.s }, parent);
+          svgEl('rect', { x: x - 4, y: ym - 120, width: w + 8, height: 240, rx: 12 }, g);
+          layout(svg, p.big[0], g, x + (w - wn) / 2, ym - 60);
+          layout(svg, p.big[1], g, x + (w - wd) / 2, ym + 62);
+          svgEl('line', { x1: x + 4, y1: ym, x2: x + w - 4, y2: ym }, g);
+        }
+      } else if (p.n != null) {
+        const wn = measure(svg, p.n, FS), wd = measure(svg, p.d, FS);
+        w = Math.max(wn, wd) + 20;
+        if (parent) {
+          const g = svgEl('g', { class: 'tk ' + p.s }, parent);
+          svgEl('rect', { x: x - 3, y: ym - 52, width: w + 6, height: 104, rx: 10 }, g);
+          svgEl('text', { x: x + w / 2, y: ym - 25, 'font-size': FS }, g, p.n);
+          svgEl('line', { x1: x + 5, y1: ym, x2: x + w - 5, y2: ym }, g);
+          svgEl('text', { x: x + w / 2, y: ym + 27, 'font-size': FS }, g, p.d);
+        }
+      } else {
+        const op = /^[+−·:=()]$/.test(p.t);
+        w = measure(svg, p.t, TS) + (op ? 10 : 14);
+        if (parent) {
+          const g = svgEl('g', { class: 'tk ' + p.s }, parent);
+          svgEl('rect', { x: x - 3, y: ym - 30, width: w + 6, height: 60, rx: 10 }, g);
+          svgEl('text', { x: x + w / 2, y: ym + 1, 'font-size': TS }, g, p.t);
+        }
+      }
+      x += w + (i < toks.length - 1 ? GAP : 0);
+    });
+    return x - x0;
+  }
+  const plain = toks => toks.map(t => typeof t === 'string' ? t.replace(/^\+[ncrb]:/, '') : { big: [plain(t.big[0]), plain(t.big[1])] });
+  const rowH = toks => toks.some(t => typeof t !== 'string') ? 262 : 112;
+
+  // ---------- egy levezetéses szakasz ----------
+  const WIN = 470;          // a levezetés ablakának magassága (a SVG felső része)
+  const ZONE = 500;         // innen kezdődik az ábra (törtcsík)
+  function derivation(id, steps, lines, zoneDraw) {
+    const svg = document.getElementById(id + '-svg');
+    const cap = document.getElementById(id + '-cap');
+    const res = document.getElementById(id + '-res');
+    const rule = document.getElementById(id + '-rule');
+    const code = document.getElementById(id + '-code');
+    code.innerHTML = lines.map(() => '<span class="ln"></span>').join('');
+    const lnEls = [...code.children];
+    lnEls.forEach((l, i) => { l.textContent = lines[i]; });
+    svgEl('line', { x1: 20, y1: ZONE - 15, x2: 880, y2: ZONE - 15, class: 'zline' }, svg);
+    const clip = svgEl('clipPath', { id: id + '-clip' }, svgEl('defs', {}, svg));
+    svgEl('rect', { x: 0, y: 0, width: 900, height: WIN }, clip);
+    const win = svgEl('g', { 'clip-path': 'url(#' + id + '-clip)' }, svg);
+    const rowsG = svgEl('g', { class: 'rows' }, win);
+    const nRows = Math.max(...steps.map(s => s.row)) + 1;
+    // minden sorhoz az utoljára megadott tokenlista
+    const rowEls = [], rowKey = [];
+    for (let r = 0; r < nRows; r++) { rowEls.push(svgEl('g', { class: 'row gone' }, rowsG)); rowKey.push(''); }
+    const zone = svgEl('g', {}, svg);
+    let zoneKey = null;
+
+    makeStepper(id, steps.length, cur => {
+      const s = steps[cur];
+      const latest = [];
+      for (let i = 0; i <= cur; i++) latest[steps[i].row] = steps[i].toks;
+      // sorok helye
+      const tops = [];
+      let y = 10;
+      for (let r = 0; r < nRows; r++) {
+        const t = latest[r] || steps.find(st => st.row === r).toks;
+        tops.push(y); y += rowH(t);
+      }
+      // felülről annyi sor látszik, amennyi az aktuálissal együtt befér az ablakba
+      const bottom = tops[s.row] + rowH(latest[s.row]);
+      let first = s.row;
+      while (first > 0 && bottom - tops[first - 1] <= WIN - 10) first--;
+      const off = tops[first] - 10;
+      rowsG.style.transform = 'translateY(' + (-off) + 'px)';
+      for (let r = 0; r < nRows; r++) {
+        const el = rowEls[r];
+        let cls = 'gone';
+        if (r <= s.row && latest[r]) {
+          const toks = r === s.row ? latest[r] : plain(latest[r]);
+          const key = JSON.stringify(toks);
+          if (key !== rowKey[r]) {
+            el.innerHTML = '';
+            layout(svg, toks, el, 30, tops[r] + rowH(toks) / 2);
+            rowKey[r] = key;
+          }
+          cls = r === s.row ? 'cur' : (tops[r] < off ? 'gone' : 'old');
+        }
+        el.setAttribute('class', 'row ' + cls);
+      }
+      // ábra
+      const zk = JSON.stringify(s.zone || null);
+      if (zk !== zoneKey) {
+        zone.innerHTML = '';
+        zone.setAttribute('class', 'zone');
+        void zone.getBoundingClientRect();
+        zoneDraw(svg, zone, s.zone || null, cur);
+        zoneKey = zk;
+      }
+      cap.innerHTML = F(s.cap);
+      res.innerHTML = F(s.res || '');
+      if (s.rule) { rule.innerHTML = s.rule.map(k => '<p>' + F(RULES[k]) + '</p>').join(''); rule.classList.remove('none'); }
+      else { rule.innerHTML = 'Ebben a lépésben nem új szabályt használunk.'; rule.classList.add('none'); }
+      lnEls.forEach((l, i) => { l.classList.toggle('on', i === cur); l.classList.toggle('later', i > cur); });
+    });
+  }
+
+  // ---------- a tankönyv szabályai (13. lecke, 48–49. o.) ----------
+  const RULES = {
+    add: '<b>Törtek összeadása és kivonása:</b> Először közös nevezőre hozzuk a törteket, azután végezzük az összeadást vagy a kivonást a számlálókkal.',
+    bov: '<b>Tört bővítése:</b> Egy tört számlálóját és nevezőjét egyszerre megszorozzuk ugyanazzal a 0-tól különböző számmal. Ezen eljárások során a tört értéke nem változik.',
+    egy: '<b>Tört egyszerűsítése:</b> A tört számlálóját és nevezőjét egyszerre elosztjuk ugyanazzal a 0-tól különböző számmal. Ezen eljárások során a tört értéke nem változik.',
+    div: '<b>Osztás törttel:</b> Az osztó reciprokával szorozzuk az osztandót.',
+    rec: '<b>Számok reciproka:</b> Közönséges tört reciprokát úgy kapjuk, hogy a számlálót és a nevezőt felcseréljük.',
+    mul: '<b>Tört szorzása törttel:</b> A számlálót szorozzuk a számlálóval, a nevezőt szorozzuk a nevezővel.',
+    divn: '<b>Tört osztása egész számmal:</b> A nevezőt szorozzuk az egész számmal, a számláló változatlan marad. VAGY (ha lehet) A számlálót elosztjuk az egész számmal, a nevező változatlan marad.',
+    resz: '<b>Számok törtrésze:</b> Egy szám 2/7 részét úgy számoljuk ki, hogy a számot megszorozzuk 2/7-del. 2/7 rész = 2/7-szeres.'
+  };
+
+  // ---------- törtcsíkok: {f:'3/4', p: részek, k: kiszínezett részek, c: szín} ----------
+  function bars(svg, g, specs) {
+    if (!specs) return;
+    specs.forEach((b, i) => {
+      const ym = ZONE + 45 + i * 92;
+      layout(svg, [b.f], g, 30, ym);
+      const wholes = Math.max(1, Math.ceil(b.k / b.p));
+      const bw = Math.min(330, (720 - (wholes - 1) * 14) / wholes);
+      for (let w = 0; w < wholes; w++) {
+        const x0 = 150 + w * (bw + 14), cw = bw / b.p;
+        for (let j = 0; j < b.p; j++) {
+          const on = w * b.p + j < b.k;
+          svgEl('rect', { x: x0 + j * cw, y: ym - 26, width: cw, height: 52, class: 'cell' + (on ? ' ' + (b.c || 'on') : '') }, g);
+        }
+        svgEl('rect', { x: x0, y: ym - 26, width: bw, height: 52, fill: 'none', stroke: 'var(--fg)', 'stroke-width': 3 }, g);
+      }
+    });
+  }
+
+  // ================= 1. ZÁRÓJELES KIFEJEZÉS =================
+  const R0 = ['(', '3/4', '+', '5/6', ')', ':', '(', '7/6', '−', '6/7', ')'];
+  derivation('zarojeles', [
+    { row: 0, toks: R0,
+      cap: 'A feladat: (3/4 + 5/6) : (7/6 − 6/7). Előbb a két zárójelben lévő műveletet végezzük el, és csak utána osztunk.',
+      res: 'Kiinduló kifejezés' },
+    { row: 0, toks: ['+c:(', '+c:3/4', '+c:+', '+c:5/6', '+c:)', ':', '(', '7/6', '−', '6/7', ')'], rule: ['add'],
+      zone: [{ f: '3/4', p: 4, k: 3 }, { f: '5/6', p: 6, k: 5, c: 'on2' }],
+      cap: 'Az első zárójel: 3/4 + 5/6. A nevezők különbözők (4 és 6), ezért előbb közös nevezőre hozzuk a törteket. A 4 és a 6 legkisebb közös többszöröse a 12.',
+      res: 'Közös nevező: 12' },
+    { row: 1, toks: ['=', '(', '+n:9/12', '+', '+n:10/12', ')', ':', '(', '7/6', '−', '6/7', ')'], rule: ['bov'],
+      zone: [{ f: '9/12', p: 12, k: 9 }, { f: '10/12', p: 12, k: 10, c: 'on2' }],
+      cap: 'Bővítés: a 3/4 számlálóját és nevezőjét 3-mal szorozzuk, így 9/12; az 5/6-ét 2-vel, így 10/12. A csíkokon látszik, hogy a törtek értéke nem változott, csak a beosztás lett finomabb.',
+      res: '3/4 = 9/12 és 5/6 = 10/12' },
+    { row: 2, toks: ['=', '+r:19/12', ':', '(', '7/6', '−', '6/7', ')'], rule: ['add'],
+      zone: [{ f: '19/12', p: 12, k: 19, c: 'on' }],
+      cap: 'Az összeadást a számlálókkal végezzük: 9 + 10 = 19, a nevező 12 marad. Az első zárójel értéke 19/12, ez több mint 1 egész.',
+      res: '3/4 + 5/6 = 19/12' },
+    { row: 2, toks: ['=', '19/12', ':', '+c:(', '+c:7/6', '+c:−', '+c:6/7', '+c:)'], rule: ['add'],
+      zone: [{ f: '7/6', p: 6, k: 7 }, { f: '6/7', p: 7, k: 6, c: 'on3' }],
+      cap: 'A második zárójel: 7/6 − 6/7. A 6 és a 7 legkisebb közös többszöröse 6 · 7 = 42, ez lesz a közös nevező.',
+      res: 'Közös nevező: 42' },
+    { row: 3, toks: ['=', '19/12', ':', '(', '+n:49/42', '−', '+n:36/42', ')'], rule: ['bov'],
+      zone: [{ f: '49/42', p: 42, k: 49 }, { f: '36/42', p: 42, k: 36, c: 'on3' }],
+      cap: 'Bővítés: a 7/6-ot 7-tel szorozzuk, így 49/42; a 6/7-et 6-tal, így 36/42.',
+      res: '7/6 = 49/42 és 6/7 = 36/42' },
+    { row: 4, toks: ['=', '19/12', ':', '+r:13/42'], rule: ['add'],
+      zone: [{ f: '13/42', p: 42, k: 13, c: 'on' }],
+      cap: 'A kivonást a számlálókkal végezzük: 49 − 36 = 13, a nevező 42 marad. A második zárójel értéke 13/42.',
+      res: '7/6 − 6/7 = 13/42' },
+    { row: 5, toks: ['=', '19/12', '+c:·', '+c:42/13'], rule: ['div', 'rec'],
+      cap: 'Törttel úgy osztunk, hogy az osztó reciprokával szorzunk. A 13/42 reciproka 42/13: a számláló és a nevező helyet cserél.',
+      res: '19/12 : 13/42 = 19/12 · 42/13' },
+    { row: 6, toks: ['=', '+n:19·42/12·13'], rule: ['mul'],
+      cap: 'Törtet törttel szorzunk: a számlálót a számlálóval, a nevezőt a nevezővel. A szorzatokat még nem számoljuk ki, mert előtte egyszerűsíteni lehet.',
+      res: '' },
+    { row: 7, toks: ['=', '+c:19·7/2·13'], rule: ['egy'],
+      cap: 'A 42 és a 12 is osztható 6-tal: 42 : 6 = 7 és 12 : 6 = 2. A törtet 6-tal egyszerűsítjük, így kisebb számokkal kell szorozni.',
+      res: 'Egyszerűsítés 6-tal' },
+    { row: 8, toks: ['=', '+r:133/26'],
+      cap: '19 · 7 = 133 és 2 · 13 = 26. A 133 = 7 · 19 és a 26 = 2 · 13 számoknak nincs 1-nél nagyobb közös osztója, tovább nem egyszerűsíthető. Az eredmény 133/26, ez körülbelül 5,115.',
+      res: 'Eredmény: (3/4 + 5/6) : (7/6 − 6/7) = 133/26' }
+  ], [
+    'A feladat',
+    '1. zárójel: közös nevező 12',
+    '3/4 = 9/12, 5/6 = 10/12',
+    '9/12 + 10/12 = 19/12',
+    '2. zárójel: közös nevező 42',
+    '7/6 = 49/42, 6/7 = 36/42',
+    '49/42 − 36/42 = 13/42',
+    'Osztás helyett szorzás a reciprokkal',
+    'Számláló · számláló, nevező · nevező',
+    'Egyszerűsítés 6-tal',
+    'Eredmény: 133/26'
+  ], (svg, g, z) => bars(svg, g, z));
+
+  // ================= 2. EMELETES TÖRT =================
+  derivation('emeletes', [
+    { row: 0, toks: [{ big: [['1', '+', '2/3'], ['3', '−', '5/6']] }],
+      cap: 'Az emeletes tört számlálójában és nevezőjében is művelet van. A hosszú (fő) törtvonal osztást jelent: a számlálót osztjuk a nevezővel. Előbb külön kiszámoljuk a számlálót és a nevezőt.',
+      res: 'Kiinduló emeletes tört' },
+    { row: 0, toks: [{ big: [['+c:1', '+c:+', '+c:2/3'], ['3', '−', '5/6']] }], rule: ['add', 'bov'],
+      zone: [{ f: '3/3', p: 3, k: 3 }, { f: '2/3', p: 3, k: 2, c: 'on2' }],
+      cap: 'A számláló: 1 + 2/3. Közös nevezőre hozunk: az 1 egészet harmadokban írjuk fel, 1 = 3/3.',
+      res: '1 = 3/3' },
+    { row: 1, toks: ['=', { big: [['+r:5/3'], ['3', '−', '5/6']] }], rule: ['add'],
+      zone: [{ f: '5/3', p: 3, k: 5 }],
+      cap: '3/3 + 2/3 = 5/3: a számlálókat adjuk össze, a nevező 3 marad. A számláló értéke 5/3.',
+      res: 'Számláló: 1 + 2/3 = 5/3' },
+    { row: 1, toks: ['=', { big: [['5/3'], ['+c:3', '+c:−', '+c:5/6']] }], rule: ['add', 'bov'],
+      zone: [{ f: '18/6', p: 6, k: 18 }, { f: '5/6', p: 6, k: 5, c: 'on3' }],
+      cap: 'A nevező: 3 − 5/6. A 3 egészet hatodokban írjuk fel: minden egészben 6 hatod van, így 3 = 18/6.',
+      res: '3 = 18/6' },
+    { row: 2, toks: ['=', { big: [['5/3'], ['+r:13/6']] }], rule: ['add'],
+      zone: [{ f: '13/6', p: 6, k: 13 }],
+      cap: '18/6 − 5/6 = 13/6: a számlálókat vonjuk ki, a nevező 6 marad. A nevező értéke 13/6.',
+      res: 'Nevező: 3 − 5/6 = 13/6' },
+    { row: 3, toks: ['=', '5/3', '+c::', '13/6'],
+      cap: 'A fő törtvonal felett és alatt most már egy-egy tört áll. A fő törtvonal osztást jelent, ezért így is írhatjuk: 5/3 : 13/6.',
+      res: 'Emeletes tört = számláló : nevező' },
+    { row: 4, toks: ['=', '5/3', '+c:·', '+c:6/13'], rule: ['div', 'rec'],
+      cap: 'Az osztó reciprokával szorzunk: a 13/6 reciproka 6/13.',
+      res: '5/3 : 13/6 = 5/3 · 6/13' },
+    { row: 5, toks: ['=', '+n:5·6/3·13'], rule: ['mul'],
+      cap: 'Számlálót a számlálóval, nevezőt a nevezővel szorzunk. A szorzás előtt érdemes egyszerűsíteni: a 6 és a 3 is osztható 3-mal.',
+      res: '' },
+    { row: 6, toks: ['=', '+c:5·2/1·13'], rule: ['egy'],
+      cap: 'Egyszerűsítés 3-mal: 6 : 3 = 2 és 3 : 3 = 1.',
+      res: 'Egyszerűsítés 3-mal' },
+    { row: 7, toks: ['=', '+r:10/13'],
+      cap: '5 · 2 = 10 és 1 · 13 = 13. A 10-nek és a 13-nak nincs 1-nél nagyobb közös osztója, tovább nem egyszerűsíthető. Az emeletes tört értéke 10/13, ez körülbelül 0,769.',
+      res: 'Eredmény: 10/13' }
+  ], [
+    'A feladat',
+    'Számláló: 1 = 3/3',
+    '3/3 + 2/3 = 5/3',
+    'Nevező: 3 = 18/6',
+    '18/6 − 5/6 = 13/6',
+    'A fő törtvonal osztás: 5/3 : 13/6',
+    'Szorzás a reciprokkal: 5/3 · 6/13',
+    'Számláló · számláló, nevező · nevező',
+    'Egyszerűsítés 3-mal',
+    'Eredmény: 10/13'
+  ], (svg, g, z) => bars(svg, g, z));
+
+  // ================= 3. MAZSOLA =================
+  // a 12 részre osztott csík: kié melyik rész
+  const OWN = [['K', 'Klári', 0, 1], ['A', 'Andi', 1, 4], ['Zs', 'Zsolt', 4, 6], ['E', 'Emese', 6, 10]];
+  function strip(svg, g, z) {
+    if (!z) return;
+    const x0 = 90, cw = 60, y = ZONE + 62, h = 74;
+    for (let j = 0; j < 12; j++) {
+      let cls = 'cell';
+      OWN.forEach(o => { if (z.own.includes(o[0]) && j >= o[2] && j < o[3]) cls += ' own-' + o[0]; });
+      if (z.rest != null && j >= z.rest) cls = 'cell ' + (z.fin ? 'rest-res' : 'rest-new');
+      svgEl('rect', { x: x0 + j * cw, y, width: cw, height: h, class: cls }, g);
+    }
+    svgEl('rect', { x: x0, y, width: 12 * cw, height: h, fill: 'none', stroke: 'var(--fg)', 'stroke-width': 3 }, g);
+    OWN.forEach(o => {
+      if (!z.own.includes(o[0])) return;
+      const cx = x0 + (o[2] + o[3]) / 2 * cw;
+      svgEl('text', { x: cx, y: y - 26, 'text-anchor': 'middle', class: 'zlbl' }, g, o[1]);
+    });
+    if (z.rest != null) {
+      const cx = x0 + (z.rest + 12) / 2 * cw;
+      svgEl('text', { x: cx, y: y + h + 28, 'text-anchor': 'middle', class: 'zlbl' }, g, 'marad: ' + (12 - z.rest) + ' rész');
+    }
+    svgEl('text', { x: x0, y: y + h + 28, class: 'zsmall' }, g, '1 egész = 12 egyenlő rész');
+  }
+  derivation('mazsola', [
+    { row: 0, toks: ['Az egész:', '1', '=', '+n:12/12'], zone: { own: [] },
+      cap: 'A mazsola egészét (2,5 kg) 1-nek vesszük. A csíkot 12 egyenlő részre osztjuk: Klári tizenkettedrészt kap, és a további lépésekben is mindig egész számú kis rész jön ki.',
+      res: '1 egész = 12/12' },
+    { row: 1, toks: ['Klári:', '+c:1/12'], zone: { own: ['K'] }, rule: ['resz'],
+      cap: 'Klári az egész 1/12 részét dolgozza fel: ez a 12 kis részből 1.',
+      res: 'Klári: 1/12' },
+    { row: 2, toks: ['Marad:', '1', '−', '1/12', '=', '+r:11/12'], zone: { own: ['K'], rest: 1 }, rule: ['add'],
+      cap: 'Klári után 1 − 1/12 = 12/12 − 1/12 = 11/12 marad: a csíkon 11 kis rész.',
+      res: 'Marad: 11/12' },
+    { row: 3, toks: ['Andi:', '11/12', '·', '3/11', '=', '33/132', '=', '+c:3/12'], zone: { own: ['K', 'A'] }, rule: ['resz', 'egy'],
+      cap: 'Andi a maradék 3/11 részét kapja, ezért a maradékot megszorozzuk 3/11-del: 11/12 · 3/11 = 33/132, ezt 11-gyel egyszerűsítve 3/12. A csíkon: a megmaradt 11 kis rész 3/11 része 3 kis rész.',
+      res: 'Andi: 3/12' },
+    { row: 4, toks: ['Marad:', '11/12', '−', '3/12', '=', '8/12', '=', '+r:2/3'], zone: { own: ['K', 'A'], rest: 4 }, rule: ['add', 'egy'],
+      cap: 'Andi után 11/12 − 3/12 = 8/12 marad, ez 4-gyel egyszerűsítve 2/3.',
+      res: 'Marad: 8/12 = 2/3' },
+    { row: 5, toks: ['Zsolt:', '8/12', '·', '1/4', '=', '8/12', ':', '4', '=', '+c:2/12'], zone: { own: ['K', 'A', 'Zs'] }, rule: ['resz', 'divn'],
+      cap: 'Zsolt a maradék 1/4 részét használja fel. 1/4-del szorozni ugyanaz, mint 4-gyel osztani, és itt a számláló osztható 4-gyel: 8 : 4 = 2, így 2/12. A csíkon a 8 kis rész negyede 2 kis rész.',
+      res: 'Zsolt: 2/12' },
+    { row: 6, toks: ['Marad:', '8/12', '−', '2/12', '=', '6/12', '=', '+r:1/2'], zone: { own: ['K', 'A', 'Zs'], rest: 6 }, rule: ['add', 'egy'],
+      cap: 'Zsolt után 8/12 − 2/12 = 6/12 marad, ez 6-tal egyszerűsítve 1/2: a mazsola fele.',
+      res: 'Marad: 6/12 = 1/2' },
+    { row: 7, toks: ['Emese:', '6/12', '·', '2/3', '=', '12/36', '=', '+c:4/12'], zone: { own: ['K', 'A', 'Zs', 'E'] }, rule: ['resz', 'egy'],
+      cap: 'Emese tortáihoz a maradék 2/3 része kell: 6/12 · 2/3 = 12/36, ez 3-mal egyszerűsítve 4/12. A csíkon a 6 kis rész 2/3 része 4 kis rész.',
+      res: 'Emese: 4/12' },
+    { row: 8, toks: ['Marad:', '6/12', '−', '4/12', '=', '2/12', '=', '+r:1/6'], zone: { own: ['K', 'A', 'Zs', 'E'], rest: 10, fin: true }, rule: ['add', 'egy'],
+      cap: 'Emese után 6/12 − 4/12 = 2/12 marad, ez 2-vel egyszerűsítve 1/6. A mazsolának tehát az 1/6 része maradt meg.',
+      res: 'Megmaradt: a mazsola 1/6 része' },
+    { row: 9, toks: ['2,5 kg', '·', '1/6', '=', '5/2', '·', '1/6', '=', '+r:5/12', 'kg'], zone: { own: ['K', 'A', 'Zs', 'E'], rest: 10, fin: true }, rule: ['resz'],
+      cap: 'Tömegben: a 2,5 kg 1/6 része 2,5 · 1/6. A 2,5 = 5/2, így 5/2 · 1/6 = 5/12 kg, ez körülbelül 0,42 kg (42 dkg).',
+      res: '2,5 kg · 1/6 = 5/12 kg ≈ 0,42 kg' }
+  ], [
+    'Az egész: 1 = 12/12',
+    'Klári: 1/12',
+    'Marad: 1 − 1/12 = 11/12',
+    'Andi: 11/12 · 3/11 = 3/12',
+    'Marad: 11/12 − 3/12 = 8/12 = 2/3',
+    'Zsolt: 8/12 · 1/4 = 2/12',
+    'Marad: 8/12 − 2/12 = 6/12 = 1/2',
+    'Emese: 6/12 · 2/3 = 4/12',
+    'Marad: 6/12 − 4/12 = 2/12 = 1/6',
+    'Tömegben: 2,5 kg · 1/6 = 5/12 kg'
+  ], strip);
+})();
+</script>
+</body>
+</html>
