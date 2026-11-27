@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Fogaskerék (B típus) lépésenként</title>
+<style>
+:root {
+  --bg: #ffffff; --fg: #1f2937; --muted: #4b5563; --line: #d1d5db; --panel: #f8fafc;
+  --accent: #15803d; --accent-hover: #166534; --accent-bg: #ecfdf5;
+  --danger: #b91c1c; --new: #16a34a; --blue: #2563eb; --ghost: #cbd5e1;
+  --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a; --fg: #f1f5f9; --muted: #a3b1c6; --line: #475569; --panel: #1e293b;
+    --accent: #22c55e; --accent-hover: #16a34a; --accent-bg: rgba(34,197,94,0.15);
+    --danger: #f87171; --new: #4ade80; --blue: #60a5fa; --ghost: #334155;
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.4);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 18px; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--fg); line-height: 1.5; padding: 16px 20px 60px; }
+.top-nav { max-width: 1500px; margin: 0 auto 16px; padding-bottom: 8px; }
+.top-nav a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.top-nav a:hover { text-decoration: underline; }
+header { max-width: 1500px; margin: 0 auto 24px; }
+header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+header p { font-size: 1.1rem; color: var(--muted); }
+.task { margin-top: 12px; font-size: 1.15rem; background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--accent); border-radius: 8px; padding: 12px 16px; color: var(--fg); }
+.toc { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px 10px; font-size: 1rem; }
+.toc a { color: var(--accent); text-decoration: none; font-weight: 600; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); }
+main { max-width: 1500px; margin: 0 auto; display: flex; flex-direction: column; gap: 36px; }
+.anim-section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px 24px; box-shadow: var(--shadow); scroll-margin-top: 8px; }
+.anim-section h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } }
+.plot-container { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+.panel { display: flex; flex-direction: column; gap: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+.panel:last-child { margin-bottom: 0; }
+.panel h3 { font-size: 1.1rem; font-weight: 700; }
+.formula { font-size: 1.4rem; font-weight: 700; text-align: center; padding: 4px 0; min-height: 2.2em; }
+button { font: inherit; font-size: 1rem; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; }
+button:hover:not(:disabled) { background: var(--accent); color: #fff; border-color: var(--accent); }
+button:disabled { opacity: 0.4; cursor: default; }
+.pager-wrap { position: sticky; top: 10px; z-index: 20; display: flex; justify-content: flex-end; pointer-events: none; margin: -4px 0 12px; }
+.pager { pointer-events: auto; display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; box-shadow: var(--shadow); flex-wrap: wrap; }
+.pager button { height: 46px; padding: 0 18px; font-size: 1.1rem; border-radius: 999px; }
+.pager button.next { background: var(--accent); color: #fff; border-color: var(--accent); }
+.pager button.next:hover:not(:disabled) { background: var(--accent-hover); }
+.pager .counter { font-weight: 700; font-size: 1.1rem; min-width: 76px; text-align: center; color: var(--muted); }
+.scene { background: var(--bg); padding: 8px; }
+.scene svg { width: 100%; height: auto; display: block; max-height: 72vh; }
+.res-box { font-family: ui-monospace, Consolas, monospace; font-size: 1.4rem; font-weight: 700; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--panel); min-height: 2.3em; }
+.cap-box { font-size: 1.25rem; line-height: 1.5; padding: 14px 18px; border-top: 1px solid var(--line); background: var(--accent-bg); min-height: 5.2em; }
+.cap-box .warn { color: var(--danger); font-weight: 700; }
+.code-steps { font-family: ui-monospace, Consolas, monospace; font-size: 1.05rem; line-height: 1.7; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 0; overflow-x: auto; }
+.code-steps .ln { display: block; padding: 0 12px; white-space: pre; border-left: 5px solid transparent; transition: background 0.8s, border-color 0.8s; }
+.code-steps .ln.on { background: #fef3c7; border-left-color: #f59e0b; color: #1f2937; font-weight: 700; }
+.ctrl { display: grid; grid-template-columns: 9em 1fr 4.5em; align-items: center; gap: 10px; font-size: 1.1rem; }
+.ctrl input { width: 100%; accent-color: var(--accent); }
+.ctrl output { font-weight: 700; font-size: 1.3rem; text-align: right; }
+.src { font-size: 1rem; }
+svg .gtext { font-size: 24px; font-weight: 600; fill: var(--muted); }
+svg .ltext { font-size: 28px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="/animaciok">← Vissza az animációkhoz</a>
+</div>
+
+<header>
+  <h1>Fogaskerék (B típus) lépésenként</h1>
+  <p>A <code>fogb n h</code> parancs egyetlen foga, az egész kerék, a sugár kiszámítása és egy egyszerűbb változat.</p>
+  <div class="task"><b>A könyv feladata:</b> Egy gyárban kétféle típusú fogaskereket gyártanak. Az A típusnál a fogakat és a keréktárcsát egyenes szakaszok határolják, a B típusnál pedig a tárcsa és a fogak külső felülete is körív alakú. Készíts parancsokat (Foga, Fogb), melyek a kétféle típusú fogaskereket rajzolják, ha paraméterül a rajzolandó fogak számát és hosszát adjuk nekik! <i>Fogb 4 50, Fogb 6 50, Fogb 12 50</i></div>
+  <nav class="toc">
+    <a href="#fog">Egy fog</a><a href="#kerek">Az egész kerék</a><a href="#sugar">A sugár</a><a href="#egyszeru">Egyszerűbb változat</a>
+  </nav>
+</header>
+
+<main>
+
+<section class="anim-section" id="fog">
+  <h2>Egy fog</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="fog-svg" viewBox="0 0 700 640" role="img" aria-label="Egy fog rajzolása"></svg></div>
+      <div class="res-box" id="fog-res"></div>
+      <div class="cap-box" id="fog-cap"></div>
+    </div>
+    <div>
+      <div class="panel"><h3>A könyv blokkja</h3><div class="code-steps" id="fog-code"></div></div>
+      <div class="panel"><h3>Beállítás</h3>
+        <label class="ctrl">fogak (n)<input type="range" id="fog-n" min="3" max="12" value="4"><output id="fog-n-o"></output></label>
+        <label class="ctrl">foghossz (h)<input type="range" id="fog-h" min="20" max="80" step="5" value="50"><output id="fog-h-o"></output></label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="anim-section" id="kerek">
+  <h2>Az egész kerék</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="kerek-svg" viewBox="0 0 700 640" role="img" aria-label="A fogaskerék fogankénti rajzolása"></svg></div>
+      <div class="res-box" id="kerek-res"></div>
+      <div class="cap-box" id="kerek-cap"></div>
+    </div>
+    <div>
+      <div class="panel"><h3>A könyv blokkja</h3><div class="code-steps" id="kerek-code"></div></div>
+      <div class="panel"><h3>Beállítás</h3>
+        <label class="ctrl">fogak (n)<input type="range" id="kerek-n" min="3" max="12" value="6"><output id="kerek-n-o"></output></label>
+        <label class="ctrl">foghossz (h)<input type="range" id="kerek-h" min="20" max="80" step="5" value="50"><output id="kerek-h-o"></output></label>
+        <button type="button" id="kerek-anim">▶ animáció: n = 3 … 12</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="anim-section" id="sugar">
+  <h2>A sugár</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="sugar-svg" viewBox="0 0 700 640" role="img" aria-label="A belső kör sugarának kiszámítása"></svg></div>
+      <div class="res-box" id="sugar-res"></div>
+      <div class="cap-box" id="sugar-cap"></div>
+    </div>
+    <div>
+      <div class="panel"><h3>Képlet</h3><div class="formula" id="sugar-f1"></div><div class="formula" id="sugar-f2"></div></div>
+      <div class="panel"><h3>A könyv blokkjai</h3><div class="code-steps" id="sugar-code"></div></div>
+      <div class="panel"><h3>Beállítás</h3>
+        <label class="ctrl">fogak (n)<input type="range" id="sugar-n" min="3" max="12" value="4"><output id="sugar-n-o"></output></label>
+        <label class="ctrl">foghossz (h)<input type="range" id="sugar-h" min="20" max="80" step="5" value="50"><output id="sugar-h-o"></output></label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="anim-section" id="egyszeru">
+  <h2>Egyszerűbb változat</h2>
+  <div class="pager-wrap"></div>
+  <div class="layout">
+    <div class="plot-container">
+      <div class="scene"><svg id="egyszeru-svg" viewBox="0 0 700 640" role="img" aria-label="Fogaskerék sugárral és fogmagassággal megadva"></svg></div>
+      <div class="res-box" id="egyszeru-res"></div>
+      <div class="cap-box" id="egyszeru-cap"></div>
+    </div>
+    <div>
+      <div class="panel"><h3>Egyszerűbb blokk</h3><div class="code-steps" id="egyszeru-code"></div></div>
+      <div class="panel"><h3>Beállítás</h3>
+        <label class="ctrl">fogak (n)<input type="range" id="egyszeru-n" min="3" max="12" value="4"><output id="egyszeru-n-o"></output></label>
+        <label class="ctrl">sugár (r)<input type="range" id="egyszeru-r" min="20" max="120" step="1" value="32"><output id="egyszeru-r-o"></output></label>
+        <label class="ctrl">fogmagasság (m)<input type="range" id="egyszeru-m" min="10" max="50" step="1" value="25"><output id="egyszeru-m-o"></output></label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="src">
+  <h3>Forrás</h3>
+  <p>Bernát Péter: Logo–Scratch feladatgyűjtemény, „Körök, körívek rajzolása – Körívek rajzolása: Fogaskerekek”, nyomtatott 32–34. oldal (a <code>körív</code> parancs a 32. oldalon, a feladat és a megoldás a 33–34. oldalon). A lépések magyarázata, a sugár levezetése és az egyszerűbb változat saját kiegészítés. A rajzok úgy készülnek, mint a Scratchben: a <code>körív</code> 1 fokos lépésekben halad, és az <code>ismételd</code> a fokszámot egészre kerekíti.</p>
+</section>
+
+</main>
+
+<script>
+(function () {
+  const PI = 3.14159;
+  const fmt = (x, d = 1) => {
+    const v = Math.round(x * Math.pow(10, d)) / Math.pow(10, d);
+    return String(v).replace('.', ',').replace('-', '−');
+  };
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+  // ---------- Scratch-szerű teknőc ----------
+  // irány: 0 = fel, 90 = jobbra (Scratch); a körív jobbra kanyarodik, 1 fokos lépésekkel
+  function sim(cmds, x, y, d) {
+    const ops = [];
+    for (const c of cmds) {
+      const rad = () => d * Math.PI / 180;
+      if (c.t === 'move') {
+        const p0 = [x, y]; x += c.L * Math.sin(rad()); y += c.L * Math.cos(rad());
+        ops.push({ k: 'm', pts: [p0, [x, y]], d0: d, d1: d, w: Math.abs(c.L), tag: c.tag });
+      } else if (c.t === 'turn') {
+        ops.push({ k: 't', pts: [[x, y]], d0: d, d1: d + c.a, w: 12, tag: c.tag }); d += c.a;
+      } else {
+        const k = Math.round(c.deg), step = 2 * c.r * PI / 360, pts = [[x, y]], d0 = d;
+        for (let i = 0; i < k; i++) { x += step * Math.sin(d * Math.PI / 180); y += step * Math.cos(d * Math.PI / 180); d += 1; pts.push([x, y]); }
+        ops.push({ k: 'a', pts, d0, d1: d, w: Math.max(step * k, 1), tag: c.tag });
+      }
+    }
+    return { ops, end: { x, y, d } };
+  }
+  // egy fog parancsai: tag = kódsor indexe
+  function toothCmds(ri, ro, deg, s, tags) {
+    return [
+      { t: 'arc', r: ri, deg, tag: tags[0] }, { t: 'turn', a: -90, tag: tags[1] }, { t: 'move', L: s, tag: tags[2] },
+      { t: 'turn', a: 90, tag: tags[3] }, { t: 'arc', r: ro, deg, tag: tags[4] }, { t: 'turn', a: 90, tag: tags[5] },
+      { t: 'move', L: s, tag: tags[6] }, { t: 'turn', a: -90, tag: tags[7] }
+    ];
+  }
+  function gear(n, ri, ro, s, tags) {
+    let cmds = [];
+    for (let i = 0; i < n; i++) cmds = cmds.concat(toothCmds(ri, ro, 180 / n, s, tags));
+    return sim(cmds, -ri, 0, 0);
+  }
+  // a műveletsor [a, b) részének pontjai, f arányig (0..1, súlyozva)
+  function partial(ops, a, b, f) {
+    const pts = [], tot = ops.slice(a, b).reduce((t, o) => t + o.w, 0);
+    let u = f * tot, dir = ops[a] ? ops[a].d0 : 0, curTag = null;
+    for (let i = a; i < b; i++) {
+      const o = ops[i];
+      if (u >= o.w || f >= 1) { pts.push(...o.pts); dir = o.d1; curTag = o.tag; u -= o.w; continue; }
+      const g = Math.max(0, u / o.w); curTag = o.tag;
+      if (o.k === 't') { pts.push(o.pts[0]); dir = o.d0 + (o.d1 - o.d0) * g; }
+      else if (o.k === 'm') { const [p, q] = o.pts; pts.push(p, [p[0] + (q[0] - p[0]) * g, p[1] + (q[1] - p[1]) * g]); dir = o.d0; }
+      else { const j = Math.floor(g * (o.pts.length - 1)); pts.push(...o.pts.slice(0, j + 1)); dir = o.d0 + j; }
+      break;
+    }
+    return { pts, dir, tag: curTag };
+  }
+
+  // ---------- rajzolás ----------
+  function View(R) { this.s = 250 / R; }
+  View.prototype.X = function (x) { return 350 + x * this.s; };
+  View.prototype.Y = function (y) { return 320 - y * this.s; };
+  View.prototype.path = function (pts, style) {
+    if (!pts.length) return '';
+    const d = pts.map((p, i) => (i ? 'L' : 'M') + this.X(p[0]).toFixed(1) + ' ' + this.Y(p[1]).toFixed(1)).join(' ');
+    return `<path d="${d}" fill="none" stroke-linejoin="round" stroke-linecap="round" ${style}/>`;
+  };
+  View.prototype.circle = function (r, style) { return `<circle cx="350" cy="320" r="${(r * this.s).toFixed(1)}" fill="none" ${style}/>`; };
+  View.prototype.turtle = function (p, dir) {
+    const X = this.X(p[0]), Y = this.Y(p[1]), a = dir * Math.PI / 180;
+    const ux = Math.sin(a), uy = -Math.cos(a), L = 26, W = 12;
+    const tip = [X + ux * L, Y + uy * L], b1 = [X - uy * W, Y + ux * W], b2 = [X + uy * W, Y - ux * W];
+    return `<polygon points="${tip.join(',')} ${b1.join(',')} ${b2.join(',')}" fill="#f59e0b" stroke="#92400e" stroke-width="2"/>`;
+  };
+  const S_DRAWN = 'stroke="var(--fg)" stroke-width="4"';
+  const S_NEW = 'stroke="var(--new)" stroke-width="7"';
+  const S_GHOST = 'stroke="var(--ghost)" stroke-width="4"';
+  const S_GUIDE = 'stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 8"';
+
+  // ---------- kódpanel ----------
+  function code(id, lines) {
+    const el = document.getElementById(id);
+    el.innerHTML = lines.map(l => `<span class="ln">${esc(l)}</span>`).join('');
+    return on => el.querySelectorAll('.ln').forEach((e, i) => e.classList.toggle('on', on.includes(i)));
+  }
+  const BOOK = [
+    'blokk fogb(n, h)',
+    '  ismételd n',
+    '    körív(h·n/π/2, 180/n)',
+    '    balra 90',
+    '    menj h/2',
+    '    jobbra 90',
+    '    körív((h·n/π + h)/2, 180/n)',
+    '    jobbra 90',
+    '    menj h/2',
+    '    balra 90'
+  ];
+  const BOOK_TAGS = [2, 3, 4, 5, 6, 7, 8, 9];
+
+  // ---------- slider ----------
+  function slider(id, fmtv, cb) {
+    const el = document.getElementById(id), o = document.getElementById(id + '-o');
+    const upd = () => { o.textContent = fmtv ? fmtv(+el.value) : el.value; };
+    el.addEventListener('input', () => { upd(); cb(); }); upd();
+    return { get v() { return +el.value; }, set v(x) { el.value = x; upd(); } };
+  }
+
+  // ---------- léptető ----------
+  const steppers = [];
+  function makeStepper(id, count, render) {
+    const sec = document.getElementById(id), wrap = sec.querySelector('.pager-wrap');
+    wrap.innerHTML = '<div class="pager">' +
+      '<button type="button" class="prev" title="Előző lépés (←)">◀ Vissza</button>' +
+      '<button type="button" class="next" title="Következő lépés (→)">Előre ▶</button>' +
+      '<button type="button" class="reset" title="Vissza az első lépésre (Home)">↺ Előlről</button>' +
+      '<span class="counter"></span></div>';
+    const q = c => wrap.querySelector('.' + c);
+    const prev = q('prev'), next = q('next'), reset = q('reset'), counter = q('counter');
+    let cur = 0, raf = null;
+    function paint(animate) {
+      const n = count();
+      cur = Math.max(0, Math.min(n - 1, cur));
+      counter.textContent = (cur + 1) + ' / ' + n;
+      prev.disabled = reset.disabled = cur === 0;
+      next.disabled = cur === n - 1;
+      if (raf) cancelAnimationFrame(raf), raf = null;
+      if (!animate) { render(cur, 1); return; }
+      const t0 = performance.now(), dur = 2000;
+      const tick = t => { const f = Math.min(1, (t - t0) / dur); render(cur, f); if (f < 1) raf = requestAnimationFrame(tick); else raf = null; };
+      raf = requestAnimationFrame(tick);
+    }
+    function go(i, animate) { const fwd = i === cur + 1; cur = i; paint(animate && fwd); }
+    prev.addEventListener('click', () => go(cur - 1, false));
+    next.addEventListener('click', () => go(cur + 1, true));
+    reset.addEventListener('click', () => go(0, false));
+    const st = { sec, next: () => { if (cur < count() - 1) go(cur + 1, true); }, prev: () => { if (cur > 0) go(cur - 1, false); },
+      home: () => go(0, false), refresh: () => paint(false), last: () => { cur = count() - 1; paint(false); } };
+    steppers.push(st); paint(false);
+    return st;
+  }
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+    if (e.target.closest && e.target.closest('input, textarea, select')) return;
+    const fwd = ['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key);
+    const back = ['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key);
+    const home = e.key === 'Home';
+    if (!fwd && !back && !home) return;
+    let best = null, bestVis = 0;
+    for (const s of steppers) {
+      const r = s.sec.getBoundingClientRect();
+      const vis = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+      if (vis > bestVis) { bestVis = vis; best = s; }
+    }
+    if (!best || bestVis < innerHeight * 0.35) return;
+    e.preventDefault();
+    if (fwd) best.next(); else if (back) best.prev(); else best.home();
+  });
+
+  const warnText = n => Number.isInteger(180 / n) ? '' :
+    ` <span class="warn">Figyelem: 180/${n} = ${fmt(180 / n, 2)} nem egész szám. Az „ismételd” ezt ${Math.round(180 / n)}-re kerekíti, ezért a kerék nem záródik be.</span>`;
+
+  // ================= Egy fog =================
+  (function () {
+    const hl = code('fog-code', BOOK);
+    const svg = document.getElementById('fog-svg');
+    const res = document.getElementById('fog-res'), cap = document.getElementById('fog-cap');
+    let st;
+    const nS = slider('fog-n', null, () => st.refresh()), hS = slider('fog-h', null, () => st.refresh());
+    const steps = [
+      { res: () => 'kiindulás', cap: (n, h) => `A szereplő a belső körön áll és felfelé néz. A szaggatott körök a fog alja (belső kör) és a fog teteje (külső kör). A halvány vonal a kész fogaskerék: ${n} fogból áll.`, code: [0] },
+      { res: (n, h, ri) => `körív(${fmt(ri)} ; ${fmt(180 / n, 2)})`, cap: n => `A fog alja: egy kis körív a belső körön, jobbra kanyarodva. A szöge 180/n = 180/${n} = ${fmt(180 / n, 2)} fok.`, code: [2] },
+      { res: () => 'balra 90', cap: () => 'Balra fordulunk 90 fokot: most kifelé, a kör középpontjától elfelé nézünk.', code: [3] },
+      { res: (n, h) => `menj ${fmt(h / 2)}`, cap: (n, h) => `A fog oldala: h/2 = ${h}/2 = ${fmt(h / 2)} lépés kifelé, a külső körig.`, code: [4] },
+      { res: () => 'jobbra 90', cap: () => 'Jobbra fordulunk 90 fokot: újra a kör mentén nézünk.', code: [5] },
+      { res: (n, h, ri, ro) => `körív(${fmt(ro)} ; ${fmt(180 / n, 2)})`, cap: n => `A fog teteje: körív a külső körön, ugyanakkora szöggel (${fmt(180 / n, 2)} fok), mint a fog alja.`, code: [6] },
+      { res: () => 'jobbra 90', cap: () => 'Jobbra fordulunk 90 fokot: befelé, a középpont felé nézünk.', code: [7] },
+      { res: (n, h) => `menj ${fmt(h / 2)}`, cap: (n, h) => `A fog másik oldala: ${fmt(h / 2)} lépés befelé, vissza a belső körre.`, code: [8] },
+      { res: () => 'balra 90', cap: () => 'Balra fordulunk 90 fokot: újra a kör mentén nézünk, mint az elején. Kész egy fog; az „ismételd n” ugyanígy rajzolja a többit.', code: [9] }
+    ];
+    st = makeStepper('fog', () => steps.length, (i, f) => {
+      const n = nS.v, h = hS.v, ri = h * n / PI / 2, ro = (h * n / PI + h) / 2;
+      const V = new View(ro), g = gear(n, ri, ro, h / 2, BOOK_TAGS);
+      const done = Math.max(0, i - 1), p0 = partial(g.ops, 0, done, 1);
+      let out = V.circle(ri, S_GUIDE) + V.circle(ro, S_GUIDE) + V.path(partial(g.ops, 0, g.ops.length, 1).pts, S_GHOST);
+      out += V.path(p0.pts, S_DRAWN);
+      let pos = [-ri, 0], dir = 0;
+      if (p0.pts.length) { pos = p0.pts[p0.pts.length - 1]; dir = p0.dir; }
+      if (i > 0) {
+        const p1 = partial(g.ops, i - 1, i, f);
+        out += V.path(p1.pts, S_NEW);
+        if (p1.pts.length) pos = p1.pts[p1.pts.length - 1];
+        dir = p1.dir;
+      }
+      out += V.turtle(pos, dir);
+      out += `<text class="gtext" x="20" y="40">belső kör: sugár ${fmt(ri)}</text><text class="gtext" x="20" y="72">külső kör: sugár ${fmt(ro)}</text>`;
+      svg.innerHTML = out;
+      const s = steps[i]; hl(s.code);
+      res.textContent = s.res(n, h, ri, ro); cap.innerHTML = s.cap(n, h, ri, ro);
+    });
+  })();
+
+  // ================= Az egész kerék =================
+  (function () {
+    const hl = code('kerek-code', BOOK);
+    const svg = document.getElementById('kerek-svg');
+    const res = document.getElementById('kerek-res'), cap = document.getElementById('kerek-cap');
+    let st, timer = null;
+    const nS = slider('kerek-n', null, () => st.refresh()), hS = slider('kerek-h', null, () => st.refresh());
+    st = makeStepper('kerek', () => nS.v + 1, (i, f) => {
+      const n = nS.v, h = hS.v, ri = h * n / PI / 2, ro = (h * n / PI + h) / 2;
+      const V = new View(ro), g = gear(n, ri, ro, h / 2, BOOK_TAGS);
+      let out = V.circle(ri, S_GUIDE) + V.path(partial(g.ops, 0, g.ops.length, 1).pts, S_GHOST);
+      const p0 = partial(g.ops, 0, Math.max(0, i - 1) * 8, 1);
+      out += V.path(p0.pts, S_DRAWN);
+      let pos = [-ri, 0], dir = 0, tag = 1;
+      if (p0.pts.length) { pos = p0.pts[p0.pts.length - 1]; dir = p0.dir; }
+      if (i > 0) {
+        const p1 = partial(g.ops, (i - 1) * 8, i * 8, f);
+        out += V.path(p1.pts, S_NEW);
+        if (p1.pts.length) pos = p1.pts[p1.pts.length - 1];
+        dir = p1.dir; tag = f < 1 ? p1.tag : 1;
+      }
+      out += V.turtle(pos, dir);
+      out += `<text class="gtext" x="20" y="40">egy fog: 2 · ${fmt(180 / n, 2)}° = ${fmt(360 / n, 2)}°</text>`;
+      svg.innerHTML = out;
+      hl(i === 0 ? [1] : [1, tag]);
+      const full = Number.isInteger(180 / n);
+      if (i === 0) { res.textContent = `fogb(${n} ; ${h})`; cap.innerHTML = `Az „ismételd n” ${n}-szer rajzolja meg ugyanazt a fogat. Egy fogban két körív van, mindkettő 180/n fokos, így egy fog 360/n fokot fordít a kerék körül.` + warnText(n); }
+      else if (i < n) { res.textContent = `${i}. fog kész`; cap.innerHTML = `Eddig ${i} fog: ${i} · ${fmt(360 / n, 2)}° = ${fmt(i * 360 / n, 2)}°-ot haladtunk körbe a 360°-ból.` + warnText(n); }
+      else { res.textContent = full ? `${n} · ${fmt(360 / n, 2)}° = 360° → kész` : `${n} fog kész, de nem záródik`; cap.innerHTML = full ? `Mind a ${n} fog kész: ${n} · ${fmt(360 / n, 2)}° = 360°, a szereplő visszaért a kiindulási pontba, a kerék bezárult.` : warnText(n); }
+    });
+    const btn = document.getElementById('kerek-anim');
+    btn.addEventListener('click', () => {
+      if (timer) { clearInterval(timer); timer = null; btn.textContent = '▶ animáció: n = 3 … 12'; return; }
+      btn.textContent = '■ megállítás';
+      nS.v = 3; st.last();
+      timer = setInterval(() => {
+        if (nS.v >= 12) { clearInterval(timer); timer = null; btn.textContent = '▶ animáció: n = 3 … 12'; return; }
+        nS.v = nS.v + 1; st.last();
+      }, 1600);
+    });
+  })();
+
+  // ================= A sugár =================
+  (function () {
+    const hl = code('sugar-code', [
+      'blokk körív(sugár, fok)',
+      '  ismételd fok',
+      '    menj 2·sugár·π/360',
+      '    jobbra 1',
+      '',
+      'blokk fogb(n, h)  … :',
+      '  körív(h·n/π/2, 180/n)',
+      '  körív((h·n/π + h)/2, 180/n)'
+    ]);
+    const svg = document.getElementById('sugar-svg');
+    const res = document.getElementById('sugar-res'), cap = document.getElementById('sugar-cap');
+    const f1 = document.getElementById('sugar-f1'), f2 = document.getElementById('sugar-f2');
+    let st;
+    const nS = slider('sugar-n', null, () => st.refresh()), hS = slider('sugar-h', null, () => st.refresh());
+    const N = 6;
+    st = makeStepper('sugar', () => N, (i, f) => {
+      const n = nS.v, h = hS.v, ri = h * n / PI / 2, ro = ri + h / 2;
+      const V = new View(ro), g = gear(n, ri, ro, h / 2, BOOK_TAGS);
+      let out = V.path(partial(g.ops, 0, g.ops.length, 1).pts, i >= 4 ? S_DRAWN : S_GHOST);
+      out += V.circle(ri, S_GUIDE);
+      const op = 'style="opacity:' + f.toFixed(2) + '"';
+      if (i >= 1) {  // a belső kör 2n darabja
+        let arcs = '';
+        for (let k = 0; k < 2 * n; k++) {
+          const a0 = Math.PI - k * Math.PI / n, a1 = a0 - Math.PI / n, pts = [];
+          for (let t = 0; t <= 20; t++) { const a = a0 + (a1 - a0) * t / 20; pts.push([ri * Math.cos(a), ri * Math.sin(a)]); }
+          arcs += V.path(pts, k % 2 === 0 ? 'stroke="var(--new)" stroke-width="8"' : 'stroke="var(--blue)" stroke-width="8"');
+        }
+        out += `<g ${i === 1 ? op : ''}>${arcs}</g>`;
+      }
+      if (i >= 3) out += `<g ${i === 3 ? op : ''}><line x1="350" y1="320" x2="${V.X(-ri)}" y2="320" stroke="var(--danger)" stroke-width="5"/><text class="ltext" x="${(350 + V.X(-ri)) / 2}" y="306" text-anchor="middle" fill="var(--danger)">r</text><circle cx="350" cy="320" r="6" fill="var(--danger)"/></g>`;
+      if (i >= 4) out += `<g ${i === 4 ? op : ''}><line x1="350" y1="320" x2="${V.X(-ri)}" y2="320" stroke="var(--danger)" stroke-width="5"/><line x1="${V.X(-ri)}" y1="320" x2="${V.X(-ro)}" y2="320" stroke="#f59e0b" stroke-width="7"/><text class="ltext" x="${(V.X(-ri) + V.X(-ro)) / 2}" y="306" text-anchor="middle" fill="#d97706">h/2</text></g>`;
+      out += `<text class="gtext" x="20" y="40">n = ${n}, h = ${h}</text>`;
+      svg.innerHTML = out;
+      const C = n * h, F = [
+        ['', ''],
+        ['belső kör = 2·n darab ív', `2 · ${n} = ${2 * n} ív, mindegyik h/2 = ${fmt(h / 2)} hosszú`],
+        ['kerület = 2·n · h/2 = n·h', `kerület = ${n} · ${h} = ${C}`],
+        ['kerület = 2·r·π  →  r = n·h / (2·π)', `r = ${C} / (2 · 3,14159) ≈ ${fmt(ri)}`],
+        ['külső sugár = r + h/2', `${fmt(ri)} + ${fmt(h / 2)} ≈ ${fmt(ro)}`],
+        ['menj 2·r·π/360  és  r = n·h/(2·π)', `menj n·h/360 = ${C}/360 ≈ ${fmt(C / 360, 2)}`]
+      ][i];
+      f1.textContent = F[0]; f2.textContent = F[1];
+      hl([[], [], [], [6], [7], [2, 6]][i]);
+      res.textContent = ['Mekkora legyen a belső kör?', `${2 * n} · ${fmt(h / 2)} = ${C}`, `kerület = ${C}`, `r ≈ ${fmt(ri)}`, `külső sugár ≈ ${fmt(ro)}`, `lépés ≈ ${fmt(C / 360, 2)}`][i];
+      cap.innerHTML = [
+        `A könyv a fog hosszát (h) adja meg, nem a kör sugarát. Ki kell számolni, mekkora belső kör kell, hogy ${n} fog pontosan körbeérjen.`,
+        `A belső kört ${2 * n} egyforma ív alkotja: a zöldeket rajzoljuk (a fogak között), a kékek a fogak alatt vannak. Mindegyik ív h/2 = ${fmt(h / 2)} hosszú, ugyanannyi, mint a fog oldala.`,
+        `A belső kör kerülete tehát ${2 * n} · ${fmt(h / 2)} = n · h = ${C}.`,
+        `A kör kerülete 2 · r · π. Ebből a sugár: r = kerület / (2 · π) = ${C} / 6,28318 ≈ ${fmt(ri)}. Ez a könyv képlete: h·n/3,14159/2.`,
+        `A külső kör sugara h/2-vel nagyobb: ${fmt(ri)} + ${fmt(h / 2)} ≈ ${fmt(ro)}. Ez a könyv második körívének képlete: (h·n/3,14159 + h)/2.`,
+        `Egyszerűsítés: a körív blokk a sugarat újra megszorozza π-vel, így a π kiesik. A belső körív egy lépése egyszerűen n·h/360 = ${fmt(C / 360, 2)}. A π-vel tehát csak azért osztunk, hogy a körív blokk utána visszaszorozza (a könyvben π helyett 3,14159 áll).`
+      ][i];
+    });
+  })();
+
+  // ================= Egyszerűbb változat =================
+  (function () {
+    const hl = code('egyszeru-code', [
+      'blokk fogb2(n, r, m)',
+      '  ismételd n',
+      '    körív(r, 180/n)',
+      '    balra 90',
+      '    menj m',
+      '    jobbra 90',
+      '    körív(r + m, 180/n)',
+      '    jobbra 90',
+      '    menj m',
+      '    balra 90'
+    ]);
+    const svg = document.getElementById('egyszeru-svg');
+    const res = document.getElementById('egyszeru-res'), cap = document.getElementById('egyszeru-cap');
+    let st;
+    const nS = slider('egyszeru-n', null, () => st.refresh()), rS = slider('egyszeru-r', null, () => st.refresh()), mS = slider('egyszeru-m', null, () => st.refresh());
+    st = makeStepper('egyszeru', () => 4, (i, f) => {
+      const n = nS.v, r = rS.v, m = mS.v, hb = 2 * m, rb = hb * n / PI / 2;
+      const V = new View(Math.max(r + m, rb + m)), g = gear(n, r, r + m, m, BOOK_TAGS);
+      let out = V.circle(r, S_GUIDE) + V.circle(r + m, S_GUIDE);
+      if (i === 0) out += V.path(partial(g.ops, 0, g.ops.length, 1).pts, S_GHOST);
+      let pos = [-r, 0], dir = 0, tag = null;
+      if (i === 1) {
+        out += V.path(partial(g.ops, 0, g.ops.length, 1).pts, S_GHOST);
+        const p = partial(g.ops, 0, 8, f); out += V.path(p.pts, S_NEW); if (p.pts.length) pos = p.pts[p.pts.length - 1]; dir = p.dir; tag = p.tag;
+      }
+      if (i === 2) {
+        out += V.path(partial(g.ops, 0, 8, 1).pts, S_DRAWN);
+        const p = partial(g.ops, 8, g.ops.length, f); out += V.path(p.pts, S_NEW); if (p.pts.length) pos = p.pts[p.pts.length - 1]; dir = p.dir; tag = f < 1 ? p.tag : null;
+      }
+      if (i === 3) {
+        out += V.path(partial(g.ops, 0, g.ops.length, 1).pts, S_DRAWN);
+        const gb = gear(n, rb, rb + m, m, BOOK_TAGS);
+        out += `<g style="opacity:${f.toFixed(2)}">` + V.path(partial(gb.ops, 0, gb.ops.length, 1).pts, 'stroke="var(--blue)" stroke-width="4" stroke-dasharray="10 6"') + '</g>';
+        out += `<text class="gtext" x="20" y="72" fill="var(--blue)">kék: a könyv fogb ${n} ${hb} rajza</text>`;
+      } else out += V.turtle(i === 2 && f >= 1 ? partial(g.ops, 0, g.ops.length, 1).pts.slice(-1)[0] : pos, dir);
+      out += `<text class="gtext" x="20" y="40">fogb2 ${n} ${r} ${m}</text>`;
+      svg.innerHTML = out;
+      hl(i === 0 ? [0] : i === 3 ? [2, 6] : (tag != null ? [1, tag] : [1]));
+      res.textContent = [`fogb2(${n} ; ${r} ; ${m})`, '1. fog', `${n} fog kész`, `fogb ${n} ${hb}  =  fogb2 ${n} ${fmt(rb)} ${m}`][i];
+      cap.innerHTML = [
+        'Ugyanaz a fog, de a belső kör sugarát (r) és a fog magasságát (m) közvetlenül adjuk meg. Így nem kell π-vel számolni: a körív blokk úgy marad, ahogy a kapunál volt.',
+        `Az első fog: körív a belső körön (r = ${r}), ki ${m} lépést, körív a külső körön (r + m = ${r + m}), vissza ${m} lépést.` + warnText(n),
+        `A többi ${n - 1} fog ugyanígy.` + (Number.isInteger(180 / n) ? ` A sugarat szabadon választhatjuk: kisebb r-nél a fogak keskenyebbek, nagyobbnál szélesebbek.` : warnText(n)),
+        `A könyv fogb ${n} ${hb} rajza (kék) akkor egyezik vele, ha r = n·h/(2·π) = ${n}·${hb}/6,28318 ≈ ${fmt(rb)} és m = h/2 = ${m}. Állítsa a sugarat ${Math.round(rb)}-re: a két rajz fedi egymást.`
+      ][i];
+    });
+  })();
+})();
+</script>
+</body>
+</html>
